@@ -19,23 +19,12 @@ var cornerGap = 0;
 var z = 100;
 var invertResize = 1;
 
-	//	<div class="buttonX" id="tableXB" style="color: #000" 
-	//	onClick="showWindow('table')">
-	//		<div class="buttonXA" id="tableXA"></div>
-	//		<div class="buttonXN" id="tableXN">Table</div>
-	//		<div class="buttonXC" id="tableXC"></div>
-	//	</div>
-
 function createButton(buttonName) {
     var buttonTitle = buttonName.substr(0, 1).toUpperCase() + buttonName.substr(1);
     var buttonXB = document.createElement('div');
-    buttonXB.setAttribute('class', 'buttonX');
+    buttonXB.setAttribute('class', 'buttonUnchecked');
     buttonXB.setAttribute('id', buttonName + 'XB');
-	buttonXB.onclick = function(event){
-	  if (!event){event = window.event};
-	  event.preventDefault();
-	  showWindow(buttonName);
-	};
+	buttonXB.onclick = function(){ showWindow(buttonName); };
     document.getElementById('buttons').appendChild(buttonXB);
 	var buttonXA = document.createElement('div')
     buttonXA.setAttribute('class', 'buttonXA');
@@ -43,10 +32,6 @@ function createButton(buttonName) {
 	var buttonXN = document.createElement('div')
     buttonXN.setAttribute('class', 'buttonXN');
     buttonXN.setAttribute('id', buttonName + 'XN');
-	buttonXN.ondoubleclick = function(event){
-	  if (!event){event = window.event};
-	  event.preventDefault();
-	};
 	var buttonXC = document.createElement('div')
     buttonXC.setAttribute('class', 'buttonXC');
     buttonXC.setAttribute('id', buttonName + 'XC');
@@ -68,20 +53,11 @@ function showWindow(buttonName)
 {
 if(document.getElementById(buttonName + 'Window').style.visibility == "hidden")
   {
-  document.getElementById(buttonName + 'XA').style.backgroundImage = "url('images/buttonCheck.jpg')";
-  document.getElementById(buttonName + 'XB').style.backgroundImage = "url()";
-  document.getElementById(buttonName + 'XB').style.color = "#FFF";
-  document.getElementById(buttonName + 'XC').style.backgroundImage = "url()";
-  document.getElementById(buttonName + 'XN').style.color = "#CCC";
+  document.getElementById(buttonName + 'XB').className = "buttonChecked";
   document.getElementById(buttonName + 'Window').style.visibility = "visible";
   windowForward(buttonName + 'Window');
-  
   }else{
-  document.getElementById(buttonName + 'XA').style.backgroundImage = "url('images/buttonXA.jpg')";
-  document.getElementById(buttonName + 'XB').style.backgroundImage = "url('images/buttonXB.jpg')";
-  document.getElementById(buttonName + 'XB').style.color = "#000";
-  document.getElementById(buttonName + 'XC').style.backgroundImage = "url('images/buttonXC.jpg')";
-  document.getElementById(buttonName + 'XN').style.color = "#333";
+  document.getElementById(buttonName + 'XB').className = "buttonUnchecked";
   document.getElementById(buttonName + 'Window').style.visibility = "hidden";
   }
 }
