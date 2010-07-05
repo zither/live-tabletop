@@ -1,0 +1,335 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<link rel="shortcut icon" href="icon.gif" />
+<link href="style.css" rel="stylesheet" type="text/css">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title> Live Tabletop </title>
+
+<script type="text/javascript">
+var selectedWindow = "a";
+var selectedBR = "a";
+var selectedTL = "a";
+var tempX = 0;
+var tempY = 0;
+var gapX = 0;
+var gapY = 0;
+var windowGap = 0;
+var cornerGap = 0;
+var z = 100;
+var invertResize = 1;
+
+	//	<div class="buttonX" id="tableXB" style="color: #000" 
+	//	onClick="showWindow('table')">
+	//		<div class="buttonXA" id="tableXA"></div>
+	//		<div class="buttonXN" id="tableXN">Table</div>
+	//		<div class="buttonXC" id="tableXC"></div>
+	//	</div>
+
+onload = function (){
+  var buttonList = new Array('gable', 'bable');
+  for( var i=0; i < buttonList.length; i++){
+    var buttonXB = document.createElement('div');
+    buttonXB.setAttribute('class', 'buttonX');
+    buttonXB.setAttribute('id', buttonList[i] + 'XB');
+	buttonXB.setAttribute('onClick', 'showWindow("' + buttonList[i] + '")')
+    document.getElementById('buttons').appendChild(buttonXB);
+	
+    buttonXB.appendChild(document.createTextNode(buttonList[i]));
+  }
+}
+
+//onload = createButtons;
+
+function showWindow(buttonName)
+{
+if(document.getElementById(buttonName + 'Window').style.visibility == "hidden")
+  {
+  document.getElementById(buttonName + 'XA').style.backgroundImage = "url('images/buttonCheck.jpg')";
+  document.getElementById(buttonName + 'XB').style.backgroundImage = "url()";
+  document.getElementById(buttonName + 'XB').style.color = "#FFF";
+  document.getElementById(buttonName + 'XC').style.backgroundImage = "url()";
+  document.getElementById(buttonName + 'XN').style.color = "#CCC";
+  document.getElementById(buttonName + 'Window').style.visibility = "visible";
+  windowForward(buttonName + 'Window');
+  
+  }else{
+  document.getElementById(buttonName + 'XA').style.backgroundImage = "url('images/buttonXA.jpg')";
+  document.getElementById(buttonName + 'XB').style.backgroundImage = "url('images/buttonXB.jpg')";
+  document.getElementById(buttonName + 'XB').style.color = "#000";
+  document.getElementById(buttonName + 'XC').style.backgroundImage = "url('images/buttonXC.jpg')";
+  document.getElementById(buttonName + 'XN').style.color = "#333";
+  document.getElementById(buttonName + 'Window').style.visibility = "hidden";
+  }
+}
+
+document.onmouseup = unSelect;
+
+function unSelect(){
+  selectedWindow = 'a';
+  selectedBR = 'a';
+  selectedTL = 'a';
+  cornerGap = 0;
+  windowGap = 0;
+  return true
+}
+//DRAGGING -----------------------------------------------------------------------
+// Detect if the browser is IE or not.
+// If it is not IE, we assume that the browser is NS.
+var IE = document.all?true:false;
+// If NS -- that is, !IE -- then set up for mouse capture
+if (!IE) document.captureEvents(Event.MOUSEMOVE)
+// Set-up to use getMouseXY function onMouseMove
+document.onmousemove = getMouseXY;
+
+function getMouseXY(e) {
+  if (IE) { // grab the x-y pos.s if browser is IE
+    tempX = event.clientX + document.body.scrollLeft;
+    tempY = event.clientY + document.body.scrollTop;
+  } else {  // grab the x-y pos.s if browser is NS
+    tempX = e.pageX;
+    tempY = e.pageY;
+  }
+  
+  if( selectedWindow != "a" ){
+    moveWindow();
+  }
+  if( selectedBR != "a" ){
+    resizeWindow();
+  }
+  if( selectedTL != "a" ){
+    resizeMove();
+  }
+  return true
+}
+function moveWindow(){
+  w = document.getElementById(selectedWindow + 'Window');
+  if(w.style.visibility == "visible"){
+	if( windowGap == 0 ) {
+	  gapY = tempY - parseInt(w.style.top);
+      gapX = tempX - parseInt(w.style.left);
+	  windowGap = 1;
+	}
+	tempX = tempX - gapX;
+	tempY = tempY - gapY;
+    if (tempY < 0){tempY = 0;}
+    if (tempX < 0){tempX = 0;}
+    if (tempX > document.body.clientWidth - 40){
+	tempX = document.body.clientWidth - 40;}
+    if (tempY > document.body.clientHeight - 40){
+	tempY = document.body.clientHeight - 40;}
+	w.style.top  = tempY + "px";
+	w.style.left = tempX + "px";
+  }else{
+	selectedWindow = "a";
+  }
+  // lock to grid
+  //locX = (tempX / ' . $configTileWidth . ') + 1;
+  //locY = (tempY / ' . $configTileHeight . ');
+  return true
+}
+function resizeWindow(){
+  w = document.getElementById(selectedBR + "IW");
+  bar = document.getElementById(selectedBR + "Bar");
+  if( cornerGap == 0 ) {
+	gapY = tempY - parseInt(w.style.height);
+    gapX = tempX - parseInt(w.style.width);
+    cornerGap = 1;
+  }
+  tempX = tempX - gapX;
+  tempY = tempY - gapY;
+  if (tempY < 100){tempY = 100;}
+  if (tempX < 100){tempX = 100;}
+  w.style.height  = tempY + "px";
+  w.style.width = tempX + "px";
+  bar.style.width = (tempX - 36) + "px";
+  return true
+}
+function resizeMove(){
+  p = document.getElementById(selectedTL + 'Window');
+  w = document.getElementById(selectedTL + "IW");
+  bar = document.getElementById(selectedTL + "Bar");
+  if( windowGap == 0 ) {
+    gapY = tempY - parseInt(p.style.top);
+    gapX = tempX - parseInt(p.style.left);
+    gapCY = tempY + parseInt(w.style.height);
+    gapCX = tempX + parseInt(w.style.width);
+    windowGap = 1;
+  }
+  if (tempX < 0){tempX = 0;}
+  if (tempY < 0){tempY = 0;}
+  if (tempX > gapCX - 100){tempX = gapCX - 100;}
+  if (tempY > gapCY - 100){tempY = gapCY - 100;}
+  if (tempX > document.body.clientWidth - 40){
+  tempX = document.body.clientWidth - 40;}
+  if (tempY > document.body.clientHeight - 40){
+  tempY = document.body.clientHeight - 40;}
+	
+  p.style.left = (tempX - gapX) + "px";
+  p.style.top  = (tempY - gapY) + "px";
+  w.style.width = (gapCX - tempX) + "px";
+  w.style.height  = (gapCY - tempY) + "px";
+  bar.style.width = (gapCX - tempX - 36) + "px";
+  return true
+}
+function windowForward(windowHover){
+  var child0 = document.getElementById(windowHover);
+  document.body.removeChild(child0);
+  document.body.appendChild(child0);
+}
+</script>
+
+</head>
+<body>
+
+<div id="tabletop"></div>
+
+<div id="pageBar">
+	<div id="buttons">
+		<div class="buttonX" id="tableXB" style="color: #000" 
+		onClick="showWindow('table')">
+			<div class="buttonXA" id="tableXA"></div>
+			<div class="buttonXN" id="tableXN">Table</div>
+			<div class="buttonXC" id="tableXC"></div>
+		</div>
+		<div class="buttonX" id="chatXB" style="color: #000" 
+		onClick="showWindow('chat')">
+			<div class="buttonXA" id="chatXA"></div>
+			<div class="buttonXN" id="chatXN">Chat</div>
+			<div class="buttonXC" id="chatXC"></div>
+		</div>
+		<div class="buttonX" id="turnsXB" style="color: #000" 
+		onClick="showWindow('turns')">
+			<div class="buttonXA" id="turnsXA"></div>
+			<div class="buttonXN" id="turnsXN">Turns</div>
+			<div class="buttonXC" id="turnsXC"></div>
+		</div>
+		<div class="buttonX" id="toolsXB" style="color: #000" 
+		onClick="showWindow('tools')">
+			<div class="buttonXA" id="toolsXA"></div>
+			<div class="buttonXN" id="toolsXN">Tools</div>
+			<div class="buttonXC" id="toolsXC"></div>
+		</div>
+		<div class="buttonX" id="filesXB" style="color: #000" 
+		onClick="showWindow('files')">
+			<div class="buttonXA" id="filesXA"></div>
+			<div class="buttonXN" id="filesXN">Files</div>
+			<div class="buttonXC" id="filesXC"></div>
+		</div>
+	</div>
+</div>
+
+<div id="logo"></div>
+
+<div id="tableWindow" class="outerWindow" style="top: 40px; left: 20px; visibility: hidden;"
+	onMouseDown="windowForward('tableWindow');">
+	<div class="title">
+		<div class="resizeTL" id="tableTL" 
+			onMouseDown="selectedTL = 'table';"></div>
+		<div class="titleA"></div>
+		<div class="titleB">Table</div>
+		<div class="titleC"></div>
+		<div class="windowBar" id="tableBar" 
+			onMouseDown="selectedWindow = 'table'"> &nbsp </div>
+		<div class="close" onClick="showWindow('table')"
+			onMouseOver="this.style.backgroundImage = 'url(images/closeHover.png)'"
+			onMouseOut="this.style.backgroundImage = 'url(images/close.png)'"></div>
+	</div>
+	<div  class="innerWindow" id="tableIW" style="width: 250px; height: 200px;">
+		contenasdfasdfasdft asfd asd fasd f asdf
+	</div>
+	<div class="windowBottom">
+		<div class="windowBL"></div><div class="resizeBR" id="tableBR" 
+			onMouseDown="selectedBR = 'table';"></div>
+	</div>
+</div>
+
+<div id="chatWindow" class="outerWindow" style="top: 50px; left: 120px; visibility: hidden;"
+	onMouseDown="windowForward('chatWindow');">
+	<div class="title">
+		<div class="titleA"></div>
+		<div class="titleB">Chat</div>
+		<div class="titleC"></div>
+		<div class="windowBar" id="chatBar" 
+			onMouseDown="selectedWindow = 'chat'"> &nbsp </div>
+		<div class="close" onClick="showWindow('chat')"
+			onMouseOver="this.style.backgroundImage = 'url(images/closeHover.png)'"
+			onMouseOut="this.style.backgroundImage = 'url(images/close.png)'"></div>
+	</div>
+	<div  class="innerWindow" id="chatIW" style="width: 250px; height: 200px;">
+		contenasdfasdfasdft asfd asd fasd f asdf
+	</div>
+	<div class="windowBottom">
+		<div class="windowBL"></div><div class="resizeBR" id="chatResize" 
+			onMouseDown="selectedBR = 'chat';">
+		</div>
+	</div>
+</div>
+
+<div id="turnsWindow" class="outerWindow" style="top: 60px; left: 220px; visibility: hidden;"
+	onMouseDown="windowForward('turnsWindow');">
+	<div class="title">
+		<div class="titleA"></div>
+		<div class="titleB">Turns</div>
+		<div class="titleC"></div>
+		<div class="windowBar" id="turnsBar" 
+			onMouseDown="selectedWindow = 'turns'"> &nbsp </div>
+		<div class="close" onClick="showWindow('turns')"
+			onMouseOver="this.style.backgroundImage = 'url(images/closeHover.png)'"
+			onMouseOut="this.style.backgroundImage = 'url(images/close.png)'"></div>
+	</div>
+	<div  class="innerWindow" id="turnsIW" style="width: 250px; height: 200px;">
+		contenasdfasdfasdft asfd asd fasd f asdf
+	</div>
+	<div class="windowBottom">
+		<div class="windowBL"></div><div class="resizeBR" id="turnsResize" 
+			onMouseDown="selectedBR = 'turns';">
+		</div>
+	</div>
+</div>
+
+<div id="toolsWindow" class="outerWindow" style="top: 70px; left: 320px; visibility: hidden;"
+	onMouseDown="windowForward('toolsWindow')">
+	<div class="title">
+		<div class="titleA"></div>
+		<div class="titleB">Tools</div>
+		<div class="titleC"></div>
+		<div class="windowBar" id="toolsBar" 
+			onMouseDown="selectedWindow = 'tools'"> &nbsp </div>
+		<div class="close" onClick="showWindow('tools')"
+			onMouseOver="this.style.backgroundImage = 'url(images/closeHover.png)'"
+			onMouseOut="this.style.backgroundImage = 'url(images/close.png)'"></div>
+	</div>
+	<div  class="innerWindow" id="toolsIW" style="width: 250px; height: 200px;">
+		contenasdfasdfasdft asfd asd fasd f asdf
+	</div>
+	<div class="windowBottom">
+		<div class="windowBL"></div><div class="resizeBR" id="toolsResize" 
+			onMouseDown="selectedBR = 'tools';">
+		</div>
+	</div>
+</div>
+<div id="filesWindow" class="outerWindow" style="top: 80px; left: 420px; visibility: hidden;"
+	onMouseDown="windowForward('filesWindow');">
+	<div class="title">
+		<div class="titleA"></div>
+		<div class="titleB">Files</div>
+		<div class="titleC"></div>
+		<div class="windowBar" id="filesBar" 
+			onMouseDown="selectedWindow = 'files'"> &nbsp </div>
+		<div class="close" onClick="showWindow('files')"
+			onMouseOver="this.style.backgroundImage = 'url(images/closeHover.png)'"
+			onMouseOut="this.style.backgroundImage = 'url(images/close.png)'"></div>
+	</div>
+	<div  class="innerWindow" id="filesIW" style="width: 250px; height: 200px;">
+		contenasdfasdfasdft asfd asd fasd f asdf
+	</div>
+	<div class="windowBottom">
+		<div class="windowBL"></div><div class="resizeBR" id="filesResize" 
+			onMouseDown="selectedBR = 'files';">
+		</div>
+	</div>
+</div>
+
+</body>
+<html>
