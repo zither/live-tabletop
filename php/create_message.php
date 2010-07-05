@@ -7,5 +7,6 @@
 // STEP 3: interpret the result (convert $result into a PHP structure or determine success/failure)
 
 // STEP 4: generate output (echo XML based on PHP structure, or indicate success/failure)
-
 ?>
+Your message was recieved, but not really, because this is just a stub.
+
