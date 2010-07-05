@@ -26,36 +26,46 @@ var invertResize = 1;
 	//		<div class="buttonXC" id="tableXC"></div>
 	//	</div>
 
-onload = function (){
-  var buttonList = new Array('table', 'chat', 'turns', 'tools', 'files');
-  for( var i=0; i < buttonList.length; i++){
-    var buttonTitle = buttonList[i].substr(0, 1).toUpperCase() + buttonList[i].substr(1);
+function createButton(buttonName) {
+    var buttonTitle = buttonName.substr(0, 1).toUpperCase() + buttonName.substr(1);
     var buttonXB = document.createElement('div');
     buttonXB.setAttribute('class', 'buttonX');
-    buttonXB.setAttribute('id', buttonList[i] + 'XB');
-	//buttonXB.setAttribute('onClick', 'showWindow("' + buttonList[i] + '")')
-	buttonXB.onclick = function() {showWindow(buttonList[i]);}
+    buttonXB.setAttribute('id', buttonName + 'XB');
+	buttonXB.onclick = function(event){
+	  if (!event){event = window.event};
+	  event.preventDefault();
+	  showWindow(buttonName);
+	};
     document.getElementById('buttons').appendChild(buttonXB);
 	var buttonXA = document.createElement('div')
     buttonXA.setAttribute('class', 'buttonXA');
-    buttonXA.setAttribute('id', buttonList[i] + 'XA');
+    buttonXA.setAttribute('id', buttonName + 'XA');
 	var buttonXN = document.createElement('div')
     buttonXN.setAttribute('class', 'buttonXN');
-    buttonXN.setAttribute('id', buttonList[i] + 'XN');
+    buttonXN.setAttribute('id', buttonName + 'XN');
+	buttonXN.ondoubleclick = function(event){
+	  if (!event){event = window.event};
+	  event.preventDefault();
+	};
 	var buttonXC = document.createElement('div')
     buttonXC.setAttribute('class', 'buttonXC');
-    buttonXC.setAttribute('id', buttonList[i] + 'XC');
+    buttonXC.setAttribute('id', buttonName + 'XC');
     buttonXB.appendChild(buttonXA);
     buttonXB.appendChild(buttonXN);
     buttonXB.appendChild(buttonXC);
     buttonXN.appendChild(document.createTextNode(buttonTitle));
+}
+
+onload = function (){
+  var buttonList = new Array('table', 'chat', 'turns', 'tools', 'files');
+  for( var i=0; i < buttonList.length; i++) {
+    createButton(buttonList[i]);
   }
 }
 
 //onload = createButtons;
 function showWindow(buttonName)
 {
-alert(buttonName);
 if(document.getElementById(buttonName + 'Window').style.visibility == "hidden")
   {
   document.getElementById(buttonName + 'XA').style.backgroundImage = "url('images/buttonCheck.jpg')";
