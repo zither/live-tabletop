@@ -32,12 +32,12 @@ function createButton(buttonName) {
 	var buttonCaption = document.createElement('div')
     buttonCaption.setAttribute('class', 'buttonCaption');
     buttonCaption.setAttribute('id', buttonName + 'XN');
-	var buttonXC = document.createElement('div')
-    buttonXC.setAttribute('class', 'buttonXC');
-    buttonXC.setAttribute('id', buttonName + 'XC');
+	var buttonEnd = document.createElement('div')
+    buttonEnd.setAttribute('class', 'buttonEnd');
+    buttonEnd.setAttribute('id', buttonName + 'XC');
     buttonContainer.appendChild(buttonStart);
     buttonContainer.appendChild(buttonCaption);
-    buttonContainer.appendChild(buttonXC);
+    buttonContainer.appendChild(buttonEnd);
     buttonCaption.appendChild(document.createTextNode(buttonTitle));
 }
 
