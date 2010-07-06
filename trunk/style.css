@@ -23,8 +23,8 @@ body	{
 	background: url(); height: 22px; float: left; margin: 0px 0px 0px 12px;
 	cursor: pointer;
 		}
-.buttonXA{
-	background-image: url(images/buttonXA.jpg); width: 19px; height: 22px;
+.buttonStart{
+	background-image: url(images/buttonStart.jpg); width: 19px; height: 22px;
 	float: left;
 		}
 .buttonCaption{
@@ -36,7 +36,7 @@ body	{
 	background-image: url(images/buttonXC.jpg); width: 5px; height: 22px;
 	float: left;
 		}
-.buttonChecked .buttonXA{ background-image: url(images/buttonCheck.jpg); }
+.buttonChecked .buttonStart{ background-image: url(images/buttonCheck.jpg); }
 .buttonChecked .buttonCaption{ color: #CCC; }
 .buttonChecked .buttonXC { background-image: url(); }
 .resizeTL{

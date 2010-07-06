@@ -26,16 +26,16 @@ function createButton(buttonName) {
     buttonContainer.setAttribute('id', buttonName + 'ButtonContainer');
 	buttonContainer.onclick = function(){ showWindow(buttonName); };
     document.getElementById('buttons').appendChild(buttonContainer);
-	var buttonXA = document.createElement('div')
-    buttonXA.setAttribute('class', 'buttonXA');
-    buttonXA.setAttribute('id', buttonName + 'XA');
+	var buttonStart = document.createElement('div')
+    buttonStart.setAttribute('class', 'buttonStart');
+    buttonStart.setAttribute('id', buttonName + 'XA');
 	var buttonCaption = document.createElement('div')
     buttonCaption.setAttribute('class', 'buttonCaption');
     buttonCaption.setAttribute('id', buttonName + 'XN');
 	var buttonXC = document.createElement('div')
     buttonXC.setAttribute('class', 'buttonXC');
     buttonXC.setAttribute('id', buttonName + 'XC');
-    buttonContainer.appendChild(buttonXA);
+    buttonContainer.appendChild(buttonStart);
     buttonContainer.appendChild(buttonCaption);
     buttonContainer.appendChild(buttonXC);
     buttonCaption.appendChild(document.createTextNode(buttonTitle));
