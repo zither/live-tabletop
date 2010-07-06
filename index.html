@@ -7,7 +7,7 @@
 <title> Live Tabletop </title>
 
 <script type="text/javascript">
-var selectedWindow = "a";
+var selectedPanel = "a";
 var selectedBR = "a";
 var selectedTL = "a";
 var dragX = 0;
@@ -19,12 +19,40 @@ var clickDragGap = 0;
 var z = 100;
 var invertResize = 1;
 
+function createPanel(panelName) {
+/*
+<div id="tablePanel" class="outerPanel" style="top: 40px; left: 20px; visibility: hidden;"
+	onMouseDown="panelForward('tablePanel');">
+	<div class="title">
+		<div class="resizeTL" id="tableTL" 
+			onMouseDown="selectedTL = 'table';"></div>
+		<div class="titleA"></div>
+		<div class="titleB">Table</div>
+		<div class="titleC"></div>
+		<div class="panelBar" id="tableBar" 
+			onMouseDown="selectedPanel = 'table'"> &nbsp </div>
+		<div class="close" onClick="showPanel('table')"
+			onMouseOver="this.style.backgroundImage = 'url(images/closeHover.png)'"
+			onMouseOut="this.style.backgroundImage = 'url(images/close.png)'"></div>
+	</div>
+	<div  class="innerPanel" id="tableIW" style="width: 250px; height: 200px;">
+		contenasdfasdfasdft asfd asd fasd f asdf
+	</div>
+	<div class="panelBottom">
+		<div class="panelBL"></div><div class="resizeBR" id="tableBR" 
+			onMouseDown="selectedBR = 'table';"></div>
+	</div>
+</div>
+*/
+
+}
+
 function createButton(buttonName) {
     var buttonTitle = buttonName.substr(0, 1).toUpperCase() + buttonName.substr(1);
     var buttonContainer = document.createElement('div');
     buttonContainer.setAttribute('class', 'buttonUnchecked');
     buttonContainer.setAttribute('id', buttonName + 'ButtonContainer');
-	buttonContainer.onclick = function(){ showWindow(buttonName); };
+	buttonContainer.onclick = function(){ showPanel(buttonName); };
     document.getElementById('buttons').appendChild(buttonContainer);
 	var buttonStart = document.createElement('div')
     buttonStart.setAttribute('class', 'buttonStart');
@@ -46,23 +74,23 @@ onload = function (){
 }
 
 //onload = createButtons;
-function showWindow(buttonName)
+function showPanel(buttonName)
 {
-if(document.getElementById(buttonName + 'Window').style.visibility == "hidden")
+if(document.getElementById(buttonName + 'Panel').style.visibility == "hidden")
   {
   document.getElementById(buttonName + 'ButtonContainer').className = "buttonChecked";
-  document.getElementById(buttonName + 'Window').style.visibility = "visible";
-  windowForward(buttonName + 'Window');
+  document.getElementById(buttonName + 'Panel').style.visibility = "visible";
+  panelForward(buttonName + 'Panel');
   }else{
   document.getElementById(buttonName + 'ButtonContainer').className = "buttonUnchecked";
-  document.getElementById(buttonName + 'Window').style.visibility = "hidden";
+  document.getElementById(buttonName + 'Panel').style.visibility = "hidden";
   }
 }
 
 document.onmouseup = unSelect;
 
 function unSelect(){
-  selectedWindow = 'a';
+  selectedPanel = 'a';
   selectedBR = 'a';
   selectedTL = 'a';
   clickDragGap = 0;
@@ -86,19 +114,19 @@ function getMouseXY(e) {
     dragY = e.pageY;
   }
   
-  if( selectedWindow != "a" ){
-    moveWindow();
+  if( selectedPanel != "a" ){
+    movePanel();
   }
   if( selectedBR != "a" ){
-    resizeWindow();
+    resizePanel();
   }
   if( selectedTL != "a" ){
     resizeMove();
   }
   return true
 }
-function moveWindow(){
-  w = document.getElementById(selectedWindow + 'Window');
+function movePanel(){
+  w = document.getElementById(selectedPanel + 'Panel');
   if(w.style.visibility == "visible"){
 	if( clickDragGap == 0 ) {
 	  clickY = dragY - parseInt(w.style.top);
@@ -116,14 +144,14 @@ function moveWindow(){
 	w.style.top  = dragY + "px";
 	w.style.left = dragX + "px";
   }else{
-	selectedWindow = "a";
+	selectedPanel = "a";
   }
   // lock to grid
   //locX = (dragX / ' . $configTileWidth . ') + 1;
   //locY = (dragY / ' . $configTileHeight . ');
   return true
 }
-function resizeWindow(){
+function resizePanel(){
   w = document.getElementById(selectedBR + "IW");
   bar = document.getElementById(selectedBR + "Bar");
   if( clickDragGap == 0 ) {
@@ -141,7 +169,7 @@ function resizeWindow(){
   return true
 }
 function resizeMove(){
-  p = document.getElementById(selectedTL + 'Window');
+  p = document.getElementById(selectedTL + 'Panel');
   w = document.getElementById(selectedTL + "IW");
   bar = document.getElementById(selectedTL + "Bar");
   if( clickDragGap == 0 ) {
@@ -167,8 +195,8 @@ function resizeMove(){
   bar.style.width = (clickCornerX - dragX - 36) + "px";
   return true
 }
-function windowForward(windowHover){
-  var child0 = document.getElementById(windowHover);
+function panelForward(panelHover){
+  var child0 = document.getElementById(panelHover);
   document.body.removeChild(child0);
   document.body.appendChild(child0);
 }
@@ -186,111 +214,111 @@ function windowForward(windowHover){
 
 <div id="logo"></div>
 
-<div id="tableWindow" class="outerWindow" style="top: 40px; left: 20px; visibility: hidden;"
-	onMouseDown="windowForward('tableWindow');">
+<div id="tablePanel" class="outerPanel" style="top: 40px; left: 20px; visibility: hidden;"
+	onMouseDown="panelForward('tablePanel');">
 	<div class="title">
 		<div class="resizeTL" id="tableTL" 
 			onMouseDown="selectedTL = 'table';"></div>
 		<div class="titleA"></div>
 		<div class="titleB">Table</div>
 		<div class="titleC"></div>
-		<div class="windowBar" id="tableBar" 
-			onMouseDown="selectedWindow = 'table'"> &nbsp </div>
-		<div class="close" onClick="showWindow('table')"
+		<div class="panelBar" id="tableBar" 
+			onMouseDown="selectedPanel = 'table'"> &nbsp </div>
+		<div class="close" onClick="showPanel('table')"
 			onMouseOver="this.style.backgroundImage = 'url(images/closeHover.png)'"
 			onMouseOut="this.style.backgroundImage = 'url(images/close.png)'"></div>
 	</div>
-	<div  class="innerWindow" id="tableIW" style="width: 250px; height: 200px;">
+	<div  class="innerPanel" id="tableIW" style="width: 250px; height: 200px;">
 		contenasdfasdfasdft asfd asd fasd f asdf
 	</div>
-	<div class="windowBottom">
-		<div class="windowBL"></div><div class="resizeBR" id="tableBR" 
+	<div class="panelBottom">
+		<div class="panelBL"></div><div class="resizeBR" id="tableBR" 
 			onMouseDown="selectedBR = 'table';"></div>
 	</div>
 </div>
 
-<div id="chatWindow" class="outerWindow" style="top: 50px; left: 120px; visibility: hidden;"
-	onMouseDown="windowForward('chatWindow');">
+<div id="chatPanel" class="outerPanel" style="top: 50px; left: 120px; visibility: hidden;"
+	onMouseDown="panelForward('chatPanel');">
 	<div class="title">
 		<div class="titleA"></div>
 		<div class="titleB">Chat</div>
 		<div class="titleC"></div>
-		<div class="windowBar" id="chatBar" 
-			onMouseDown="selectedWindow = 'chat'"> &nbsp </div>
-		<div class="close" onClick="showWindow('chat')"
+		<div class="panelBar" id="chatBar" 
+			onMouseDown="selectedPanel = 'chat'"> &nbsp </div>
+		<div class="close" onClick="showPanel('chat')"
 			onMouseOver="this.style.backgroundImage = 'url(images/closeHover.png)'"
 			onMouseOut="this.style.backgroundImage = 'url(images/close.png)'"></div>
 	</div>
-	<div  class="innerWindow" id="chatIW" style="width: 250px; height: 200px;">
+	<div  class="innerPanel" id="chatIW" style="width: 250px; height: 200px;">
 		contenasdfasdfasdft asfd asd fasd f asdf
 	</div>
-	<div class="windowBottom">
-		<div class="windowBL"></div><div class="resizeBR" id="chatResize" 
+	<div class="panelBottom">
+		<div class="panelBL"></div><div class="resizeBR" id="chatResize" 
 			onMouseDown="selectedBR = 'chat';">
 		</div>
 	</div>
 </div>
 
-<div id="turnsWindow" class="outerWindow" style="top: 60px; left: 220px; visibility: hidden;"
-	onMouseDown="windowForward('turnsWindow');">
+<div id="turnsPanel" class="outerPanel" style="top: 60px; left: 220px; visibility: hidden;"
+	onMouseDown="panelForward('turnsPanel');">
 	<div class="title">
 		<div class="titleA"></div>
 		<div class="titleB">Turns</div>
 		<div class="titleC"></div>
-		<div class="windowBar" id="turnsBar" 
-			onMouseDown="selectedWindow = 'turns'"> &nbsp </div>
-		<div class="close" onClick="showWindow('turns')"
+		<div class="panelBar" id="turnsBar" 
+			onMouseDown="selectedPanel = 'turns'"> &nbsp </div>
+		<div class="close" onClick="showPanel('turns')"
 			onMouseOver="this.style.backgroundImage = 'url(images/closeHover.png)'"
 			onMouseOut="this.style.backgroundImage = 'url(images/close.png)'"></div>
 	</div>
-	<div  class="innerWindow" id="turnsIW" style="width: 250px; height: 200px;">
+	<div  class="innerPanel" id="turnsIW" style="width: 250px; height: 200px;">
 		contenasdfasdfasdft asfd asd fasd f asdf
 	</div>
-	<div class="windowBottom">
-		<div class="windowBL"></div><div class="resizeBR" id="turnsResize" 
+	<div class="panelBottom">
+		<div class="panelBL"></div><div class="resizeBR" id="turnsResize" 
 			onMouseDown="selectedBR = 'turns';">
 		</div>
 	</div>
 </div>
 
-<div id="toolsWindow" class="outerWindow" style="top: 70px; left: 320px; visibility: hidden;"
-	onMouseDown="windowForward('toolsWindow')">
+<div id="toolsPanel" class="outerPanel" style="top: 70px; left: 320px; visibility: hidden;"
+	onMouseDown="panelForward('toolsPanel')">
 	<div class="title">
 		<div class="titleA"></div>
 		<div class="titleB">Tools</div>
 		<div class="titleC"></div>
-		<div class="windowBar" id="toolsBar" 
-			onMouseDown="selectedWindow = 'tools'"> &nbsp </div>
-		<div class="close" onClick="showWindow('tools')"
+		<div class="panelBar" id="toolsBar" 
+			onMouseDown="selectedPanel = 'tools'"> &nbsp </div>
+		<div class="close" onClick="showPanel('tools')"
 			onMouseOver="this.style.backgroundImage = 'url(images/closeHover.png)'"
 			onMouseOut="this.style.backgroundImage = 'url(images/close.png)'"></div>
 	</div>
-	<div  class="innerWindow" id="toolsIW" style="width: 250px; height: 200px;">
+	<div  class="innerPanel" id="toolsIW" style="width: 250px; height: 200px;">
 		contenasdfasdfasdft asfd asd fasd f asdf
 	</div>
-	<div class="windowBottom">
-		<div class="windowBL"></div><div class="resizeBR" id="toolsResize" 
+	<div class="panelBottom">
+		<div class="panelBL"></div><div class="resizeBR" id="toolsResize" 
 			onMouseDown="selectedBR = 'tools';">
 		</div>
 	</div>
 </div>
-<div id="filesWindow" class="outerWindow" style="top: 80px; left: 420px; visibility: hidden;"
-	onMouseDown="windowForward('filesWindow');">
+<div id="filesPanel" class="outerPanel" style="top: 80px; left: 420px; visibility: hidden;"
+	onMouseDown="panelForward('filesPanel');">
 	<div class="title">
 		<div class="titleA"></div>
 		<div class="titleB">Files</div>
 		<div class="titleC"></div>
-		<div class="windowBar" id="filesBar" 
-			onMouseDown="selectedWindow = 'files'"> &nbsp </div>
-		<div class="close" onClick="showWindow('files')"
+		<div class="panelBar" id="filesBar" 
+			onMouseDown="selectedPanel = 'files'"> &nbsp </div>
+		<div class="close" onClick="showPanel('files')"
 			onMouseOver="this.style.backgroundImage = 'url(images/closeHover.png)'"
 			onMouseOut="this.style.backgroundImage = 'url(images/close.png)'"></div>
 	</div>
-	<div  class="innerWindow" id="filesIW" style="width: 250px; height: 200px;">
+	<div  class="innerPanel" id="filesIW" style="width: 250px; height: 200px;">
 		contenasdfasdfasdft asfd asd fasd f asdf
 	</div>
-	<div class="windowBottom">
-		<div class="windowBL"></div><div class="resizeBR" id="filesResize" 
+	<div class="panelBottom">
+		<div class="panelBL"></div><div class="resizeBR" id="filesResize" 
 			onMouseDown="selectedBR = 'files';">
 		</div>
 	</div>
