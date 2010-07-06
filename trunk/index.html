@@ -10,35 +10,35 @@
 var selectedWindow = "a";
 var selectedBR = "a";
 var selectedTL = "a";
-var tempX = 0;
-var tempY = 0;
-var gapX = 0;
-var gapY = 0;
-var windowGap = 0;
-var cornerGap = 0;
+var dragX = 0;
+var dragY = 0;
+var clickX = 0;
+var clickY = 0;
+var clickDragGap = 0;
+var clickDragGap = 0;
 var z = 100;
 var invertResize = 1;
 
 function createButton(buttonName) {
     var buttonTitle = buttonName.substr(0, 1).toUpperCase() + buttonName.substr(1);
-    var buttonXB = document.createElement('div');
-    buttonXB.setAttribute('class', 'buttonUnchecked');
-    buttonXB.setAttribute('id', buttonName + 'XB');
-	buttonXB.onclick = function(){ showWindow(buttonName); };
-    document.getElementById('buttons').appendChild(buttonXB);
+    var buttonContainer = document.createElement('div');
+    buttonContainer.setAttribute('class', 'buttonUnchecked');
+    buttonContainer.setAttribute('id', buttonName + 'ButtonContainer');
+	buttonContainer.onclick = function(){ showWindow(buttonName); };
+    document.getElementById('buttons').appendChild(buttonContainer);
 	var buttonXA = document.createElement('div')
     buttonXA.setAttribute('class', 'buttonXA');
     buttonXA.setAttribute('id', buttonName + 'XA');
-	var buttonXN = document.createElement('div')
-    buttonXN.setAttribute('class', 'buttonXN');
-    buttonXN.setAttribute('id', buttonName + 'XN');
+	var buttonCaption = document.createElement('div')
+    buttonCaption.setAttribute('class', 'buttonCaption');
+    buttonCaption.setAttribute('id', buttonName + 'XN');
 	var buttonXC = document.createElement('div')
     buttonXC.setAttribute('class', 'buttonXC');
     buttonXC.setAttribute('id', buttonName + 'XC');
-    buttonXB.appendChild(buttonXA);
-    buttonXB.appendChild(buttonXN);
-    buttonXB.appendChild(buttonXC);
-    buttonXN.appendChild(document.createTextNode(buttonTitle));
+    buttonContainer.appendChild(buttonXA);
+    buttonContainer.appendChild(buttonCaption);
+    buttonContainer.appendChild(buttonXC);
+    buttonCaption.appendChild(document.createTextNode(buttonTitle));
 }
 
 onload = function (){
@@ -53,11 +53,11 @@ function showWindow(buttonName)
 {
 if(document.getElementById(buttonName + 'Window').style.visibility == "hidden")
   {
-  document.getElementById(buttonName + 'XB').className = "buttonChecked";
+  document.getElementById(buttonName + 'ButtonContainer').className = "buttonChecked";
   document.getElementById(buttonName + 'Window').style.visibility = "visible";
   windowForward(buttonName + 'Window');
   }else{
-  document.getElementById(buttonName + 'XB').className = "buttonUnchecked";
+  document.getElementById(buttonName + 'ButtonContainer').className = "buttonUnchecked";
   document.getElementById(buttonName + 'Window').style.visibility = "hidden";
   }
 }
@@ -68,8 +68,7 @@ function unSelect(){
   selectedWindow = 'a';
   selectedBR = 'a';
   selectedTL = 'a';
-  cornerGap = 0;
-  windowGap = 0;
+  clickDragGap = 0;
   return true
 }
 //DRAGGING -----------------------------------------------------------------------
@@ -83,11 +82,11 @@ document.onmousemove = getMouseXY;
 
 function getMouseXY(e) {
   if (IE) { // grab the x-y pos.s if browser is IE
-    tempX = event.clientX + document.body.scrollLeft;
-    tempY = event.clientY + document.body.scrollTop;
+    dragX = event.clientX + document.body.scrollLeft;
+    dragY = event.clientY + document.body.scrollTop;
   } else {  // grab the x-y pos.s if browser is NS
-    tempX = e.pageX;
-    tempY = e.pageY;
+    dragX = e.pageX;
+    dragY = e.pageY;
   }
   
   if( selectedWindow != "a" ){
@@ -104,71 +103,71 @@ function getMouseXY(e) {
 function moveWindow(){
   w = document.getElementById(selectedWindow + 'Window');
   if(w.style.visibility == "visible"){
-	if( windowGap == 0 ) {
-	  gapY = tempY - parseInt(w.style.top);
-      gapX = tempX - parseInt(w.style.left);
-	  windowGap = 1;
+	if( clickDragGap == 0 ) {
+	  clickY = dragY - parseInt(w.style.top);
+      clickX = dragX - parseInt(w.style.left);
+	  clickDragGap = 1;
 	}
-	tempX = tempX - gapX;
-	tempY = tempY - gapY;
-    if (tempY < 0){tempY = 0;}
-    if (tempX < 0){tempX = 0;}
-    if (tempX > document.body.clientWidth - 40){
-	tempX = document.body.clientWidth - 40;}
-    if (tempY > document.body.clientHeight - 40){
-	tempY = document.body.clientHeight - 40;}
-	w.style.top  = tempY + "px";
-	w.style.left = tempX + "px";
+	dragX = dragX - clickX;
+	dragY = dragY - clickY;
+    if (dragY < 0){dragY = 0;}
+    if (dragX < 0){dragX = 0;}
+    if (dragX > document.body.clientWidth - 40){
+	dragX = document.body.clientWidth - 40;}
+    if (dragY > document.body.clientHeight - 40){
+	dragY = document.body.clientHeight - 40;}
+	w.style.top  = dragY + "px";
+	w.style.left = dragX + "px";
   }else{
 	selectedWindow = "a";
   }
   // lock to grid
-  //locX = (tempX / ' . $configTileWidth . ') + 1;
-  //locY = (tempY / ' . $configTileHeight . ');
+  //locX = (dragX / ' . $configTileWidth . ') + 1;
+  //locY = (dragY / ' . $configTileHeight . ');
   return true
 }
 function resizeWindow(){
   w = document.getElementById(selectedBR + "IW");
   bar = document.getElementById(selectedBR + "Bar");
-  if( cornerGap == 0 ) {
-	gapY = tempY - parseInt(w.style.height);
-    gapX = tempX - parseInt(w.style.width);
-    cornerGap = 1;
+  if( clickDragGap == 0 ) {
+	clickY = dragY - parseInt(w.style.height);
+    clickX = dragX - parseInt(w.style.width);
+    clickDragGap = 1;
   }
-  tempX = tempX - gapX;
-  tempY = tempY - gapY;
-  if (tempY < 100){tempY = 100;}
-  if (tempX < 100){tempX = 100;}
-  w.style.height  = tempY + "px";
-  w.style.width = tempX + "px";
-  bar.style.width = (tempX - 36) + "px";
+  dragX = dragX - clickX;
+  dragY = dragY - clickY;
+  if (dragY < 100){dragY = 100;}
+  if (dragX < 100){dragX = 100;}
+  w.style.height  = dragY + "px";
+  w.style.width = dragX + "px";
+  bar.style.width = (dragX - 36) + "px";
   return true
 }
 function resizeMove(){
   p = document.getElementById(selectedTL + 'Window');
   w = document.getElementById(selectedTL + "IW");
   bar = document.getElementById(selectedTL + "Bar");
-  if( windowGap == 0 ) {
-    gapY = tempY - parseInt(p.style.top);
-    gapX = tempX - parseInt(p.style.left);
-    gapCY = tempY + parseInt(w.style.height);
-    gapCX = tempX + parseInt(w.style.width);
-    windowGap = 1;
+  if( clickDragGap == 0 ) {
+    clickY = dragY - parseInt(p.style.top);
+    clickX = dragX - parseInt(p.style.left);
+    clickCornerY = dragY + parseInt(w.style.height);
+    clickCornerX = dragX + parseInt(w.style.width);
+    clickDragGap = 1;
   }
-  if (tempX < 0){tempX = 0;}
-  if (tempY < 0){tempY = 0;}
-  if (tempX > gapCX - 100){tempX = gapCX - 100;}
-  if (tempY > gapCY - 100){tempY = gapCY - 100;}
-  if (tempX > document.body.clientWidth - 40){
-  tempX = document.body.clientWidth - 40;}
-  if (tempY > document.body.clientHeight - 40){
-  tempY = document.body.clientHeight - 40;}
+  if (dragX < 0){dragX = 0;}
+  if (dragY < 0){dragY = 0;}
+  if (dragX > clickCornerX - 100){dragX = clickCornerX - 100;}
+  if (dragY > clickCornerY - 100){dragY = clickCornerY - 100;}
+  if (dragX > document.body.clientWidth - 40){
+  dragX = document.body.clientWidth - 40;}
+  if (dragY > document.body.clientHeight - 40){
+  dragY = document.body.clientHeight - 40;}
 	
-  p.style.left = (tempX - gapX) + "px";
-  p.style.top  = (tempY - gapY) + "px";
-  w.style.width = (gapCX - tempX) + "px";
-  w.style.height  = (gapCY - tempY) + "px";
-  bar.style.width = (gapCX - tempX - 36) + "px";
+  p.style.left = (dragX - clickX) + "px";
+  p.style.top  = (dragY - clickY) + "px";
+  w.style.width = (clickCornerX - dragX) + "px";
+  w.style.height  = (clickCornerY - dragY) + "px";
+  bar.style.width = (clickCornerX - dragX - 36) + "px";
   return true
 }
 function windowForward(windowHover){

@@ -27,7 +27,7 @@ body	{
 	background-image: url(images/buttonXA.jpg); width: 19px; height: 22px;
 	float: left;
 		}
-.buttonXN{
+.buttonCaption{
 	height: 22px; float: left; color: #333; font-size: 16px;
 	font-family: Arial,Helvetica,sans-serif; text-decoration: none;
 	padding: 1px 1px 0px 4px; font-weight: ;
@@ -37,7 +37,7 @@ body	{
 	float: left;
 		}
 .buttonChecked .buttonXA{ background-image: url(images/buttonCheck.jpg); }
-.buttonChecked .buttonXN{ color: #CCC; }
+.buttonChecked .buttonCaption{ color: #CCC; }
 .buttonChecked .buttonXC { background-image: url(); }
 .resizeTL{
 	background: url(images/resizeTL.png); width: 22px; height: 23px; float: left; margin-left: -6px;
