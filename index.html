@@ -20,20 +20,21 @@ var z = 100;
 var invertResize = 1;
 
 function createPanel(panelName, xPos, yPos, panelWidth, panelHeight) {
+    createButton(panelName);
     var panelCaption = panelName.substr(0, 1).toUpperCase() + panelName.substr(1);
     var outerPanel = document.createElement('div');
     outerPanel.setAttribute('class', 'outerPanel');
     outerPanel.setAttribute('id', panelName + "Panel");
     outerPanel.setAttribute('style', 'left: ' + xPos + 'px; top: ' + yPos + 
 	'px; visibility: hidden;');
-	outerPanel.onclick = function(){ panelForward(panelName + "Panel"); };
+	outerPanel.onmousedown = function(){ panelForward(panelName + "Panel"); };
 	document.body.appendChild(outerPanel);
 	
       var panelTitle = document.createElement('div');
       panelTitle.setAttribute('class', 'title');	
         var resizeTL = document.createElement('div');
         resizeTL.setAttribute('class', 'resizeTL');
-	    outerPanel.onmousedown = function(){ selectedTL = panelName; };
+	    resizeTL.onmousedown = function(){ selectedTL = panelName; };
         var titleStart = document.createElement('div');
         titleStart.setAttribute('class', 'titleStart');
         var titleCaption = document.createElement('div');
@@ -77,28 +78,6 @@ function createPanel(panelName, xPos, yPos, panelWidth, panelHeight) {
 		panelBottom.appendChild(panelBL);
 		panelBottom.appendChild(panelBR);
 
-/*
-<div id="tablePanel" class="outerPanel" style="top: 40px; left: 20px; visibility: hidden;"
-	onMouseDown="panelForward('tablePanel');">
-	<div class="title">
-		<div class="resizeTL"  onMouseDown="selectedTL = 'table';"></div>
-		<div class="titleStart"></div>
-		<div class="titleCaption">Table</div>
-		<div class="titleC"></div>
-		<div class="panelBar" onMouseDown="selectedPanel = 'table'"> &nbsp </div>
-		<div class="close" onClick="showPanel('table')"
-			onMouseOver="this.style.backgroundImage = 'url(images/closeHover.png)'"
-			onMouseOut="this.style.backgroundImage = 'url(images/close.png)'"></div>
-	</div>
-	<div  class="innerPanel" id="tableIW" style="width: 250px; height: 200px;">
-		contenasdfasdfasdft asfd asd fasd f asdf
-	</div>
-	<div class="panelBottom">
-		<div class="panelBL"></div><div class="resizeBR" onMouseDown="selectedBR = 'table';"></div>
-	</div>
-</div>
-*/
-
 }
 
 function createButton(buttonName) {
@@ -121,12 +100,11 @@ function createButton(buttonName) {
 }
 
 onload = function (){
-  var buttonList = new Array('table', 'chat', 'turns', 'tools', 'files', 'gable', 'bable');
-  for( var i=0; i < buttonList.length; i++) {
-    createButton(buttonList[i]);
-  }
-  createPanel('gable', 20, 40, 175, 300)
-  createPanel('bable', 200, 40, 175, 300)
+  createPanel('table', 20, 40, 175, 300)
+  createPanel('chat', 220, 40, 175, 300)
+  createPanel('turns', 420, 40, 175, 300)
+  createPanel('tools', 620, 40, 175, 300)
+  createPanel('files', 820, 40, 175, 300)
 }
 
 function showPanel(buttonName){
@@ -174,9 +152,8 @@ function getMouseXY(e) {
     resizePanel();
   }
   if( selectedTL != "a" ){
-    //resizeMove();
+    resizeMove();
   }
-  return true
 }
 function movePanel(){
   w = document.getElementById(selectedPanel + 'Panel');
@@ -228,6 +205,7 @@ function resizeMove(){
     clickCornerX = dragX + parseInt(w.style.width);
     clickDragGap = 1;
   }
+  
   if (dragX < 0){dragX = 0;}
   if (dragY < 0){dragY = 0;}
   if (dragX > clickCornerX - 100){dragX = clickCornerX - 100;}
@@ -263,115 +241,6 @@ function panelForward(panelHover){
 
 <div id="logo"></div>
 
-<div id="tablePanel" class="outerPanel" style="top: 40px; left: 20px; visibility: hidden;"
-	onMouseDown="panelForward('tablePanel');">
-	<div class="title">
-		<div class="resizeTL" onMouseDown="selectedTL = 'table';"></div>
-		<div class="titleStart"></div>
-		<div class="titleCaption">Table</div>
-		<div class="titleEnd"></div>
-		<div class="panelBar" id="tableBar" 
-			onMouseDown="selectedPanel = 'table'"> &nbsp </div>
-		<div class="close" onClick="showPanel('table')"
-			onMouseOver="this.style.backgroundImage = 'url(images/closeHover.png)'"
-			onMouseOut="this.style.backgroundImage = 'url(images/close.png)'"></div>
-	</div>
-	<div  class="innerPanel" id="tableIW" style="width: 250px; height: 200px;">
-		contenasdfasdfasdft asfd asd fasd f asdf
-	</div>
-	<div class="panelBottom">
-		<div class="panelBL"></div><div class="resizeBR" id="tableBR" 
-			onMouseDown="selectedBR = 'table';"></div>
-	</div>
-</div>
-
-<div id="chatPanel" class="outerPanel" style="top: 50px; left: 120px; visibility: hidden;"
-	onMouseDown="panelForward('chatPanel');">
-	<div class="title">
-		<div class="resizeTL" onMouseDown="selectedTL = 'chat';"></div>
-		<div class="titleStart"></div>
-		<div class="titleCaption">Chat</div>
-		<div class="titleEnd"></div>
-		<div class="panelBar" id="chatBar" 
-			onMouseDown="selectedPanel = 'chat'"> &nbsp </div>
-		<div class="close" onClick="showPanel('chat')"
-			onMouseOver="this.style.backgroundImage = 'url(images/closeHover.png)'"
-			onMouseOut="this.style.backgroundImage = 'url(images/close.png)'"></div>
-	</div>
-	<div  class="innerPanel" id="chatIW" style="width: 250px; height: 200px;">
-		contenasdfasdfasdft asfd asd fasd f asdf
-	</div>
-	<div class="panelBottom">
-		<div class="panelBL"></div><div class="resizeBR" id="chatResize" 
-			onMouseDown="selectedBR = 'chat';">
-		</div>
-	</div>
-</div>
-
-<div id="turnsPanel" class="outerPanel" style="top: 60px; left: 220px; visibility: hidden;"
-	onMouseDown="panelForward('turnsPanel');">
-	<div class="title">
-		<div class="titleStart"></div>
-		<div class="titleCaption">Turns</div>
-		<div class="titleEnd"></div>
-		<div class="panelBar" id="turnsBar" 
-			onMouseDown="selectedPanel = 'turns'"> &nbsp </div>
-		<div class="close" onClick="showPanel('turns')"
-			onMouseOver="this.style.backgroundImage = 'url(images/closeHover.png)'"
-			onMouseOut="this.style.backgroundImage = 'url(images/close.png)'"></div>
-	</div>
-	<div  class="innerPanel" id="turnsIW" style="width: 250px; height: 200px;">
-		contenasdfasdfasdft asfd asd fasd f asdf
-	</div>
-	<div class="panelBottom">
-		<div class="panelBL"></div><div class="resizeBR" id="turnsResize" 
-			onMouseDown="selectedBR = 'turns';">
-		</div>
-	</div>
-</div>
-
-<div id="toolsPanel" class="outerPanel" style="top: 70px; left: 320px; visibility: hidden;"
-	onMouseDown="panelForward('toolsPanel')">
-	<div class="title">
-		<div class="titleStart"></div>
-		<div class="titleCaption">Tools</div>
-		<div class="titleEnd"></div>
-		<div class="panelBar" id="toolsBar" 
-			onMouseDown="selectedPanel = 'tools'"> &nbsp </div>
-		<div class="close" onClick="showPanel('tools')"
-			onMouseOver="this.style.backgroundImage = 'url(images/closeHover.png)'"
-			onMouseOut="this.style.backgroundImage = 'url(images/close.png)'"></div>
-	</div>
-	<div  class="innerPanel" id="toolsIW" style="width: 250px; height: 200px;">
-		contenasdfasdfasdft asfd asd fasd f asdf
-	</div>
-	<div class="panelBottom">
-		<div class="panelBL"></div><div class="resizeBR" id="toolsResize" 
-			onMouseDown="selectedBR = 'tools';">
-		</div>
-	</div>
-</div>
-<div id="filesPanel" class="outerPanel" style="top: 80px; left: 420px; visibility: hidden;"
-	onMouseDown="panelForward('filesPanel');">
-	<div class="title">
-		<div class="titleStart"></div>
-		<div class="titleCaption">Files</div>
-		<div class="titleEnd"></div>
-		<div class="panelBar" id="filesBar" 
-			onMouseDown="selectedPanel = 'files'"> &nbsp </div>
-		<div class="close" onClick="showPanel('files')"
-			onMouseOver="this.style.backgroundImage = 'url(images/closeHover.png)'"
-			onMouseOut="this.style.backgroundImage = 'url(images/close.png)'"></div>
-	</div>
-	<div  class="innerPanel" id="filesIW" style="width: 250px; height: 200px;">
-		contenasdfasdfasdft asfd asd fasd f asdf
-	</div>
-	<div class="panelBottom">
-		<div class="panelBL"></div><div class="resizeBR" id="filesResize" 
-			onMouseDown="selectedBR = 'files';">
-		</div>
-	</div>
-</div>
 
 </body>
 <html>
