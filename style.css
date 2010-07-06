@@ -43,17 +43,17 @@ body	{
 	background: url(images/resizeTL.png); width: 22px; height: 23px; float: left; margin-left: -6px;
 	cursor: nw-resize;
 		}
-.titleA	{
+.titleStart	{
 	background-image: url(images/titleA.jpg); width: 5px; height: 23px; margin-left: 1px;
 	float: left;
 		}
-.titleB	{
+.titleCaption{
 	background: url(images/titleB.jpg) repeat-x top left; height: 21px;
 	float: left; color: #CCC; font-size: 16px;
 	font-family: Arial,Helvetica,sans-serif; text-decoration: none;
 	padding: 2px 0px 0px 0px;
 		}
-.titleC	{
+.titleEnd	{
 	background-image: url(images/titleC.jpg); width: 5px; height: 23px;
 	float: left;
 		}
