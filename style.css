@@ -16,7 +16,7 @@ body	{
 	margin: 2px auto 0px 200px; position: relative;
 		}
 .buttonUnchecked{
-	background: url(images/buttonXB.jpg) repeat-x left top; height: 22px;
+	background: url(images/buttonContainer.jpg) repeat-x left top; height: 22px;
 	float: left; margin: 0px 0px 0px 12px; cursor: pointer;
 		}
 .buttonChecked{
