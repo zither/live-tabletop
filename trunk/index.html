@@ -19,18 +19,73 @@ var clickDragGap = 0;
 var z = 100;
 var invertResize = 1;
 
-function createPanel(panelName) {
+function createPanel(panelName, xPos, yPos, panelWidth, panelHeight) {
+    var panelCaption = panelName.substr(0, 1).toUpperCase() + panelName.substr(1);
+    var outerPanel = document.createElement('div');
+    outerPanel.setAttribute('class', 'outerPanel');
+    outerPanel.setAttribute('id', panelName + "Panel");
+    outerPanel.setAttribute('style', 'left: ' + xPos + 'px; top: ' + yPos + 
+	'px; visibility: hidden;');
+	outerPanel.onclick = function(){ panelForward(panelName + "Panel"); };
+	document.body.appendChild(outerPanel);
+	
+      var panelTitle = document.createElement('div');
+      panelTitle.setAttribute('class', 'title');	
+        var resizeTL = document.createElement('div');
+        resizeTL.setAttribute('class', 'resizeTL');
+	    outerPanel.onmousedown = function(){ selectedTL = panelName; };
+        var titleStart = document.createElement('div');
+        titleStart.setAttribute('class', 'titleStart');
+        var titleCaption = document.createElement('div');
+        titleCaption.setAttribute('class', 'titleCaption');
+        var titleEnd = document.createElement('div');
+        titleEnd.setAttribute('class', 'titleEnd');
+        var panelBar = document.createElement('div');
+        panelBar.setAttribute('class', 'panelBar');
+        panelBar.setAttribute('id', panelName + 'Bar');
+	    panelBar.onmousedown = function(){ selectedPanel = panelName; };
+        var panelClose = document.createElement('div');
+        panelClose.setAttribute('class', 'close');
+        panelClose.onclick = function(){ showPanel(panelName); };
+	    panelClose.onmouseover = function(){ this.style.backgroundImage = 'url(images/closeHover.png)'; };
+	    panelClose.onmouseout = function(){ this.style.backgroundImage = 'url(images/close.png)'; };
+	    outerPanel.appendChild(panelTitle);
+	    panelTitle.appendChild(resizeTL);
+	    panelTitle.appendChild(titleStart);
+	    panelTitle.appendChild(titleCaption);
+        titleCaption.appendChild(document.createTextNode(panelCaption));
+	    panelTitle.appendChild(titleEnd);
+	    panelTitle.appendChild(panelBar);
+        panelBar.appendChild(document.createTextNode(" "));
+	    panelTitle.appendChild(panelClose);
+	
+      var innerPanel = document.createElement('div');
+      innerPanel.setAttribute('id', panelName + 'IW');
+      innerPanel.setAttribute('class', 'innerPanel');
+      innerPanel.setAttribute('style', 'width: ' + panelWidth + 'px; height: ' + 
+	    panelHeight + 'px;');
+	  var panelBottom = document.createElement('div')
+      panelBottom.setAttribute('class', 'panelBottom');
+      outerPanel.appendChild(innerPanel);
+      innerPanel.appendChild(document.createTextNode("stuff"));
+      outerPanel.appendChild(panelBottom);
+	    var panelBL = document.createElement('div')
+        panelBL.setAttribute('class', 'panelBL');
+	    var panelBR = document.createElement('div')
+        panelBR.setAttribute('class', 'resizeBR');
+	    panelBR.onmousedown = function(){ selectedBR = panelName; };
+		panelBottom.appendChild(panelBL);
+		panelBottom.appendChild(panelBR);
+
 /*
 <div id="tablePanel" class="outerPanel" style="top: 40px; left: 20px; visibility: hidden;"
 	onMouseDown="panelForward('tablePanel');">
 	<div class="title">
-		<div class="resizeTL" id="tableTL" 
-			onMouseDown="selectedTL = 'table';"></div>
-		<div class="titleA"></div>
-		<div class="titleB">Table</div>
+		<div class="resizeTL"  onMouseDown="selectedTL = 'table';"></div>
+		<div class="titleStart"></div>
+		<div class="titleCaption">Table</div>
 		<div class="titleC"></div>
-		<div class="panelBar" id="tableBar" 
-			onMouseDown="selectedPanel = 'table'"> &nbsp </div>
+		<div class="panelBar" onMouseDown="selectedPanel = 'table'"> &nbsp </div>
 		<div class="close" onClick="showPanel('table')"
 			onMouseOver="this.style.backgroundImage = 'url(images/closeHover.png)'"
 			onMouseOut="this.style.backgroundImage = 'url(images/close.png)'"></div>
@@ -39,8 +94,7 @@ function createPanel(panelName) {
 		contenasdfasdfasdft asfd asd fasd f asdf
 	</div>
 	<div class="panelBottom">
-		<div class="panelBL"></div><div class="resizeBR" id="tableBR" 
-			onMouseDown="selectedBR = 'table';"></div>
+		<div class="panelBL"></div><div class="resizeBR" onMouseDown="selectedBR = 'table';"></div>
 	</div>
 </div>
 */
@@ -60,30 +114,29 @@ function createButton(buttonName) {
     buttonCaption.setAttribute('class', 'buttonCaption');
 	var buttonEnd = document.createElement('div')
     buttonEnd.setAttribute('class', 'buttonEnd');
-    buttonContainer.appendChild(buttonStart, buttonCaption, buttonEnd);
+    buttonContainer.appendChild(buttonStart);
     buttonContainer.appendChild(buttonCaption);
     buttonContainer.appendChild(buttonEnd);
     buttonCaption.appendChild(document.createTextNode(buttonTitle));
 }
 
 onload = function (){
-  var buttonList = new Array('table', 'chat', 'turns', 'tools', 'files');
+  var buttonList = new Array('table', 'chat', 'turns', 'tools', 'files', 'gable', 'bable');
   for( var i=0; i < buttonList.length; i++) {
     createButton(buttonList[i]);
   }
+  createPanel('gable', 20, 40, 175, 300)
+  createPanel('bable', 200, 40, 175, 300)
 }
 
-//onload = createButtons;
-function showPanel(buttonName)
-{
-if(document.getElementById(buttonName + 'Panel').style.visibility == "hidden")
-  {
-  document.getElementById(buttonName + 'ButtonContainer').className = "buttonChecked";
-  document.getElementById(buttonName + 'Panel').style.visibility = "visible";
-  panelForward(buttonName + 'Panel');
+function showPanel(buttonName){
+  if(document.getElementById(buttonName + 'Panel').style.visibility == "hidden"){
+    panelForward(buttonName + 'Panel');
+    document.getElementById(buttonName + 'ButtonContainer').className = "buttonChecked";
+    document.getElementById(buttonName + 'Panel').style.visibility = "visible";
   }else{
-  document.getElementById(buttonName + 'ButtonContainer').className = "buttonUnchecked";
-  document.getElementById(buttonName + 'Panel').style.visibility = "hidden";
+    document.getElementById(buttonName + 'ButtonContainer').className = "buttonUnchecked";
+    document.getElementById(buttonName + 'Panel').style.visibility = "hidden";
   }
 }
 
@@ -121,31 +174,27 @@ function getMouseXY(e) {
     resizePanel();
   }
   if( selectedTL != "a" ){
-    resizeMove();
+    //resizeMove();
   }
   return true
 }
 function movePanel(){
   w = document.getElementById(selectedPanel + 'Panel');
-  if(w.style.visibility == "visible"){
-	if( clickDragGap == 0 ) {
-	  clickY = dragY - parseInt(w.style.top);
-      clickX = dragX - parseInt(w.style.left);
-	  clickDragGap = 1;
-	}
-	dragX = dragX - clickX;
-	dragY = dragY - clickY;
-    if (dragY < 0){dragY = 0;}
-    if (dragX < 0){dragX = 0;}
-    if (dragX > document.body.clientWidth - 40){
-	dragX = document.body.clientWidth - 40;}
-    if (dragY > document.body.clientHeight - 40){
-	dragY = document.body.clientHeight - 40;}
-	w.style.top  = dragY + "px";
-	w.style.left = dragX + "px";
-  }else{
-	selectedPanel = "a";
+  if( clickDragGap == 0 ) {
+    clickY = dragY - parseInt(w.style.top);
+    clickX = dragX - parseInt(w.style.left);
+    clickDragGap = 1;
   }
+  dragX = dragX - clickX;
+  dragY = dragY - clickY;
+  if (dragY < 0){dragY = 0;}
+  if (dragX < 0){dragX = 0;}
+  if (dragX > document.body.clientWidth - 40){
+  dragX = document.body.clientWidth - 40;}
+  if (dragY > document.body.clientHeight - 40){
+  dragY = document.body.clientHeight - 40;}
+  w.style.top  = dragY + "px";
+  w.style.left = dragX + "px";
   // lock to grid
   //locX = (dragX / ' . $configTileWidth . ') + 1;
   //locY = (dragY / ' . $configTileHeight . ');
@@ -155,7 +204,7 @@ function resizePanel(){
   w = document.getElementById(selectedBR + "IW");
   bar = document.getElementById(selectedBR + "Bar");
   if( clickDragGap == 0 ) {
-	clickY = dragY - parseInt(w.style.height);
+    clickY = dragY - parseInt(w.style.height);
     clickX = dragX - parseInt(w.style.width);
     clickDragGap = 1;
   }
@@ -217,11 +266,10 @@ function panelForward(panelHover){
 <div id="tablePanel" class="outerPanel" style="top: 40px; left: 20px; visibility: hidden;"
 	onMouseDown="panelForward('tablePanel');">
 	<div class="title">
-		<div class="resizeTL" id="tableTL" 
-			onMouseDown="selectedTL = 'table';"></div>
-		<div class="titleA"></div>
-		<div class="titleB">Table</div>
-		<div class="titleC"></div>
+		<div class="resizeTL" onMouseDown="selectedTL = 'table';"></div>
+		<div class="titleStart"></div>
+		<div class="titleCaption">Table</div>
+		<div class="titleEnd"></div>
 		<div class="panelBar" id="tableBar" 
 			onMouseDown="selectedPanel = 'table'"> &nbsp </div>
 		<div class="close" onClick="showPanel('table')"
@@ -240,9 +288,10 @@ function panelForward(panelHover){
 <div id="chatPanel" class="outerPanel" style="top: 50px; left: 120px; visibility: hidden;"
 	onMouseDown="panelForward('chatPanel');">
 	<div class="title">
-		<div class="titleA"></div>
-		<div class="titleB">Chat</div>
-		<div class="titleC"></div>
+		<div class="resizeTL" onMouseDown="selectedTL = 'chat';"></div>
+		<div class="titleStart"></div>
+		<div class="titleCaption">Chat</div>
+		<div class="titleEnd"></div>
 		<div class="panelBar" id="chatBar" 
 			onMouseDown="selectedPanel = 'chat'"> &nbsp </div>
 		<div class="close" onClick="showPanel('chat')"
@@ -262,9 +311,9 @@ function panelForward(panelHover){
 <div id="turnsPanel" class="outerPanel" style="top: 60px; left: 220px; visibility: hidden;"
 	onMouseDown="panelForward('turnsPanel');">
 	<div class="title">
-		<div class="titleA"></div>
-		<div class="titleB">Turns</div>
-		<div class="titleC"></div>
+		<div class="titleStart"></div>
+		<div class="titleCaption">Turns</div>
+		<div class="titleEnd"></div>
 		<div class="panelBar" id="turnsBar" 
 			onMouseDown="selectedPanel = 'turns'"> &nbsp </div>
 		<div class="close" onClick="showPanel('turns')"
@@ -284,9 +333,9 @@ function panelForward(panelHover){
 <div id="toolsPanel" class="outerPanel" style="top: 70px; left: 320px; visibility: hidden;"
 	onMouseDown="panelForward('toolsPanel')">
 	<div class="title">
-		<div class="titleA"></div>
-		<div class="titleB">Tools</div>
-		<div class="titleC"></div>
+		<div class="titleStart"></div>
+		<div class="titleCaption">Tools</div>
+		<div class="titleEnd"></div>
 		<div class="panelBar" id="toolsBar" 
 			onMouseDown="selectedPanel = 'tools'"> &nbsp </div>
 		<div class="close" onClick="showPanel('tools')"
@@ -305,9 +354,9 @@ function panelForward(panelHover){
 <div id="filesPanel" class="outerPanel" style="top: 80px; left: 420px; visibility: hidden;"
 	onMouseDown="panelForward('filesPanel');">
 	<div class="title">
-		<div class="titleA"></div>
-		<div class="titleB">Files</div>
-		<div class="titleC"></div>
+		<div class="titleStart"></div>
+		<div class="titleCaption">Files</div>
+		<div class="titleEnd"></div>
 		<div class="panelBar" id="filesBar" 
 			onMouseDown="selectedPanel = 'files'"> &nbsp </div>
 		<div class="close" onClick="showPanel('files')"
