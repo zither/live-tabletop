@@ -32,13 +32,13 @@ body	{
 	font-family: Arial,Helvetica,sans-serif; text-decoration: none;
 	padding: 1px 1px 0px 4px; font-weight: ;
 		}
-.buttonXC{
-	background-image: url(images/buttonXC.jpg); width: 5px; height: 22px;
+.buttonEnd{
+	background-image: url(images/buttonEnd.jpg); width: 5px; height: 22px;
 	float: left;
 		}
 .buttonChecked .buttonStart{ background-image: url(images/buttonCheck.jpg); }
 .buttonChecked .buttonCaption{ color: #CCC; }
-.buttonChecked .buttonXC { background-image: url(); }
+.buttonChecked .buttonEnd { background-image: url(); }
 .resizeTL{
 	background: url(images/resizeTL.png); width: 22px; height: 23px; float: left; margin-left: -6px;
 	cursor: nw-resize;
