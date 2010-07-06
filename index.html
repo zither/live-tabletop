@@ -32,7 +32,7 @@ function createButton(buttonName) {
     buttonCaption.setAttribute('class', 'buttonCaption');
 	var buttonEnd = document.createElement('div')
     buttonEnd.setAttribute('class', 'buttonEnd');
-    buttonContainer.appendChild(buttonStart);
+    buttonContainer.appendChild(buttonStart, buttonCaption, buttonEnd);
     buttonContainer.appendChild(buttonCaption);
     buttonContainer.appendChild(buttonEnd);
     buttonCaption.appendChild(document.createTextNode(buttonTitle));
