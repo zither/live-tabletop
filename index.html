@@ -43,11 +43,13 @@ function createPanel( panelName, xPos, yPos, panelWidth, panelHeight) {
       panel.panelBar = document.createElement('div');
       panel.panelBar.setAttribute('class', 'panelBar');
       panel.panelBar.setAttribute('style', 'width: ' + (panelWidth - 36) + 'px;');
+      panel.panelBar.onmousedown = function(){ selectedPanel = panel; };
       var panelClose = document.createElement('div');
       panelClose.setAttribute('class', 'close');
       panelClose.onmouseover = function(){ this.style.backgroundImage = 'url(images/closeHover.png)'; };
       panelClose.onmouseout = function(){ this.style.backgroundImage = 'url(images/close.png)'; };
-      panel.outerPanel.appendChild(panelTitle);
+      panelClose.onclick = function(){ showPanel(panel); };
+	  panel.outerPanel.appendChild(panelTitle);
       panelTitle.appendChild(resizeTL);
       panelTitle.appendChild(titleStart);
       panelTitle.appendChild(titleCaption);
@@ -78,8 +80,6 @@ function createPanel( panelName, xPos, yPos, panelWidth, panelHeight) {
     panel.buttonContainer.setAttribute('class', 'buttonUnchecked');
 	panel.buttonContainer.onclick = function(){ showPanel(panel); };
     document.getElementById('buttons').appendChild(panel.buttonContainer);
-    panelClose.onclick = function(){ showPanel(panel); };
-	panel.panelBar.onmousedown = function(){ selectedPanel = panel; };
 	var buttonStart = document.createElement('div')
     buttonStart.setAttribute('class', 'buttonStart');
 	var buttonCaption = document.createElement('div')
@@ -94,11 +94,11 @@ function createPanel( panelName, xPos, yPos, panelWidth, panelHeight) {
 
 onload = function (){
 
-  var tableCat = new createPanel( 'Table', 20, 40, 175, 300);
-  var chatPanel = new createPanel( 'Chat', 220, 40, 175, 300);
-  var turnsPanel = new createPanel( 'Turns', 420, 40, 175, 300);
-  var toolsPanel = new createPanel( 'Tools', 620, 40, 175, 300);
-  var filesPanel = new createPanel( 'Files', 820, 40, 175, 300);
+  var tableCat = new createPanel( 'Table', 420, 170, 175, 300);
+  var chatCat = new createPanel( 'Chat', 220, 26, 355, 130);
+  var turnsCat = new createPanel( 'Turns', 6, 0, 175, 300);
+  var toolsCat = new createPanel( 'Tools', 585, 26, 175, 300);
+  var filesCat = new createPanel( 'Files', 775, 26, 175, 300);
 }
 
 function showPanel(panelShow){
