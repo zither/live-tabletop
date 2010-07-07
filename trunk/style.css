@@ -10,7 +10,7 @@ body	{
 	position: fixed; left: 10px; top: 0px;
 		}
 #tabletop	{
-	background: #999 url(images/abaddon45.png) no-repeat; width: auto; height: 700px;
+	background: #999 url(images/abaddon45.png) no-repeat; width: 945; height: 945px;
 		}
 #buttons{
 	margin: 2px auto 0px 200px; position: relative;
