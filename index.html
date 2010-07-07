@@ -7,9 +7,13 @@
 <title> Live Tabletop </title>
 
 <script type="text/javascript">
-var selectedPanel = "a";
-var selectedBR = "a";
-var selectedTL = "a";
+var blankObject = document.createElement('div');
+blankObject.setAttribute('style', "top: 0px; left 0px;");
+var selectedPanel = blankObject;
+var selectedBR = blankObject;
+var selectedTL = blankObject;
+var selectedBar = blankObject;
+var selectedIW = blankObject;
 var dragX = 0;
 var dragY = 0;
 var clickX = 0;
@@ -19,22 +23,17 @@ var clickDragGap = 0;
 var z = 100;
 var invertResize = 1;
 
-function createPanel(panelName, xPos, yPos, panelWidth, panelHeight) {
-    createButton(panelName);
-    var panelCaption = panelName.substr(0, 1).toUpperCase() + panelName.substr(1);
-    var outerPanel = document.createElement('div');
+function createPanel(outerPanel, panelName, xPos, yPos, panelWidth, panelHeight) {
     outerPanel.setAttribute('class', 'outerPanel');
-    outerPanel.setAttribute('id', panelName + "Panel");
     outerPanel.setAttribute('style', 'left: ' + xPos + 'px; top: ' + yPos + 
 	'px; visibility: hidden;');
-	outerPanel.onmousedown = function(){ panelForward(panelName + "Panel"); };
+	outerPanel.onmousedown = function(){ panelForward(outerPanel); };
 	document.body.appendChild(outerPanel);
 	
       var panelTitle = document.createElement('div');
       panelTitle.setAttribute('class', 'title');	
         var resizeTL = document.createElement('div');
         resizeTL.setAttribute('class', 'resizeTL');
-	    resizeTL.onmousedown = function(){ selectedTL = panelName; };
         var titleStart = document.createElement('div');
         titleStart.setAttribute('class', 'titleStart');
         var titleCaption = document.createElement('div');
@@ -43,26 +42,22 @@ function createPanel(panelName, xPos, yPos, panelWidth, panelHeight) {
         titleEnd.setAttribute('class', 'titleEnd');
         var panelBar = document.createElement('div');
         panelBar.setAttribute('class', 'panelBar');
-        panelBar.setAttribute('id', panelName + 'Bar');
         panelBar.setAttribute('style', 'width: ' + (panelWidth - 36) + 'px;');
-	    panelBar.onmousedown = function(){ selectedPanel = panelName; };
         var panelClose = document.createElement('div');
         panelClose.setAttribute('class', 'close');
-        panelClose.onclick = function(){ showPanel(panelName); };
 	    panelClose.onmouseover = function(){ this.style.backgroundImage = 'url(images/closeHover.png)'; };
 	    panelClose.onmouseout = function(){ this.style.backgroundImage = 'url(images/close.png)'; };
 	    outerPanel.appendChild(panelTitle);
 	    panelTitle.appendChild(resizeTL);
 	    panelTitle.appendChild(titleStart);
 	    panelTitle.appendChild(titleCaption);
-        titleCaption.appendChild(document.createTextNode(panelCaption));
+        titleCaption.appendChild(document.createTextNode(panelName));
 	    panelTitle.appendChild(titleEnd);
 	    panelTitle.appendChild(panelBar);
         panelBar.appendChild(document.createTextNode(" "));
 	    panelTitle.appendChild(panelClose);
 	
       var innerPanel = document.createElement('div');
-      innerPanel.setAttribute('id', panelName + 'IW');
       innerPanel.setAttribute('class', 'innerPanel');
       innerPanel.setAttribute('style', 'width: ' + panelWidth + 'px; height: ' + 
 	    panelHeight + 'px;');
@@ -75,19 +70,18 @@ function createPanel(panelName, xPos, yPos, panelWidth, panelHeight) {
         panelBL.setAttribute('class', 'panelBL');
 	    var panelBR = document.createElement('div')
         panelBR.setAttribute('class', 'resizeBR');
-	    panelBR.onmousedown = function(){ selectedBR = panelName; };
 		panelBottom.appendChild(panelBL);
 		panelBottom.appendChild(panelBR);
-
-}
-
-function createButton(buttonName) {
-    var buttonTitle = buttonName.substr(0, 1).toUpperCase() + buttonName.substr(1);
+// Create Menu Button
     var buttonContainer = document.createElement('div');
     buttonContainer.setAttribute('class', 'buttonUnchecked');
-    buttonContainer.setAttribute('id', buttonName + 'ButtonContainer');
-	buttonContainer.onclick = function(){ showPanel(buttonName); };
+	buttonContainer.onclick = function(){ showPanel(outerPanel, buttonContainer); };
     document.getElementById('buttons').appendChild(buttonContainer);
+    panelClose.onclick = function(){ showPanel(outerPanel, buttonContainer); };
+	panelBar.onmousedown = function(){ selectedPanel = outerPanel; };
+	    panelBR.onmousedown = function(){ selectedBR = outerPanel; selectedIW = innerPanel};
+	resizeTL.onmousedown = function(){ selectedTL = outerPanel;
+      selectedBar = panelBar; selectedIW = innerPanel};
 	var buttonStart = document.createElement('div')
     buttonStart.setAttribute('class', 'buttonStart');
 	var buttonCaption = document.createElement('div')
@@ -97,34 +91,40 @@ function createButton(buttonName) {
     buttonContainer.appendChild(buttonStart);
     buttonContainer.appendChild(buttonCaption);
     buttonContainer.appendChild(buttonEnd);
-    buttonCaption.appendChild(document.createTextNode(buttonTitle));
+    buttonCaption.appendChild(document.createTextNode(panelName));
 }
 
 onload = function (){
-  createPanel('table', 20, 40, 175, 300)
-  createPanel('chat', 220, 40, 175, 300)
-  createPanel('turns', 420, 40, 175, 300)
-  createPanel('tools', 620, 40, 175, 300)
-  createPanel('files', 820, 40, 175, 300)
+
+  var tablePanel = document.createElement('div');
+  createPanel(tablePanel, 'Table', 20, 40, 175, 300)
+  var chatPanel = document.createElement('div');
+  createPanel(chatPanel, 'Chat', 220, 40, 175, 300)
+  var turnsPanel = document.createElement('div');
+  createPanel(turnsPanel, 'Turns', 420, 40, 175, 300)
+  var toolsPanel = document.createElement('div');
+  createPanel(toolsPanel, 'Tools', 620, 40, 175, 300)
+  var filesPanel = document.createElement('div');
+  createPanel(filesPanel, 'Files', 820, 40, 175, 300)
 }
 
-function showPanel(buttonName){
-  if(document.getElementById(buttonName + 'Panel').style.visibility == "hidden"){
-    panelForward(buttonName + 'Panel');
-    document.getElementById(buttonName + 'ButtonContainer').className = "buttonChecked";
-    document.getElementById(buttonName + 'Panel').style.visibility = "visible";
+function showPanel(panelShow, buttonContainer){
+  if(panelShow.style.visibility == "hidden"){
+    panelForward(panelShow);
+    buttonContainer.className = "buttonChecked";
+    panelShow.style.visibility = "visible";
   }else{
-    document.getElementById(buttonName + 'ButtonContainer').className = "buttonUnchecked";
-    document.getElementById(buttonName + 'Panel').style.visibility = "hidden";
+    buttonContainer.className = "buttonUnchecked";
+    panelShow.style.visibility = "hidden";
   }
 }
 
 document.onmouseup = unSelect;
 
 function unSelect(){
-  selectedPanel = 'a';
-  selectedBR = 'a';
-  selectedTL = 'a';
+  selectedPanel = blankObject;
+  selectedBR = blankObject;
+  selectedTL = blankObject;
   clickDragGap = 0;
   return true
 }
@@ -146,18 +146,18 @@ function getMouseXY(e) {
     dragY = e.pageY;
   }
   
-  if( selectedPanel != "a" ){
+  if( selectedPanel != blankObject ){
     movePanel();
   }
-  if( selectedBR != "a" ){
+  if( selectedBR != blankObject ){
     resizePanel();
   }
-  if( selectedTL != "a" ){
+  if( selectedTL != blankObject ){
     resizeMove();
   }
 }
 function movePanel(){
-  w = document.getElementById(selectedPanel + 'Panel');
+  w = selectedPanel;
   if( clickDragGap == 0 ) {
     clickY = dragY - parseInt(w.style.top);
     clickX = dragX - parseInt(w.style.left);
@@ -179,8 +179,8 @@ function movePanel(){
   return true
 }
 function resizePanel(){
-  w = document.getElementById(selectedBR + "IW");
-  bar = document.getElementById(selectedBR + "Bar");
+  w = selectedIW;
+  bar = selectedBar;
   if( clickDragGap == 0 ) {
     clickY = dragY - parseInt(w.style.height);
     clickX = dragX - parseInt(w.style.width);
@@ -196,9 +196,9 @@ function resizePanel(){
   return true
 }
 function resizeMove(){
-  p = document.getElementById(selectedTL + 'Panel');
-  w = document.getElementById(selectedTL + "IW");
-  bar = document.getElementById(selectedTL + "Bar");
+  p = selectedTL;
+  w = selectedIW;
+  bar = selectedBar;
   if( clickDragGap == 0 ) {
     clickY = dragY - parseInt(p.style.top);
     clickX = dragX - parseInt(p.style.left);
@@ -223,10 +223,9 @@ function resizeMove(){
   bar.style.width = (clickCornerX - dragX - 36) + "px";
   return true
 }
-function panelForward(panelHover){
-  var child0 = document.getElementById(panelHover);
-  document.body.removeChild(child0);
-  document.body.appendChild(child0);
+function panelForward(panelFront){
+  document.body.removeChild(panelFront);
+  document.body.appendChild(panelFront);
 }
 </script>
 
