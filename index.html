@@ -44,6 +44,7 @@ function createPanel(panelName, xPos, yPos, panelWidth, panelHeight) {
         var panelBar = document.createElement('div');
         panelBar.setAttribute('class', 'panelBar');
         panelBar.setAttribute('id', panelName + 'Bar');
+        panelBar.setAttribute('style', 'width: ' + (panelWidth - 36) + 'px;');
 	    panelBar.onmousedown = function(){ selectedPanel = panelName; };
         var panelClose = document.createElement('div');
         panelClose.setAttribute('class', 'close');
@@ -235,12 +236,9 @@ function panelForward(panelHover){
 <div id="tabletop"></div>
 
 <div id="pageBar">
-	<div id="buttons">
-	</div>
+	<div id="logo"></div>
+	<div id="buttons"></div>
 </div>
-
-<div id="logo"></div>
-
 
 </body>
 <html>
