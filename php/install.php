@@ -6,6 +6,8 @@
 
 $query = <<<____SCHEMA____
 
+DROP TABLE IF EXISTS users, tiles, tables, pieces, messages, images, stats;
+
 /* USERS TABLE
 
    Passwords are hashed so evildoers who gain access to the database cannot see
@@ -20,6 +22,10 @@ $query = <<<____SCHEMA____
    VARCHAR(200) because MYSQL can only index a finite number of characters. 
    Other references to the user (like cross-references between tables) use the 
    auto-incrementing user_id.
+
+   The last action timestamp records the last time the user was actively using
+   Live Tabletop, so it needs to be updated frequently. It allows us to remove
+   inactive users and content created by inactive users.
 */
 
 CREATE TABLE users (
@@ -28,7 +34,9 @@ CREATE TABLE users (
   password_hash TEXT NOT NULL,
   password_salt TEXT NOT NULL,
   color TEXT,
-  permissions TEXT NOT NULL
+  permissions TEXT NOT NULL,
+  last_action TIMESTAMP,
+  logged_in TINYINT NOT NULL DEFAULT 0
 );
 
 
@@ -145,9 +153,9 @@ CREATE TABLE stats (
 DELIMITER //
 
 
-
 /* Users Procedures */
 
+DROP PROCEDURE IF EXISTS create_user//
 CREATE PROCEDURE create_user (IN the_name VARCHAR(200), IN the_hash TEXT,
   IN the_salt TEXT, IN the_color TEXT, IN the_permissions TEXT)
 BEGIN
@@ -155,21 +163,25 @@ BEGIN
     VALUES (the_name, the_hash, the_salt, the_color, the_permissions);
 END//
 
+DROP PROCEDURE IF EXISTS read_users//
 CREATE PROCEDURE read_users ()
 BEGIN
   SELECT * FROM users ORDER BY name;
 END//
 
+DROP PROCEDURE IF EXISTS read_user_by_name//
 CREATE PROCEDURE read_user_by_name (IN the_name VARCHAR(200))
 BEGIN
   SELECT * FROM users WHERE LOWER(name) = LOWER(the_name);
 END//
 
+DROP PROCEDURE IF EXISTS update_user_password//
 CREATE PROCEDURE update_user_password (IN the_user INT, IN the_hash TEXT, IN the_salt TEXT)
 BEGIN
   UPDATE users SET password_hash = the_hash, password_salt = the_salt WHERE user_id = the_user;
 END//
 
+DROP PROCEDURE IF EXISTS update_user//
 CREATE PROCEDURE update_user (IN the_user INT, IN the_name VARCHAR(200),
   IN the_color TEXT, IN the_permissions TEXT)
 BEGIN
@@ -177,6 +189,13 @@ BEGIN
     WHERE user_id = the_user;
 END//
 
+DROP PROCEDURE IF EXISTS update_user_timestamp//
+CREATE PROCEDURE update_user_timestamp (IN the_user INT)
+BEGIN
+  UPDATE users SET last_action = NOW() WHERE user_id = the_user;
+END//
+
+DROP PROCEDURE IF EXISTS delete_user//
 CREATE PROCEDURE delete_user (IN the_user INT)
 BEGIN
   START TRANSACTION;
@@ -200,6 +219,7 @@ END//
 
 /* Tiles Procedures */
 
+DROP PROCEDURE IF EXISTS create_tiles//
 CREATE PROCEDURE create_tiles (IN the_table INT, IN the_image INT,
   IN the_width SMALLINT, IN the_height SMALLINT)
 BEGIN
@@ -219,12 +239,14 @@ BEGIN
   COMMIT;
 END//
 
+DROP PROCEDURE IF EXISTS read_tiles//
 CREATE PROCEDURE read_tiles (IN the_table INT)
 BEGIN
   SELECT image_id, fog, right_wall, bottom_wall FROM tiles WHERE table_id = the_table
     ORDER BY y, x ASC;
 END//
 
+DROP PROCEDURE IF EXISTS update_tile//
 CREATE PROCEDURE update_tile (IN the_table INT, IN the_x SMALLINT, IN the_y SMALLINT,
   IN the_image INT, IN the_fog TINYINT, IN the_right TINYINT, IN the_bottom TINYINT)
 BEGIN
@@ -236,6 +258,7 @@ BEGIN
   COMMIT;
 END//
 
+DROP PROCEDURE IF EXISTS update_tiles_fill_fog//
 CREATE PROCEDURE update_tiles_fill_fog (IN the_table INT)
 BEGIN
   START TRANSACTION;
@@ -244,6 +267,7 @@ BEGIN
   COMMIT;
 END//
 
+DROP PROCEDURE IF EXISTS update_tiles_clear_fog//
 CREATE PROCEDURE update_tiles_clear_fog (IN the_table INT)
 BEGIN
   START TRANSACTION;
@@ -256,6 +280,7 @@ END//
 
 /* Tables Procedures */
 
+DROP PROCEDURE IF EXISTS create_table//
 CREATE PROCEDURE create_table (IN the_name VARCHAR(200), IN the_image INT,
   IN the_user INT, IN the_rows SMALLINT, IN the_columns SMALLINT, 
   IN the_width INT, IN the_height INT)
@@ -266,22 +291,26 @@ BEGIN
       the_width, the_height, the_width, the_height);
 END//
 
+DROP PROCEDURE IF EXISTS read_table//
 CREATE PROCEDURE read_table (IN the_table INT)
 BEGIN
   SELECT * FROM tables WHERE table_id = the_table;
 END//
 
+DROP PROCEDURE IF EXISTS read_tables//
 CREATE PROCEDURE read_tables ()
 BEGIN
   SELECT * FROM tables, users WHERE tables.user_id = users.user_id
     ORDER BY users.name;
 END//
 
+DROP PROCEDURE IF EXISTS read_tables_by_user_id//
 CREATE PROCEDURE read_tables_by_user_id (IN the_user INT)
 BEGIN
   SELECT * FROM tables WHERE user_id = the_user;
 END//
 
+DROP PROCEDURE IF EXISTS read_table_timestamps//
 CREATE PROCEDURE read_table_timestamps (IN the_table INT)
 BEGIN
   SELECT TIME_TO_SEC(piece_stamp) AS pieceStamp,
@@ -290,6 +319,7 @@ BEGIN
     FROM tables WHERE table_id = the_table;
 END//
 
+DROP PROCEDURE IF EXISTS update_table//
 CREATE PROCEDURE update_table (IN the_table INT, IN the_name VARCHAR(200),
   IN the_user INT, IN the_image INT, IN the_grid_width INT,
   IN the_grid_height INT, IN the_thickness INT, the_color TEXT)
@@ -300,6 +330,7 @@ BEGIN
     WHERE table_id = the_table;
 END//
 
+DROP PROCEDURE IF EXISTS delete_table//
 CREATE PROCEDURE delete_table (IN the_table INT)
 BEGIN
   START TRANSACTION;
@@ -315,6 +346,7 @@ END//
 
 /* Piece Procedures */
 
+DROP PROCEDURE IF EXISTS create_piece//
 CREATE PROCEDURE create_piece (IN the_table INT, IN the_image INT,
   IN the_user INT, IN the_name TEXT, IN the_x INT, IN the_y INT,
   IN the_x_offset INT, IN the_y_offset INT, IN the_width SMALLINT,
@@ -329,11 +361,13 @@ BEGIN
   COMMIT;
 END//
 
+DROP PROCEDURE IF EXISTS read_pieces//
 CREATE PROCEDURE read_pieces (IN the_table INT)
 BEGIN
   SELECT * FROM pieces WHERE table_id = the_table ORDER BY name, user_id;
 END//
 
+DROP PROCEDURE IF EXISTS update_piece//
 CREATE PROCEDURE update_piece (IN the_piece INT, IN the_image INT,
   IN the_user INT, IN the_name TEXT, IN the_x INT, IN the_y INT,
   IN the_x_offset INT, IN the_y_offset INT,
@@ -349,6 +383,7 @@ BEGIN
   COMMIT;
 END//
 
+DROP PROCEDURE IF EXISTS delete_piece//
 CREATE PROCEDURE delete_piece (IN the_piece INT)
 BEGIN
   START TRANSACTION;
@@ -362,6 +397,7 @@ END//
 
 /* Messages Procedures */
 
+DROP PROCEDURE IF EXISTS create_message//
 CREATE PROCEDURE create_message (IN the_table INT, IN the_user INT, IN the_text TEXT)
 BEGIN
   START TRANSACTION;
@@ -370,6 +406,7 @@ BEGIN
   COMMIT;
 END//
 
+DROP PROCEDURE IF EXISTS read_messages//
 CREATE PROCEDURE read_messages (IN the_table INT, IN the_time INT)
 BEGIN
   SELECT * FROM messages
@@ -377,6 +414,7 @@ BEGIN
     ORDER BY time ASC;
 END//
 
+DROP PROCEDURE IF EXISTS expire_messages//
 CREATE PROCEDURE expire_messages ()
 BEGIN
   DELETE FROM messages WHERE time < DATE_SUB(NOW(), INTERVAL 6 HOUR);
@@ -386,21 +424,25 @@ END//
 
 /* Images Procedures */
 
+DROP PROCEDURE IF EXISTS create_image//
 CREATE PROCEDURE create_image (IN the_user INT, IN the_file TEXT)
 BEGIN
   INSERT INTO images (user_id, file) VALUES (the_user, the_file);
 END//
 
+DROP PROCEDURE IF EXISTS read_images//
 CREATE PROCEDURE read_images (IN the_user INT)
 BEGIN
   SELECT * FROM images WHERE user_id = the_user OR public = 1;
 END//
 
+DROP PROCEDURE IF EXISTS update_image//
 CREATE PROCEDURE update_image (IN the_image INT, IN the_user INT, IN the_public INT)
 BEGIN
   UPDATE images SET user_id = the_user, public = the_public WHERE image_id = the_image;
 END//
 
+DROP PROCEDURE IF EXISTS delete_image//
 CREATE PROCEDURE delete_image (IN the_image INT)
 BEGIN
   DELETE FROM images WHERE image_id = the_image;
@@ -409,16 +451,19 @@ END//
 
 /* Stats Procedures */
 
+DROP PROCEDURE IF EXISTS set_stat//
 CREATE PROCEDURE set_stat (IN the_piece INT, IN the_name VARCHAR(200), IN the_value TEXT)
 BEGIN
   REPLACE INTO stats (piece_id, name, value) VALUES (the_piece, the_name, the_value);
 END//
 
+DROP PROCEDURE IF EXISTS get_stat//
 CREATE PROCEDURE get_stat (IN the_piece INT, IN the_name VARCHAR(200))
 BEGIN
   SELECT value FROM stats WHERE piece_id = the_piece AND name = the_name;
 END//
 
+DROP PROCEDURE IF EXISTS delete_stat//
 CREATE PROCEDURE delete_stat (IN the_piece INT, IN the_name VARCHAR(200))
 BEGIN
   DELETE FROM stats WHERE piece_id = the_piece AND name = the_name;
