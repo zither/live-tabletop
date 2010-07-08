@@ -31,6 +31,7 @@ if (strcmp($hash, $row['hash']) != 0) die ($FAIL);
 
 // STEP 4: Save session variables that only the server can modify
 
+session_start();
 $_SESSION['user_id'] = $row['user_id'];
 $_SESSION['permissions'] = $row['permissions'];
 
