@@ -165,9 +165,9 @@ BEGIN
   SELECT * FROM users WHERE LOWER(name) = LOWER(the_name);
 END//
 
-CREATE PROCEDURE update_user_password_hash (IN the_user INT, IN the_hash TEXT)
+CREATE PROCEDURE update_user_password (IN the_user INT, IN the_hash TEXT, IN the_salt TEXT)
 BEGIN
-  UPDATE users SET password_hash = the_hash WHERE user_id = the_user;
+  UPDATE users SET password_hash = the_hash, password_salt = the_salt WHERE user_id = the_user;
 END//
 
 CREATE PROCEDURE update_user (IN the_user INT, IN the_name VARCHAR(200),
@@ -182,6 +182,7 @@ BEGIN
   START TRANSACTION;
   DELETE FROM messages WHERE user_id = the_user;
   DELETE FROM messages WHERE table_id IN (
+    SELECT table_id FROM tables WHERE user_id = the_user);
   DELETE FROM stats WHERE piece_id IN (
     SELECT piece_id FROM pieces WHERE table_id IN (
       SELECT table_id FROM tables WHERE user_id = the_user));
@@ -202,16 +203,18 @@ END//
 CREATE PROCEDURE create_tiles (IN the_table INT, IN the_image INT,
   IN the_width SMALLINT, IN the_height SMALLINT)
 BEGIN
+  DECLARE loop_row INT;
+  DECLARE loop_column INT;
   START TRANSACTION;
-  DECLARE col SMALLINT;
-  DECLARE row SMALLINT;
-  WHILE row < the_height DO
-    WHILE col < the_width DO
+  SET loop_row = 0;
+  WHILE loop_row < the_height DO
+    SET loop_column = 0;
+    WHILE loop_column < the_width DO
       INSERT INTO tiles (x, y, image_id, table_id)
-        VALUES (col, row, the_image, the_table);
-      SET col = col + 1;
+        VALUES (loop_column, loop_row, the_image, the_table);
+      SET loop_column = loop_column + 1;
     END WHILE;
-    SET row = row + 1;
+    SET loop_row = loop_row + 1;
   END WHILE;
   COMMIT;
 END//
@@ -225,7 +228,7 @@ END//
 CREATE PROCEDURE update_tile (IN the_table INT, IN the_x SMALLINT, IN the_y SMALLINT,
   IN the_image INT, IN the_fog TINYINT, IN the_right TINYINT, IN the_bottom TINYINT)
 BEGIN
-  START_TRANSACTION;
+  START TRANSACTION;
   UPDATE tiles SET image = the_image, fog = the_fog, 
       right_wall = the_right, bottom_wall = the_bottom
     WHERE x = the_x AND y = the_y AND table_id = the_table;
@@ -235,7 +238,7 @@ END//
 
 CREATE PROCEDURE update_tiles_fill_fog (IN the_table INT)
 BEGIN
-  START_TRANSACTION;
+  START TRANSACTION;
   UPDATE tiles SET fog = 1 WHERE table_id = the_table;
   UPDATE tables SET tile_stamp = NOW() WHERE table_id = the_table;
   COMMIT;
@@ -243,7 +246,7 @@ END//
 
 CREATE PROCEDURE update_tiles_clear_fog (IN the_table INT)
 BEGIN
-  START_TRANSACTION;
+  START TRANSACTION;
   UPDATE tiles SET fog = 0 WHERE table_id = the_table;
   UPDATE tables SET tile_stamp = NOW() WHERE table_id = the_table;
   COMMIT;
@@ -279,7 +282,7 @@ BEGIN
   SELECT * FROM tables WHERE user_id = the_user;
 END//
 
-CREATE PROCEDURE read_table_timestamps.php (IN the_table INT)
+CREATE PROCEDURE read_table_timestamps (IN the_table INT)
 BEGIN
   SELECT TIME_TO_SEC(piece_stamp) AS pieceStamp,
          TIME_TO_SEC(tile_stamp) AS tileStamp,
@@ -291,7 +294,7 @@ CREATE PROCEDURE update_table (IN the_table INT, IN the_name VARCHAR(200),
   IN the_user INT, IN the_image INT, IN the_grid_width INT,
   IN the_grid_height INT, IN the_thickness INT, the_color TEXT)
 BEGIN
-  UPDATE tables SET name = the_name, user_id = the_user, image_id = the_image
+  UPDATE tables SET name = the_name, user_id = the_user, image_id = the_image,
       grid_width = the_grid_width, grid_height = the_grid_height,
       grid_thickness = the_grid_thickness, grid_color = the_grid_color
     WHERE table_id = the_table;
@@ -331,7 +334,7 @@ BEGIN
   SELECT * FROM pieces WHERE table_id = the_table ORDER BY name, user_id;
 END//
 
-CREATE PROCEDURE update_piece (IN the_piece, IN the_image INT,
+CREATE PROCEDURE update_piece (IN the_piece INT, IN the_image INT,
   IN the_user INT, IN the_name TEXT, IN the_x INT, IN the_y INT,
   IN the_x_offset INT, IN the_y_offset INT,
   IN the_width SMALLINT, IN the_height SMALLINT, IN the_color TEXT)
@@ -408,7 +411,7 @@ END//
 
 CREATE PROCEDURE set_stat (IN the_piece INT, IN the_name VARCHAR(200), IN the_value TEXT)
 BEGIN
-  REPLACE stats SET value = the_value WHERE piece_id = the_piece AND name = the_name;
+  REPLACE INTO stats (piece_id, name, value) VALUES (the_piece, the_name, the_value);
 END//
 
 CREATE PROCEDURE get_stat (IN the_piece INT, IN the_name VARCHAR(200))
