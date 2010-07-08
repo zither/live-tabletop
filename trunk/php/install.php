@@ -1,8 +1,10 @@
 <?php
 
+if (file_exists('db_config.php')) die ("Live Tabletop is already installed.");
+
 include('users.php');
 
-// STEP 1: Interpret the request
+// STEP 1: Interpret the Request
 
 $location = mysqli_real_escape_string($_REQUEST['location']);
 $username = mysqli_real_escape_string($_REQUEST['username']);
@@ -11,32 +13,37 @@ $database = mysqli_real_escape_string($_REQUEST['database']);
 $admin_username = mysqli_real_escape_string($_REQUEST['admin_username']);
 $admin_password = mysqli_real_escape_string($_REQUEST['admin_password']);
 
-// STEP 2: Query the database
+// STEP 2: Query the Database
 
-// connect to database
 $link = mysqli_connect($location , $username , $password, $database)
   or die('Could not connect: ' . mysqli_error());
 
-// create tables and procedures
-$query = file_get_contents('schema.sql');
-$error = true;
 mysqli_autocommit($link, false);
-if (mysqli_multi_query($link, $query)) {
-  $error = false;
+if (mysqli_multi_query($link, file_get_contents('schema.sql'))) {
   do {
     $result = mysqli_store_result($link);
-    if (mysqli_errno() != 0) {$error = true; break;}
+    if (mysqli_errno() != 0) {
+      mysqli_rollback($link);
+      die("Query failed: " . mysqli_error());
+    }
   } while (mysqli_next_result($link);
+  mysqli_commit($link);
 }
-if ($error) {mysqli_rollback($link); die("Query failed: " . mysqli_error());}
-else {mysqli_commit($link);}
+else {
+  mysqli_rollback($link);
+  die("Query failed: " . mysqli_error());
+}
 
-// create admin
 LT_create_user($admin_username, $admin_password, "administrator")
   or die('Query failed: ' . mysqli_error());
 
-// STEP 3: interpret the result (convert $result into a PHP structure or determine success/failure)
-
-// STEP 4: generate output (echo XML based on PHP structure, or indicate success/failure)
+// STEP 3: Create db_config.php
+file_put_contents('db_config.php',
+  "<?php\n"
+  . "\$DBLocation = $location;\n"
+  . "\$DBUsername = $username;\n"
+  . "\$DBPassword = $password;\n"
+  . "\$DBName = $database;\n"
+  . "?>\n";
 
 ?>
