@@ -2,6 +2,7 @@
 
 include('db_config.php');
 include('users.php');
+session_start();
 
 // Failure for any reason results in an empty <users></users> document element.
 // We return same failure result regardless of the reason for failure so that
@@ -20,8 +21,8 @@ $password = mysqli_real_escape_string($_REQUEST['password']);
 $link = mysqli_connect($DBLocation , $DBUsername , $DBPassword, $DBName)
   or die($FAIL);
 
-$query = "CALL get_user_by_name($username)";
-$result = mysqli_query($query) or die($FAIL);
+$query = "CALL get_user_by_name('$username')";
+$result = mysqli_query($link, $query) or die($FAIL);
  
 // STEP 3: Interpret the Result
 
@@ -31,7 +32,6 @@ if (strcmp($hash, $row['hash']) != 0) die ($FAIL);
 
 // STEP 4: Save session variables that only the server can modify
 
-session_start();
 $_SESSION['user_id'] = $row['user_id'];
 $_SESSION['permissions'] = $row['permissions'];
 

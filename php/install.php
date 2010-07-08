@@ -4,6 +4,7 @@ if (file_exists('db_config.php')) die ("Live Tabletop is already installed.");
 
 include('users.php');
 
+
 // STEP 1: Interpret the Request
 
 $DBLocation = mysqli_real_escape_string($_REQUEST['location']);
@@ -13,11 +14,13 @@ $DBName = mysqli_real_escape_string($_REQUEST['database']);
 $admin_username = mysqli_real_escape_string($_REQUEST['admin_username']);
 $admin_password = mysqli_real_escape_string($_REQUEST['admin_password']);
 
+
 // STEP 2: Query the Database
 
 $link = mysqli_connect($DBLocation , $DBUsername , $DBPassword, $DBName)
   or die('Could not connect: ' . mysqli_error());
 
+// create the database schema (tables and stored procedures)
 mysqli_autocommit($link, false);
 if (mysqli_multi_query($link, file_get_contents('schema.sql'))) {
   do {
@@ -34,8 +37,12 @@ else {
   die("Query failed: " . mysqli_error());
 }
 
-LT_create_user($admin_username, $admin_password, "administrator")
-  or die('Query failed: ' . mysqli_error());
+// create an administrator account
+$salt = LT_random_salt();
+$hash = LT_hash_password($admin_password, $salt);
+$query = "CALL create_user('$admin_username', '$hash', '$salt', NULL, 'administrator')";
+mysqli_query($link, $query) or die('Query failed: ' . mysqli_error());
+
 
 // STEP 3: Create db_config.php
 file_put_contents('db_config.php',
@@ -46,4 +53,6 @@ file_put_contents('db_config.php',
   . "\$DBName = $DBName;\n"
   . "?>\n";
 
+
 ?>
+
