@@ -1,11 +1,22 @@
 <?php
 
-// STEP 1: Interpret the request ($_GET, $_POST, $_REQUEST, $_COOKIE, etc.)
+include('db_config.php');
+include('users.php');
+session_start();
 
-// STEP 2: Query the database (get the $result of calling a MySQL prepared statement)
- 
-// STEP 3: interpret the result (convert $result into a PHP structure or determine success/failure)
+// STEP 1: Interpret the Request
 
-// STEP 4: generate output (echo XML based on PHP structure, or indicate success/failure)
+if (!isset($_SESSION['user_id'])) die('You are not logged in.');
+
+$user_id = mysqli_real_escape_string($_SESSION['user_id']);
+$password = mysqli_real_escape_string($_REQUEST['password']);
+$salt = LT_random_salt();
+$hash = LT_hash_password($password, $salt);
+
+// STEP 2: Query the Database
+
+if ($link = mysqli_connect($DBLocation , $DBUsername , $DBPassword, $DBName)) {
+  mysqli_query($link, "CALL update_user_pasword('$user_id', '$hash', '$salt')");
+}
 
 ?>
