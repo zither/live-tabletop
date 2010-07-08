@@ -35,9 +35,9 @@ CREATE TABLE users (
 /* TILES TABLE
 
    Fog is 0 if there is no fog of war on this tile or 1 if there is fog of war
-   on this tile. Right and bottom have the value 2 if there is a door on that 
-   side of the tile, 1 if there is a wall on that side of the tile and 0 if 
-   there is neither a wall nor a door.
+   on this tile. Right and bottom walls have the value 2 if there is a door on
+   that side of the tile, 1 if there is a wall on that side of the tile and 0 
+   if there is neither a wall nor a door.
 */
 
 CREATE TABLE tiles (
@@ -46,8 +46,8 @@ CREATE TABLE tiles (
   y SMALLINT NOT NULL,
   image_id INT,
   fog TINYINT NOT NULL DEFAULT 0,
-  right TINYINT NOT NULL DEFAULT 0,
-  bottom TINYINT NOT NULL DEFAULT 0,
+  right_wall TINYINT NOT NULL DEFAULT 0,
+  bottom_wall TINYINT NOT NULL DEFAULT 0,
   PRIMARY KEY (table_id, x, y)
 );
 
@@ -62,18 +62,18 @@ CREATE TABLE tiles (
 */
 
 CREATE TABLE tables (
-  table_id INT AUTO INCREMENT PRIMARY KEY,
+  table_id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
   image_id INT,
   name VARCHAR(200) NOT NULL UNIQUE,
-  rows SMALLINT NOT NULL,
-  columns SMALLINT NOT NULL,
+  tile_rows SMALLINT NOT NULL,
+  tile_columns SMALLINT NOT NULL,
   tile_width INT NOT NULL DEFAULT 45,
   tile_height INT NOT NULL DEFAULT 45,
   grid_width INT NOT NULL DEFAULT 45,
   grid_height INT NOT NULL DEFAULT 45,
   grid_thickness INT NOT NULL DEFAULT 0,
-  grid_color TEXT NOT NULL DEFAULT 'black',
+  grid_color TEXT,
   piece_stamp TIMESTAMP,
   tile_stamp TIMESTAMP,
   message_stamp TIMESTAMP
@@ -88,7 +88,7 @@ CREATE TABLE tables (
 */
 
 CREATE TABLE pieces (
-  piece_id INT AUTO INCREMENT PRIMARY KEY,
+  piece_id INT AUTO_INCREMENT PRIMARY KEY,
   table_id INT NOT NULL,
   user_id INT NOT NULL,
   image_id INT,
@@ -116,7 +116,7 @@ CREATE TABLE messages (
 /* IMAGES TABLE */
 
 CREATE TABLE images (
-  image_id INT AUTO INCREMENT PRIMARY KEY,
+  image_id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
   file TEXT NOT NULL,
   public TINYINT NOT NULL DEFAULT 0,
@@ -130,7 +130,7 @@ CREATE TABLE stats (
   piece_id INT NOT NULL,
   name VARCHAR(200) NOT NULL,
   value TEXT,
-  PRIMARY KEY (peice_id, name)
+  PRIMARY KEY (piece_id, name)
 );
 
 
@@ -199,8 +199,8 @@ END//
 
 /* Tiles Procedures */
 
-CREATE PROCEDURE create_tiles (IN the_width SMALLINT, IN the_height SMALLINT,
-  IN the_image INT, IN the_table INT)
+CREATE PROCEDURE create_tiles (IN the_table INT, IN the_image INT,
+  IN the_width SMALLINT, IN the_height SMALLINT)
 BEGIN
   START TRANSACTION;
   DECLARE col SMALLINT;
@@ -218,7 +218,7 @@ END//
 
 CREATE PROCEDURE read_tiles (IN the_table INT)
 BEGIN
-  SELECT image_id, fog, right, bottom FROM tiles WHERE table_id = the_table
+  SELECT image_id, fog, right_wall, bottom_wall FROM tiles WHERE table_id = the_table
     ORDER BY y, x ASC;
 END//
 
@@ -226,7 +226,8 @@ CREATE PROCEDURE update_tile (IN the_table INT, IN the_x SMALLINT, IN the_y SMAL
   IN the_image INT, IN the_fog TINYINT, IN the_right TINYINT, IN the_bottom TINYINT)
 BEGIN
   START_TRANSACTION;
-  UPDATE tiles SET image = the_image, fog = the_fog, right = the_right, bottom = the_bottom
+  UPDATE tiles SET image = the_image, fog = the_fog, 
+      right_wall = the_right, bottom_wall = the_bottom
     WHERE x = the_x AND y = the_y AND table_id = the_table;
   UPDATE tables SET tile_stamp = NOW() WHERE table_id = the_table;
   COMMIT;
@@ -256,7 +257,7 @@ CREATE PROCEDURE create_table (IN the_name VARCHAR(200), IN the_image INT,
   IN the_user INT, IN the_rows SMALLINT, IN the_columns SMALLINT, 
   IN the_width INT, IN the_height INT)
 BEGIN
-  INSERT INTO tables (name, image_id, user_id, rows, columns,
+  INSERT INTO tables (name, image_id, user_id, tile_rows, tile_columns,
       tile_width, tile_height, grid_width, grid_height)
     VALUES (the_name, the_image, the_user, the_rows, the_columns,
       the_width, the_height, the_width, the_height);
