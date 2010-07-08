@@ -6,16 +6,16 @@ include('users.php');
 
 // STEP 1: Interpret the Request
 
-$location = mysqli_real_escape_string($_REQUEST['location']);
-$username = mysqli_real_escape_string($_REQUEST['username']);
-$password = mysqli_real_escape_string($_REQUEST['password']);
-$database = mysqli_real_escape_string($_REQUEST['database']);
+$DBLocation = mysqli_real_escape_string($_REQUEST['location']);
+$DBUsername = mysqli_real_escape_string($_REQUEST['username']);
+$DBPassword = mysqli_real_escape_string($_REQUEST['password']);
+$DBName = mysqli_real_escape_string($_REQUEST['database']);
 $admin_username = mysqli_real_escape_string($_REQUEST['admin_username']);
 $admin_password = mysqli_real_escape_string($_REQUEST['admin_password']);
 
 // STEP 2: Query the Database
 
-$link = mysqli_connect($location , $username , $password, $database)
+$link = mysqli_connect($DBLocation , $DBUsername , $DBPassword, $DBName)
   or die('Could not connect: ' . mysqli_error());
 
 mysqli_autocommit($link, false);
@@ -40,10 +40,10 @@ LT_create_user($admin_username, $admin_password, "administrator")
 // STEP 3: Create db_config.php
 file_put_contents('db_config.php',
   "<?php\n"
-  . "\$DBLocation = $location;\n"
-  . "\$DBUsername = $username;\n"
-  . "\$DBPassword = $password;\n"
-  . "\$DBName = $database;\n"
+  . "\$DBLocation = $DBLocation;\n"
+  . "\$DBUsername = $DBUsername;\n"
+  . "\$DBPassword = $DBPassword;\n"
+  . "\$DBName = $DBName;\n"
   . "?>\n";
 
 ?>
