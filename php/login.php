@@ -26,7 +26,7 @@ $result = mysqli_query($link, $query) or die($FAIL);
  
 // STEP 3: Interpret the Result
 
-$row = mysqli_fetch_array($result, MYSQLI_ASSOC)) or die($FAIL);
+$row = mysqli_fetch_array($result, MYSQLI_ASSOC) or die($FAIL);
 $hash = LT_hash_password($password, $row['salt']);
 if (strcmp($hash, $row['hash']) != 0) die ($FAIL);
 
