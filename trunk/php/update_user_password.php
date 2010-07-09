@@ -16,7 +16,7 @@ $hash = LT_hash_password($password, $salt);
 // STEP 2: Query the Database
 
 if ($link = mysqli_connect($DBLocation , $DBUsername , $DBPassword, $DBName)) {
-  mysqli_query($link, "CALL update_user_pasword('$user_id', '$hash', '$salt')");
+  mysqli_query($link, "CALL update_user_pasword($user_id, '$hash', '$salt')");
 }
 
 ?>

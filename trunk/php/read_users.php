@@ -1,11 +1,23 @@
 <?php
 
-// STEP 1: Interpret the request ($_GET, $_POST, $_REQUEST, $_COOKIE, etc.)
+include('db_config.php');
+include('users.php');
+session_start();
 
-// STEP 2: Query the database (get the $result of calling a MySQL prepared statement)
- 
-// STEP 3: interpret the result (convert $result into a PHP structure or determine success/failure)
+if (!isset($_SESSION['user_id'])) die('You are not logged in.');
 
-// STEP 4: generate output (echo XML based on PHP structure, or indicate success/failure)
+echo "<users>\n";
+if ($link = mysqli_connect($DBLocation , $DBUsername , $DBPassword, $DBName)) {
+  if ($result = mysqli_query($link, "CALL read_users()") {
+    while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+      echo "  <user "
+        . "id=\"{$row['user_id']}\" "
+        . "name=\"{$row['name']}\" "
+        . "color=\"{$row['color']}\" "
+        . "permissions=\"{$row['permissions']}\"/>\n";
+    }
+  }
+}
+echo "</users>\n";
 
 ?>
