@@ -1,12 +1,22 @@
 <?php
 
-// STEP 1: Interpret the request ($_GET, $_POST, $_REQUEST, $_COOKIE, etc.)
+include('db_config.php');
+include('roll.php');
+session_start();
 
-// STEP 2: Query the database (get the $result of calling a MySQL prepared statement)
- 
-// STEP 3: interpret the result (convert $result into a PHP structure or determine success/failure)
+if (!isset($_SESSION['user_id'])) die('You are not logged in.');
 
-// STEP 4: generate output (echo XML based on PHP structure, or indicate success/failure)
+// STEP 1: Interpret the Request
+
+$text = mysqli_real_escape_string($_REQUEST['text']);
+
+// STEP 2: Query the Database
+
+// STEP 3: Interpret the Result
+
+include('xml_headers.php');
+
+// STEP 4: Generate Output
 ?>
 Your message was recieved, but not really, because this is just a stub.
 
