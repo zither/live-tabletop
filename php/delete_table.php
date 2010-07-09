@@ -1,11 +1,31 @@
 <?php
 
-// STEP 1: Interpret the request ($_GET, $_POST, $_REQUEST, $_COOKIE, etc.)
+include('db_config.php');
+session_start();
 
-// STEP 2: Query the database (get the $result of calling a MySQL prepared statement)
- 
-// STEP 3: interpret the result (convert $result into a PHP structure or determine success/failure)
+if (!isset($_SESSION['user_id'])) die('You are not logged in.');
 
-// STEP 4: generate output (echo XML based on PHP structure, or indicate success/failure)
+// STEP 1: Interpret the Request
+
+$user_id = mysqli_real_escape_string($_SESSION['user_id']);
+$table_id = mysqli_real_escape_string($_REQUEST['table_id']);
+$admin = strcmp($_SESSION['permissions'], 'administrator') == 0;
+
+// STEP 2: Query the Database
+
+// connect to database
+$link = mysqli_connect($DBLocation , $DBUsername , $DBPassword, $DBName)
+  or die ("Connect error: " + mysqli_error());
+
+// only admins may delete other user's tables
+$result = (mysqli_query($link, "CALL read_table($table_id)")
+  or die ("Query error: " + mysqli_error());
+$row = mysqli_fetch_array($result, MYSQLI_ASSOC);
+if (!$admin && $user_id != $row['user_id'])
+  die("You do not have permission to do this.");
+
+// remove the table from the tables table
+$result = (mysqli_query($link, "CALL delete_table($table_id)")
+  or die ("Query error: " + mysqli_error());
 
 ?>

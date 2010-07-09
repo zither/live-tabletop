@@ -289,6 +289,12 @@ BEGIN
   SELECT * FROM tables WHERE table_id = the_table;
 END//
 
+DROP PROCEDURE IF EXISTS read_table_by_name//
+CREATE PROCEDURE read_table_by_name (IN the_name VARCHAR(200))
+BEGIN
+  SELECT * FROM tables WHERE name = the_name;
+END//
+
 DROP PROCEDURE IF EXISTS read_tables//
 CREATE PROCEDURE read_tables ()
 BEGIN
