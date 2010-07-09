@@ -1,11 +1,11 @@
 <?php
 
 include('db_config.php');
-include('users.php');
 session_start();
 
 if (!isset($_SESSION['user_id'])) die('You are not logged in.');
 
+include('xml_headers.php');
 echo "<users>\n";
 if ($link = mysqli_connect($DBLocation , $DBUsername , $DBPassword, $DBName)) {
   if ($result = mysqli_query($link, "CALL read_users()") {

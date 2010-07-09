@@ -37,6 +37,7 @@ $_SESSION['permissions'] = $row['permissions'];
 
 // STEP 5: Generate Output
 
+include('xml_headers.php');
 echo "<users>\n"
    . "  <user id=\"{$row['user_id']}\" name=\"{$row['name']}\""
    .     " color=\"{$row['color']}\" permissions=\"{$row['permissions']}\"/>\n"
