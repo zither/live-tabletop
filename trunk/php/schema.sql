@@ -401,17 +401,11 @@ END//
 DROP PROCEDURE IF EXISTS read_messages//
 CREATE PROCEDURE read_messages (IN the_table INT, IN the_time INT)
 BEGIN
+  DELETE FROM messages WHERE time < DATE_SUB(NOW(), INTERVAL 6 HOUR);
   SELECT * FROM messages
     WHERE table_id = the_table AND TIME_TO_SEC(time) > the_time
     ORDER BY time ASC;
 END//
-
-DROP PROCEDURE IF EXISTS expire_messages//
-CREATE PROCEDURE expire_messages ()
-BEGIN
-  DELETE FROM messages WHERE time < DATE_SUB(NOW(), INTERVAL 6 HOUR);
-END//
-
 
 
 /* Images Procedures */
