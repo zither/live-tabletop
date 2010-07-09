@@ -21,7 +21,7 @@ $password = mysqli_real_escape_string($_REQUEST['password']);
 $link = mysqli_connect($DBLocation , $DBUsername , $DBPassword, $DBName)
   or die($FAIL);
 
-$query = "CALL get_user_by_name('$username')";
+$query = "CALL read_user_by_name('$username')";
 $result = mysqli_query($link, $query) or die($FAIL);
  
 // STEP 3: Interpret the Result
