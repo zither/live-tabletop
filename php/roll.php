@@ -35,7 +35,7 @@ function LT_roll($roll) {
 // but whose contents are the result of passing that text through LT_roll().
 // The title is displayed as a tooltip in most browsers.
 function LT_expand_rolls($string) {
-  $left = explode('[', $string);
+  $left = explode('[', htmlspecialchars($string));
   $output = $left[0];
   for ($i = 0; $i < count($left); $i++) {
     $right = explode(']', $left[$i]);

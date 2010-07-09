@@ -8,15 +8,15 @@ if (!isset($_SESSION['user_id'])) die('You are not logged in.');
 
 // STEP 1: Interpret the Request
 
-$text = mysqli_real_escape_string($_REQUEST['text']);
+$user_id = mysqli_real_escape_string($_SESSION['user_id']);
+$table_id = mysqli_real_escape_string($_REQUEST['table_id']);
+$text = mysqli_real_escape_string(LT_expand_rolls($_REQUEST['text']));
 
 // STEP 2: Query the Database
 
-// STEP 3: Interpret the Result
+if ($link = mysqli_connect($DBLocation , $DBUsername , $DBPassword, $DBName)) {
+  mysqli_query($link, "CALL create_message($table_id, $user_id, '$text')");
+}
 
-include('xml_headers.php');
-
-// STEP 4: Generate Output
 ?>
-Your message was recieved, but not really, because this is just a stub.
 
