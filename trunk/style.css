@@ -25,11 +25,11 @@ body	{
 	cursor: pointer;
 		}
 .buttonStart{
-	background-image: url(images/buttonStart.jpg); width: 19px; height: 22px;
+	background-image: url(images/buttonUncheck.jpg); width: 19px; height: 22px;
 	float: left;
 		}
 .buttonCaption{
-	height: 22px; float: left; color: #333; font-size: 16px;
+	height: 22px; float: left; color: #CCC; font-size: 16px;
 	font-family: Arial,Helvetica,sans-serif; text-decoration: none;
 	padding: 1px 1px 0px 4px; font-weight: ;
 		}
@@ -38,24 +38,23 @@ body	{
 	float: left;
 		}
 .buttonChecked .buttonStart{ background-image: url(images/buttonCheck.jpg); }
-.buttonChecked .buttonCaption{ color: #CCC; }
 .buttonChecked .buttonEnd { background-image: url(); }
 .resizeTL{
 	background: url(images/resizeTL.png); width: 22px; height: 23px; float: left; margin-left: -6px;
 	cursor: nw-resize;
 		}
 .titleStart	{
-	background-image: url(images/titleA.jpg); width: 5px; height: 23px; margin-left: 1px;
+	background-image: url(images/titleStart.jpg); width: 5px; height: 23px; margin-left: 1px;
 	float: left;
 		}
 .titleCaption{
-	background: url(images/titleB.jpg) repeat-x top left; height: 21px;
+	background: url(images/titleBG.jpg) repeat-x top left; height: 21px;
 	float: left; color: #CCC; font-size: 16px;
 	font-family: Arial,Helvetica,sans-serif; text-decoration: none;
 	padding: 2px 0px 0px 0px;
 		}
 .titleEnd	{
-	background-image: url(images/titleC.jpg); width: 5px; height: 23px;
+	background-image: url(images/titleEnd.jpg); width: 5px; height: 23px;
 	float: left;
 		}
 .close	{
