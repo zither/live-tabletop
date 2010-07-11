@@ -150,48 +150,55 @@ function getMouseXY(e) {
   }
 }
 function movePanel(){
-  w = selectedPanel.outerPanel;
+  var panel = selectedPanel.outerPanel;
   var panelW = parseInt(selectedPanel.innerPanel.style.width);
+  var panelH = parseInt(selectedPanel.innerPanel.style.height);
   if( clickDragGap == 0 ) {
-    clickY = dragY - parseInt(w.style.top);
-    clickX = dragX - parseInt(w.style.left);
+    clickY = dragY - parseInt(panel.style.top);
+    clickX = dragX - parseInt(panel.style.left);
     clickDragGap = 1;
   }
   dragX = dragX - clickX;
   dragY = dragY - clickY;
   if (dragY < 0){dragY = 0;}
   if (dragX < 6){dragX = 6;}
-  if (dragX > document.body.clientWidth - panelW - 8 ){
-  dragX = document.body.clientWidth - panelW - 8 ;}
-  if (dragY > document.body.clientHeight - 40){
-  dragY = document.body.clientHeight - 40;}
-  w.style.top  = dragY + "px";
-  w.style.left = dragX + "px";
+  if (dragX > window.innerWidth - panelW - 25 ){
+  dragX = window.innerWidth - panelW - 25 ;}
+  if (dragY > window.innerHeight - panelH - 61){
+  dragY = window.innerHeight - panelH - 61;}
+  panel.style.top  = dragY + "px";
+  panel.style.left = dragX + "px";
   // lock to grid
   //locX = (dragX / ' . $configTileWidth . ') + 1;
   //locY = (dragY / ' . $configTileHeight . ');
   return true
 }
 function resizePanel(){
-  w = selectedBR.innerPanel;
-  bar = selectedBR.panelBar;
-  var panelWidth = parseInt(w.style.width);
+  var panel = selectedBR.innerPanel;
+  var bar = selectedBR.panelBar;
+  var panelH = parseInt(panel.style.height);
+  var panelWidth = parseInt(panel.style.width);
   var panelX = parseInt(selectedBR.outerPanel.style.left);
+  var panelY = parseInt(selectedBR.outerPanel.style.top);
   if( clickDragGap == 0 ) {
-    clickY = dragY - parseInt(w.style.height);
-    clickX = dragX - parseInt(w.style.width);
+    clickY = dragY - parseInt(panel.style.height);
+    clickX = dragX - parseInt(panel.style.width);
     clickDragGap = 1;
   }
   dragX = dragX - clickX;
   dragY = dragY - clickY;
   if (dragY < 100){dragY = 100;}
   if (dragX < 100){dragX = 100;}
-  if (panelX + dragX + 8 > document.body.clientWidth ){
-    w.style.width = (document.body.clientWidth - panelX - 8) + "px";
+  if (panelX + dragX + 25 > window.innerWidth ){
+    panel.style.width = (window.innerWidth - panelX - 25) + "px";
   } else {
-    w.style.width = dragX + "px";
+    panel.style.width = dragX + "px";
   }
-  w.style.height  = dragY + "px";
+  if (dragY + panelY + 61 > window.innerHeight){
+    panel.style.height = (window.innerHeight - panelY - 61) + "px";
+  } else {
+    panel.style.height = dragY + "px";
+  }
   bar.style.width = (dragX - 36) + "px";
   return true
 }
