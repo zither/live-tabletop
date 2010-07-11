@@ -210,11 +210,6 @@ function resizeMove(){
   if (dragY < clickY){dragY = clickY;}
   if (dragX > clickCornerX - 100){dragX = clickCornerX - 100;}
   if (dragY > clickCornerY - 100){dragY = clickCornerY - 100;}
-  if (dragX > document.body.clientWidth - 40){
-  dragX = document.body.clientWidth - 40;}
-  if (dragY > document.body.clientHeight - 40){
-  dragY = document.body.clientHeight - 40;}
-	
   p.style.left = (dragX - clickX) + "px";
   p.style.top  = (dragY - clickY) + "px";
   w.style.width = (clickCornerX - dragX) + "px";
