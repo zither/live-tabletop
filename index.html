@@ -151,6 +151,7 @@ function getMouseXY(e) {
 }
 function movePanel(){
   w = selectedPanel.outerPanel;
+  var panelW = parseInt(selectedPanel.innerPanel.style.width);
   if( clickDragGap == 0 ) {
     clickY = dragY - parseInt(w.style.top);
     clickX = dragX - parseInt(w.style.left);
@@ -159,9 +160,9 @@ function movePanel(){
   dragX = dragX - clickX;
   dragY = dragY - clickY;
   if (dragY < 0){dragY = 0;}
-  if (dragX < 0){dragX = 0;}
-  if (dragX > document.body.clientWidth - 40){
-  dragX = document.body.clientWidth - 40;}
+  if (dragX < 6){dragX = 6;}
+  if (dragX > document.body.clientWidth - panelW - 8 ){
+  dragX = document.body.clientWidth - panelW - 8 ;}
   if (dragY > document.body.clientHeight - 40){
   dragY = document.body.clientHeight - 40;}
   w.style.top  = dragY + "px";
@@ -174,6 +175,8 @@ function movePanel(){
 function resizePanel(){
   w = selectedBR.innerPanel;
   bar = selectedBR.panelBar;
+  var panelWidth = parseInt(w.style.width);
+  var panelX = parseInt(selectedBR.outerPanel.style.left);
   if( clickDragGap == 0 ) {
     clickY = dragY - parseInt(w.style.height);
     clickX = dragX - parseInt(w.style.width);
@@ -183,8 +186,12 @@ function resizePanel(){
   dragY = dragY - clickY;
   if (dragY < 100){dragY = 100;}
   if (dragX < 100){dragX = 100;}
+  if (panelX + dragX + 8 > document.body.clientWidth ){
+    w.style.width = (document.body.clientWidth - panelX - 8) + "px";
+  } else {
+    w.style.width = dragX + "px";
+  }
   w.style.height  = dragY + "px";
-  w.style.width = dragX + "px";
   bar.style.width = (dragX - 36) + "px";
   return true
 }
@@ -199,9 +206,8 @@ function resizeMove(){
     clickCornerX = dragX + parseInt(w.style.width);
     clickDragGap = 1;
   }
-  
-  if (dragX < 0){dragX = 0;}
-  if (dragY < 0){dragY = 0;}
+  if (dragX < clickX + 6 ){dragX = clickX + 6;}
+  if (dragY < clickY){dragY = clickY;}
   if (dragX > clickCornerX - 100){dragX = clickCornerX - 100;}
   if (dragY > clickCornerY - 100){dragY = clickCornerY - 100;}
   if (dragX > document.body.clientWidth - 40){
