@@ -21,7 +21,7 @@ $link = mysqli_connect($DBLocation , $DBUsername , $DBPassword, $DBName)
   or die('Could not connect: ' . mysqli_error());
 
 // create the database schema (tables and stored procedures)
-mysqli_autocommit($link, false);
+mysqli_autocommit($link, FALSE);
 if (mysqli_multi_query($link, file_get_contents('schema.sql'))) {
   do {
     $result = mysqli_store_result($link);

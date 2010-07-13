@@ -1,11 +1,17 @@
 <?php
 
-// STEP 1: Interpret the request ($_GET, $_POST, $_REQUEST, $_COOKIE, etc.)
+session_start();
 
-// STEP 2: Query the database (get the $result of calling a MySQL prepared statement)
- 
-// STEP 3: interpret the result (convert $result into a PHP structure or determine success/failure)
+include('db_config.php');
+include('ownership.php');
 
-// STEP 4: generate output (echo XML based on PHP structure, or indicate success/failure)
+$table_id = mysqli_real_escape_string($_REQUEST['table_id']);
+
+if (LT_can_modify_table($table_id)) {
+  $link = mysqli_connect($DBLocation , $DBUsername , $DBPassword, $DBName)
+    or die ("Connect failed: " + mysqli_error());
+  $result = mysqli_query($link, "CALL update_tiles_clear_fog($table_id)")
+    or die ("Query failed: " + mysqli_error());
+}
 
 ?>
