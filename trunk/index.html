@@ -160,12 +160,12 @@ function movePanel(){
   }
   dragX = dragX - clickX;
   dragY = dragY - clickY;
-  if (dragY < 0){dragY = 0;}
-  if (dragX < 6){dragX = 6;}
   if (dragX > window.innerWidth - panelW - 25 ){
   dragX = window.innerWidth - panelW - 25 ;}
   if (dragY > window.innerHeight - panelH - 61){
   dragY = window.innerHeight - panelH - 61;}
+  if (dragY < 0){dragY = 0;}
+  if (dragX < 6){dragX = 6;}
   panel.style.top  = dragY + "px";
   panel.style.left = dragX + "px";
   // lock to grid
