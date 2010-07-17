@@ -37,6 +37,7 @@ else {
   die("Query failed: " . $LT_SQL->error);
 }
 
+
 // Create an Administrator Account
 
 $salt = LT_random_salt();

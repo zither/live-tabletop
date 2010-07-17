@@ -1,45 +1,42 @@
 <?php
 
-include('db_config.php');
 session_start();
-
 if (!isset($_SESSION['user_id'])) die('You are not logged in.');
 
-// STEP 1: Interpret the Request
+include('db_config.php');
 
-$user_id = mysqli_real_escape_string($_SESSION['user_id']);
+// Interpret the Request
 
-$name = mysqli_real_escape_string($_REQUEST['name']);
-$background = mysqli_real_escape_string($_REQUEST['background']);
+$user_id = $LT_SQL->real_escape_string($_SESSION['user_id']);
 
-$tile_rows = mysqli_real_escape_string($_REQUEST['tile_rows']);
-$tile_columns = mysqli_real_escape_string($_REQUEST['tile_columns']);
-$tile_width = mysqli_real_escape_string($_REQUEST['tile_width']);
-$tile_height = mysqli_real_escape_string($_REQUEST['tile_height']);
+$name = $LT_SQL->real_escape_string($_REQUEST['name']);
+$background = $LT_SQL->real_escape_string($_REQUEST['background']);
 
-$grid_width = mysqli_real_escape_string($_REQUEST['grid_width']);
-$grid_height = mysqli_real_escape_string($_REQUEST['grid_height']);
-$grid_thickness = mysqli_real_escape_string($_REQUEST['grid_thickness']);
-$grid_color = mysqli_real_escape_string($_REQUEST['grid_color']);
+$tile_rows = $LT_SQL->real_escape_string($_REQUEST['tile_rows']);
+$tile_columns = $LT_SQL->real_escape_string($_REQUEST['tile_columns']);
+$tile_width = $LT_SQL->real_escape_string($_REQUEST['tile_width']);
+$tile_height = $LT_SQL->real_escape_string($_REQUEST['tile_height']);
 
-// STEP 2: Query the Database
+$grid_width = $LT_SQL->real_escape_string($_REQUEST['grid_width']);
+$grid_height = $LT_SQL->real_escape_string($_REQUEST['grid_height']);
+$grid_thickness = $LT_SQL->real_escape_string($_REQUEST['grid_thickness']);
+$grid_color = $LT_SQL->real_escape_string($_REQUEST['grid_color']);
 
-$link = mysqli_connect($DBLocation , $DBUsername , $DBPassword, $DBName)
-  or die ("Connect failed: " + mysqli_error());
+// Query the Database
 
-$query = "CALL create_table('$name', $background, $user_id, "
+$LT_SQL->query("CALL create_table('$name', $background, $user_id, "
   . "$tile_rows, $tile_columns, $tile_width, $tile_height, "
-  . "$grid_width, $grid_height, $grid_thickness, '$grid_color')";
-$result = mysqli_query($link, $query) or die ("Query failed: " + mysqli_error());
+  . "$grid_width, $grid_height, $grid_thickness, '$grid_color')")
+  or die ("Query failed: " . $LT_SQL->error);
 
-$query = "CALL read_table_by_name('$name')";
-$result = mysqli_query($link, $query) or die ("Query failed: " + mysqli_error());
+$LT_SQL->query("CALL read_table_by_name('$name')")
+  or die ("Query failed: " . $LT_SQL->error);
 
-// STEP 3: Generate Output
+// Generate Output
 
 include('xml_headers.php');
 echo "<tables>\n";
-while($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+while($row = $result->fetch_assoc()) {
   echo "  <table"
     . " id=\"{$row['table_id']}\""
     . " user=\"{$row['user_id']}\""

@@ -1,47 +1,37 @@
 <?php
 
+session_start();
+
 include('db_config.php');
 include('users.php');
-session_start();
 
 // Failure for any reason results in an empty <users></users> document element.
 // We return same failure result regardless of the reason for failure so that
 // we don't help password crackers figure out if they got the wrong password
 // or the wrong username or the wrong argument names.
 
-$FAIL = "<users></users>\n";
+// Interpret the Request
 
-// STEP 1: Interpret the Request
+$username = $LT_SQL->real_escape_string($_REQUEST['username']);
+$password = $LT_SQL->real_escape_string($_REQUEST['password']);
 
-$username = mysqli_real_escape_string($_REQUEST['username']);
-$password = mysqli_real_escape_string($_REQUEST['password']);
-
-// STEP 2: Query the Database
-
-$link = mysqli_connect($DBLocation , $DBUsername , $DBPassword, $DBName)
-  or die($FAIL);
-
-$query = "CALL read_user_by_name('$username')";
-$result = mysqli_query($link, $query) or die($FAIL);
- 
-// STEP 3: Interpret the Result
-
-$row = mysqli_fetch_array($result, MYSQLI_ASSOC) or die($FAIL);
-$hash = LT_hash_password($password, $row['salt']);
-if (strcmp($hash, $row['hash']) != 0) die ($FAIL);
-
-// STEP 4: Save session variables that only the server can modify
-
-$_SESSION['user_id'] = $row['user_id'];
-$_SESSION['permissions'] = $row['permissions'];
-
-// STEP 5: Generate Output
+// Query the Database and Generate Output
 
 include('xml_headers.php');
-echo "<users>\n"
-   . "  <user id=\"{$row['user_id']}\" name=\"{$row['name']}\""
-   .     " color=\"{$row['color']}\" permissions=\"{$row['permissions']}\"/>\n"
-   . "</users>\n";
+echo "<users>\n";
+if ($result = $LT_SQL->query("CALL read_user_by_name('$username')")) {
+  if ($row = $result->fetch_assoc()) {
+    $hash = LT_hash_password($password, $row['salt']);
+    if (strcmp($hash, $row['hash']) == 0) {
+      // Save session variables that only the server can modify
+      $_SESSION['user_id'] = $row['user_id'];
+      $_SESSION['permissions'] = $row['permissions'];
+      echo "  <user id=\"{$row['user_id']}\" name=\"{$row['name']}\" "
+        . "color=\"{$row['color']}\" permissions=\"{$row['permissions']}\"/>\n";
+    }
+  }
+}
+echo "</users>\n";
 
 ?>
 

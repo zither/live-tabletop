@@ -1,27 +1,24 @@
 <?php
 
-include('db_config.php');
 session_start();
-
 if (!isset($_SESSION['user_id'])) die('You are not logged in.');
 
-// STEP 1: Interpret the Request
+include('db_config.php');
 
-$user_id = mysqli_real_escape_string($_SESSION['user_id']);
+// Interpret the Request
 
-// STEP 2: Query the Database
+$user_id = $LT_SQL->real_escape_string($_SESSION['user_id']);
 
-$link = mysqli_connect($DBLocation , $DBUsername , $DBPassword, $DBName)
-  or die ("Connect failed: " + mysqli_error());
+// Query the Database
 
-$query = "CALL read_tables_by_user_id($user_id)";
-$result = mysqli_query($link, $query) or die ("Query failed: " + mysqli_error());
+$result = $LT_SQL->query("CALL read_tables_by_user_id($user_id)")
+  or die ("Query failed: " . $LT_SQL->error);
 
-// STEP 3: Generate Output
+// Generate Output
 
 include('xml_headers.php');
 echo "<tables>\n";
-while($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+while($row = $result->fetch_assoc()) {
   echo "  <table"
     . " id=\"{$row['table_id']}\""
     . " user=\"{$row['user_id']}\""
