@@ -7,18 +7,17 @@ if (!isset($_SESSION['user_id'])) die('You are not logged in.');
 if (strcmp($_SESSION['permissions'], 'administrator') != 0)
   die ("You do not have permission to do this.");
 
-// STEP 1: Interpret the Request
+// Interpret the Request
 
-$user_id = mysqli_real_escape_string($_REQUEST['user_id']);
-$username = mysqli_real_escape_string($_REQUEST['username']);
-$color = mysqli_real_escape_string($_REQUEST['color']);
-$permissions = mysqli_real_escape_string($_REQUEST['permissions']);
+$user_id = $LT_SQL->real_escape_string($_REQUEST['user_id']);
+$username = $LT_SQL->real_escape_string($_REQUEST['username']);
+$color = $LT_SQL->real_escape_string($_REQUEST['color']);
+$permissions = $LT_SQL->real_escape_string($_REQUEST['permissions']);
 
-// STEP 2: Query the Database
+// Query the Database
 
-$link = mysqli_connect($DBLocation , $DBUsername , $DBPassword, $DBName)
-  or die('Could not connect: ' . mysqli_error());
-$query = "CALL update_user($user_id, '$username', '$color', '$permissions')";
-mysqli_query($link, $query) or die('Query failed: ' . mysqli_error());
+$LT_SQL->query(
+  "CALL update_user($user_id, '$username', '$color', '$permissions')")
+  or die('Query failed: ' . $LT_SQL->error);
 
 ?>

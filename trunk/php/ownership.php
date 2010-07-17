@@ -15,12 +15,10 @@ function LT_can_modify_table($table_id) {
   if (strcmp($_SESSION['permissions'], 'administrator') == 0) return TRUE;
 
   // other users can only update tables they own
-  $user_id = mysqli_real_escape_string($_SESSION['user_id']);
-  if ($link = mysqli_connect($DBLocation , $DBUsername , $DBPassword, $DBName)) {
-    if ($result = (mysqli_query($link, "CALL read_table($table_id)")) {
-      if ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
-        return $user_id == $row['user_id'];
-      }
+  $user_id = $LT_SQL->real_escape_string($_SESSION['user_id']);
+  if ($result = ($LT_SQL->query("CALL read_table($table_id)")) {
+    if ($row = $result->fetch_assoc()) {
+      return $user_id == $row['user_id'];
     }
   }
   // a FALSE result could also mean an SQL error or bad table id

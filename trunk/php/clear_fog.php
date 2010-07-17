@@ -5,13 +5,15 @@ session_start();
 include('db_config.php');
 include('ownership.php');
 
-$table_id = mysqli_real_escape_string($_REQUEST['table_id']);
+// Interpret the Request
+
+$table_id = $LT_SQL->real_escape_string($_REQUEST['table_id']);
+
+// Query the Database
 
 if (LT_can_modify_table($table_id)) {
-  $link = mysqli_connect($DBLocation , $DBUsername , $DBPassword, $DBName)
-    or die ("Connect failed: " + mysqli_error());
-  $result = mysqli_query($link, "CALL update_tiles_clear_fog($table_id)")
-    or die ("Query failed: " + mysqli_error());
+  $LT_SQL->query("CALL update_tiles_clear_fog($table_id)")
+    or die ("Query failed: " . $LT_SQL->error);
 }
 
 ?>
