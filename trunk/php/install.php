@@ -48,10 +48,10 @@ mysqli_query($link, $query) or die('Query failed: ' . mysqli_error($link));
 // STEP 3: Create db_config.php
 file_put_contents('db_config.php',
   "<?php\n"
-  . "\$DBLocation = $DBLocation;\n"
-  . "\$DBUsername = $DBUsername;\n"
-  . "\$DBPassword = $DBPassword;\n"
-  . "\$DBName = $DBName;\n"
+  . "\$DBLocation = '$DBLocation';\n"
+  . "\$DBUsername = '$DBUsername';\n"
+  . "\$DBPassword = '$DBPassword';\n"
+  . "\$DBName = '$DBName';\n"
   . "?>\n");
 
 
