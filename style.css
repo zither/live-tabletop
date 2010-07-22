@@ -17,16 +17,15 @@ body	{
 	margin: 2px auto 0px 200px; position: relative;
 		}
 .buttonUnchecked{
-	background: url(images/buttonContainer.jpg) repeat-x left top; height: 22px;
-	float: left; margin: 0px 0px 0px 12px; cursor: pointer;
+	height: 22px; float: left; margin: 0px 0px 0px 12px; cursor: pointer;
 		}
 .buttonChecked{
 	background: url(); height: 22px; float: left; margin: 0px 0px 0px 12px;
 	cursor: pointer;
 		}
 .buttonStart{
-	background-image: url(images/buttonUncheck.jpg); width: 19px; height: 22px;
-	float: left;
+	background-image: url(images/buttonUncheck.png); width: 19px; height: 19px;
+	float: left; margin-top: 3px;
 		}
 .buttonCaption{
 	height: 22px; float: left; color: #CCC; font-size: 16px;
@@ -37,7 +36,7 @@ body	{
 	background-image: url(images/buttonEnd.jpg); width: 5px; height: 22px;
 	float: left;
 		}
-.buttonChecked .buttonStart{ background-image: url(images/buttonCheck.jpg); }
+.buttonChecked .buttonStart{ background-image: url(images/buttonCheck.PNG); }
 .buttonChecked .buttonEnd { background-image: url(); }
 .resizeTL{
 	background: url(images/resizeTL.png); width: 22px; height: 23px; float: left; margin-left: -6px;
