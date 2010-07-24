@@ -187,6 +187,16 @@ var tests = [
     var result = (count == 1) ? "PASS" : "FAIL [returned " + count + " users]";
     LT_create_element("div", {}, document.body, "login.php: " + result);
 
+// PRIVATE ROLL
+
+    LT_ajax_request("POST", "private_roll.php", 
+      {text: "From 1975 - 2010, [0 + 2010 - 1975] years passed."}, tests.shift());
+  },
+  function (ajax) {
+    var text = unescape(ajax.responseXML.getElementsByTagName("message")[0].textContent.replace(/^\s+|\s+$/g, ''));
+    var result = (text == 'From 1975 - 2010, <span title="0 + 2010 - 1975">35</span> years passed.') ? "PASS" : "FAIL [" + text + "]";
+    LT_create_element("div", {}, document.body, "private_roll.php: " + result);
+
 // FINISHED
 
     LT_create_element("div", {}, document.body, "... finished!");
