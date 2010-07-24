@@ -197,6 +197,82 @@ var tests = [
     var result = (text == 'From 1975 - 2010, <span title="0 + 2010 - 1975">35</span> years passed.') ? "PASS" : "FAIL [" + text + "]";
     LT_create_element("div", {}, document.body, "private_roll.php: " + result);
 
+// CREATE USER
+
+    LT_ajax_request("POST", "create_user.php", 
+      {username: "larry", password: "curly", permissions: "user"}, tests.shift());
+  },
+  function (ajax) {
+    var text = ajax.responseText.replace(/^\s+|\s+$/g, '');
+    var result = (text == "") ? "PASS" : "FAIL [" + text + "]";
+    LT_create_element("div", {}, document.body, "create_user.php: " + result);
+    LT_ajax_request("POST", "login.php", 
+      {username: "larry", password: "curly"}, tests.shift());
+  },
+  function (ajax) {
+    var count = ajax.responseXML.getElementsByTagName("user").length;
+    var result = (count == 1) ? "PASS" : "FAIL [returned " + count + " users]";
+    LT_create_element("div", {}, document.body, "login.php: " + result);
+    LT_ajax_request("POST", "login.php", 
+      {username: ADMIN_USERNAME, password: ADMIN_PASSWORD}, tests.shift());
+  },
+  function (ajax) {
+    var count = ajax.responseXML.getElementsByTagName("user").length;
+    var result = (count == 1) ? "PASS" : "FAIL [returned " + count + " users]";
+    LT_create_element("div", {}, document.body, "login.php: " + result);
+
+// READ USERS
+
+    LT_ajax_request("POST", "read_users.php", {}, tests.shift());
+  },
+  function (ajax) {
+    var count = ajax.responseXML.getElementsByTagName("user").length;
+    var result = (count == 2) ? "PASS" : "FAIL [returned " + count + " users]";
+    LT_create_element("div", {}, document.body, "read_users.php: " + result);
+
+// UPDATE USER
+
+    LT_ajax_request("POST", "update_user.php", {
+        user_id: 2,
+        username: "moe",
+        color: "green",
+        permissions: "administrator"
+      }, tests.shift());
+  },
+  function (ajax) {
+    var text = ajax.responseText.replace(/^\s+|\s+$/g, '');
+    var result = (text == "") ? "PASS" : "FAIL [" + text + "]";
+    LT_create_element("div", {}, document.body, "update_user.php: " + result);
+    LT_ajax_request("POST", "read_users.php", {}, tests.shift());
+  },
+  function (ajax) {
+    var result = "FAIL [" + ajax.responseText + "]";
+    var users = ajax.responseXML.getElementsByTagName("user");
+    for (var i = 0; i < users.length; i++) {
+      if (users[i].getAttribute("id") == "2"
+        && users[i].getAttribute("name") == "moe"
+        && users[i].getAttribute("color") == "green"
+        && users[i].getAttribute("permissions") == "administrator"
+      ) result = "PASS";
+    }
+    LT_create_element("div", {}, document.body, "update_user.php: " + result);
+
+// DELETE USER
+
+    LT_ajax_request("POST", "delete_user.php", {user_id: 2}, tests.shift());
+  },
+  function (ajax) {
+    var text = ajax.responseText.replace(/^\s+|\s+$/g, '');
+    var result = (text == "") ? "PASS" : "FAIL [" + text + "]";
+    LT_create_element("div", {}, document.body, "delete_user.php: " + result);
+    LT_ajax_request("POST", "read_users.php", {}, tests.shift());
+  },
+  function (ajax) {
+    var count = ajax.responseXML.getElementsByTagName("user").length;
+    var result = (count == 1) ? "PASS" : "FAIL [returned " + count + " users]";
+    LT_create_element("div", {}, document.body, "read_users.php: " + result);
+
+
 // FINISHED
 
     LT_create_element("div", {}, document.body, "... finished!");
