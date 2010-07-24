@@ -146,7 +146,7 @@ CREATE TABLE messages (
   table_id INT NOT NULL,
   user_id INT NOT NULL,
   text TEXT,
-  time TIMESTAMP
+  time_stamp TIMESTAMP
 );
 
 
@@ -158,7 +158,7 @@ CREATE TABLE images (
   file TEXT NOT NULL,
   type TEXT NOT NULL,
   public TINYINT NOT NULL DEFAULT 0,
-  time TIMESTAMP
+  time_stamp TIMESTAMP
 );
 
 
@@ -187,12 +187,16 @@ END;
 
 CREATE PROCEDURE read_users ()
 BEGIN
-  SELECT * FROM users ORDER BY name;
+  SELECT user_id, name, password_hash, password_salt, color, permissions, logged_in,
+    TIME_TO_SEC(TIMEDIFF(last_action, '1970-01-01 00:00:00')) AS last_action
+    FROM users ORDER BY name;
 END; 
 
 CREATE PROCEDURE read_user_by_name (IN the_name VARCHAR(200))
 BEGIN
-  SELECT * FROM users WHERE LOWER(name) = LOWER(the_name);
+  SELECT user_id, name, password_hash, password_salt, color, permissions, logged_in,
+    TIME_TO_SEC(TIMEDIFF(last_action, '1970-01-01 00:00:00')) AS last_action
+    FROM users WHERE LOWER(name) = LOWER(the_name);
 END; 
 
 CREATE PROCEDURE update_user_password (IN the_user INT, IN the_hash TEXT, IN the_salt TEXT)
@@ -413,15 +417,15 @@ END;
 
 CREATE PROCEDURE read_messages (IN the_table INT, IN the_time INT)
 BEGIN
-  SELECT * FROM messages
-    WHERE table_id = the_table 
-    AND TIME_TO_SEC(TIMEDIFF(time, '1970-01-01 00:00:00')) > the_time
+  SELECT table_id, user_id, text,
+    TIME_TO_SEC(TIMEDIFF(time_stamp, '1970-01-01 00:00:00')) AS time
+    FROM messages WHERE table_id = the_table AND time > the_time
     ORDER BY time ASC;
 END; 
 
 CREATE PROCEDURE expire_messages ()
 BEGIN
-  DELETE FROM messages WHERE time < DATE_SUB(NOW(), INTERVAL 6 HOUR);
+  DELETE FROM messages WHERE time_stamp < DATE_SUB(NOW(), INTERVAL 6 HOUR);
 END; 
 
 
@@ -436,13 +440,16 @@ END;
 
 CREATE PROCEDURE read_images (IN the_type TEXT)
 BEGIN
-  SELECT * FROM images WHERE type = the_type;
+  SELECT image_id, user_id, file, type, public,
+    TIME_TO_SEC(TIMEDIFF(time_stamp, '1970-01-01 00:00:00')) AS time
+    FROM images WHERE type = the_type;
 END; 
 
 CREATE PROCEDURE read_images_useable (IN the_user INT, IN the_type TEXT)
 BEGIN
-  SELECT * FROM images
-    WHERE type = the_type AND (user_id = the_user OR public = 1);
+  SELECT image_id, user_id, file, type, public,
+    TIME_TO_SEC(TIMEDIFF(time_stamp, '1970-01-01 00:00:00')) AS time
+    FROM images WHERE type = the_type AND (user_id = the_user OR public = 1);
 END; 
 
 CREATE PROCEDURE update_image (IN the_image INT, IN the_user INT, IN the_public INT)
