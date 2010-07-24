@@ -65,6 +65,9 @@ var CREATE_TABLE_ARGS = {
 var tests = [
   function () {
     LT_create_element("div", {}, document.body, "Starting tests ...");
+
+// INSTALL
+
     LT_ajax_request("POST", "install.php", {
         location:"<?php echo $_REQUEST['location'];?>",
         database:"<?php echo $_REQUEST['database'];?>",
@@ -77,72 +80,115 @@ var tests = [
   function (ajax) {
     var text = ajax.responseText.replace(/^\s+|\s+$/g, '');
     var result = (text == "") ? "PASS" : "FAIL [" + text + "]";
-    LT_create_element("pre", {}, document.body, "install.php: " + result);
+    LT_create_element("div", {}, document.body, "install.php: " + result);
     if (text == "") // only continue if this first test passes 
       LT_ajax_request("POST", "db_config.php", {}, tests.shift());
   },
   function (ajax) {
     var result = (ajax.status == 200) ? "PASS" : "FAIL [status = " + ajax.status + "]";
-    LT_create_element("pre", {}, document.body, "db_config.php: " + result);
+    LT_create_element("div", {}, document.body, "db_config.php: " + result);
+
+// LOGIN
+
     LT_ajax_request("POST", "login.php", 
       {username:ADMIN_USERNAME, password:WRONG_PASSWORD}, tests.shift());
   },
   function (ajax) {
     var count = ajax.responseXML.getElementsByTagName("user").length;
     var result = (count == 0) ? "PASS" : "FAIL [returned " + count + " users]";
-    LT_create_element("pre", {}, document.body, "login.php(wrong password): " + result);
+    LT_create_element("div", {}, document.body, "login.php(wrong password): " + result);
     LT_ajax_request("POST", "login.php", 
       {username:ADMIN_USERNAME, password:ADMIN_PASSWORD}, tests.shift());
   },
   function (ajax) {
     var count = ajax.responseXML.getElementsByTagName("user").length;
     var result = (count == 1) ? "PASS" : "FAIL [returned " + count + " users]";
-    LT_create_element("pre", {}, document.body, "login.php(right password): " + result);
+    LT_create_element("div", {}, document.body, "login.php(right password): " + result);
+
+// LOGOUT / CREATE TABLE
+
     LT_ajax_request("POST", "logout.php", 
       {}, tests.shift());
   },
   function (ajax) {
     var text = ajax.responseText.replace(/^\s+|\s+$/g, '');
     var result = (text == "") ? "PASS" : "FAIL [" + text + "]";
-    LT_create_element("pre", {}, document.body, "logout.php: " + result);
+    LT_create_element("div", {}, document.body, "logout.php: " + result);
     LT_ajax_request("POST", "create_table.php", CREATE_TABLE_ARGS, tests.shift());
   },
   function (ajax) {
     var text = ajax.responseText.replace(/^\s+|\s+$/g, '');
     var result = (text == "You are not logged in.") ? "PASS" : "FAIL : [" + text + "]";
-    LT_create_element("pre", {}, document.body, "create_table.php(logged out): " + result);
+    LT_create_element("div", {}, document.body, "create_table.php(logged out): " + result);
     LT_ajax_request("POST", "login.php", 
       {username:ADMIN_USERNAME, password:ADMIN_PASSWORD}, tests.shift());
   },
   function (ajax) {
     var count = ajax.responseXML.getElementsByTagName("user").length;
     var result = (count == 1) ? "PASS" : "FAIL [returned " + count + " users]";
-    LT_create_element("pre", {}, document.body, "login.php: " + result);
+    LT_create_element("div", {}, document.body, "login.php: " + result);
     LT_ajax_request("POST", "create_table.php", CREATE_TABLE_ARGS, tests.shift());
   },
   function (ajax) {
     var count = ajax.responseXML.getElementsByTagName("table").length;
     var result = (count == 1) ? "PASS" : "FAIL [returned " + count + " tables]";
-    LT_create_element("pre", {}, document.body, "create_table.php(logged in): " + result);
+    LT_create_element("div", {}, document.body, "create_table.php(logged in): " + result);
+
+// CREATE AND READ MESSAGES, GET TABLE TIMESTAMPS
+
     LT_ajax_request("POST", "create_message.php", 
       {table_id: 1, user_id: 1, text: "Hello, world!"}, tests.shift());
   },
   function (ajax) {
     var text = ajax.responseText.replace(/^\s+|\s+$/g, '');
     var result = (text == "") ? "PASS" : "FAIL [" + text + "]";
-    LT_create_element("pre", {}, document.body, "create_message.php: " + result);
+    LT_create_element("div", {}, document.body, "create_message.php: " + result);
     LT_ajax_request("POST", "read_table.php", {table_id: 1}, tests.shift());
   },
   function (ajax) {
     var count = ajax.responseXML.getElementsByTagName("table").length;
     var result = (count == 1) ? "PASS" : "FAIL [returned " + count + " tables]";
-    LT_create_element("pre", {}, document.body, "read_table.php: " + result);
+    LT_create_element("div", {}, document.body, "read_table.php: " + result);
     LT_ajax_request("POST", "read_messages.php", {table_id: 1, time: 0}, tests.shift());
   },
   function (ajax) {
     var count = ajax.responseXML.getElementsByTagName("message").length;
     var result = (count == 1) ? "PASS" : "FAIL [returned " + count + " messages]";
-    LT_create_element("pre", {}, document.body, "read_messages.php: " + result);
+    LT_create_element("div", {}, document.body, "read_messages.php: " + result);
+    LT_ajax_request("POST", "update_user_password.php", 
+      {password: WRONG_PASSWORD}, tests.shift());
+  },
+  function (ajax) {
+    var text = ajax.responseText.replace(/^\s+|\s+$/g, '');
+    var result = (text == "") ? "PASS" : "FAIL [" + text + "]";
+
+// CHANGE PASSWORD
+
+    LT_create_element("div", {}, document.body, "update_user_password.php: " + result);
+    LT_ajax_request("POST", "login.php", 
+      {username: ADMIN_USERNAME, password: WRONG_PASSWORD}, tests.shift());
+  },
+  function (ajax) {
+    var count = ajax.responseXML.getElementsByTagName("user").length;
+    var result = (count == 1) ? "PASS" : "FAIL [returned " + count + " users]";
+    LT_create_element("div", {}, document.body, "login.php: " + result);
+    LT_ajax_request("POST", "update_user_password.php", 
+      {password: ADMIN_PASSWORD}, tests.shift());
+  },
+  function (ajax) {
+    var text = ajax.responseText.replace(/^\s+|\s+$/g, '');
+    var result = (text == "") ? "PASS" : "FAIL [" + text + "]";
+    LT_create_element("div", {}, document.body, "update_user_password.php: " + result);
+    LT_ajax_request("POST", "login.php", 
+      {username: ADMIN_USERNAME, password: ADMIN_PASSWORD}, tests.shift());
+  },
+  function (ajax) {
+    var count = ajax.responseXML.getElementsByTagName("user").length;
+    var result = (count == 1) ? "PASS" : "FAIL [returned " + count + " users]";
+    LT_create_element("div", {}, document.body, "login.php: " + result);
+
+// FINISHED
+
     LT_create_element("div", {}, document.body, "... finished!");
   }];
 

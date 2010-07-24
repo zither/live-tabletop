@@ -1,10 +1,10 @@
 <?php
 
+session_start();
+if (!isset($_SESSION['user_id'])) die ('You are not logged in.');
+
 include('db_config.php');
 include('users.php');
-session_start();
-
-if (!isset($_SESSION['user_id'])) die('You are not logged in.');
 
 // Interpret the Request
 
@@ -15,8 +15,7 @@ $hash = LT_hash_password($password, $salt);
 
 // Query the Database
 
-if ($link = $LT_SQL->connect($DBLocation , $DBUsername , $DBPassword, $DBName)) {
-  $LT_SQL->query("CALL update_user_pasword($user_id, '$hash', '$salt')");
-}
+$LT_SQL->query("CALL update_user_password($user_id, '$hash', '$salt')")
+  or die ("Query failed: " . $LT_SQL->error);
 
 ?>
