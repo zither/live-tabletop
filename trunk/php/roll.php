@@ -11,7 +11,7 @@
 
 // returns the result of a dice roll in dice notation
 function LT_roll($roll) {
-  $total = 0
+  $total = 0;
   $addends = explode('+', $roll);
   for ($i = 0; $i < count($addends); $i++) {
     $subtractends = explode('-', $addends[$i]);
