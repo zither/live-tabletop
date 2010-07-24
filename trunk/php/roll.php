@@ -37,9 +37,9 @@ function LT_roll($roll) {
 function LT_expand_rolls($string) {
   $left = explode('[', htmlspecialchars($string));
   $output = $left[0];
-  for ($i = 0; $i < count($left); $i++) {
+  for ($i = 1; $i < count($left); $i++) {
     $right = explode(']', $left[$i]);
-    $ouput .= (count($right) == 2) ? "<span title=\"{$right[0]}\">"
+    $output .= (count($right) == 2) ? "<span title=\"{$right[0]}\">"
       . LT_roll($right[0]) . "</span>{$right[1]}" : $left[$i];
   }
   return $output;

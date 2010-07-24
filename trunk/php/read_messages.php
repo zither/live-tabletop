@@ -21,7 +21,7 @@ include('xml_headers.php');
 echo "<messages>\n";
 while ($row = $result->fetch_assoc()) {
   echo "  <message user_id=\"{$row['user_id']}\" time=\"{$row['time']}\">"
-    . htmlspecialchars($row['text']) . "</message>\n";
+    . rawurlencode($row['text']) . "</message>\n";
 }
 echo "</messages>\n";
 
