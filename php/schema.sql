@@ -419,7 +419,8 @@ CREATE PROCEDURE read_messages (IN the_table INT, IN the_time INT)
 BEGIN
   SELECT table_id, user_id, text,
     TIME_TO_SEC(TIMEDIFF(time_stamp, '1970-01-01 00:00:00')) AS time
-    FROM messages WHERE table_id = the_table AND time > the_time
+    FROM messages WHERE table_id = the_table 
+    AND TIME_TO_SEC(TIMEDIFF(time_stamp, '1970-01-01 00:00:00')) > the_time
     ORDER BY time ASC;
 END; 
 
