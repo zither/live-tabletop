@@ -8,10 +8,11 @@ include('db_config.php');
 // Interpret the Request
 
 $table_id = $LT_SQL->real_escape_string($_REQUEST['table_id']);
+$time = $LT_SQL->real_escape_string($_REQUEST['time']);
 
 // Query the Database
 
-$result = $LT_SQL->query("CALL read_messages($table_id)")
+$result = $LT_SQL->query("CALL read_messages($table_id, '$time')")
   or die ("Query failed: " . $LT_SQL->error);
 
 // Generate Output

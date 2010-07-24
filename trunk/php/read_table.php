@@ -7,7 +7,7 @@ include('db_config.php');
 
 // Interpret the Request
 
-$name = $LT_SQL->real_escape_string($_REQUEST['table_id']);
+$table_id = $LT_SQL->real_escape_string($_REQUEST['table_id']);
 
 // Query the Database
 
