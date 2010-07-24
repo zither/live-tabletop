@@ -1,7 +1,7 @@
 <?php
 
 session_start();
-if (!isset($_SESSION['user_id'])) die('You are not logged in.');
+if (!isset($_SESSION['user_id'])) die ('You are not logged in.');
 
 include('db_config.php');
 include('roll.php');
@@ -14,7 +14,8 @@ $text = $LT_SQL->real_escape_string(LT_expand_rolls($_REQUEST['text']));
 
 // Query the Database
 
-$LT_SQL->query("CALL create_message($table_id, $user_id, '$text')");
+$LT_SQL->query("CALL create_message($table_id, $user_id, '$text')")
+  or die ("Query failed: " . $LT_SQL->error);
 
 ?>
 

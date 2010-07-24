@@ -111,9 +111,9 @@ CREATE TABLE tables (
   grid_height INT NOT NULL DEFAULT 45,
   grid_thickness INT NOT NULL DEFAULT 0,
   grid_color TEXT,
-  piece_stamp TIMESTAMP,
-  tile_stamp TIMESTAMP,
-  message_stamp TIMESTAMP
+  piece_stamp DATETIME,
+  tile_stamp DATETIME,
+  message_stamp DATETIME
 );
 
 
@@ -296,9 +296,10 @@ CREATE PROCEDURE create_table (IN the_name VARCHAR(200), IN the_image INT,
   IN the_width INT, IN the_height INT)
 BEGIN
   INSERT INTO tables (name, image_id, user_id, tile_rows, tile_columns,
-      tile_width, tile_height, grid_width, grid_height)
+      tile_width, tile_height, grid_width, grid_height,
+      tile_stamp, message_stamp, piece_stamp)
     VALUES (the_name, the_image, the_user, the_rows, the_columns,
-      the_width, the_height, the_width, the_height);
+      the_width, the_height, the_width, the_height, NOW(), NOW(), NOW());
 END; 
 
 CREATE PROCEDURE read_table (IN the_table INT)
@@ -324,9 +325,9 @@ END;
 
 CREATE PROCEDURE read_table_timestamps (IN the_table INT)
 BEGIN
-  SELECT TIME_TO_SEC(piece_stamp) AS pieceStamp,
-         TIME_TO_SEC(tile_stamp) AS tileStamp,
-         TIME_TO_SEC(message_stamp) AS messageStamp
+  SELECT TIME_TO_SEC(TIMEDIFF(piece_stamp, '1970-01-01 00:00:00')) AS pieceStamp,
+         TIME_TO_SEC(TIMEDIFF(tile_stamp, '1970-01-01 00:00:00')) AS tileStamp,
+         TIME_TO_SEC(TIMEDIFF(message_stamp, '1970-01-01 00:00:00')) AS messageStamp
     FROM tables WHERE table_id = the_table;
 END; 
 
@@ -345,7 +346,7 @@ BEGIN
   START TRANSACTION;
   DELETE FROM stats WHERE piece_id IN (
     SELECT piece_id FROM pieces WHERE table_id = the_table);
-  DELETE FROM pieces WHERE table_it = the_table;
+  DELETE FROM pieces WHERE table_id = the_table;
   DELETE FROM messages WHERE table_id = the_table;
   DELETE FROM tables WHERE table_id = the_table;
   COMMIT;
@@ -405,7 +406,7 @@ END;
 CREATE PROCEDURE create_message (IN the_table INT, IN the_user INT, IN the_text TEXT)
 BEGIN
   START TRANSACTION;
-  INSERT INTO chat (table_id, user_id, text) VALUES (the_table, the_user, the_text);
+  INSERT INTO messages (table_id, user_id, text) VALUES (the_table, the_user, the_text);
   UPDATE tables SET message_stamp = NOW() WHERE table_id = the_table;
   COMMIT;
 END; 
@@ -413,7 +414,8 @@ END;
 CREATE PROCEDURE read_messages (IN the_table INT, IN the_time INT)
 BEGIN
   SELECT * FROM messages
-    WHERE table_id = the_table AND TIME_TO_SEC(time) > the_time
+    WHERE table_id = the_table 
+    AND TIME_TO_SEC(TIMEDIFF(time, '1970-01-01 00:00:00')) > the_time
     ORDER BY time ASC;
 END; 
 
