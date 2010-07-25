@@ -1,6 +1,15 @@
-* {margin: 0px; padding: 0px; border: 0px; background: no-repeat}
+*	{
+	margin: 0px; padding: 0px; border: 0px; background: no-repeat;
+	}
+div		{
+	font-family: Arial,Helvetica,sans-serif; font-size: 14px;
+	}
 body	{
-	background: #999;}
+	background: #999;
+	}
+input		{
+	background: #CCC; color: #333; margin-right: 4px;
+	}
 #pageBar{
 	background: url(images/pageBar.jpg) repeat-x left top; height: 26px;
 	width: 100%; position: fixed; top: 0px;
@@ -9,7 +18,7 @@ body	{
 	background-image: url(images/logo.png); width: 170px; height: 33px;
 	position: fixed; left: 10px; top: 0px;
 		}
-#tabletop	{
+#tableTop	{
 	background: #999 url(images/abaddon45.png) no-repeat; width: 1145px; height: 945px;
 	margin: 200px 200px 200px 200px;
 		}
@@ -29,8 +38,7 @@ body	{
 		}
 .buttonCaption{
 	height: 22px; float: left; color: #CCC; font-size: 16px;
-	font-family: Arial,Helvetica,sans-serif; text-decoration: none;
-	padding: 1px 1px 0px 4px; font-weight: ;
+	text-decoration: none; padding: 1px 1px 0px 4px;
 		}
 .buttonEnd{
 	background-image: url(images/buttonEnd.jpg); width: 5px; height: 22px;
@@ -48,8 +56,7 @@ body	{
 		}
 .titleCaption{
 	background: url(images/titleBG.jpg) repeat-x top left; height: 21px;
-	float: left; color: #CCC; font-size: 16px;
-	font-family: Arial,Helvetica,sans-serif; text-decoration: none;
+	float: left; color: #CCC; font-size: 16px; text-decoration: none;
 	padding: 2px 0px 0px 0px;
 		}
 .titleEnd	{
@@ -59,6 +66,9 @@ body	{
 .close	{
 	background-image: url(images/close.png); width: 27px; height: 23px;
 	float: right; margin-right: -21px; cursor: pointer;
+		}
+.close:hover {
+	background-image: url(images/closeHover.png);
 		}
 .innerPanel{
 	background: #D4D4D4 url(images/panel.jpg) repeat-x top left; clear: both;
@@ -73,14 +83,22 @@ body	{
 	background: #D4D4D4; width: auto; height:20px; border-bottom: 1px solid #666;
 		}
 .panelBL{
-	background: url(images/bottomCorner.png); height: 21px; width: 6px; float: left; margin-left: -6px;
+	background: url(images/bottomCorner.png); height: 21px; width: 6px; float: left;
+	margin-left: -6px;
 		}
 .resizeBR{
-	background: url(images/resizeBR.png); height: 21px; width: 21px; float: right; margin-right: -21px;
-	cursor: nw-resize;
+	background: url(images/resizeBR.png); height: 21px; width: 21px; float: right;
+	margin-right: -21px; cursor: nw-resize;
 		}
-
 .outerPanel{
 	background:  url(images/panelBar.jpg) repeat-x top left;
 	position: fixed; visibility: hidden; z-index: 0;
+		}
+.login{
+	color: #CCC; float: right; 
+	text-decoration: none; margin-right: 8px; cursor: pointer; position: relative
+	    }
+#loginDiv{
+	float: right; visibility: hidden; margin-top: -3px;
+	padding: 4px 4px 4px 4px;
 		}
