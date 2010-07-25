@@ -44,4 +44,3 @@ var instalRoutine = LT_ajax_request("POST", "php/install.php",
     admin_password: "password"
   }
 );
-  
