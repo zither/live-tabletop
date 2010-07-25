@@ -308,30 +308,50 @@ END;
 
 CREATE PROCEDURE read_table (IN the_table INT)
 BEGIN
-  SELECT * FROM tables WHERE table_id = the_table;
+  SELECT table_id, user_id, image_id, name, tile_rows, tile_columns,
+    tile_width, tile_height, grid_width, grid_height, grid_thickness, grid_color, 
+    TIME_TO_SEC(TIMEDIFF(piece_stamp, '1970-01-01 00:00:00')) AS piece_stamp,
+    TIME_TO_SEC(TIMEDIFF(tile_stamp, '1970-01-01 00:00:00')) AS tile_stamp,
+    TIME_TO_SEC(TIMEDIFF(message_stamp, '1970-01-01 00:00:00')) AS message_stamp
+ FROM tables WHERE table_id = the_table;
 END; 
 
 CREATE PROCEDURE read_table_by_name (IN the_name VARCHAR(200))
 BEGIN
-  SELECT * FROM tables WHERE name = the_name;
+  SELECT table_id, user_id, image_id, name, tile_rows, tile_columns,
+    tile_width, tile_height, grid_width, grid_height, grid_thickness, grid_color, 
+    TIME_TO_SEC(TIMEDIFF(piece_stamp, '1970-01-01 00:00:00')) AS piece_stamp,
+    TIME_TO_SEC(TIMEDIFF(tile_stamp, '1970-01-01 00:00:00')) AS tile_stamp,
+    TIME_TO_SEC(TIMEDIFF(message_stamp, '1970-01-01 00:00:00')) AS message_stamp
+  FROM tables WHERE name = the_name;
 END; 
 
 CREATE PROCEDURE read_tables ()
 BEGIN
-  SELECT * FROM tables, users WHERE tables.user_id = users.user_id
+  SELECT table_id, user_id, image_id, name, tile_rows, tile_columns,
+    tile_width, tile_height, grid_width, grid_height, grid_thickness, grid_color, 
+    TIME_TO_SEC(TIMEDIFF(piece_stamp, '1970-01-01 00:00:00')) AS piece_stamp,
+    TIME_TO_SEC(TIMEDIFF(tile_stamp, '1970-01-01 00:00:00')) AS tile_stamp,
+    TIME_TO_SEC(TIMEDIFF(message_stamp, '1970-01-01 00:00:00')) AS message_stamp
+  FROM tables, users WHERE tables.user_id = users.user_id
     ORDER BY users.name;
 END; 
 
 CREATE PROCEDURE read_tables_by_user_id (IN the_user INT)
 BEGIN
-  SELECT * FROM tables WHERE user_id = the_user;
+  SELECT table_id, user_id, image_id, name, tile_rows, tile_columns,
+    tile_width, tile_height, grid_width, grid_height, grid_thickness, grid_color, 
+    TIME_TO_SEC(TIMEDIFF(piece_stamp, '1970-01-01 00:00:00')) AS piece_stamp,
+    TIME_TO_SEC(TIMEDIFF(tile_stamp, '1970-01-01 00:00:00')) AS tile_stamp,
+    TIME_TO_SEC(TIMEDIFF(message_stamp, '1970-01-01 00:00:00')) AS message_stamp
+  FROM tables WHERE user_id = the_user;
 END; 
 
 CREATE PROCEDURE read_table_timestamps (IN the_table INT)
 BEGIN
-  SELECT TIME_TO_SEC(TIMEDIFF(piece_stamp, '1970-01-01 00:00:00')) AS pieceStamp,
-         TIME_TO_SEC(TIMEDIFF(tile_stamp, '1970-01-01 00:00:00')) AS tileStamp,
-         TIME_TO_SEC(TIMEDIFF(message_stamp, '1970-01-01 00:00:00')) AS messageStamp
+  SELECT TIME_TO_SEC(TIMEDIFF(piece_stamp, '1970-01-01 00:00:00')) AS piece_stamp,
+         TIME_TO_SEC(TIMEDIFF(tile_stamp, '1970-01-01 00:00:00')) AS tile_stamp,
+         TIME_TO_SEC(TIMEDIFF(message_stamp, '1970-01-01 00:00:00')) AS message_stamp
     FROM tables WHERE table_id = the_table;
 END; 
 
