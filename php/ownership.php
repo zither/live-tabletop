@@ -16,7 +16,7 @@ function LT_can_modify_table($table_id) {
 
   // other users can only update tables they own
   $user_id = $LT_SQL->real_escape_string($_SESSION['user_id']);
-  if ($result = ($LT_SQL->query("CALL read_table($table_id)")) {
+  if ($result = ($LT_SQL->query("CALL read_table($table_id)"))) {
     if ($row = $result->fetch_assoc()) {
       return $user_id == $row['user_id'];
     }

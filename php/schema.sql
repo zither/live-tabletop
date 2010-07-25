@@ -268,7 +268,7 @@ CREATE PROCEDURE update_tile (IN the_table INT, IN the_x SMALLINT, IN the_y SMAL
   IN the_image INT, IN the_fog TINYINT, IN the_right TINYINT, IN the_bottom TINYINT)
 BEGIN
   START TRANSACTION;
-  UPDATE tiles SET image = the_image, fog = the_fog, 
+  UPDATE tiles SET image_id = the_image, fog = the_fog, 
       right_wall = the_right, bottom_wall = the_bottom
     WHERE x = the_x AND y = the_y AND table_id = the_table;
   UPDATE tables SET tile_stamp = NOW() WHERE table_id = the_table;
@@ -337,7 +337,7 @@ END;
 
 CREATE PROCEDURE update_table (IN the_table INT, IN the_name VARCHAR(200),
   IN the_user INT, IN the_image INT, IN the_grid_width INT,
-  IN the_grid_height INT, IN the_thickness INT, the_color TEXT)
+  IN the_grid_height INT, IN the_grid_thickness INT, the_grid_color TEXT)
 BEGIN
   UPDATE tables SET name = the_name, user_id = the_user, image_id = the_image,
       grid_width = the_grid_width, grid_height = the_grid_height,
