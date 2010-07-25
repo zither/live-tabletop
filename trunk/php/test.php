@@ -93,7 +93,7 @@ var TEST = {
     var result = test.result(ajax);
     TEST.echo(test.action + ": " + result);
     if (TEST.index == TEST.tests.length) TEST.echo("... FINISHED!");
-    else if (TEST.index != 0 || result == "PASS") TEST.request();}
+    else if (TEST.index != 1 || result == "PASS") TEST.request();}
 };
 
 TEST.tests = [
@@ -242,18 +242,18 @@ TEST.tests = [
   {action: "read_table.php",
     args: {table_id: 1},
     result: function (ajax) {
-    var tables = ajax.responseXML.getElementsByTagName("table");
-    for (var i = 0; i < tables.length; i++) {
-      if (tables[i].getAttribute("id") == "1"
-        && tables[i].getAttribute("name") == "My Original Table"
-        && tables[i].getAttribute("background") == "3"
-        && tables[i].getAttribute("grid_width") == "15"
-        && tables[i].getAttribute("grid_height") == "10"
-        && tables[i].getAttribute("grid_thickness") == "2"
-        && tables[i].getAttribute("grid_color") == "brown"
-      ) return "PASS";
-    }
-    return "FAIL [" + ajax.responseText + "]";}},
+      var tables = ajax.responseXML.getElementsByTagName("table");
+      for (var i = 0; i < tables.length; i++) {
+        if (tables[i].getAttribute("id") == "1"
+          && tables[i].getAttribute("name") == "My Original Table"
+          && tables[i].getAttribute("background") == "3"
+          && tables[i].getAttribute("grid_width") == "15"
+          && tables[i].getAttribute("grid_height") == "10"
+          && tables[i].getAttribute("grid_thickness") == "2"
+          && tables[i].getAttribute("grid_color") == "brown"
+        ) return "PASS";
+      }
+      return "FAIL [" + ajax.responseText + "]";}},
 
   // DELETE TABLE
   {action: "delete_table.php", args: {table_id: 2}, result: TEST.blank},
@@ -264,7 +264,13 @@ TEST.tests = [
   // READ TILES
   {action: "read_tiles.php",
     args: {table_id: 1},
-    result: TEST.unimplemented},
+    result: function (ajax) {
+      var text = ajax.responseXML.documentElement.textContent;
+      var tiles = text.replace(/^\s+|\s+$/g, '').split(' ');
+      if (tiles.length != 5000) return "FAIL [" + tiles.length + " tiles]";
+      for (var i = 0; i < tiles.length; i++)
+         if (tiles[i] != "0002") return "FAIL [" + i + ": " + tiles[i] + "]";
+      return "PASS";}},
 
   // UPDATE TILE
   {action: "update_tile.php",
@@ -279,23 +285,43 @@ TEST.tests = [
     result: TEST.blank},
   {action: "read_tiles.php",
     args: {table_id: 1},
-    result: TEST.unimplemented},
+    result: function (ajax) {
+      var text = ajax.responseXML.documentElement.textContent;
+      var tiles = text.replace(/^\s+|\s+$/g, '').split(' ');
+      if (tiles.length != 5000) return "FAIL [" + tiles.length + " tiles]";
+      for (var i = 0; i < tiles.length; i++) {
+         var target = (i == 507) ? "1214" : "0002";
+         if (tiles[i] != target) return "FAIL [" + i + ": " + tiles[i] + "]";
+      }
+      return "PASS";}},
 
   // FILL FOG
-  {action: "fill_fog.php",
-    args: {table_id: 1},
-    result: TEST.blank},
+  {action: "fill_fog.php", args: {table_id: 1}, result: TEST.blank},
   {action: "read_tiles.php",
     args: {table_id: 1},
-    result: TEST.unimplemented},
+    result: function (ajax) {
+      var text = ajax.responseXML.documentElement.textContent;
+      var tiles = text.replace(/^\s+|\s+$/g, '').split(' ');
+      if (tiles.length != 5000) return "FAIL [" + tiles.length + " tiles]";
+      for (var i = 0; i < tiles.length; i++) {
+         var target = (i == 507) ? "1214" : "1002";
+         if (tiles[i] != target) return "FAIL [" + i + ": " + tiles[i] + "]";
+      }
+      return "PASS";}},
 
   // CLEAR FOG
-  {action: "clear_fog.php",
-    args: {table_id: 1},
-    result: TEST.blank},
+  {action: "clear_fog.php", args: {table_id: 1}, result: TEST.blank},
   {action: "read_tiles.php",
     args: {table_id: 1},
-    result: TEST.unimplemented},
+    result: function (ajax) {
+      var text = ajax.responseXML.documentElement.textContent;
+      var tiles = text.replace(/^\s+|\s+$/g, '').split(' ');
+      if (tiles.length != 5000) return "FAIL [" + tiles.length + " tiles]";
+      for (var i = 0; i < tiles.length; i++) {
+         var target = (i == 507) ? "0214" : "0002";
+         if (tiles[i] != target) return "FAIL [" + i + ": " + tiles[i] + "]";
+      }
+      return "PASS";}},
 
   // P I E C E
 
@@ -317,7 +343,7 @@ TEST.tests = [
   // READ PIECES
   {action: "read_pieces.php",
     args: {table_id: 1},
-    result: TEST.unimplemented},
+    result: function (ajax) {return TEST.count(ajax, "piece", 1);}},
 
   // UPDATE PIECE
   {action: "update_piece.php",
@@ -336,7 +362,23 @@ TEST.tests = [
     result: TEST.blank},
   {action: "read_pieces.php",
     args: {table_id: 1},
-    result: TEST.unimplemented},
+    result: function (ajax) {
+      var pieces = ajax.responseXML.getElementsByTagName("piece");
+      for (var i = 0; i < pieces.length; i++) {
+        if (pieces[i].getAttribute("id") == "1"
+          && pieces[i].getAttribute("image") == "11"
+          && pieces[i].getAttribute("user") == "2"
+          && pieces[i].getAttribute("name") == "Still My Piece"
+          && pieces[i].getAttribute("x") == "99"
+          && pieces[i].getAttribute("y") == "49"
+          && pieces[i].getAttribute("x_offset") == "5"
+          && pieces[i].getAttribute("y_offset") == "10"
+          && pieces[i].getAttribute("width") == "20"
+          && pieces[i].getAttribute("height") == "40"
+          && pieces[i].getAttribute("color") == "orange"
+        ) return "PASS";
+      }
+      return "FAIL [" + ajax.responseText + "]";}},
 
   // UPDATE STAT
   {action: "update_stat.php",
@@ -344,7 +386,13 @@ TEST.tests = [
     result: TEST.blank},
   {action: "read_pieces.php",
     args: {table_id: 1},
-    result: TEST.unimplemented},
+    result: function (ajax) {
+      var stats = ajax.responseXML.getElementsByTagName("stat");
+      for (var i = 0; i < stats.length; i++) {
+        if (stats[i].getAttribute("name") == "hit points"
+          && stats[i].textContent == "20") return "PASS";
+      }
+      return "FAIL [" + ajax.responseText + "]";}},
 
   // DELETE STAT
   {action: "delete_stat.php",
@@ -352,15 +400,13 @@ TEST.tests = [
     result: TEST.blank},
   {action: "read_pieces.php",
     args: {table_id: 1},
-    result: TEST.unimplemented},
+    result: function (ajax) {return TEST.count(ajax, "stat", 0);}},
 
   // DELETE PIECE
-  {action: "delete_piece.php",
-    args: {piece_id: 1},
-    result: TEST.blank},
+  {action: "delete_piece.php", args: {piece_id: 1}, result: TEST.blank},
   {action: "read_pieces.php",
     args: {table_id: 1},
-    result: TEST.unimplemented},
+    result: function (ajax) {return TEST.count(ajax, "piece", 0);}},
 
   // I M A G E
 
