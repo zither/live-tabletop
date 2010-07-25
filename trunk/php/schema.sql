@@ -21,6 +21,7 @@ DROP PROCEDURE IF EXISTS read_table_timestamps;
 DROP PROCEDURE IF EXISTS update_table;
 DROP PROCEDURE IF EXISTS delete_table;
 DROP PROCEDURE IF EXISTS create_piece;
+DROP PROCEDURE IF EXISTS read_piece;
 DROP PROCEDURE IF EXISTS read_pieces;
 DROP PROCEDURE IF EXISTS update_piece;
 DROP PROCEDURE IF EXISTS delete_piece;
@@ -392,6 +393,11 @@ BEGIN
       the_x_offset, the_y_offset, the_width, the_height);
   UPDATE tables SET piece_stamp = NOW() WHERE table_id = the_table;
   COMMIT;
+END; 
+
+CREATE PROCEDURE read_piece (IN the_piece INT)
+BEGIN
+  SELECT * FROM pieces WHERE piece_id = the_piece;
 END; 
 
 CREATE PROCEDURE read_pieces (IN the_table INT)
