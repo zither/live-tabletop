@@ -276,15 +276,24 @@ TEST.tests = [
       fog: 1,
       right: 2,
       bottom: 1},
+    result: TEST.blank},
+  {action: "read_tiles.php",
+    args: {table_id: 1},
     result: TEST.unimplemented},
 
   // FILL FOG
   {action: "fill_fog.php",
     args: {table_id: 1},
+    result: TEST.blank},
+  {action: "read_tiles.php",
+    args: {table_id: 1},
     result: TEST.unimplemented},
 
   // CLEAR FOG
   {action: "clear_fog.php",
+    args: {table_id: 1},
+    result: TEST.blank},
+  {action: "read_tiles.php",
     args: {table_id: 1},
     result: TEST.unimplemented},
 
@@ -303,7 +312,7 @@ TEST.tests = [
       y_offset: -8,
       height: 16,
       width: 64},
-    result: TEST.unimplemented},
+    result: TEST.blank},
 
   // READ PIECES
   {action: "read_pieces.php",
@@ -324,7 +333,7 @@ TEST.tests = [
       width: 20,
       height: 40,
       color: "orange"},
-    result: TEST.unimplemented},
+    result: TEST.blank},
   {action: "read_pieces.php",
     args: {table_id: 1},
     result: TEST.unimplemented},
@@ -332,7 +341,7 @@ TEST.tests = [
   // UPDATE STAT
   {action: "update_stat.php",
     args: {piece_id: 1, name: "hit points", value: "20"},
-    result: TEST.unimplemented},
+    result: TEST.blank},
   {action: "read_pieces.php",
     args: {table_id: 1},
     result: TEST.unimplemented},
@@ -340,7 +349,7 @@ TEST.tests = [
   // DELETE STAT
   {action: "delete_stat.php",
     args: {piece_id: 1, name: "hit points"},
-    result: TEST.unimplemented},
+    result: TEST.blank},
   {action: "read_pieces.php",
     args: {table_id: 1},
     result: TEST.unimplemented},
@@ -348,7 +357,7 @@ TEST.tests = [
   // DELETE PIECE
   {action: "delete_piece.php",
     args: {piece_id: 1},
-    result: TEST.unimplemented},
+    result: TEST.blank},
   {action: "read_pieces.php",
     args: {table_id: 1},
     result: TEST.unimplemented},
