@@ -387,7 +387,7 @@ CREATE PROCEDURE create_piece (IN the_table INT, IN the_image INT,
 BEGIN
   START TRANSACTION;
   INSERT INTO pieces (table_id, image_id, user_id, name, x, y,
-      x_offset, y_offsetname, width, height) 
+      x_offset, y_offset, width, height) 
     VALUES (the_table, the_image, the_user, the_name, the_x, the_y,
       the_x_offset, the_y_offset, the_width, the_height);
   UPDATE tables SET piece_stamp = NOW() WHERE table_id = the_table;
@@ -406,7 +406,7 @@ CREATE PROCEDURE update_piece (IN the_piece INT, IN the_image INT,
 BEGIN
   START TRANSACTION;
   UPDATE pieces SET image_id = the_image, user_id = the_user, name = the_name,
-      x = the_x, y = the_x, x_offset = the_x_offset, y_offset = the_y_offset,
+      x = the_x, y = the_y, x_offset = the_x_offset, y_offset = the_y_offset,
       width = the_width, height = the_height, color = the_color 
     WHERE piece_id = the_piece;
   UPDATE tables SET piece_stamp = NOW() WHERE table_id = (
