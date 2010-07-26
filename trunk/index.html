@@ -6,6 +6,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <title> Live Tabletop </title>
 <script type="text/javascript" src="js/panelAssets.js"></script>
+<script type="text/javascript" src="js/xml.js"></script>
+<script type="text/javascript" src="js/init.js"></script>
 <script type="text/javascript" src="js/login.js"></script>
 <script type="text/javascript">
 
@@ -41,13 +43,26 @@ onload = function (){
         var instalRoutine = LT_ajax_request("POST", "php/login.php",
           { username : loginUsername.value, password : loginPassword.value});
 	  }
-  var tableCat = new createPanel( 'Tables', 420, 170, 175, 300);
-  var chatCat = new createPanel( 'Chat', 220, 26, 355, 130);
-  var turnsCat = new createPanel( 'Turns', 6, 26, 175, 300);
-  var toolsCat = new createPanel( 'Tools', 585, 26, 175, 300);
-  var filesCat = new createPanel( 'Files', 775, 26, 175, 150);
+      loginSubmit.onmouseover = function(){
+        loginSubmit.style.cursor = 'pointer';
+	  }
+  var tableCat = new Panel( 'Tables', 420, 170, 175, 300);
+  var chatCat = new Panel( 'Chat', 220, 26, 355, 130);
+  var turnsCat = new Panel( 'Turns', 6, 26, 175, 300);
+  var toolsCat = new Panel( 'Tools', 585, 26, 175, 300);
+  var filesCat = new Panel( 'Files', 775, 26, 175, 150);
+  
+  var chatInput = element('input', { type : 'text', 
+   id : 'chatInput', size : 8, value : 'Login' }, chatCat.innerPanel);
+
+/*
+  chatInput = document.createElement('input');
+  chatInput.setAttribute('id', 'chatInput');
+  chatCat.innerpanel.appendChild(chatInput);
+  */
 }
 </script>
+<script type="text/javascript" src="js/chatPanel.js"></script>
 </head>
 <body>
 

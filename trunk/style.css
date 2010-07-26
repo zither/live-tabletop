@@ -38,7 +38,7 @@ input		{
 		}
 .buttonCaption{
 	height: 22px; float: left; color: #CCC; font-size: 16px;
-	text-decoration: none; padding: 1px 1px 0px 4px;
+	text-decoration: none; padding: 1px 1px 0px 2px;
 		}
 .buttonEnd{
 	background-image: url(images/buttonEnd.jpg); width: 5px; height: 22px;
@@ -98,7 +98,7 @@ input		{
 	color: #CCC; float: right; 
 	text-decoration: none; margin-right: 8px; cursor: pointer; position: relative
 	    }
+.login:hover{	text-decoration: underline;	    }
 #loginDiv{
-	float: right; visibility: hidden; margin-top: -3px;
-	padding: 4px 4px 4px 4px;
+	float: right; visibility: hidden;
 		}
