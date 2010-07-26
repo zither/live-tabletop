@@ -23,7 +23,7 @@ function element (elementType, attributes, parentDiv, divText) {
   return item
 }
 
-function createPanel( panelName, xPos, yPos, panelWidth, panelHeight, hasButton) {
+function Panel( panelName, xPos, yPos, panelWidth, panelHeight, hasButton) {
   var panel = this;
   panel.outerPanel = new element('div', { 'class' : 'outerPanel', 
     'style' : 'left: ' + xPos + 'px; top: ' + yPos + 'px; visibility: hidden;'
