@@ -1,3 +1,5 @@
+var chatInput = element('input', { type : 'text', 
+ id : 'chatInput', size : 8, value : 'Login' }, chatCat.innerPanel);
 
 /*
 var instalRoutine = LT_ajax_request("POST", "php/install.php",
