@@ -23,7 +23,7 @@ LT.element = function(elementType, attributes, parentElement, text) {
     item.setAttribute(attributeName, attributes[attributeName]);
   }
   if(parentElement){ parentElement.appendChild(item); }
-  if(divText){ item.appendChild(document.createTextNode(divText)); }
+  if(text){ item.appendChild(document.createTextNode(text)); }
   return item
 }
 
