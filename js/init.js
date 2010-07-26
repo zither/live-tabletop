@@ -36,12 +36,14 @@ function loadPage() {
         var loginRoutine = LT_ajax_request("POST", "php/login.php",
           { username : loginUsername.value, password : loginPassword.value});
 		alert(loginRoutine.responseText);
+		//alert(loginRoutine.users.user[0]);
 	  }
-  var tableCat = new Panel( 'Tables', 420, 170, 175, 300);
-  var chatCat = new Panel( 'Chat', 220, 26, 355, 130);
-  var turnsCat = new Panel( 'Turns', 6, 26, 175, 300);
-  var toolsCat = new Panel( 'Tools', 585, 26, 175, 300);
-  var filesCat = new Panel( 'Files', 775, 26, 175, 150);
+  //This creates global variables.
+  window.tablePanel = new Panel( 'Tables', 420, 170, 175, 300);
+  window.chatPanel = new Panel( 'Chat', 220, 26, 355, 130);
+  window.turnsPanel = new Panel( 'Turns', 6, 26, 175, 300);
+  window.toolsPanel = new Panel( 'Tools', 585, 26, 175, 300);
+  window.filesPanel = new Panel( 'Files', 775, 26, 175, 150);
   
 }
 //var checkInstall = LT_ajax_request("POST", 'php/db_config.php', {}, function(ajax){if(ajax.status != 200){}});
