@@ -3,39 +3,44 @@ function emptyMe (clearMe, defaultText){
 	
 }
 function loadPage() {
-  tableTop = document.createElement('div');
-  tableTop.setAttribute('id', 'tableTop');
-  document.body.appendChild(tableTop);
-  //var tableTop = new element('div', { id : 'tableTop' }, document.body);
-  var pageBar = element('div', { id : 'pageBar' }, document.body);
-    var logoDiv = element('div', { id : 'logo' }, pageBar);
-	//var buttonsDiv = new element('div', { id : 'buttons' }, pageBar););
-    buttonsDiv = document.createElement('div');
-    buttonsDiv.setAttribute('id', 'buttons');
-    pageBar.appendChild(buttonsDiv);
-    var loginButton = new element('div', { class : 'login'}, pageBar);
+  LT.tableTop = new LT.element('div', { id : 'tableTop' }, document.body);
+  LT.pageBar = LT.element('div', { id : 'pageBar' }, document.body);
+    var logoDiv = LT.element('div', { id : 'logo' }, LT.pageBar);
+	LT.buttonsDiv = new LT.element('div', { id : 'buttons' }, LT.pageBar);
+
+    var loginButton = new LT.element('div', { class : 'login'}, LT.pageBar);
 	loginText = document.createTextNode("Login");
 	logoutText = document.createTextNode("Logout");
     loginButton.appendChild(loginText);
-    var loginDiv = new element('div', { id : 'loginDiv' }, pageBar);
+    var loginDiv = new LT.element('div', { id : 'loginDiv' }, LT.pageBar);
     loginButton.onclick = function(){
-      pageBar.removeChild(loginButton);
+      LT.pageBar.removeChild(loginButton);
       loginDiv.style.visibility = 'visible';
     }
-      var loginForm = new element('form', { id : 'loginForm', 
+      var loginForm = new LT.element('form', { id : 'loginForm', 
 	    style : 'float: right;'}, loginDiv);
-      var loginUsername = new element('input', { style : 'border: 1px solid #CCC;',
+      var loginUsername = new LT.element('input', { style : 'border: 1px solid #CCC;',
         id : 'username', size : 10, value : 'username' }, loginForm);
 	  loginUsername.onfocus = function(){ emptyMe(this, 'username') };
-      var loginPassword = new element('input', { style : 'border: 1px solid #CCC;',
+      var loginPassword = new LT.element('input', { style : 'border: 1px solid #CCC;',
         id : 'password', size : 10, value : 'password', type : 'password' }, loginForm);
 	  loginPassword.onfocus = function(){ emptyMe(this, 'password') };
-      var loginSubmit = new element('input', { type : 'button', style : 'cursor: pointer', 
+      var loginSubmit = new LT.element('input', { type : 'button', style : 'cursor: pointer', 
         id : 'loginSubmit', size : 8, value : 'Login' }, loginForm);
       loginSubmit.onclick = function(){
-        var loginRoutine = LT_ajax_request("POST", "php/login.php",
+        var loginRoutine = LT.ajaxRequest("POST", "php/login.php",
           { username : loginUsername.value, password : loginPassword.value});
-		alert(loginRoutine.responseText);
+		//alert(loginRoutine.responseText);
+		var userElement = loginRoutine.responseXML.getElementsByTagName('user')[0];
+		if(userElement){
+		  LT.username = userElement.getAttribute('name');
+		  LT.userID = userElement.getAttribute('id');
+		  LT.userColor = userElement.getAttribute('color');
+		  LT.userPermissions = userElement.getAttribute('permissions');
+		  alert(LT.username);
+		}else{
+		  alert('Incorrect username or password.')
+		}
 		//alert(loginRoutine.users.user[0]);
 	  }
   //This creates global variables.
@@ -46,10 +51,10 @@ function loadPage() {
   window.filesPanel = new Panel( 'Files', 775, 26, 175, 150);
   
 }
-//var checkInstall = LT_ajax_request("POST", 'php/db_config.php', {}, function(ajax){if(ajax.status != 200){}});
-var checkInstall = LT_ajax_request("POST", 'php/db_config.php', {});
+//var checkInstall = LT.ajaxRequest("POST", 'php/db_config.php', {}, function(ajax){if(ajax.status != 200){}});
+var checkInstall = LT.ajaxRequest("POST", 'php/db_config.php', {});
 if(checkInstall.status != 200){
-  var installRoutine = LT_ajax_request("POST", "php/install.php",
+  var installRoutine = LT.ajaxRequest("POST", "php/install.php",
   {
     location: "localhost",
     username: "root",

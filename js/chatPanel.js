@@ -1,5 +1,5 @@
 function populateChatPanel() {
-  var chatInput = element('input', { type : 'text', 
+  var chatInput = LT.element('input', { type : 'text', 
     id : 'chatInput', size : 8, value : 'Login' }, chatPanel.innerPanel);
 }
 /*

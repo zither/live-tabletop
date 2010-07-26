@@ -13,50 +13,40 @@ var clickDragGap = 0;
 var z = 100;
 var invertResize = 1;
 
-function element (elementType, attributes, parentDiv, divText) {
-  var item = document.createElement(elementType);
-  for(var attributeName in attributes){
-    item.setAttribute(attributeName, attributes[attributeName]);
-  }
-  parentDiv.appendChild(item);
-  if(divText){ item.appendChild(document.createTextNode(divText)); }
-  return item
-}
-
 function Panel( panelName, xPos, yPos, panelWidth, panelHeight, hasButton) {
   var panel = this;
-  panel.outerPanel = new element('div', { 'class' : 'outerPanel', 
+  panel.outerPanel = new LT.element('div', { 'class' : 'outerPanel', 
     'style' : 'left: ' + xPos + 'px; top: ' + yPos + 'px; visibility: hidden;'
-  }, tableTop);
+  }, LT.tableTop);
   panel.outerPanel.onmousedown = function(){ panelForward(panel); };
-    panelTitle = new element('div', { 'class' : 'title' }, panel.outerPanel);
-      var resizeTL = new element('div', { 'class' : 'resizeTL' }, panelTitle);
+    panelTitle = new LT.element('div', { 'class' : 'title' }, panel.outerPanel);
+      var resizeTL = new LT.element('div', { 'class' : 'resizeTL' }, panelTitle);
 	  resizeTL.onmousedown = function(){ selectedTL = panel;};
-      var titleStart = new element('div', { 'class' : 'titleStart' }, panelTitle);
-      var titleCaption = new element('div', { 'class' : 'titleCaption' },
+      var titleStart = new LT.element('div', { 'class' : 'titleStart' }, panelTitle);
+      var titleCaption = new LT.element('div', { 'class' : 'titleCaption' },
         panelTitle, panelName);
-      var titleEnd = new element('div', { 'class' : 'titleEnd' }, panelTitle);
-      panel.panelBar = new element('div', { 'class' : 'panelBar', 
+      var titleEnd = new LT.element('div', { 'class' : 'titleEnd' }, panelTitle);
+      panel.panelBar = new LT.element('div', { 'class' : 'panelBar', 
         'style' : 'width: ' + (panelWidth - 36) + 'px;' }, panelTitle, ' ');
       panel.panelBar.onmousedown = function(){ selectedPanel = panel; };
-      var panelClose = new element('div', { 'class' : 'close' }, panelTitle);
+      var panelClose = new LT.element('div', { 'class' : 'close' }, panelTitle);
       panelClose.onclick = function(){ showPanel(panel); };
 	
-    panel.innerPanel = new element('div', { 'class' : 'innerPanel', 
+    panel.innerPanel = new LT.element('div', { 'class' : 'innerPanel', 
       'style' : 'width: ' + panelWidth + 'px; height: ' + panelHeight + 'px;' 
 	}, panel.outerPanel);
     panel.innerPanel.appendChild(document.createTextNode("stuff"));
-    var panelBottom = new element('div', { 'class' : 'panelBottom' }, panel.outerPanel);
-      var panelBL = new element('div', { 'class' : 'panelBL' }, panelBottom);
-      var panelBR = new element('div', { 'class' : 'resizeBR' }, panelBottom);
+    var panelBottom = new LT.element('div', { 'class' : 'panelBottom' }, panel.outerPanel);
+      var panelBL = new LT.element('div', { 'class' : 'panelBL' }, panelBottom);
+      var panelBR = new LT.element('div', { 'class' : 'resizeBR' }, panelBottom);
 	  panelBR.onmousedown = function(){ selectedBR = panel;};
 // Create Menu Button ------------------------------------------------------
-	this.buttonContainer = new element('div', { 'class' : 'buttonUnchecked' }, buttonsDiv);
+	this.buttonContainer = new LT.element('div', { 'class' : 'buttonUnchecked' }, LT.buttonsDiv);
 	panel.buttonContainer.onclick = function(){ showPanel(panel); };
-	var buttonStart = new element('div', { 'class' : 'buttonStart' }, panel.buttonContainer);
-	var buttonCaption = new element('div', { 'class' : 'buttonCaption' },
+	var buttonStart = new LT.element('div', { 'class' : 'buttonStart' }, panel.buttonContainer);
+	var buttonCaption = new LT.element('div', { 'class' : 'buttonCaption' },
       panel.buttonContainer, panelName);
-	var buttonEnd = new element('div', { 'class' : 'buttonEnd' }, panel.buttonContainer);
+	var buttonEnd = new LT.element('div', { 'class' : 'buttonEnd' }, panel.buttonContainer);
 	buttonCaption.onselectstart = function () { return false; };
 }
 
@@ -184,6 +174,6 @@ function resizeMove(){
   return true
 }
 function panelForward(panel){
-  tableTop.removeChild(panel.outerPanel);
-  tableTop.appendChild(panel.outerPanel);
+  LT.tableTop.removeChild(panel.outerPanel);
+  LT.tableTop.appendChild(panel.outerPanel);
 }
