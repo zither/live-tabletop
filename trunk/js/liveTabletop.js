@@ -1,4 +1,16 @@
-function LT_ajax_request(method, url, args, callback) {
+var LT = {};
+
+LT.element = function(elementType, attributes, parentElement, divText) {
+  var item = document.createElement(elementType);
+  for(var attributeName in attributes){
+    item.setAttribute(attributeName, attributes[attributeName]);
+  }
+  if(parentElement){ parentElement.appendChild(item); }
+  if(divText){ item.appendChild(document.createTextNode(divText)); }
+  return item
+}
+
+LT.ajaxRequest = function(method, url, args, callback) {
 
   // make an asynchronous request if a callback is provided
   var ajax = new XMLHttpRequest();
