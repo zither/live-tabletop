@@ -1,7 +1,7 @@
 var LT = {};
 
 /*
-LT.element Create a new HTML element and insert it into the document.
+LT.element creates a new HTML element and inserts it into the document.
 
 Parameters:
 
