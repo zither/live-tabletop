@@ -100,5 +100,5 @@ input		{
 	    }
 .login:hover{	text-decoration: underline;	    }
 #loginDiv{
-	float: right; visibility: hidden;
+	float: right; visibility: hidden; color: #999;
 		}

@@ -1,6 +1,8 @@
 function populateChatPanel() {
-  var chatInput = LT.element('input', { type : 'text', 
-    id : 'chatInput', size : 8, value : 'Login' }, chatPanel.innerPanel);
+  var chatForm = LT.element('form', { id : 'chatForm' }, LT.chatPanel.innerPanel);
+  LT.chatInput = LT.element('input', { id : 'chatInput', size : 24, 
+    style : 'border: 1px solid #CCC;', value : '<< Write a message. >>' }, chatForm);
+  LT.chatInput.onfocus = function(){ emptyMe(this, '<< Write a message. >>') };
 }
 /*
 var instalRoutine = LT_ajax_request("POST", "php/install.php",
