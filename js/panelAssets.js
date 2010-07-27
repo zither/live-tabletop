@@ -35,7 +35,7 @@ function Panel( panelName, buttonName, buttonLoc, xPos, yPos, panelWidth, panelH
     panel.innerPanel = new LT.element('div', { 'class' : 'innerPanel', 
       'style' : 'width: ' + panelWidth + 'px; height: ' + panelHeight + 'px;' 
 	}, panel.outerPanel);
-    panel.innerPanel.appendChild(document.createTextNode("stuff"));
+	panel.panelContent = new LT.element('div', {}, panel.innerPanel, "stuff");
     var panelBottom = new LT.element('div', { 'class' : 'panelBottom' }, panel.outerPanel);
       var panelBL = new LT.element('div', { 'class' : 'panelBL' }, panelBottom);
       var panelBR = new LT.element('div', { 'class' : 'resizeBR' }, panelBottom);
@@ -137,7 +137,7 @@ function resizePanel(){
   dragX = dragX - clickX;
   dragY = dragY - clickY;
   if (dragY < 100){dragY = 100;}
-  if (dragX < 100){dragX = 100;}
+  if (dragX < 140){dragX = 140;}
   if (panelX + dragX + 25 > window.innerWidth ){
     panel.style.width = (window.innerWidth - panelX - 25) + "px";
   } else {
@@ -164,7 +164,7 @@ function resizeMove(){
   }
   if (dragX < clickX + 6 ){dragX = clickX + 6;}
   if (dragY < clickY + 26){dragY = clickY + 26;}
-  if (dragX > clickCornerX - 100){dragX = clickCornerX - 100;}
+  if (dragX > clickCornerX - 140){dragX = clickCornerX - 140;}
   if (dragY > clickCornerY - 100){dragY = clickCornerY - 100;}
   resizeOP.style.left = (dragX - clickX) + "px";
   resizeOP.style.top  = (dragY - clickY) + "px";
@@ -176,4 +176,6 @@ function resizeMove(){
 function panelForward(panel){
   LT.tableTop.removeChild(panel.outerPanel);
   LT.tableTop.appendChild(panel.outerPanel);
+  panel.innerPanel.removeChild(panel.panelContent);
+  panel.innerPanel.appendChild(panel.panelContent);
 }
