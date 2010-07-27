@@ -3,102 +3,34 @@
 <html>
   <head>
     <title>Live Tabletop Automated Test</title>
+    <link rel="stylesheet" href="test.css"/>
+    <script type="text/javascript" src="../js/liveTabletop.js"></script>
+    <script type="text/javascript" src="test.js"></script>
     <script type="text/javascript">
 
-function LT_ajax_request(method, url, args, callback) {
+// constants
+TEST.ADMIN_USERNAME = "foo";
+TEST.ADMIN_PASSWORD = "bar";
+TEST.WRONG_PASSWORD = "baz";
+TEST.TABLE_ARGS = {
+name: "My Table",
+  background: 1,
+  default_tile: 2,
+  rows: 100,
+  columns: 50,
+  tile_width: 45,
+  tile_height: 30};
 
-  // make an asynchronous request if a callback is provided
-  var ajax = new XMLHttpRequest();
-  var asynchronous = false;
-  if (callback) {
-    asynchronous = true;
-    ajax.onreadystatechange = function () {
-      if (ajax.readyState == 4) callback(ajax);
-    };
-  }
+// special result tests
+TEST.one_table = function (ajax) {return TEST.count(ajax, "table", 1);};
+TEST.one_user = function (ajax) {return TEST.count(ajax, "user", 1);},
 
-  // combine args into urlencoded string
-  var arg_list = [];
-  for (var a in args) arg_list.push(a + "=" + encodeURIComponent(args[a]));
-  var argument_string = arg_list.join("&");
-
-  // with the GET method we just append the args to the URL
-  if (method == "GET") {
-    ajax.open(method, url + "?" + argument_string, asynchronous);
-    ajax.send();
-  }
-
-  // with the POST method we send the args as a urlencoded message body
-  if (method == "POST") {
-    ajax.open(method, url, asynchronous);
-    ajax.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    ajax.setRequestHeader("Content-length", argument_string.length);
-    ajax.setRequestHeader("Connection", "close");
-    ajax.send(argument_string);
-  }
-
-  // return the ajax object, especially for synchronous requests
-  return ajax;
-}
-
-function LT_create_element(tag_name, attributes, container, text) {
-  var element = document.createElement(tag_name);
-  for (attribute_name in attributes)
-    element.setAttribute(attribute_name, attributes[attribute_name]);
-  if (container) container.appendChild(element);
-  if (text) element.appendChild(document.createTextNode(text));
-  return element;
-}
-
-var TEST = {
-  ADMIN_USERNAME: "foo",
-  ADMIN_PASSWORD: "bar",
-  WRONG_PASSWORD: "baz",
-  TABLE_ARGS: {
-    name: "My Table",
-    background: 1,
-    default_tile: 2,
-    rows: 100,
-    columns: 50,
-    tile_width: 45,
-    tile_height: 30},
-  index: 0,
-  start: function () {
-    TEST.echo("STARTING TESTS ...");
-    TEST.request();},
-  echo: function (text) {
-    LT_create_element("div", {}, document.body, text);},
-  request: function () {
-    var test = TEST.tests[TEST.index];
-    LT_ajax_request("POST", test.action, test.args, TEST.finish);},
-  blank: function (ajax) {
-    var text = ajax.responseText.replace(/^\s+|\s+$/g, '');
-    return (text == "") ? "PASS" : "FAIL [" + text + "]";},
-  exists: function (ajax) {
-    if (ajax.status == 200) return "PASS";
-    else return "FAIL [status = " + ajax.status + "]";},
-  unimplemented: function (ajax) {
-    return "FAIL (test not implemented) [" + ajax.responseText + "]";},
-  count: function (ajax, tag, target) {
-    var count = ajax.responseXML.getElementsByTagName(tag).length;
-    if (count == target) return "PASS";
-    else return "FAIL [returned " + count + " " + tag + "s]";},
-  equals: function (ajax, target) {
-    var text = ajax.responseText.replace(/^\s+|\s+$/g, '');
-    return (text == target) ? "PASS" : "FAIL [" + text + "]";},
-  one_table: function (ajax) {return TEST.count(ajax, "table", 1);},
-  one_user: function (ajax) {return TEST.count(ajax, "user", 1);},
-  finish: function (ajax) {
-    var test = TEST.tests[TEST.index++];
-    var result = test.result(ajax);
-    TEST.echo(test.action + ": " + result);
-    if (TEST.index == TEST.tests.length) TEST.echo("... FINISHED!");
-    else if (TEST.index != 1 || result == "PASS") TEST.request();}
-};
-
+// list of tests
 TEST.tests = [
-  // INSTALL
-  {action: "install.php",
+
+  {group: "INSTALL",
+    action: "install.php",
+    abort: true,
     args: {
       location:"<?php echo $_REQUEST['location'];?>",
       database:"<?php echo $_REQUEST['database'];?>",
@@ -109,16 +41,15 @@ TEST.tests = [
     result: TEST.blank},
   {action: "db_config.php", args: {}, result: TEST.exists},
 
-  // LOGIN
-  {action: "login.php",
+  {group: "LOGIN",
+    action: "login.php",
     args: {username: TEST.ADMIN_USERNAME, password: TEST.WRONG_PASSWORD},
     result: function (ajax) {return TEST.count(ajax, "user", 0);}},
   {action: "login.php",
     args: {username: TEST.ADMIN_USERNAME, password: TEST.ADMIN_PASSWORD},
     result: TEST.one_user},
 
-  // LOGOUT
-  {action: "logout.php", args: {}, result: TEST.blank},
+  {group: "LOGOUT", action: "logout.php", args: {}, result: TEST.blank},
   {action: "create_table.php",
     args: TEST.TABLE_ARGS,
     result: function (ajax) {
@@ -130,18 +61,18 @@ TEST.tests = [
 
   // M E S S A G E
 
-  // CREATE MESSAGE
-  {action: "create_message.php",
+  {group: "CREATE MESSAGE",
+    action: "create_message.php",
     args: {table_id: 1, user_id: 1, text: "Hello, world!"},
     result: TEST.blank},
 
-  // READ MESSAGES
-  {action: "read_messages.php",
+  {group: "READ MESSAGES",
+    action: "read_messages.php",
     args: {table_id: 1, time: 0},
     result: function (ajax) {return TEST.count(ajax, "message", 1);}},
 
-  // PRIVATE ROLL
-  {action: "private_roll.php",
+  {group: "PRIVATE ROLL",
+    action: "private_roll.php",
     args: {text: "From 1975 - 2010, [0 + 2010 - 1975] years passed."},
     result: function (ajax) {
       var roll = ajax.responseXML.getElementsByTagName("message")[0];
@@ -151,8 +82,8 @@ TEST.tests = [
 
   // U S E R
 
-  // CHANGE PASSWORD
-  {action: "update_user_password.php",
+  {group: "CHANGE PASSWORD",
+    action: "update_user_password.php",
     args: {password: TEST.WRONG_PASSWORD},
     result: TEST.blank},
   {action: "login.php",
@@ -165,8 +96,8 @@ TEST.tests = [
     args: {username: TEST.ADMIN_USERNAME, password: TEST.ADMIN_PASSWORD},
     result: TEST.one_user},
 
-  // CREATE USER
-  {action: "create_user.php",
+  {group: "CREATE USER",
+    action: "create_user.php",
     args: {username: "larry", password: "curly", permissions: "user"},
     result: TEST.blank},
   {action: "login.php",
@@ -176,13 +107,13 @@ TEST.tests = [
     args: {username: TEST.ADMIN_USERNAME, password: TEST.ADMIN_PASSWORD},
     result: TEST.one_user},
 
-  // READ USERS
-  {action: "read_users.php",
+  {group: "READ USERS",
+    action: "read_users.php",
     args: {},
     result: function (ajax) {return TEST.count(ajax, "user", 2);}},
 
-  // UPDATE USER
-  {action: "update_user.php",
+  {group: "UPDATE USER",
+    action: "update_user.php",
     args: {
       user_id: 2,
       username: "moe",
@@ -202,14 +133,16 @@ TEST.tests = [
       }
       return "FAIL [" + ajax.responseText + "]";}},
 
-  // DELETE USER
-  {action: "delete_user.php", args: {user_id: 2}, result: TEST.blank},
+  {group: "DELETE USER",
+    action: "delete_user.php",
+    args: {user_id: 2},
+    result: TEST.blank},
   {action: "read_users.php", args: {}, result: TEST.one_user},
 
   // T A B L E
 
-  // CREATE TABLE
-  {action: "create_table.php",
+  {group: "CREATE TABLE",
+    action: "create_table.php",
     args: {
       name: "My Other Table",
       background: 5,
@@ -220,16 +153,18 @@ TEST.tests = [
       tile_height: 40},
     result: TEST.one_table},
 
-  // READ TABLE
-  {action: "read_table.php", args: {table_id: 2}, result: TEST.one_table},
+  {group: "READ TABLE",
+    action: "read_table.php",
+    args: {table_id: 2},
+    result: TEST.one_table},
 
-  // READ TABLES
-  {action: "read_tables.php",
+  {group: "READ TABLES",
+    action: "read_tables.php",
     args: {},
     result: function (ajax) {return TEST.count(ajax, "table", 2);}},
 
-  // UPDATE TABLE
-  {action: "update_table.php",
+  {group: "UPDATE TABLE",
+    action: "update_table.php",
     args: {
       table_id: 1,
       name: "My Original Table",
@@ -255,14 +190,16 @@ TEST.tests = [
       }
       return "FAIL [" + ajax.responseText + "]";}},
 
-  // DELETE TABLE
-  {action: "delete_table.php", args: {table_id: 2}, result: TEST.blank},
+  {group: "DELETE TABLE",
+    action: "delete_table.php",
+    args: {table_id: 2},
+    result: TEST.blank},
   {action: "read_tables.php", args: {}, result: TEST.one_table},
 
   // T I L E
 
-  // READ TILES
-  {action: "read_tiles.php",
+  {group: "READ TILES",
+    action: "read_tiles.php",
     args: {table_id: 1},
     result: function (ajax) {
       var text = ajax.responseXML.documentElement.textContent;
@@ -272,8 +209,8 @@ TEST.tests = [
          if (tiles[i] != "0002") return "FAIL [" + i + ": " + tiles[i] + "]";
       return "PASS";}},
 
-  // UPDATE TILE
-  {action: "update_tile.php",
+  {group: "UPDATE TILE",
+    action: "update_tile.php",
     args: {
       table_id: 1,
       x: 7,
@@ -295,8 +232,8 @@ TEST.tests = [
       }
       return "PASS";}},
 
-  // FILL FOG
-  {action: "fill_fog.php", args: {table_id: 1}, result: TEST.blank},
+  {group: "FILL FOG",
+    action: "fill_fog.php", args: {table_id: 1}, result: TEST.blank},
   {action: "read_tiles.php",
     args: {table_id: 1},
     result: function (ajax) {
@@ -309,8 +246,8 @@ TEST.tests = [
       }
       return "PASS";}},
 
-  // CLEAR FOG
-  {action: "clear_fog.php", args: {table_id: 1}, result: TEST.blank},
+  {group: "CLEAR FOG",
+    action: "clear_fog.php", args: {table_id: 1}, result: TEST.blank},
   {action: "read_tiles.php",
     args: {table_id: 1},
     result: function (ajax) {
@@ -325,8 +262,8 @@ TEST.tests = [
 
   // P I E C E
 
-  // CREATE PIECE
-  {action: "create_piece.php",
+  {group: "CREATE PIECE",
+    action: "create_piece.php",
     args: {
       table_id: 1,
       image_id: 10,
@@ -340,13 +277,13 @@ TEST.tests = [
       width: 64},
     result: TEST.blank},
 
-  // READ PIECES
-  {action: "read_pieces.php",
+  {group: "READ PIECES",
+    action: "read_pieces.php",
     args: {table_id: 1},
     result: function (ajax) {return TEST.count(ajax, "piece", 1);}},
 
-  // UPDATE PIECE
-  {action: "update_piece.php",
+  {group: "UPDATE PIECE",
+    action: "update_piece.php",
     args: {
       piece_id: 1,
       image_id: 11,
@@ -380,8 +317,8 @@ TEST.tests = [
       }
       return "FAIL [" + ajax.responseText + "]";}},
 
-  // UPDATE STAT
-  {action: "update_stat.php",
+  {group: "UPDATE STAT",
+    action: "update_stat.php",
     args: {piece_id: 1, name: "hit points", value: "20"},
     result: TEST.blank},
   {action: "read_pieces.php",
@@ -394,47 +331,48 @@ TEST.tests = [
       }
       return "FAIL [" + ajax.responseText + "]";}},
 
-  // DELETE STAT
-  {action: "delete_stat.php",
+  {group: "DELETE STAT",
+    action: "delete_stat.php",
     args: {piece_id: 1, name: "hit points"},
     result: TEST.blank},
   {action: "read_pieces.php",
     args: {table_id: 1},
     result: function (ajax) {return TEST.count(ajax, "stat", 0);}},
 
-  // DELETE PIECE
-  {action: "delete_piece.php", args: {piece_id: 1}, result: TEST.blank},
+  {group: "DELETE PIECE",
+    action: "delete_piece.php", args: {piece_id: 1}, result: TEST.blank},
   {action: "read_pieces.php",
     args: {table_id: 1},
     result: function (ajax) {return TEST.count(ajax, "piece", 0);}},
 
   // I M A G E
 
-  // CREATE IMAGE - actually this will not be done with AJAX
-  {action: "create_image.php",
+  {group: "CREATE IMAGE",
+    action: "create_image.php",
+    uploader: true, // this action does not use ajax
     args: {file: "background.gif", type: "background"},
     result: TEST.unimplemented},
 
-  // READ IMAGES
-  {action: "read_images.php",
+  {group: "READ IMAGES",
+    action: "read_images.php",
     args: {type: "background"},
     result: TEST.unimplemented},
 
-  // READ IMAGES USEABLE
-  {action: "read_images_useable.php",
+  {group: "READ IMAGES USEABLE",
+    action: "read_images_useable.php",
     args: {type: "background"},
     result: TEST.unimplemented},
 
-  // UPDATE IMAGE
-  {action: "update_image.php",
+  {group: "UPDATE IMAGE",
+    action: "update_image.php",
     args: {image_id: 1, user_id: 2, public: 1},
     result: TEST.unimplemented},
   {action: "read_images.php",
     args: {type: "background"},
     result: TEST.unimplemented},
 
-  // DELETE IMAGE
-  {action: "delete_image.php",
+  {group: "DELETE IMAGE",
+    action: "delete_image.php",
     args: {image_id: 1},
     result: TEST.unimplemented},
   {action: "read_images.php",
