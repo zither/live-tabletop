@@ -21,13 +21,25 @@ var TEST = {
   // Do not use this method in your own functions and methods.
   request: function () {
     var test = TEST.tests[TEST.index];
-    if (test.uploader) {
-      LT.element("div", {}, document.body, 
-        "... SORRY, UPLOADER NOT IMPLEMENTED YET ...");
-      TEST.finish(null);
+    if (test.upload) {
+      var form = document.getElementById(test.form);
+      for (var arg_name in test.args) {
+        LT.element("input", {
+            type: "hidden",
+            name: arg_name,
+            value: test.args[arg_name]
+          }, form);
+      }
+/*
+      form.action = test.action;
+      form.method = "POST";
+      form.enctype = "multipart/form-data";
+      form.onsubmit = LT.startUpload;
+*/
+      form.submit();
     }
     else {
-      LT.ajaxRequest("POST", "../" + test.action, test.args, TEST.finish);
+      LT.ajaxRequest("POST", test.action, test.args, TEST.finish);
     }
   },
 
@@ -54,8 +66,21 @@ var TEST = {
   // TEST.unimplemented(ajax) returns "FAIL (test not implemented)" followed
   // by the text of the returned XMLHttpRequest object (the ajax parameter.)
   unimplemented: function (ajax) {
-    var text = ajax ? ajax.responseText : "no XMLHttpRequest";
-    return "FAIL (test not implemented) [" + text + "]";
+    if (ajax && ajax.responseText) {
+      return "FAIL (test not implemented) [" + ajax.responseText + "]";
+    }
+    return "FAIL (test not implemented) [no XMLHttpRequest]";
+  },
+
+  // TEST.uploaded(result) returns "PASS" if result is not a string.
+  // Uploader tests do not have an XMLHttpRequest object.
+  // Instead the server must return javascript which passes a result
+  // to the TEST.finish method.
+  uploaded: function (result) {
+    if (typeof (result) == 'string') {
+      return "FAIL [" + result + "]";
+    }
+    return "PASS";
   },
 
   // TEST.count(ajax, tag, target) returns "PASS" if the returned
