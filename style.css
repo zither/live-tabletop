@@ -61,7 +61,7 @@ input		{
 		}
 .titleEnd	{
 	background-image: url(images/titleEnd.jpg); width: 5px; height: 23px;
-	float: left;
+	float: left; margin-right: 1px;
 		}
 .close	{
 	background-image: url(images/close.png); width: 27px; height: 23px;
