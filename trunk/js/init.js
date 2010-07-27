@@ -24,10 +24,13 @@ function loadPage() {
   LT.tableTop = new LT.element('div', { id : 'tableTop' }, document.body);
   LT.createLogin();
   //This creates global variables.
-  LT.tablePanel = new Panel( 'Tables', 'Tables', LT.buttonsDiv, 420, 170, 175, 300);
-  LT.chatPanel = new Panel( 'Chat', 'Chat', LT.buttonsDiv, 220, 26, 355, 130);
-  LT.turnsPanel = new Panel( 'Turns', 'Turns', LT.buttonsDiv, 6, 26, 175, 300);
-  LT.toolsPanel = new Panel( 'Tools', 'Tools', LT.buttonsDiv, 585, 26, 175, 300);
-  LT.filesPanel = new Panel( 'Files', 'Files', LT.buttonsDiv, 775, 26, 175, 150);
+  LT.tablesPanel = new Panel( 'Tables', 'Tables', LT.buttonsDiv, 6, 26, 175, 300);
+  LT.chatPanel = new Panel( 'Chat', 'Chat', LT.buttonsDiv, 6, 49, 355, 130);
+  LT.turnsPanel = new Panel( 'Turns', 'Turns', LT.buttonsDiv, 6, 72, 175, 300);
+  LT.toolsPanel = new Panel( 'Tools', 'Tools', LT.buttonsDiv, 6, 95, 225, 250);
+  LT.filesPanel = new Panel( 'Files', 'Files', LT.buttonsDiv, 6, 118, 250, 150);
+  
+  populateChatPanel();
+  populateTablesPanel();
   
 }
