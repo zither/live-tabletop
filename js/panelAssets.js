@@ -13,7 +13,7 @@ var clickDragGap = 0;
 var z = 100;
 var invertResize = 1;
 
-function Panel( panelName, xPos, yPos, panelWidth, panelHeight, hasButton) {
+function Panel( panelName, buttonName, buttonLoc, xPos, yPos, panelWidth, panelHeight) {
   var panel = this;
   panel.outerPanel = new LT.element('div', { 'class' : 'outerPanel', 
     'style' : 'left: ' + xPos + 'px; top: ' + yPos + 'px; visibility: hidden;'
@@ -41,11 +41,11 @@ function Panel( panelName, xPos, yPos, panelWidth, panelHeight, hasButton) {
       var panelBR = new LT.element('div', { 'class' : 'resizeBR' }, panelBottom);
 	  panelBR.onmousedown = function(){ selectedBR = panel;};
 // Create Menu Button ------------------------------------------------------
-	this.buttonContainer = new LT.element('div', { 'class' : 'buttonUnchecked' }, LT.buttonsDiv);
+	this.buttonContainer = new LT.element('div', { 'class' : 'buttonUnchecked' }, buttonLoc);
 	panel.buttonContainer.onclick = function(){ showPanel(panel); };
 	var buttonStart = new LT.element('div', { 'class' : 'buttonStart' }, panel.buttonContainer);
 	var buttonCaption = new LT.element('div', { 'class' : 'buttonCaption' },
-      panel.buttonContainer, panelName);
+      panel.buttonContainer, buttonName);
 	var buttonEnd = new LT.element('div', { 'class' : 'buttonEnd' }, panel.buttonContainer);
 	buttonCaption.onselectstart = function () { return false; };
 }
