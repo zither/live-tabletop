@@ -25,6 +25,9 @@ body	{
 .buttonUnchecked, .buttonChecked{
 	height: 22px; float: left; margin: 0px 0px 0px 12px;
 		}
+.buttonUnchecked:hover, .buttonChecked:hover{
+	cursor: pointer;
+		}
 .buttonStart{
 	background-image: url(images/buttonUncheck.png); width: 19px; height: 19px;
 	float: left; margin-top: 4px;
@@ -96,10 +99,11 @@ body	{
 	    }
 .login:hover{	text-decoration: underline;	    }
 #loginDiv{
-	float: right; color: #999; padding: 1px 1px 1px 1px; margin-top: 3px;
-	background: #000;
+	float: right;
 		}
-
+#loginForm {
+	background: #000; margin-top: 3px; color: #999; padding: 1px 1px 1px 1px;;
+	}
 #loginForm input{
 	background: #CCC; color: #333; margin-right: 4px;
 	}
