@@ -3,7 +3,7 @@
 session_start();
 
 include('db_config.php');
-include('users.php');
+include('include/users.php');
 
 // Failure for any reason results in an empty <users></users> document element.
 // We return same failure result regardless of the reason for failure so that
@@ -17,7 +17,7 @@ $password = $LT_SQL->real_escape_string($_REQUEST['password']);
 
 // Query the Database and Generate Output
 
-include('xml_headers.php');
+include('include/xml_headers.php');
 echo "<users>\n";
 if ($result = $LT_SQL->query("CALL read_user_by_name('$username')")) {
   if ($row = $result->fetch_assoc()) {
