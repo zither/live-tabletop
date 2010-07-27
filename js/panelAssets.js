@@ -35,7 +35,7 @@ function Panel( panelName, buttonName, buttonLoc, xPos, yPos, panelWidth, panelH
     panel.innerPanel = new LT.element('div', { 'class' : 'innerPanel', 
       'style' : 'width: ' + panelWidth + 'px; height: ' + panelHeight + 'px;' 
 	}, panel.outerPanel);
-	panel.panelContent = new LT.element('div', {}, panel.innerPanel, "stuff");
+	panel.panelContent = new LT.element('div', {}, panel.innerPanel, "");
     var panelBottom = new LT.element('div', { 'class' : 'panelBottom' }, panel.outerPanel);
       var panelBL = new LT.element('div', { 'class' : 'panelBL' }, panelBottom);
       var panelBR = new LT.element('div', { 'class' : 'resizeBR' }, panelBottom);

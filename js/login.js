@@ -1,13 +1,5 @@
 LT.createLogin = function(){
-    var loginButton = new LT.element('div', { class : 'login'}, LT.pageBar);
-	loginText = document.createTextNode("Login");
-	logoutText = document.createTextNode("Logout");
-    loginButton.appendChild(loginText);
     LT.loginDiv = new LT.element('div', { id : 'loginDiv' }, LT.pageBar);
-    loginButton.onclick = function(){
-      LT.pageBar.removeChild(loginButton);
-      LT.loginDiv.style.visibility = 'visible';
-    }
       var loginForm = new LT.element('form', { id : 'loginForm', 
 	    style : 'float: right;'}, LT.loginDiv);
       var loginUsername = new LT.element('input', { style : 'border: 1px solid #CCC;',
@@ -30,7 +22,7 @@ LT.createLogin = function(){
           LT.loginDiv.removeChild(loginForm);
           loggedIn = LT.element('div', { id : 'loggedIn' }, LT.loginDiv );
           LT.tablePanel = new Panel( 'User Options', LT.username + "'s " + 'options', LT.loginDiv, 
-		    420, 170, 175, 300);
+		    185, 26, 150, 150);
 		}else{
 		  alert('Incorrect username or password.')
 		}
