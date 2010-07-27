@@ -3,7 +3,7 @@
 session_start();
 
 include('db_config.php');
-include('ownership.php');
+include('include/ownership.php');
 
 // Interpret the Request
 

@@ -1,7 +1,7 @@
 <?php
 
 session_start();
-if (!isset($_SESSION['user_id'])) die('You are not logged in.');
+if (!isset($_SESSION['user_id'])) die ('You are not logged in.');
 
 include('db_config.php');
 
@@ -43,7 +43,7 @@ for ($i = 0; $i < count($pieces); $i++) {
 
 // Generate Output
 
-include('xml_headers.php');
+include('include/xml_headers.php');
 echo "<pieces>\n";
 for ($i = 0; $i < count($pieces); $i++) {
   echo "  <piece";

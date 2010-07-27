@@ -4,7 +4,7 @@ session_start();
 if (!isset($_SESSION['user_id'])) die ('You are not logged in.');
 
 include('db_config.php');
-include('users.php');
+include('include/users.php');
 
 // Interpret the Request
 

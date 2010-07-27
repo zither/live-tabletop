@@ -2,7 +2,7 @@
 
 if (file_exists('db_config.php')) die ("Live Tabletop is already installed.");
 
-include('users.php');
+include('include/users.php');
 
 
 // Interpret the Request
@@ -22,7 +22,7 @@ $admin_password = $LT_SQL->real_escape_string($_REQUEST['admin_password']);
 // Create the Database Schema (tables and stored procedures)
 
 $LT_SQL->autocommit(FALSE);
-if ($LT_SQL->multi_query(file_get_contents('schema.sql'))) {
+if ($LT_SQL->multi_query(file_get_contents('include/schema.sql'))) {
   do {
     $result = $LT_SQL->store_result();
     if ($LT_SQL->errno != 0) {

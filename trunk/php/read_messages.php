@@ -1,7 +1,7 @@
 <?php
 
 session_start();
-if (!isset($_SESSION['user_id'])) die('You are not logged in.');
+if (!isset($_SESSION['user_id'])) die ('You are not logged in.');
 
 include('db_config.php');
 
@@ -17,7 +17,7 @@ $result = $LT_SQL->query("CALL read_messages($table_id, '$time')")
 
 // Generate Output
 
-include('xml_headers.php');
+include('include/xml_headers.php');
 echo "<messages>\n";
 while ($row = $result->fetch_assoc()) {
   echo "  <message user_id=\"{$row['user_id']}\" time=\"{$row['time']}\">"

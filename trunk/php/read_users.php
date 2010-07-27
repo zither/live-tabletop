@@ -12,7 +12,7 @@ $result = $LT_SQL->query("CALL read_users()")
 
 // Generate Output
 
-include('xml_headers.php');
+include('include/xml_headers.php');
 echo "<users>\n";
 while ($row = $result->fetch_assoc()) {
   echo "  <user "

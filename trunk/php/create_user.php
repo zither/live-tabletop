@@ -6,7 +6,7 @@ if (strcmp($_SESSION['permissions'], 'administrator') != 0)
   die ("You do not have permission to do this.");
 
 include('db_config.php');
-include('users.php');
+include('include/users.php');
 
 // Interpret the Request
 

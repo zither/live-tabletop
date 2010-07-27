@@ -42,7 +42,7 @@ if (!$result) {
 
 // Generate Output
 
-include('xml_headers.php');
+include('include/xml_headers.php');
 echo "<tables>\n";
 echo "  <table"
   . " id=\"{$row['table_id']}\""

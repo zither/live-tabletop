@@ -16,7 +16,7 @@ $result = $LT_SQL->query("CALL read_tables_by_user_id($user_id)")
 
 // Generate Output
 
-include('xml_headers.php');
+include('include/xml_headers.php');
 echo "<tables>\n";
 while($row = $result->fetch_assoc()) {
   echo "  <table"

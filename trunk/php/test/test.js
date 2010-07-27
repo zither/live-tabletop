@@ -27,7 +27,7 @@ var TEST = {
       TEST.finish(null);
     }
     else {
-      LT.ajaxRequest("POST", test.action, test.args, TEST.finish);
+      LT.ajaxRequest("POST", "../" + test.action, test.args, TEST.finish);
     }
   },
 

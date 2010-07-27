@@ -4,7 +4,7 @@
   <head>
     <title>Live Tabletop Automated Test</title>
     <link rel="stylesheet" href="test.css"/>
-    <script type="text/javascript" src="../js/liveTabletop.js"></script>
+    <script type="text/javascript" src="../../js/liveTabletop.js"></script>
     <script type="text/javascript" src="test.js"></script>
     <script type="text/javascript">
 
