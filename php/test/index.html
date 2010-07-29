@@ -376,15 +376,6 @@ TEST.tests = [
     result: TEST.unimplemented}
 ];
 
-// event handler for submit button
-TEST.submit = function () {
-  TEST.INSTALL_ARGS.location = document.getElementById("location").value;
-  TEST.INSTALL_ARGS.database = document.getElementById("database").value;
-  TEST.INSTALL_ARGS.username = document.getElementById("username").value;
-  TEST.INSTALL_ARGS.password = document.getElementById("password").value;
-  TEST.start();
-}
-
 LT.startUpload = function () {
   LT.element("div", {}, document.body, "STARTING UPLOAD...");
 }
@@ -392,6 +383,20 @@ LT.startUpload = function () {
 LT.stopUpload = function (result) {
   TEST.finish(result);
 }
+onload = function () {
+  // event handler for submit button
+  document.getElementById("begin").onsubmit = function (e) {
+    if (!e) var e = window.event;
+    TEST.INSTALL_ARGS.location = document.getElementById("location").value;
+    TEST.INSTALL_ARGS.database = document.getElementById("database").value;
+    TEST.INSTALL_ARGS.username = document.getElementById("username").value;
+    TEST.INSTALL_ARGS.password = document.getElementById("password").value;
+    TEST.start();
+    e.preventDefault();
+    return false;
+  }
+}
+
     </script>
   </head>
   <body>
@@ -417,16 +422,15 @@ LT.stopUpload = function (result) {
           enctype="multipart/form-data"
           target="create_image_target"
           onsubmit="LT.startUpload();" >
-      <input name="file" type="file"/>
-      image file
-<!--
-      <input type="submit" value="Upload"/>
--->
-    </form>
-    <iframe id="create_image_target"
-            name="create_image_target"
-            src="about:blank">
-    </iframe>
+      <div>
+        <input name="file" type="file"/>
+        image file
+      </div>
+      <div>
+        <iframe id="create_image_target"
+                name="create_image_target"
+                src="about:blank">
+        </iframe>
 <!--
 #create_image_target {
   width:0;
@@ -434,9 +438,12 @@ LT.stopUpload = function (result) {
   border:0px solid #fff;
 }
 -->
-    <div>
-      <input type="submit" value="Begin Test" onclick="TEST.submit();"/>
-    </div>
-
+      </div>
+    </form>
+    <form action="#" id="begin">
+      <div>
+        <input type="submit" value="Begin Test"/>
+      </div>
+    </form>
   </body>
 </html>
