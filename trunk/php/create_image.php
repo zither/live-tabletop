@@ -4,8 +4,8 @@ session_start();
 
 function done($result) {
   echo '<script language="javascript" type="text/javascript">'
-    . "\n   window.top.window.LT.stopUpload(" . json_encode($result)
-    . ");\n</script>";
+    . "\n   window.top.window.LT.finishUpload({$_REQUEST['uploader']}, "
+    . json_encode($result) . ");\n</script>";
   die();
 }
 
@@ -16,12 +16,12 @@ include('db_config.php');
 // Interpret the Request
 
 $user = $LT_SQL->real_escape_string($_SESSION['user_id']);
-
 $type = $LT_SQL->real_escape_string($_REQUEST['type']);
 if ($type != 'background' && $type != 'tile' && $type != 'piece')
   done("Unsupported category: " . $type);
-
 $name = $LT_SQL->real_escape_string(basename( $_FILES['file']['name']));
+
+// Store the Uploaded Image
 
 move_uploaded_file($_FILES['file']['tmp_name'], getcwd() . DIRECTORY_SEPARATOR
   . '..' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'upload'

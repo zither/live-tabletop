@@ -21,22 +21,8 @@ var TEST = {
   // Do not use this method in your own functions and methods.
   request: function () {
     var test = TEST.tests[TEST.index];
-    if (test.upload) {
-      var form = document.getElementById(test.form);
-      for (var arg_name in test.args) {
-        LT.element("input", {
-            type: "hidden",
-            name: arg_name,
-            value: test.args[arg_name]
-          }, form);
-      }
-/*
-      form.action = test.action;
-      form.method = "POST";
-      form.enctype = "multipart/form-data";
-      form.onsubmit = LT.startUpload;
-*/
-      form.submit();
+    if (test.uploader) {
+      test.uploader.submit(test.args);
     }
     else {
       LT.ajaxRequest("POST", test.action, test.args, TEST.finish);
