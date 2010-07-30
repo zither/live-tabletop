@@ -3,6 +3,7 @@
     <title>Live Tabletop Automated Test</title>
     <link rel="stylesheet" href="test.css"/>
     <script type="text/javascript" src="../../js/liveTabletop.js"></script>
+    <script type="text/javascript" src="../../js/uploader.js"></script>
     <script type="text/javascript" src="test.js"></script>
     <script type="text/javascript">
 
@@ -11,7 +12,7 @@ TEST.ADMIN_USERNAME = "foo";
 TEST.ADMIN_PASSWORD = "bar";
 TEST.WRONG_PASSWORD = "baz";
 TEST.TABLE_ARGS = {
-name: "My Table",
+  name: "My Table",
   background: 1,
   default_tile: 2,
   rows: 100,
@@ -25,6 +26,8 @@ TEST.INSTALL_ARGS = {
 // special result tests
 TEST.one_table = function (ajax) {return TEST.count(ajax, "table", 1);};
 TEST.one_user = function (ajax) {return TEST.count(ajax, "user", 1);},
+
+TEST.uploader = new LT.Uploader("../create_image.php");
 
 // list of tests
 TEST.tests = [
@@ -343,9 +346,8 @@ TEST.tests = [
   // I M A G E
 
   {group: "CREATE IMAGE",
-    action: "../create_image.php",
-    upload: true, // this test does not use ajax
-    form: "create_image",
+    action: TEST.uploader.form.action,
+    uploader: TEST.uploader,
     args: {type: "background"},
     result: TEST.uploaded},
 
@@ -376,74 +378,52 @@ TEST.tests = [
     result: TEST.unimplemented}
 ];
 
-LT.startUpload = function () {
-  LT.element("div", {}, document.body, "STARTING UPLOAD...");
-}
-
-LT.stopUpload = function (result) {
-  TEST.finish(result);
-}
 onload = function () {
-  // event handler for submit button
-  document.getElementById("begin").onsubmit = function (e) {
+  // text fields
+  var descriptions = {
+    location: "URL of database server",
+    database: "database name",
+    username: "database user name",
+    password: "database password"};
+  var inputs = {};
+  for (var field in descriptions) {
+    var div = LT.element("div", {}, document.body);
+    inputs[field] = LT.element("input", {type: "text", name: field}, div);
+    div.appendChild(document.createTextNode(descriptions[field]));
+  }
+
+  // image selection
+  LT.element("div", {}, document.body, "select an image file:");
+  document.body.appendChild(TEST.uploader.form);
+  TEST.uploader.form.onsubmit = function () {
+    LT.element("div", {}, document.body, "STARTING UPLOAD...");
+  }
+  TEST.uploader.onload = function (result) {    
+    LT.element("div", {}, document.body, "... FINISHED UPLOAD");
+    TEST.finish(result);
+  }
+  TEST.uploader.iframe.style.removeProperty("border");
+  TEST.uploader.iframe.style.removeProperty("height");
+  TEST.uploader.iframe.style.removeProperty("width");
+  TEST.uploader.iframe.style.display = "block";
+
+  // submit button
+  var begin = LT.element("input", {type: "submit", value: "Begin Test"},
+    document.body);
+  begin.onclick = function (e) {
     if (!e) var e = window.event;
-    TEST.INSTALL_ARGS.location = document.getElementById("location").value;
-    TEST.INSTALL_ARGS.database = document.getElementById("database").value;
-    TEST.INSTALL_ARGS.username = document.getElementById("username").value;
-    TEST.INSTALL_ARGS.password = document.getElementById("password").value;
+    TEST.INSTALL_ARGS.location = inputs.location.value;
+    TEST.INSTALL_ARGS.database = inputs.database.value;
+    TEST.INSTALL_ARGS.username = inputs.username.value;
+    TEST.INSTALL_ARGS.password = inputs.password.value;
     TEST.start();
     e.preventDefault();
     return false;
-  }
+  };
 }
 
     </script>
   </head>
   <body>
-    <div>
-      <input type="text" name="location" id="location"/>
-      URL of database server
-    </div>
-    <div>
-      <input type="text" name="database" id="database"/>
-      database name
-    </div>
-    <div>
-      <input type="text" name="username" id="username"/>
-      database user name
-    </div>
-    <div>
-      <input type="text" name="password" id="password"/>
-      database password
-    </div>
-    <form id="create_image"
-          action="../create_image.php"
-          method="POST"
-          enctype="multipart/form-data"
-          target="create_image_target"
-          onsubmit="LT.startUpload();" >
-      <div>
-        <input name="file" type="file"/>
-        image file
-      </div>
-      <div>
-        <iframe id="create_image_target"
-                name="create_image_target"
-                src="about:blank">
-        </iframe>
-<!--
-#create_image_target {
-  width:0;
-  height:0;
-  border:0px solid #fff;
-}
--->
-      </div>
-    </form>
-    <form action="#" id="begin">
-      <div>
-        <input type="submit" value="Begin Test"/>
-      </div>
-    </form>
   </body>
 </html>
