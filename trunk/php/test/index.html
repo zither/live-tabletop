@@ -354,28 +354,35 @@ TEST.tests = [
   {group: "READ IMAGES",
     action: "../read_images.php",
     args: {type: "background"},
-    result: TEST.unimplemented},
+    result: function (ajax) {return TEST.count(ajax, "image", 1);}},
 
+/*
   {group: "READ IMAGES USEABLE",
     action: "../read_images_useable.php",
     args: {type: "background"},
-    result: TEST.unimplemented},
+    result: function (ajax) {return TEST.count(ajax, "image", 1);}},
+*/
 
   {group: "UPDATE IMAGE",
     action: "../update_image.php",
     args: {image_id: 1, user_id: 2, public: 1},
-    result: TEST.unimplemented},
+    result: TEST.blank},
   {action: "../read_images.php",
     args: {type: "background"},
-    result: TEST.unimplemented},
+    result: function (ajax) {
+      var image = ajax.responseXML.getElementsByTagName("image")[0];
+      if (image.getAttribute("id") == "1"
+        && image.getAttribute("user") == "2"
+        && image.getAttribute("public") == "1") return "PASS";
+      return "FAIL [" + ajax.responseText + "]";}},
 
   {group: "DELETE IMAGE",
     action: "../delete_image.php",
     args: {image_id: 1},
-    result: TEST.unimplemented},
+    result: TEST.blank},
   {action: "../read_images.php",
     args: {type: "background"},
-    result: TEST.unimplemented}
+    result: function (ajax) {return TEST.count(ajax, "image", 0);}}
 ];
 
 onload = function () {
