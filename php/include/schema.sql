@@ -29,6 +29,7 @@ DROP PROCEDURE IF EXISTS create_message;
 DROP PROCEDURE IF EXISTS read_messages;
 DROP PROCEDURE IF EXISTS expire_messages;
 DROP PROCEDURE IF EXISTS create_image;
+DROP PROCEDURE IF EXISTS read_image;
 DROP PROCEDURE IF EXISTS read_images;
 DROP PROCEDURE IF EXISTS read_images_useable;
 DROP PROCEDURE IF EXISTS update_image;
@@ -463,6 +464,13 @@ CREATE PROCEDURE create_image (IN the_user INT, IN the_file TEXT,
 BEGIN
   INSERT INTO images (user_id, file, type, public)
     VALUES (the_user, the_file, the_type, the_public);
+END; 
+
+CREATE PROCEDURE read_image (IN the_image TEXT)
+BEGIN
+  SELECT image_id, user_id, file, type, public,
+    TIME_TO_SEC(TIMEDIFF(time_stamp, '1970-01-01 00:00:00')) AS time
+    FROM images WHERE image_id = the_image;
 END; 
 
 CREATE PROCEDURE read_images (IN the_type TEXT)
