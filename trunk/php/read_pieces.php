@@ -15,21 +15,7 @@ $result = $LT_SQL->query("CALL read_pieces($table_id)")
   or die ("Query failed: " . $LT_SQL->error);
 $pieces = array();
 while ($row = $result->fetch_assoc()) {
-  $pieces[] = array(
-    'stats' => array(),
-    'attributes' => array(
-      'id' => $row['piece_id'],
-      'table' => $row['table_id'],
-      'image' => $row['image_id'],
-      'user' => $row['user_id'],
-      'name' => $row['name'],
-      'x' => $row['x'],
-      'y' => $row['y'],
-      'x_offset' => $row['x_offset'],
-      'y_offset' => $row['y_offset'],
-      'width' => $row['width'],
-      'height' => $row['height'],
-      'color' => $row['color']));
+  $pieces[] = array('stats' => array(), 'attributes' => $row);
 }
 
 for ($i = 0; $i < count($pieces); $i++) {
@@ -48,11 +34,12 @@ echo "<pieces>\n";
 for ($i = 0; $i < count($pieces); $i++) {
   echo "  <piece";
   foreach ($pieces[$i]['attributes'] as $name => $value) {
-    echo " $name=\"$value\"";
+    echo " $name=\"" . htmlspecialchars($value) . "\"";
   }
   echo ">\n";
   foreach ($pieces[$i]['stats'] as $name => $value) {
-    echo "    <stat name=\"$name\">$value</stat>\n";
+    echo "    <stat name=\"" . htmlspecialchars($name) . "\">"
+      . htmlspecialchars($value) . "</stat>\n";
   }
   echo "  </piece>\n";
 }

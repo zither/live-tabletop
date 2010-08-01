@@ -15,11 +15,11 @@ $result = $LT_SQL->query("CALL read_users()")
 include('include/xml_headers.php');
 echo "<users>\n";
 while ($row = $result->fetch_assoc()) {
-  echo "  <user "
-    . "id=\"{$row['user_id']}\" "
-    . "name=\"{$row['name']}\" "
-    . "color=\"{$row['color']}\" "
-    . "permissions=\"{$row['permissions']}\"/>\n";
+  echo "  <user id=\"" . htmlspecialchars($row['id'])
+    . "\" name=\"" . htmlspecialchars($row['name'])
+    . "\" color=\"" . htmlspecialchars($row['color'])
+    . "\" permissions=\"" . htmlspecialchars($row['permissions'])
+    . "\"/>\n";
 }
 echo "</users>\n";
 

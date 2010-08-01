@@ -13,7 +13,7 @@ TEST.ADMIN_PASSWORD = "bar";
 TEST.WRONG_PASSWORD = "baz";
 TEST.TABLE_ARGS = {
   name: "My Table",
-  background: 1,
+  image_id: 1,
   default_tile: 2,
   rows: 100,
   columns: 50,
@@ -143,7 +143,7 @@ TEST.tests = [
     action: "../create_table.php",
     args: {
       name: "My Other Table",
-      background: 5,
+      image_id: 5,
       default_tile: 7,
       rows: 16,
       columns: 25,
@@ -166,7 +166,7 @@ TEST.tests = [
     args: {
       table_id: 1,
       name: "My Original Table",
-      background: 3,
+      image_id: 3,
       grid_width: 15,
       grid_height: 10,
       grid_thickness: 2,
@@ -179,7 +179,7 @@ TEST.tests = [
       for (var i = 0; i < tables.length; i++) {
         if (tables[i].getAttribute("id") == "1"
           && tables[i].getAttribute("name") == "My Original Table"
-          && tables[i].getAttribute("background") == "3"
+          && tables[i].getAttribute("image_id") == "3"
           && tables[i].getAttribute("grid_width") == "15"
           && tables[i].getAttribute("grid_height") == "10"
           && tables[i].getAttribute("grid_thickness") == "2"
@@ -301,8 +301,8 @@ TEST.tests = [
       var pieces = ajax.responseXML.getElementsByTagName("piece");
       for (var i = 0; i < pieces.length; i++) {
         if (pieces[i].getAttribute("id") == "1"
-          && pieces[i].getAttribute("image") == "11"
-          && pieces[i].getAttribute("user") == "2"
+          && pieces[i].getAttribute("image_id") == "11"
+          && pieces[i].getAttribute("user_id") == "2"
           && pieces[i].getAttribute("name") == "Still My Piece"
           && pieces[i].getAttribute("x") == "99"
           && pieces[i].getAttribute("y") == "49"
@@ -372,7 +372,7 @@ TEST.tests = [
     result: function (ajax) {
       var image = ajax.responseXML.getElementsByTagName("image")[0];
       if (image.getAttribute("id") == "1"
-        && image.getAttribute("user") == "2"
+        && image.getAttribute("user_id") == "2"
         && image.getAttribute("public") == "1") return "PASS";
       return "FAIL [" + ajax.responseText + "]";}},
 
