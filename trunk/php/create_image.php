@@ -4,7 +4,7 @@ session_start();
 
 function done($result) {
   echo '<script language="javascript" type="text/javascript">'
-    . "\n   window.top.window.LT.finishUpload({$_REQUEST['uploader']}, "
+    . "\n   window.top.window.LT.Uploader.finish({$_REQUEST['uploader']}, "
     . json_encode($result) . ");\n</script>";
   die();
 }

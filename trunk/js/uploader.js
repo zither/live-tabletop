@@ -23,22 +23,11 @@ $result = move_uploaded_file($_FILES['file']['tmp_name'], getcwd()
   . DIRECTORY_SEPARATOR . basename( $_FILES['file']['name']));
 ?>
 <script language="javascript" type="text/javascript">
-  window.top.window.LT.finishUpload(<?php
+  window.top.window.LT.Uploader.finish(<?php
     echo $uploader . ", " . json_encode($result); 
   ?>);
 </script>
 */
-
-// do not modify
-LT.uploaders = [];
-
-// do not modify
-LT.finishUpload = function (index, result) {
-  var uploader = LT.uploaders[index];
-  if (uploader.onload) {
-    uploader.onload(result);
-  }
-}
 
 // asynchronous uploader class
 LT.Uploader = function (url, container) {
@@ -51,8 +40,8 @@ LT.Uploader = function (url, container) {
   this.temp_args = [];
 
   // uploader indices are used as unique ids - do not modify them
-  this.index = LT.uploaders.length;
-  LT.uploaders.push(this);
+  this.index = LT.Uploader.uploaders.length;
+  LT.Uploader.uploaders.push(this);
 
   // the target name is set automatically by uploader index
   var target_name = "uploader_target_" + this.index;
@@ -138,5 +127,16 @@ LT.Uploader.prototype.deleteArgument = function (arg_name) {
   this.form.removeChild(this.perm_args[arg_name]);
   delete (this.perm_args[arg_name]);
 };
+
+// do not modify
+LT.Uploader.uploaders = [];
+
+// do not modify
+LT.Uploader.finish = function (index, result) {
+  var uploader = LT.Uploader.uploaders[index];
+  if (uploader.onload) {
+    uploader.onload(result);
+  }
+}
 
 
