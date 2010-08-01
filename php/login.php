@@ -24,10 +24,13 @@ if ($result = $LT_SQL->query("CALL read_user_by_name('$username')")) {
     $hash = LT_hash_password($password, $row['password_salt']);
     if (strcmp($hash, $row['password_hash']) == 0) {
       // Save session variables that only the server can modify
-      $_SESSION['user_id'] = $row['user_id'];
+      $_SESSION['user_id'] = $row['id'];
       $_SESSION['permissions'] = $row['permissions'];
-      echo "  <user id=\"{$row['user_id']}\" name=\"{$row['name']}\" "
-        . "color=\"{$row['color']}\" permissions=\"{$row['permissions']}\"/>\n";
+      echo "  <user id=\"" . htmlspecialchars($row['id'])
+        . "\" name=\"" . htmlspecialchars($row['name'])
+        . "\" color=\"" . htmlspecialchars($row['color'])
+        . "\" permissions=\"" . htmlspecialchars($row['permissions'])
+        . "\"/>\n";
     }
   }
 }

@@ -60,7 +60,7 @@ DROP PROCEDURE IF EXISTS delete_stat;
 */
 
 CREATE TABLE users (
-  user_id INT AUTO_INCREMENT PRIMARY KEY,
+  id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(200) NOT NULL UNIQUE,
   password_hash TEXT NOT NULL,
   password_salt TEXT NOT NULL,
@@ -101,7 +101,7 @@ CREATE TABLE tiles (
 */
 
 CREATE TABLE tables (
-  table_id INT AUTO_INCREMENT PRIMARY KEY,
+  id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
   image_id INT,
   name VARCHAR(200) NOT NULL UNIQUE,
@@ -127,7 +127,7 @@ CREATE TABLE tables (
 */
 
 CREATE TABLE pieces (
-  piece_id INT AUTO_INCREMENT PRIMARY KEY,
+  id INT AUTO_INCREMENT PRIMARY KEY,
   table_id INT NOT NULL,
   user_id INT NOT NULL,
   image_id INT,
@@ -155,7 +155,7 @@ CREATE TABLE messages (
 /* IMAGES TABLE */
 
 CREATE TABLE images (
-  image_id INT AUTO_INCREMENT PRIMARY KEY,
+  id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
   file TEXT NOT NULL,
   type TEXT NOT NULL,
@@ -189,33 +189,33 @@ END;
 
 CREATE PROCEDURE read_users ()
 BEGIN
-  SELECT user_id, name, password_hash, password_salt, color, permissions, logged_in,
+  SELECT id, name, password_hash, password_salt, color, permissions, logged_in,
     TIME_TO_SEC(TIMEDIFF(last_action, '1970-01-01 00:00:00')) AS last_action
     FROM users ORDER BY name;
 END; 
 
 CREATE PROCEDURE read_user_by_name (IN the_name VARCHAR(200))
 BEGIN
-  SELECT user_id, name, password_hash, password_salt, color, permissions, logged_in,
+  SELECT id, name, password_hash, password_salt, color, permissions, logged_in,
     TIME_TO_SEC(TIMEDIFF(last_action, '1970-01-01 00:00:00')) AS last_action
     FROM users WHERE LOWER(name) = LOWER(the_name);
 END; 
 
 CREATE PROCEDURE update_user_password (IN the_user INT, IN the_hash TEXT, IN the_salt TEXT)
 BEGIN
-  UPDATE users SET password_hash = the_hash, password_salt = the_salt WHERE user_id = the_user;
+  UPDATE users SET password_hash = the_hash, password_salt = the_salt WHERE id = the_user;
 END; 
 
 CREATE PROCEDURE update_user (IN the_user INT, IN the_name VARCHAR(200),
   IN the_color TEXT, IN the_permissions TEXT)
 BEGIN
   UPDATE users SET name = the_name, color = the_color, permissions = the_permissions
-    WHERE user_id = the_user;
+    WHERE id = the_user;
 END; 
 
 CREATE PROCEDURE update_user_timestamp (IN the_user INT)
 BEGIN
-  UPDATE users SET last_action = NOW() WHERE user_id = the_user;
+  UPDATE users SET last_action = NOW() WHERE id = the_user;
 END; 
 
 CREATE PROCEDURE delete_user (IN the_user INT)
@@ -223,17 +223,17 @@ BEGIN
   START TRANSACTION;
   DELETE FROM messages WHERE user_id = the_user;
   DELETE FROM messages WHERE table_id IN (
-    SELECT table_id FROM tables WHERE user_id = the_user);
+    SELECT id FROM tables WHERE user_id = the_user);
   DELETE FROM stats WHERE piece_id IN (
-    SELECT piece_id FROM pieces WHERE table_id IN (
-      SELECT table_id FROM tables WHERE user_id = the_user));
+    SELECT id FROM pieces WHERE table_id IN (
+      SELECT id FROM tables WHERE user_id = the_user));
   DELETE FROM pieces WHERE table_id IN (
-    SELECT table_id FROM tables WHERE user_id = the_user);
+    SELECT id FROM tables WHERE user_id = the_user);
   DELETE FROM tiles WHERE table_id IN (
-    SELECT table_id FROM tables WHERE user_id = the_user);
+    SELECT id FROM tables WHERE user_id = the_user);
   DELETE FROM tables WHERE user_id = the_user;
   DELETE FROM images WHERE user_id = the_user;
-  DELETE FROM users WHERE user_id = the_user;
+  DELETE FROM users WHERE id = the_user;
   COMMIT;
 END; 
 
@@ -273,7 +273,7 @@ BEGIN
   UPDATE tiles SET image_id = the_image, fog = the_fog, 
       right_wall = the_right, bottom_wall = the_bottom
     WHERE x = the_x AND y = the_y AND table_id = the_table;
-  UPDATE tables SET tile_stamp = NOW() WHERE table_id = the_table;
+  UPDATE tables SET tile_stamp = NOW() WHERE id = the_table;
   COMMIT;
 END; 
 
@@ -281,7 +281,7 @@ CREATE PROCEDURE update_tiles_fill_fog (IN the_table INT)
 BEGIN
   START TRANSACTION;
   UPDATE tiles SET fog = 1 WHERE table_id = the_table;
-  UPDATE tables SET tile_stamp = NOW() WHERE table_id = the_table;
+  UPDATE tables SET tile_stamp = NOW() WHERE id = the_table;
   COMMIT;
 END; 
 
@@ -289,7 +289,7 @@ CREATE PROCEDURE update_tiles_clear_fog (IN the_table INT)
 BEGIN
   START TRANSACTION;
   UPDATE tiles SET fog = 0 WHERE table_id = the_table;
-  UPDATE tables SET tile_stamp = NOW() WHERE table_id = the_table;
+  UPDATE tables SET tile_stamp = NOW() WHERE id = the_table;
   COMMIT;
 END; 
 
@@ -310,17 +310,17 @@ END;
 
 CREATE PROCEDURE read_table (IN the_table INT)
 BEGIN
-  SELECT table_id, user_id, image_id, name, tile_rows, tile_columns,
+  SELECT id, user_id, image_id, name, tile_rows, tile_columns,
     tile_width, tile_height, grid_width, grid_height, grid_thickness, grid_color, 
     TIME_TO_SEC(TIMEDIFF(piece_stamp, '1970-01-01 00:00:00')) AS piece_stamp,
     TIME_TO_SEC(TIMEDIFF(tile_stamp, '1970-01-01 00:00:00')) AS tile_stamp,
     TIME_TO_SEC(TIMEDIFF(message_stamp, '1970-01-01 00:00:00')) AS message_stamp
- FROM tables WHERE table_id = the_table;
+ FROM tables WHERE id = the_table;
 END; 
 
 CREATE PROCEDURE read_table_by_name (IN the_name VARCHAR(200))
 BEGIN
-  SELECT table_id, user_id, image_id, name, tile_rows, tile_columns,
+  SELECT id, user_id, image_id, name, tile_rows, tile_columns,
     tile_width, tile_height, grid_width, grid_height, grid_thickness, grid_color, 
     TIME_TO_SEC(TIMEDIFF(piece_stamp, '1970-01-01 00:00:00')) AS piece_stamp,
     TIME_TO_SEC(TIMEDIFF(tile_stamp, '1970-01-01 00:00:00')) AS tile_stamp,
@@ -330,23 +330,22 @@ END;
 
 CREATE PROCEDURE read_tables ()
 BEGIN
-  SELECT table_id, user_id, image_id, name, tile_rows, tile_columns,
+  SELECT id, user_id, image_id, name, tile_rows, tile_columns,
     tile_width, tile_height, grid_width, grid_height, grid_thickness, grid_color, 
     TIME_TO_SEC(TIMEDIFF(piece_stamp, '1970-01-01 00:00:00')) AS piece_stamp,
     TIME_TO_SEC(TIMEDIFF(tile_stamp, '1970-01-01 00:00:00')) AS tile_stamp,
     TIME_TO_SEC(TIMEDIFF(message_stamp, '1970-01-01 00:00:00')) AS message_stamp
-  FROM tables, users WHERE tables.user_id = users.user_id
-    ORDER BY users.name;
+  FROM tables ORDER BY name;
 END; 
 
 CREATE PROCEDURE read_tables_by_user_id (IN the_user INT)
 BEGIN
-  SELECT table_id, user_id, image_id, name, tile_rows, tile_columns,
+  SELECT id, user_id, image_id, name, tile_rows, tile_columns,
     tile_width, tile_height, grid_width, grid_height, grid_thickness, grid_color, 
     TIME_TO_SEC(TIMEDIFF(piece_stamp, '1970-01-01 00:00:00')) AS piece_stamp,
     TIME_TO_SEC(TIMEDIFF(tile_stamp, '1970-01-01 00:00:00')) AS tile_stamp,
     TIME_TO_SEC(TIMEDIFF(message_stamp, '1970-01-01 00:00:00')) AS message_stamp
-  FROM tables WHERE user_id = the_user;
+  FROM tables WHERE user_id = the_user ORDER BY name;
 END; 
 
 CREATE PROCEDURE read_table_timestamps (IN the_table INT)
@@ -364,17 +363,17 @@ BEGIN
   UPDATE tables SET name = the_name, user_id = the_user, image_id = the_image,
       grid_width = the_grid_width, grid_height = the_grid_height,
       grid_thickness = the_grid_thickness, grid_color = the_grid_color
-    WHERE table_id = the_table;
+    WHERE id = the_table;
 END; 
 
 CREATE PROCEDURE delete_table (IN the_table INT)
 BEGIN
   START TRANSACTION;
   DELETE FROM stats WHERE piece_id IN (
-    SELECT piece_id FROM pieces WHERE table_id = the_table);
+    SELECT id FROM pieces WHERE table_id = the_table);
   DELETE FROM pieces WHERE table_id = the_table;
   DELETE FROM messages WHERE table_id = the_table;
-  DELETE FROM tables WHERE table_id = the_table;
+  DELETE FROM tables WHERE id = the_table;
   COMMIT;
 END; 
 
@@ -392,13 +391,13 @@ BEGIN
       x_offset, y_offset, width, height) 
     VALUES (the_table, the_image, the_user, the_name, the_x, the_y,
       the_x_offset, the_y_offset, the_width, the_height);
-  UPDATE tables SET piece_stamp = NOW() WHERE table_id = the_table;
+  UPDATE tables SET piece_stamp = NOW() WHERE id = the_table;
   COMMIT;
 END; 
 
 CREATE PROCEDURE read_piece (IN the_piece INT)
 BEGIN
-  SELECT * FROM pieces WHERE piece_id = the_piece;
+  SELECT * FROM pieces WHERE id = the_piece;
 END; 
 
 CREATE PROCEDURE read_pieces (IN the_table INT)
@@ -415,18 +414,18 @@ BEGIN
   UPDATE pieces SET image_id = the_image, user_id = the_user, name = the_name,
       x = the_x, y = the_y, x_offset = the_x_offset, y_offset = the_y_offset,
       width = the_width, height = the_height, color = the_color 
-    WHERE piece_id = the_piece;
-  UPDATE tables SET piece_stamp = NOW() WHERE table_id = (
-    SELECT table_id FROM pieces WHERE piece_id = the_piece);
+    WHERE id = the_piece;
+  UPDATE tables SET piece_stamp = NOW() WHERE id = (
+    SELECT table_id FROM pieces WHERE id = the_piece);
   COMMIT;
 END; 
 
 CREATE PROCEDURE delete_piece (IN the_piece INT)
 BEGIN
   START TRANSACTION;
-  UPDATE tables SET piece_stamp = NOW() WHERE table_id = (
-    SELECT table_id FROM pieces WHERE piece_id = the_piece);
-  DELETE FROM pieces WHERE piece_id = the_piece;
+  UPDATE tables SET piece_stamp = NOW() WHERE id = (
+    SELECT table_id FROM pieces WHERE id = the_piece);
+  DELETE FROM pieces WHERE id = the_piece;
   COMMIT;
 END; 
 
@@ -438,7 +437,7 @@ CREATE PROCEDURE create_message (IN the_table INT, IN the_user INT, IN the_text 
 BEGIN
   START TRANSACTION;
   INSERT INTO messages (table_id, user_id, text) VALUES (the_table, the_user, the_text);
-  UPDATE tables SET message_stamp = NOW() WHERE table_id = the_table;
+  UPDATE tables SET message_stamp = NOW() WHERE id = the_table;
   COMMIT;
 END; 
 
@@ -468,33 +467,33 @@ END;
 
 CREATE PROCEDURE read_image (IN the_image TEXT)
 BEGIN
-  SELECT image_id, user_id, file, type, public,
+  SELECT id, user_id, file, type, public,
     TIME_TO_SEC(TIMEDIFF(time_stamp, '1970-01-01 00:00:00')) AS time
-    FROM images WHERE image_id = the_image;
+    FROM images WHERE id = the_image;
 END; 
 
 CREATE PROCEDURE read_images (IN the_type TEXT)
 BEGIN
-  SELECT image_id, user_id, file, type, public,
+  SELECT id, user_id, file, type, public,
     TIME_TO_SEC(TIMEDIFF(time_stamp, '1970-01-01 00:00:00')) AS time
     FROM images WHERE type = the_type;
 END; 
 
 CREATE PROCEDURE read_images_useable (IN the_user INT, IN the_type TEXT)
 BEGIN
-  SELECT image_id, user_id, file, type, public,
+  SELECT id, user_id, file, type, public,
     TIME_TO_SEC(TIMEDIFF(time_stamp, '1970-01-01 00:00:00')) AS time
     FROM images WHERE type = the_type AND (user_id = the_user OR public = 1);
 END; 
 
 CREATE PROCEDURE update_image (IN the_image INT, IN the_user INT, IN the_public INT)
 BEGIN
-  UPDATE images SET user_id = the_user, public = the_public WHERE image_id = the_image;
+  UPDATE images SET user_id = the_user, public = the_public WHERE id = the_image;
 END; 
 
 CREATE PROCEDURE delete_image (IN the_image INT)
 BEGIN
-  DELETE FROM images WHERE image_id = the_image;
+  DELETE FROM images WHERE id = the_image;
 END; 
 
 
