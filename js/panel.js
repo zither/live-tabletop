@@ -13,51 +13,50 @@ var clickDragGap = 0;
 var z = 100;
 var invertResize = 1;
 
-function Panel( panelName, buttonName, buttonLoc, xPos, yPos, panelWidth, panelHeight) {
+LT.Panel = function ( panelName, buttonName, buttonLoc, xPos, yPos, panelWidth, panelHeight) {
   var panel = this;
   panel.outerPanel = new LT.element('div', { 'class' : 'outerPanel', 
     'style' : 'left: ' + xPos + 'px; top: ' + yPos + 'px; visibility: hidden;'
   }, LT.tableTop);
-  panel.outerPanel.onmousedown = function(){ panelForward(panel); };
-    panelTitle = new LT.element('div', { 'class' : 'title' }, panel.outerPanel);
-      var resizeTL = new LT.element('div', { 'class' : 'resizeTL' }, panelTitle);
-	  resizeTL.onmousedown = function(){ selectedTL = panel;};
-      var titleStart = new LT.element('div', { 'class' : 'titleStart' }, panelTitle);
-      var titleCaption = new LT.element('div', { 'class' : 'titleCaption' },
-        panelTitle, panelName);
-      var titleEnd = new LT.element('div', { 'class' : 'titleEnd' }, panelTitle);
-      panel.panelBar = new LT.element('div', { 'class' : 'panelBar', 
-        'style' : 'width: ' + (panelWidth - 36) + 'px;' }, panelTitle, ' ');
-      panel.panelBar.onmousedown = function(){ selectedPanel = panel; };
-      var panelClose = new LT.element('div', { 'class' : 'close' }, panelTitle);
-      panelClose.onclick = function(){ showPanel(panel); };
-	
-    panel.innerPanel = new LT.element('div', { 'class' : 'innerPanel', 
-      'style' : 'width: ' + panelWidth + 'px; height: ' + panelHeight + 'px;' 
-	}, panel.outerPanel);
-	panel.panelContent = new LT.element('div', {}, panel.innerPanel, "");
-    var panelBottom = new LT.element('div', { 'class' : 'panelBottom' }, panel.outerPanel);
-      var panelBL = new LT.element('div', { 'class' : 'panelBL' }, panelBottom);
-      var panelBR = new LT.element('div', { 'class' : 'resizeBR' }, panelBottom);
-	  panelBR.onmousedown = function(){ selectedBR = panel;};
+  this.outerPanel.onmousedown = function(){ panel.bringToFront(); };
+  panelTitle = new LT.element('div', { 'class' : 'title' }, panel.outerPanel);
+  var resizeTL = new LT.element('div', { 'class' : 'resizeTL' }, panelTitle);
+  resizeTL.onmousedown = function(){ selectedTL = panel;};
+  var titleStart = new LT.element('div', { 'class' : 'titleStart' }, panelTitle);
+  var titleCaption = new LT.element('div', { 'class' : 'titleCaption' },
+    panelTitle, panelName);
+  var titleEnd = new LT.element('div', { 'class' : 'titleEnd' }, panelTitle);
+  this.panelBar = new LT.element('div', { 'class' : 'panelBar', 
+    'style' : 'width: ' + (panelWidth - 36) + 'px;' }, panelTitle, ' ');
+  this.panelBar.onmousedown = function(){ selectedPanel = panel; };
+  var panelClose = new LT.element('div', { 'class' : 'close' }, panelTitle);
+  panelClose.onclick = function(){ panel.show(); };
+  this.innerPanel = new LT.element('div', { 'class' : 'innerPanel', 
+    'style' : 'width: ' + panelWidth + 'px; height: ' + panelHeight + 'px;' 
+    }, panel.outerPanel);
+  this.panelContent = new LT.element('div', {}, panel.innerPanel, "");
+  var panelBottom = new LT.element('div', { 'class' : 'panelBottom' }, panel.outerPanel);
+  var panelBL = new LT.element('div', { 'class' : 'panelBL' }, panelBottom);
+  var panelBR = new LT.element('div', { 'class' : 'resizeBR' }, panelBottom);
+  panelBR.onmousedown = function(){ selectedBR = panel;};
 // Create Menu Button ------------------------------------------------------
-	this.buttonContainer = new LT.element('div', { 'class' : 'buttonUnchecked' }, buttonLoc);
-	panel.buttonContainer.onclick = function(){ showPanel(panel); };
-	var buttonStart = new LT.element('div', { 'class' : 'buttonStart' }, panel.buttonContainer);
-	var buttonCaption = new LT.element('div', { 'class' : 'buttonCaption' },
-      panel.buttonContainer, buttonName);
-	var buttonEnd = new LT.element('div', { 'class' : 'buttonEnd' }, panel.buttonContainer);
-	buttonCaption.onselectstart = function () { return false; };
+  this.buttonContainer = new LT.element('div', { 'class' : 'buttonUnchecked' }, buttonLoc);
+  this.buttonContainer.onclick = function(){ panel.show(); };
+  var buttonStart = new LT.element('div', { 'class' : 'buttonStart' }, panel.buttonContainer);
+  var buttonCaption = new LT.element('div', { 'class' : 'buttonCaption' },
+  this.buttonContainer, buttonName);
+  var buttonEnd = new LT.element('div', { 'class' : 'buttonEnd' }, panel.buttonContainer);
+  buttonCaption.onselectstart = function () { return false; };
 }
 
-function showPanel(panelShow){
-  if(panelShow.outerPanel.style.visibility == "hidden"){
-    panelForward(panelShow);
-    panelShow.buttonContainer.className = "buttonChecked";
-    panelShow.outerPanel.style.visibility = "visible";
+LT.Panel.prototype.show = function(){
+  if(this.outerPanel.style.visibility == "hidden"){
+    this.bringToFront();
+    this.buttonContainer.className = "buttonChecked";
+    this.outerPanel.style.visibility = "visible";
   }else{
-    panelShow.buttonContainer.className = "buttonUnchecked";
-    panelShow.outerPanel.style.visibility = "hidden";
+    this.buttonContainer.className = "buttonUnchecked";
+    this.outerPanel.style.visibility = "hidden";
   }
 }
 
@@ -173,9 +172,9 @@ function resizeMove(){
   bar.style.width = (clickCornerX - dragX - 36) + "px";
   return true
 }
-function panelForward(panel){
-  LT.tableTop.removeChild(panel.outerPanel);
-  LT.tableTop.appendChild(panel.outerPanel);
-  panel.innerPanel.removeChild(panel.panelContent);
-  panel.innerPanel.appendChild(panel.panelContent);
+LT.Panel.prototype.bringToFront = function(){
+  LT.tableTop.removeChild(this.outerPanel);
+  LT.tableTop.appendChild(this.outerPanel);
+  this.innerPanel.removeChild(this.panelContent);
+  this.innerPanel.appendChild(this.panelContent);
 }
