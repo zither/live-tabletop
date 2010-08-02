@@ -1,9 +1,9 @@
 LT.createLogin = function(){
-    LT.loginDiv = new LT.element('div', { id : 'loginDiv' }, LT.pageBar);
-      var loginForm = new LT.element('form', { id : 'loginForm', 
-	    style : 'float: right;'}, LT.loginDiv);
-      var loginUsername = new LT.element('input', { style : 'border: 1px solid #CCC;',
-        id : 'username', size : 10, value : 'username' }, loginForm);
+  LT.loginDiv = new LT.element('div', { id : 'loginDiv' }, LT.pageBar);
+  var loginForm = new LT.element('form', { id : 'loginForm', 
+    style : 'float: right;'}, LT.loginDiv);
+  var loginUsername = new LT.element('input', { style : 'border: 1px solid #CCC;',
+    id : 'username', size : 10, value : 'username' }, loginForm);
 	  loginUsername.onfocus = function(){ emptyMe(this, 'username') };
       var loginPassword = new LT.element('input', { style : 'border: 1px solid #CCC;',
         id : 'password', size : 10, value : 'password', type : 'password' }, loginForm);
@@ -21,8 +21,9 @@ LT.createLogin = function(){
 		  LT.userPermissions = userElement.getAttribute('permissions');
           LT.loginDiv.removeChild(loginForm);
           loggedIn = LT.element('div', { id : 'loggedIn' }, LT.loginDiv );
-          LT.tablePanel = new Panel( 'User Options', LT.username + "'s " + 'options', LT.loginDiv, 
+          LT.tablePanel = LT.Panel( 'User Options', LT.username + "'s " + 'options', LT.loginDiv, 
 		    185, 26, 150, 150);
+  alert(document.cookie);
 		}else{
 		  alert('Incorrect username or password.')
 		}

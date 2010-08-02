@@ -32,5 +32,5 @@ function loadPage() {
   
   populateChatPanel();
   populateTablesPanel();
-  
+  alert(document.cookie);
 }

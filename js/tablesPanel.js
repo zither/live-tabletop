@@ -31,7 +31,7 @@ function populateTablesPanel() {
 
       LT.tableSubmit.onclick = function(){
         var createTable = LT.ajaxRequest("POST", "php/create_table.php",
-          { name : LT.tableInput.value, background : 1, default_tile: 1,
+          { name : LT.tableInput.value, image_id : 1, default_tile: 1,
 		    rows : 1, columns : 1, tile_height : 1, tile_width : 1 });
       }
 }
