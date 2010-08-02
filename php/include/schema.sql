@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS users, tiles, tables, pieces, messages, images, stats;
 
 DROP PROCEDURE IF EXISTS create_user;
 DROP PROCEDURE IF EXISTS read_users;
+DROP PROCEDURE IF EXISTS read_user;
 DROP PROCEDURE IF EXISTS read_user_by_name;
 DROP PROCEDURE IF EXISTS update_user_password;
 DROP PROCEDURE IF EXISTS update_user;
@@ -192,6 +193,13 @@ BEGIN
   SELECT id, name, password_hash, password_salt, color, permissions, logged_in,
     TIME_TO_SEC(TIMEDIFF(last_action, '1970-01-01 00:00:00')) AS last_action
     FROM users ORDER BY name;
+END; 
+
+CREATE PROCEDURE read_user (IN the_user INT)
+BEGIN
+  SELECT id, name, password_hash, password_salt, color, permissions, logged_in,
+    TIME_TO_SEC(TIMEDIFF(last_action, '1970-01-01 00:00:00')) AS last_action
+    FROM users WHERE id = the_user;
 END; 
 
 CREATE PROCEDURE read_user_by_name (IN the_name VARCHAR(200))
