@@ -1,5 +1,6 @@
 function refreshTableList(){
   var readTables = LT.ajaxRequest("POST", "php/read_tables.php",{ });
+  if (readTables.responseXML){
   var tableElements = readTables.responseXML.getElementsByTagName('table');
   LT.tableList = [];
   for( var i = 0 ; i < tableElements.length; i++ ){
@@ -12,6 +13,7 @@ function refreshTableList(){
   //alert(LT.tableList.length);
   for( var i = 0 ; i < LT.tableList.length; i++ ){
     LT.element('div', {}, LT.tableListDiv, LT.tableList[i].name);
+  }
   }
 }
 
