@@ -20,27 +20,23 @@ $tile_height = $LT_SQL->real_escape_string($_REQUEST['tile_height']);
 
 // Query the Database
 
-$result = $LT_SQL->query("CALL create_table('$name', $image_id, $user_id, "
+$LT_SQL->query("CALL create_table('$name', $image_id, $user_id, "
   . "$tile_rows, $tile_columns, $tile_width, $tile_height)")
   or die ("create_table failed: " . $LT_SQL->error);
 
-$result = $LT_SQL->query("CALL read_table_by_name('$name')")
+$LT_SQL->multi_query("CALL read_table_by_name('$name')")
   or die ("read_table_by_name failed: " . $LT_SQL->error);
-
+$result = $LT_SQL->store_result();
 $row = $result->fetch_assoc() or die ("Could not find table $name.");
-
 $table_id = $row['id'];
-
-$result = $LT_SQL->query("CALL create_tiles($table_id, "
-  . "$default_tile, $tile_columns, $tile_rows)");
-
-if (!$result) {
-  // if creating the tiles fails we should delete the table too.
-  $error = $LT_SQL->error;
-  $LT_SQL->query("CALL delete_table($table_id)")
-    or die ("delete_table failed: " . $LT_SQL->error);
-  die ("create_tiles failed: " . $error);
+if ($LT_SQL->more_results()) {
+  while($LT_SQL->next_result());
 }
+
+$LT_SQL->query("CALL create_tiles($table_id, "
+  . "$default_tile, $tile_columns, $tile_rows)")
+  or die ("create_tiles failed: " . $LT_SQL->error);
+
 
 // Generate Output
 
