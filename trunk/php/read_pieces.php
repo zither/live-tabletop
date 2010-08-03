@@ -33,13 +33,21 @@ include('include/xml_headers.php');
 echo "<pieces>\n";
 for ($i = 0; $i < count($pieces); $i++) {
   echo "  <piece";
-  foreach ($pieces[$i]['attributes'] as $name => $value) {
-    echo " $name=\"" . htmlspecialchars($value) . "\"";
+  foreach ($pieces[$i]['attributes'] as $key => $value) {
+    if ($key == 'name' or $key == 'color') {
+      // URL-encode strings to be decoded by javascript's decodeURIComponent.
+      echo " $key=\"" . rawurlencode($value) . "\"";
+    }
+    else {
+      // Encode integers as strings.
+      echo " $key=\"$value\"";
+    }
   }
   echo ">\n";
-  foreach ($pieces[$i]['stats'] as $name => $value) {
-    echo "    <stat name=\"" . htmlspecialchars($name) . "\">"
-      . htmlspecialchars($value) . "</stat>\n";
+  foreach ($pieces[$i]['stats'] as $key => $value) {
+    // URL-encode strings to be decoded by javascript's decodeURIComponent.
+    echo "    <stat name=\"" . rawurlencode($key) . "\">"
+      . rawurlencode($value) . "</stat>\n";
   }
   echo "  </piece>\n";
 }

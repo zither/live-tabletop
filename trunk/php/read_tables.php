@@ -16,15 +16,7 @@ $result = $LT_SQL->query("CALL read_tables_by_user_id($user_id)")
 
 // Generate Output
 
-include('include/xml_headers.php');
-echo "<tables>\n";
-while($row = $result->fetch_assoc()) {
-  echo "  <table";
-  foreach ($row as $key => $value) {
-    echo " $key=\"" . htmlspecialchars($value) . "\"";
-  }
-  echo "/>\n";
-}
-echo "</tables>\n";
+include('include/tables.php');
+LT_write_tables($result);
 
 ?>

@@ -20,11 +20,16 @@ $result = $LT_SQL->query("CALL read_images('$type')")
 include('include/xml_headers.php');
 echo "<images>\n";
 while($row = $result->fetch_assoc()) {
-  echo "  <image";
-  foreach ($row as $key => $value) {
-    echo " $key=\"" . htmlspecialchars($value) . "\"";
-  }
-  echo "/>\n";
+  echo "  <image"
+    // Encode integers as strings.
+    . " id=\"{$row['id']}\""
+    . " user_id=\"{$row['user_id']}\""
+    . " public=\"{$row['public']}\""
+    . " time=\"{$row['time']}\""
+    // URL-encode strings to be decoded by javascript's decodeURIComponent.
+    . " file=\"" . rawurlencode($row['file']) . "\""
+    . " type=\"" . rawurlencode($row['type']) . "\""
+    . "/>\n";
 }
 echo "</images>\n";
 

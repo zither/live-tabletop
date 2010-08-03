@@ -4,7 +4,7 @@ LT.Piece = function (element) {
   for (var i = 0; i < LT.Piece.properties.length; i++) {
     var property = LT.Piece.properties[i];
     if (property == "name" || property == "color") {
-      this[property] = element.getAttribute(property); // strings
+      this[property] = decodeURIComponent(element.getAttribute(property)); // strings
     }
     else {
       this[property] = parseInt(element.getAttribute(property)); // integers
@@ -13,7 +13,9 @@ LT.Piece = function (element) {
   this.stats = {};
   var statNodes = element.getElementsByTagName("stat");
   for (var j = 0; j < statNodes.length; j++) {
-    this.stats[statNodes[j].getAttribute("name")] = statNodes[j].textContent;
+    var statName = decodeURIComponent(statNodes[j].getAttribute("name"));
+    var statValue = decodeURIComponent(statNodes[j].textContent);
+    this.stats[statName] = statValue;
   }
 };
 

@@ -19,13 +19,10 @@ $row = $result->fetch_assoc()
 
 // Generate Output
 
+include('include/users.php');
 include('include/xml_headers.php');
 echo "<users>\n";
-echo "  <user id=\"" . htmlspecialchars($row['id'])
-  . "\" name=\"" . htmlspecialchars($row['name'])
-  . "\" color=\"" . htmlspecialchars($row['color'])
-  . "\" permissions=\"" . htmlspecialchars($row['permissions'])
-  . "\"/>\n";
+LT_write_user_row($row);
 echo "</users>\n";
 
 ?>
