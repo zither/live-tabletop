@@ -24,10 +24,10 @@ LT.Tile = function (tableID, x, y, tileCode) {
 
 LT.Tile.prototype.update = function (mods) {
   var args = {table_id: this.table_id, x: this.x, y: this.y,
-    fog: typeof(mods['fog']) == "undefined" ? this.fog : mods.fog,
-    right: typeof(mods['right']) == "undefined" ? this.right : mods.right,
-    bottom: typeof(mods['bottom']) == "undefined" ? this.bottom : mods.bottom,
-    image_id: typeof(mods['image_id']) == "undefined" ? this.image_id : mods.image_id
+    fog: typeof(mods.fog) == "undefined" ? this.fog : mods.fog,
+    right: typeof(mods.right) == "undefined" ? this.right : mods.right,
+    bottom: typeof(mods.bottom) == "undefined" ? this.bottom : mods.bottom,
+    image_id: typeof(mods.image_id) == "undefined" ? this.image_id : mods.image_id
   };    
   LT.ajaxRequest("POST", "php/update_tile.php", args, function () {return;});
 }
