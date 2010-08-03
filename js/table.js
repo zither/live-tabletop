@@ -3,8 +3,8 @@
 LT.Table = function (element) {
   for (var i = 0; i < LT.Table.properties.length; i++) {
     var property = LT.Table.properties[i];
-    if (property == "name" || property == "color" || property = "grid_color") {
-      this[property] = element.getAttribute(property); // strings
+    if (property == "name" || property = "grid_color") {
+      this[property] = decodeURIComponent(element.getAttribute(property)); // strings
     }
     else {
       this[property] = parseInt(element.getAttribute(property)); // integers

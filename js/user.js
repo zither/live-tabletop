@@ -2,7 +2,7 @@ LT.User = function (element) {
   this.id = parseInt(element.getAttribute("id"));
   for (var i = 0; i < LT.User.properties.length; i++) {
     var property = LT.User.properties[i];
-    this[property] = element.getAttribute(property);
+    this[property] = decodeURIComponent(element.getAttribute(property));
   }
 }
 

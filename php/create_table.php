@@ -40,13 +40,10 @@ $LT_SQL->query("CALL create_tiles($table_id, "
 
 // Generate Output
 
+include('include/tables.php');
 include('include/xml_headers.php');
 echo "<tables>\n";
-echo "  <table";
-foreach ($row as $key => $value) {
-  echo " $key=\"" . htmlspecialchars($value) . "\"";
-}
-echo "/>\n";
+LT_write_table_row($row);
 echo "</tables>\n";
 
 ?>
