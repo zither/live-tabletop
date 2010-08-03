@@ -1,3 +1,5 @@
+// PIECE CLASS CONSTRUCTOR
+
 LT.Piece = function (element) {
   for (var i = 0; i < LT.Piece.properties.length; i++) {
     var property = LT.Piece.properties[i];
@@ -15,10 +17,12 @@ LT.Piece = function (element) {
   }
 };
 
-// PROPERTIES
+// PIECE PROPERTIES
 
 LT.Piece.properties = ["id", "user_id", "image_id", "table_id", "name", 
   "x", "y", "x_offset", "y_offset", "height", "width", "color"];
+
+// CLIENT-SERVER COMMUNICATION
 
 LT.Piece.prototype.update = function (mods) {
   var args = {}
@@ -35,6 +39,13 @@ LT.Piece.prototype.update = function (mods) {
   delete(args.id);
   LT.ajaxRequest("POST", "php/update_piece.php", args, function () {return;});
 }
+
+LT.Piece.prototype.delete = function (mods) {
+  var args = {piece_id: this.id}
+  LT.ajaxRequest("POST", "php/delete_piece.php", args, function () {return;});
+}
+
+// PROPERTY ACCESSORS (GETTERS) AND MUTATORS (SETTERS)
 
 LT.Piece.prototype.getName = function () {return this.name;};
 LT.Piece.prototype.setName = function (newName) {
