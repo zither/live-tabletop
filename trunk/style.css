@@ -1,109 +1,197 @@
-*	{
-	margin: 0px; padding: 0px; border: 0px; background: no-repeat;
-	}
-div		{
-	font-family: Arial,Helvetica,sans-serif; font-size: 14px;
-	}
-body	{
-	background: #999;
-	}
-#pageBar{
-	background: url(images/pageBar.jpg) repeat-x left top; height: 26px;
-	width: 100%; position: fixed; top: 0px;
-		}
-#logo	{
-	background-image: url(images/logo.png); width: 170px; height: 33px;
-	position: fixed; left: 10px; top: 0px;
-		}
-#tableTop	{
-	background: #999 url(images/abaddon45.png) no-repeat; width: 1145px; height: 945px;
-	margin: 200px 200px 200px 200px;
-		}
-#buttons{
-	margin-left: 155px; position: relative; 
-		}
-.buttonUnchecked, .buttonChecked{
-	height: 22px; float: left; margin: 0px 0px 0px 12px;
-		}
-.buttonUnchecked:hover, .buttonChecked:hover{
-	cursor: pointer;
-		}
-.buttonStart{
-	background-image: url(images/buttonUncheck.png); width: 19px; height: 19px;
-	float: left; margin-top: 4px;
-		}
-.buttonCaption{background: url(images/pageBar.jpg) repeat-x left top;
-	height: 22px; float: left; color: #CCC; font-size: 16px;
-	text-decoration: none; padding: 2px 1px 0px 2px;
-		}
-.buttonEnd{
-	background-image: url(images/buttonEnd.jpg); width: 5px; height: 22px;
-	float: left;
-		}
-.buttonChecked .buttonStart{ background-image: url(images/buttonCheck.PNG); }
-.buttonChecked .buttonEnd { background-image: url(); }
-.resizeTL{
-	background: url(images/resizeTL.png); width: 22px; height: 23px; float: left; margin-left: -6px;
-	cursor: nw-resize;
-		}
-.titleStart	{
-	background-image: url(images/titleStart.jpg); width: 5px; height: 23px; margin-left: 1px;
-	float: left;
-		}
-.titleCaption{
-	background: url(images/titleBG.jpg) repeat-x top left; height: 21px;
-	float: left; color: #CCC; font-size: 16px; text-decoration: none;
-	padding: 2px 0px 0px 0px;
-		}
-.titleEnd	{
-	background-image: url(images/titleEnd.jpg); width: 5px; height: 23px;
-	float: left; margin-right: 1px;
-		}
-.close	{
-	background-image: url(images/close.png); width: 27px; height: 23px;
-	float: right; margin-right: -21px; cursor: pointer;
-		}
+* {
+  margin: 0px;
+  padding: 0px;
+  border: 0px;
+  background: no-repeat;
+}
+div {
+  font-family: Arial,Helvetica,sans-serif;
+  font-size: 14px;
+}
+body {
+  background: #999;
+}
+#pageBar {
+  background: url(images/pageBar.jpg) repeat-x left top;
+  height: 26px;
+  width: 100%;
+  position: fixed;
+  top: 0px;
+}
+#logo {
+  background-image: url(images/logo.png);
+  width: 170px;
+  height: 33px;
+  position: fixed;
+  left: 10px;
+  top: 0px;
+}
+#tableTop {
+  background: #999 url(images/abaddon45.png) no-repeat;
+  width: 1145px;
+  height: 945px;
+  margin: 200px 200px 200px 200px;
+}
+#buttons {
+  margin-left: 155px;
+  position: relative;
+  
+}
+.buttonUnchecked, .buttonChecked {
+  height: 22px;
+  float: left;
+  margin: 0px 0px 0px 12px;
+}
+.buttonUnchecked:hover, .buttonChecked:hover {
+  cursor: pointer;
+}
+.buttonStart {
+  background-image: url(images/buttonUncheck.png);
+  width: 19px;
+  height: 19px;
+  float: left;
+  margin-top: 4px;
+}
+.buttonCaption {
+  background: url(images/pageBar.jpg) repeat-x left top;
+  height: 22px;
+  float: left;
+  color: #CCC;
+  font-size: 16px;
+  text-decoration: none;
+  padding: 2px 1px 0px 2px;
+}
+.buttonEnd {
+  background-image: url(images/buttonEnd.jpg);
+  width: 5px;
+  height: 22px;
+  float: left;
+}
+.buttonChecked .buttonStart {
+  background-image: url(images/buttonCheck.PNG);
+}
+.buttonChecked .buttonEnd {
+  background-image: url();
+}
+.resizeTL {
+  background: url(images/resizeTL.png);
+  width: 22px;
+  height: 23px;
+  float: left;
+  margin-left: -6px;
+  cursor: nw-resize;
+}
+.title {
+  position: relative;
+}
+.titleStart {
+  background-image: url(images/titleStart.jpg);
+  width: 5px;
+  height: 23px;
+  margin-left: 1px;
+  float: left;
+}
+.titleCaption {
+  background: url(images/titleBG.jpg) repeat-x top left;
+  height: 21px;
+  float: left;
+  color: #CCC;
+  font-size: 16px;
+  text-decoration: none;
+  padding: 2px 0px 0px 0px;
+}
+.titleEnd {
+  background-image: url(images/titleEnd.jpg);
+  width: 5px;
+  height: 23px;
+  float: left;
+  margin-right: 1px;
+}
+.close {
+  background-image: url(images/close.png);
+  width: 27px;
+  height: 23px;
+  float: right;
+  margin-right: -21px;
+  cursor: pointer;
+}
 .close:hover {
-	background-image: url(images/closeHover.png);
-		}
-.innerPanel{
-	background: #D4D4D4 url(images/panel.jpg) repeat-x top left; clear: both;
-	border-left: 1px solid #666; border-right: 1px solid #666; color: #333; 
-	padding: 0px 0px 0px 4px; margin: 0px -21px 0px -6px; padding-right: 8px;
-	overflow: auto;
-		}
+  background-image: url(images/closeHover.png);
+}
+.innerPanel {
+  background: #D4D4D4 url(images/panel.jpg) repeat-x top left;
+  clear: both;
+  border-left: 1px solid #666;
+  border-right: 1px solid #666;
+  color: #333;
+  padding: 0px 0px 0px 4px;
+  margin: 0px -21px 0px -6px;
+  padding-right: 8px;
+  overflow: auto;
+}
 .innerPanel input {
-	background: #FFF; color: #333; margin-right: 4px;
-		}
-.panelBar{
-	position: fixed; height: 23px; margin-left: 17px; cursor: pointer;
-		}
-.panelBottom{
-	background: #D4D4D4; width: auto; height:20px; border-bottom: 1px solid #666;
-		}
-.panelBL{
-	background: url(images/bottomCorner.png); height: 21px; width: 6px; float: left;
-	margin-left: -6px;
-		}
-.resizeBR{
-	background: url(images/resizeBR.png); height: 21px; width: 21px; float: right;
-	margin-right: -21px; cursor: nw-resize;
-		}
-.outerPanel{
-	background:  url(images/panelBar.jpg) repeat-x top left;
-	position: fixed; visibility: hidden; z-index: 0;
-		}
-.login{
-	color: #CCC; float: right; 
-	text-decoration: none; margin-right: 8px; cursor: pointer; position: relative
-	    }
-.login:hover{	text-decoration: underline;	    }
-#loginDiv{
-	float: right;
-		}
+  background: #FFF;
+  color: #333;
+  margin-right: 4px;
+}
+.panelBar {
+  position: absolute;
+  height: 23px;
+  margin-left: 17px;
+  cursor: pointer;
+  left: 0px;
+  top: 0px;
+}
+.panelBottom {
+  background: #D4D4D4;
+  width: auto;
+  height:20px;
+  border-bottom: 1px solid #666;
+}
+.panelBL {
+  background: url(images/bottomCorner.png);
+  height: 21px;
+  width: 6px;
+  float: left;
+  margin-left: -6px;
+}
+.resizeBR {
+  background: url(images/resizeBR.png);
+  height: 21px;
+  width: 21px;
+  float: right;
+  margin-right: -21px;
+  cursor: nw-resize;
+}
+.outerPanel {
+  background: url(images/panelBar.jpg) repeat-x top left;
+  position: fixed;
+  visibility: hidden;
+  z-index: 0;
+}
+.login {
+  color: #CCC;
+  float: right;
+  text-decoration: none;
+  margin-right: 8px;
+  cursor: pointer;
+  position: relative
+}
+.login:hover {
+  text-decoration: underline;
+}
+#loginDiv {
+  float: right;
+}
 #loginForm {
-	background: #000; margin-top: 3px; color: #999; padding: 1px 1px 1px 1px;;
-	}
-#loginForm input{
-	background: #CCC; color: #333; margin-right: 4px;
-	}
+  background: #000;
+  margin-top: 3px;
+  color: #999;
+  padding: 1px 1px 1px 1px;;
+}
+#loginForm input {
+  background: #CCC;
+  color: #333;
+  margin-right: 4px;
+}
+
