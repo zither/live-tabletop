@@ -1,3 +1,20 @@
+/*
+The LT.Panel constructor takes seven arguments:
+
+  panelName is the name that will be displayed in the panel's title bar.
+  buttonName will be displayed next to the button that shows the panel.
+  buttonLoc is the parent element of the button that shows the panel.
+  x is the panel's initial horizontal position.
+  y is the panel's initial vertical position.
+  width is the panel's initial width.
+  height is the panel's initial height.
+
+Once created the panels will take care of themselves.
+
+Each panel has a content property which is an element to which you may append
+other elements to populate the panel with forms, tables, text, etc.
+*/
+
 // GLOBAL VARIABLES
 
 LT.selectedPanel = null;
