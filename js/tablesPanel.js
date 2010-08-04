@@ -19,10 +19,10 @@ function refreshTableList(){
 
 function populateTablesPanel() {
   //refreshTableList();
-  LT.tableListDiv = LT.element('div',{}, LT.tablesPanel.panelContent);
-  LT.tableRefresh = LT.element('a',{}, LT.tablesPanel.panelContent, 'Refresh');
+  LT.tableListDiv = LT.element('div',{}, LT.tablesPanel.content);
+  LT.tableRefresh = LT.element('a',{}, LT.tablesPanel.content, 'Refresh');
   LT.tableRefresh.onClick = refreshTableList();
-  LT.tablesForm = LT.element('form', { }, LT.tablesPanel.panelContent);
+  LT.tablesForm = LT.element('form', { }, LT.tablesPanel.content);
   LT.tableInput = LT.element('input', { size : 24, 
     style : 'border: 1px solid #CCC;', value : '<< Table Name >>' }, LT.tablesForm);
   LT.tableInput.onfocus = function(){ emptyMe(this, '<< Table Name >>') };
