@@ -37,8 +37,8 @@ LT.Table.prototype.update = function (mods) {
   LT.ajaxRequest("POST", "php/update_table.php", args, function () {return;});
 }
 
-LT.Table.prototype.delete = function () {
-  var args = {table_id: this.id}
+LT.Table.prototype.remove = function () {
+  var args = {table_id: this.id};
   LT.ajaxRequest("POST", "php/delete_table.php", args, function () {return;});
 }
 
@@ -49,12 +49,12 @@ LT.Table.prototype.setName = function (newName) {
   this.update({name: newName});
 };
 
-LT.Table.prototype.getUserID = function () {return this.user_id);
+LT.Table.prototype.getUserID = function () {return this.user_id};
 LT.Table.prototype.setUserID = function (newUserID) {
   this.update({user_id: newUserID});
 };
 
-LT.Table.prototype.getImageID = function () {return this.image_id);
+LT.Table.prototype.getImageID = function () {return this.image_id};
 LT.Table.prototype.setImageID = function (newImageID) {
   this.update({image_id: newImageID});
 };

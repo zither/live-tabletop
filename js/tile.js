@@ -32,8 +32,8 @@ LT.Tile.prototype.update = function (mods) {
   LT.ajaxRequest("POST", "php/update_tile.php", args, function () {return;});
 }
 
-LT.Tile.prototype.delete = function () {
-  var args = {table_id: this.id, x: this.x, y: this.y}
+LT.Tile.prototype.remove = function () {
+  var args = {table_id: this.id, x: this.x, y: this.y};
   LT.ajaxRequest("POST", "php/delete_tile.php", args, function () {return;});
 }
 
@@ -44,18 +44,18 @@ LT.Tile.prototype.setImageID = function (newImageID) {
   this.update({image_id: newImageID});
 };
 
-LT.Tile.prototype.hasFog = function () {return this.fog == 1;);
+LT.Tile.prototype.hasFog = function () {return this.fog == 1;};
 LT.Tile.prototype.makeFog = function () {this.update({fog: 1});};
 LT.Tile.prototype.clearFog = function () {this.update({fog: 0});};
 
-LT.Tile.prototype.hasRightWall = function () {return this.right == 1;);
-LT.Tile.prototype.hasRightDoor = function () {return this.right == 2;);
+LT.Tile.prototype.hasRightWall = function () {return this.right == 1;};
+LT.Tile.prototype.hasRightDoor = function () {return this.right == 2;};
 LT.Tile.prototype.makeRightWall = function () {this.update({right: 1});};
 LT.Tile.prototype.makeRightDoor = function () {this.update({right: 2});};
 LT.Tile.prototype.clearRightWall = function () {this.update({right: 0});};
 
-LT.Tile.prototype.hasBottomWall = function () {return this.bottom == 1;);
-LT.Tile.prototype.hasBottomDoor = function () {return this.bottom == 2;);
+LT.Tile.prototype.hasBottomWall = function () {return this.bottom == 1;};
+LT.Tile.prototype.hasBottomDoor = function () {return this.bottom == 2;};
 LT.Tile.prototype.makeBottomWall = function () {this.update({bottom: 1});};
 LT.Tile.prototype.makeBottomDoor = function () {this.update({bottom: 2});};
 LT.Tile.prototype.clearBottomWall = function () {this.update({bottom: 0});};

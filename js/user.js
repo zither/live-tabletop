@@ -22,7 +22,7 @@ LT.User.prototype.update = function (mods) {
   LT.ajaxRequest("POST", "update_user.php", args, function () {return;});
 };
 
-LT.User.prototype.delete = function () {
+LT.User.prototype.remove = function () {
   var args = {user_id: this.id};
   LT.ajaxRequest("POST", "delete_user.php", args, function () {return;});
 };
