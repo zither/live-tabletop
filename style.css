@@ -68,7 +68,7 @@ body {
   float: left;
 }
 .buttonChecked .buttonStart {
-  background-image: url(images/buttonCheck.PNG);
+  background-image: url(images/buttonCheck.png);
 }
 .buttonChecked .buttonEnd {
   background-image: url();
