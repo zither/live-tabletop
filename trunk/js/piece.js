@@ -42,8 +42,8 @@ LT.Piece.prototype.update = function (mods) {
   LT.ajaxRequest("POST", "php/update_piece.php", args, function () {return;});
 }
 
-LT.Piece.prototype.delete = function () {
-  var args = {piece_id: this.id}
+LT.Piece.prototype.remove = function () {
+  var args = {piece_id: this.id};
   LT.ajaxRequest("POST", "php/delete_piece.php", args, function () {return;});
 }
 
@@ -73,24 +73,24 @@ LT.Piece.prototype.setSize = function (newWidth, newHeight) {
   this.update({width: newWidth, height: newHeight});
 };
 
-LT.Piece.prototype.getUserID = function () {return this.user_id);
+LT.Piece.prototype.getUserID = function () {return this.user_id};
 LT.Piece.prototype.setUserID = function (newUserID) {
   this.update({user_id: newUserID});
 };
 
-LT.Piece.prototype.getImageID = function () {return this.image_id);
+LT.Piece.prototype.getImageID = function () {return this.image_id};
 LT.Piece.prototype.setImageID = function (newImageID) {
   this.update({image_id: newImageID});
 };
 
-LT.Piece.prototype.getTableID = function () {return this.table_id);
+LT.Piece.prototype.getTableID = function () {return this.table_id};
 LT.Piece.prototype.setTableID = function (newTableID) {
   this.update({table_id: newTableID});
 };
 
 // STATS
 
-LT.Piece.prototype.getStat = function (statName) {return this.stats[statName]);
+LT.Piece.prototype.getStat = function (statName) {return this.stats[statName]};
 LT.Piece.prototype.setStat = function (statName, newValue) {
   var args = {piece_id: this.id, name: statName, value: newValue};
   LT.ajaxRequest("POST", "php/update_stat.php", args, function () {return;});
@@ -117,7 +117,7 @@ LT.Piece.prototype.characterSheet = function () {
   for (var statName in this.stats) {
     var row = LT.element("tr", {}, tbody);
     LT.element("td", {}, row, statName);
-    LT.element("td", {}, row this.stats[statName]);
+    LT.element("td", {}, row, this.stats[statName]);
   }
   return table;
 };

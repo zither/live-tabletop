@@ -17,7 +17,7 @@ LT.Image.prototype.update = function (newUserID, newPublic) {
   LT.ajaxRequest("POST", "php/update_image.php", args, function () {return;});
 }
 
-LT.Image.prototype.delete = function () {
+LT.Image.prototype.remove = function () {
   var args = {image_id: this['id']};
   LT.ajaxRequest("POST", "php/delete_image.php", args, function () {return;});
 };
