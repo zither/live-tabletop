@@ -70,8 +70,14 @@ If the callback is ommited, the request is synchronous:
 
 LT.ajaxRequest = function(method, url, args, callback) {
 
-  // make an asynchronous request if a callback is provided
   var ajax = new XMLHttpRequest();
+
+  // do not send a request when the page is viewed locally
+  if (window.location.protocol == 'file:') {
+    return ajax;
+  }
+
+  // make an asynchronous request if a callback is provided
   var asynchronous = false;
   if (callback) {
     asynchronous = true;
