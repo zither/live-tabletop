@@ -161,7 +161,7 @@ body {
   width: 21px;
   float: right;
   margin-right: -21px;
-  cursor: nw-resize;
+  cursor: se-resize;
 }
 .outerPanel {
   background: url(images/panelBar.jpg) repeat-x top left;
