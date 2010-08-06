@@ -158,7 +158,8 @@ document.onmousemove = function (e) {
       window.innerWidth - panelX - 25) + "px";
     LT.selectedBR.inside.style.height = Math.min(LT.dragY,
       window.innerHeight - panelY - 61) + "px";
-    LT.selectedBR.bar.style.width = (LT.dragX - 36) + "px";
+    LT.selectedBR.bar.style.width = (Math.min(LT.dragX,
+      window.innerWidth - panelX - 25) - 36) + "px";
   }
 
   // Resize panel using the top-left handle.
