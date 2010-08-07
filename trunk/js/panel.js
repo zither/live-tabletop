@@ -1,6 +1,5 @@
 /*
 The LT.Panel constructor takes seven arguments:
-
   panelName is the name that will be displayed in the panel's title bar.
   buttonName will be displayed next to the button that shows the panel.
   buttonLoc is the parent element of the button that shows the panel.
@@ -55,10 +54,9 @@ LT.Panel = function (panelName, buttonName, buttonLoc, x, y, width, height) {
     .onclick = function() {panel.show();};
 
   // Middle: this.content contains elements specific to each panel
-  this.inside = LT.element('div', {'class' : 'innerPanel', 
+  this.content = LT.element('div', {'class' : 'innerPanel', 
     'style' : 'width: ' + width + 'px; height: ' + height + 'px;' 
     }, this.outside);
-  this.content = LT.element('div', {}, this.inside, "");
 
   // Bottom: includes bottom-right resize button
   var bottom = LT.element('div', {'class' : 'panelBottom'}, this.outside);
@@ -128,8 +126,8 @@ document.onmousemove = function (e) {
   
   // Move panel.
   if (LT.selectedPanel) {
-    var w = parseInt(LT.selectedPanel.inside.style.width);
-    var h = parseInt(LT.selectedPanel.inside.style.height);
+    var w = parseInt(LT.selectedPanel.content.style.width);
+    var h = parseInt(LT.selectedPanel.content.style.height);
     if (LT.clickDragGap == 0) {
       LT.clickX = LT.dragX - parseInt(LT.selectedPanel.outside.style.left);
       LT.clickY = LT.dragY - parseInt(LT.selectedPanel.outside.style.top);
@@ -148,15 +146,15 @@ document.onmousemove = function (e) {
     var panelX = parseInt(LT.selectedBR.outside.style.left);
     var panelY = parseInt(LT.selectedBR.outside.style.top);
     if (LT.clickDragGap == 0) {
-      LT.clickX = LT.dragX - parseInt(LT.selectedBR.inside.style.width);
-      LT.clickY = LT.dragY - parseInt(LT.selectedBR.inside.style.height);
+      LT.clickX = LT.dragX - parseInt(LT.selectedBR.content.style.width);
+      LT.clickY = LT.dragY - parseInt(LT.selectedBR.content.style.height);
       LT.clickDragGap = 1;
    }
     LT.dragX = Math.max(LT.dragX - LT.clickX, 140);
     LT.dragY = Math.max(LT.dragY - LT.clickY, 100);
-    LT.selectedBR.inside.style.width = Math.min(LT.dragX,
+    LT.selectedBR.content.style.width = Math.min(LT.dragX,
       window.innerWidth - panelX - 25) + "px";
-    LT.selectedBR.inside.style.height = Math.min(LT.dragY,
+    LT.selectedBR.content.style.height = Math.min(LT.dragY,
       window.innerHeight - panelY - 61) + "px";
     LT.selectedBR.bar.style.width = (Math.min(LT.dragX,
       window.innerWidth - panelX - 25) - 36) + "px";
@@ -167,8 +165,8 @@ document.onmousemove = function (e) {
     if (LT.clickDragGap == 0) {
       LT.clickX = LT.dragX - parseInt(LT.selectedTL.outside.style.left);
       LT.clickY = LT.dragY - parseInt(LT.selectedTL.outside.style.top);
-      LT.clickCornerX = LT.dragX + parseInt(LT.selectedTL.inside.style.width);
-      LT.clickCornerY = LT.dragY + parseInt(LT.selectedTL.inside.style.height);
+      LT.clickCornerX = LT.dragX + parseInt(LT.selectedTL.content.style.width);
+      LT.clickCornerY = LT.dragY + parseInt(LT.selectedTL.content.style.height);
       LT.clickDragGap = 1;
     }
     LT.dragX = Math.max(LT.dragX, LT.clickX + 6);
@@ -177,11 +175,10 @@ document.onmousemove = function (e) {
     LT.dragY = Math.min(LT.dragY, LT.clickCornerY - 100);
     LT.selectedTL.outside.style.left = (LT.dragX - LT.clickX) + "px";
     LT.selectedTL.outside.style.top  = (LT.dragY - LT.clickY) + "px";
-    LT.selectedTL.inside.style.width  = (LT.clickCornerX - LT.dragX) + "px";
-    LT.selectedTL.inside.style.height = (LT.clickCornerY - LT.dragY) + "px";
+    LT.selectedTL.content.style.width  = (LT.clickCornerX - LT.dragX) + "px";
+    LT.selectedTL.content.style.height = (LT.clickCornerY - LT.dragY) + "px";
     LT.selectedTL.bar.style.width = (LT.clickCornerX - LT.dragX - 36) + "px";
   }
   e.preventDefault();
   return false;
 };
-
