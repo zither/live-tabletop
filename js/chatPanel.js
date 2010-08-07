@@ -1,11 +1,11 @@
 function populateChatPanel() {
-  LT.chatOutput = LT.element('div', { id : 'chatOutput' }, LT.chatPanel.panelContent);
-  LT.chatForm = LT.element('form', { id : 'chatForm' }, LT.chatPanel.panelContent);
+  LT.chatOutput = LT.element('div', { id : 'chatOutput' }, LT.chatPanel.innerPanel);
+  LT.chatForm = LT.element('form', { id : 'chatForm' }, LT.chatPanel.innerPanel);
   LT.chatInput = LT.element('input', { id : 'chatInput', size : 24, 
-    style : 'border: 1px solid #CCC;', value : '<< Write a message. >>' }, LT.chatForm);
+    style : 'border: 1px solid #CCC;'}, LT.chatForm, '<< Write a message. >>', 1 );
   LT.chatInput.onfocus = function(){ emptyMe(this, '<< Write a message. >>') };
   LT.chatSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
-        id : 'chatSubmit', size : 8, value : 'Send' }, LT.chatForm);
+        id : 'chatSubmit', size : 8 }, LT.chatForm, 'Send');
 
 		LT.tableID = 1;
       LT.chatSubmit.onclick = function(){

@@ -1,5 +1,8 @@
 var LT = {};
 
+function emptyMe (clearMe, defaultText){
+	if( clearMe.value == defaultText ){ clearMe.value = ""; }	
+}
 /*
 LT.element creates a new HTML element and inserts it into the document.
 
@@ -17,56 +20,34 @@ but no parentElement, you must create and insert the text node yourself.
 If you want the element inserted at the end of the page, use document.body
 as the parentElement.
 */
-LT.element = function(elementType, attributes, parentElement, text) {
+LT.element = function(elementType, attributes, parentElement, text, clears) {
   var item = document.createElement(elementType);
   for(var attributeName in attributes){
     item.setAttribute(attributeName, attributes[attributeName]);
   }
   if(parentElement){ parentElement.appendChild(item); }
-  if(text){ item.appendChild(document.createTextNode(text)); }
+  if( elementType == 'input' ){
+    if(text){ item.setAttribute('value', text); }  
+  }else{
+    if(text){ item.appendChild(document.createTextNode(text)); }
+  }
+  if(clears) { 
+    item.onfocus = function(){ 
+	  if( item.value == text ){ this.value = ""; }
+	}
+  }
   return item
 }
 
-/*
-LT.ajaxRequest Creates and sends an XMLHttpRequest
+LT.textInput = function(attributes, parentElement, text){
+  var item = LT.element('input', attributes, parentElement, text);
+  //if(text){attributes.type = 'text';}
+  
+  item.onfocus = function(){ 
+	if( item.value == text ){ this.value = ""; }
+  }
 
-Parameters:
-
-  method (required) "GET" or "POST"
-  url (required) i.e. "php/install.php"
-  args (required) an object of the form {arg1: "val1", arg2: "val2"}
-  callback (optional) a function called when the request is finished
-
-Returns: the XMLHttpRequest object
-
-
-If a callback is provided, the request is asynchronous:
-
-  LT_ajax_request("POST", "php/login.php", 
-    {username:"foo", password:"bar"},
-    function (ajax) {
-      if (ajax.status == 200 
-        && ajax.responseXML.getElementsByTagName("user").length == 1)
-        alert ("You have logged in successfully");
-      else
-        alert ("You have not logged in successfully");
-    });
-  alert("The page continues to run javascript "
-    + "while we wait for the login results.");
-
-
-If the callback is ommited, the request is synchronous:
-
-  var ajax = LT_ajax_request("POST", "php/login.php", 
-    {username:"foo", password:"bar"});
-  alert("The page will freeze while we wait for the login results");
-  if (ajax.status == 200
-    && ajax.responseXML.getElementsByTagName("user").length == 1)
-    alert ("You have logged in successfully");
-  else
-    alert ("You have not logged in successfully");
-
-*/
+}
 
 LT.ajaxRequest = function(method, url, args, callback) {
 

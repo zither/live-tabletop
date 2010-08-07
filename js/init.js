@@ -14,15 +14,12 @@ if(checkInstall.status == 200){
   }
   );
 }
-function emptyMe (clearMe, defaultText){
-	if( clearMe.value == defaultText ){ clearMe.value = ""; }	
-}
 function loadPage() {
   LT.pageBar = LT.element('div', { id : 'pageBar' }, document.body);
     var logoDiv = LT.element('div', { id : 'logo' }, LT.pageBar);
 	LT.buttonsDiv = new LT.element('div', { id : 'buttons' }, LT.pageBar);
   LT.tableTop = new LT.element('div', { id : 'tableTop' }, document.body);
-  LT.createLogin();
+  loginCheck();
   //This creates global variables.
   LT.tablesPanel = new LT.Panel( 'Tables', 'Tables', LT.buttonsDiv, 6, 26, 175, 300);
   LT.chatPanel = new LT.Panel( 'Chat', 'Chat', LT.buttonsDiv, 6, 49, 355, 130);
@@ -32,5 +29,4 @@ function loadPage() {
   
   populateChatPanel();
   populateTablesPanel();
-  alert(document.cookie);
 }
