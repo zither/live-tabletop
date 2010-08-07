@@ -17,9 +17,9 @@ onload = function () {
   }
   LT.pageBar = LT.element('div', {id: 'pageBar'}, document.body);
   LT.element('div', {id: 'logo'}, LT.pageBar);
-  LT.buttons = new LT.element('div', {id: 'buttons'}, LT.pageBar);
-  LT.tableTop = new LT.element('div', {id: 'tableTop'}, document.body);
-  loginCheck();
+  LT.buttons = LT.element('div', {id: 'buttons'}, LT.pageBar);
+  LT.tableTop = LT.element('div', {id: 'tableTop'}, document.body);
+  LT.loginCheck();
   LT.createChatPanel();
   LT.createTablesPanel();
   LT.createTurnsPanel();
