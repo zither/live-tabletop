@@ -1,4 +1,4 @@
-function refreshTableList(){
+LT.refreshTableList = function () {
   var readTables = LT.ajaxRequest("POST", "php/read_tables.php",{ });
   if (readTables.responseXML){
   var tableElements = readTables.responseXML.getElementsByTagName('table');
@@ -19,13 +19,14 @@ function refreshTableList(){
     LT.element('div', {}, LT.tableListDiv, LT.tableList[i].name);
   }
   }
-}
+};
 
-function populateTablesPanel() {
-  //refreshTableList();
+LT.createTablesPanel = function () {
+  LT.tablesPanel = new LT.Panel( 'Tables', 'Tables', LT.buttonsDiv, 6, 26, 175, 300);
+  //LT.refreshTableList();
   LT.tableListDiv = LT.element('div',{}, LT.tablesPanel.content);
   LT.tableRefresh = LT.element('a',{}, LT.tablesPanel.content, 'Refresh');
-  LT.tableRefresh.onClick = refreshTableList();
+  LT.tableRefresh.onClick = LT.refreshTableList;
   LT.tablesForm = LT.element('form', { }, LT.tablesPanel.content);
   LT.inputTableName = LT.element('input', { size : 24, type: 'text',
     style : 'border: 0px solid #CCC;' }, LT.tablesForm, 'Table Name', 1);
@@ -46,4 +47,5 @@ function populateTablesPanel() {
 		    rows : LT.inputTableRows.value, columns : LT.inputTableCols.value,
 			tile_height : LT.inputTileHeight.value, tile_width : LT.inputTileWidth.value });
       }
-}
+};
+
