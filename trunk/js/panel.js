@@ -43,13 +43,13 @@ LT.Panel = function (panelName, buttonName, buttonLoc, x, y, width, height) {
   // Top: includes top-left resize button, title, close button
   var title = LT.element('div', {'class' : 'title'}, this.outside);
   LT.element('div', {'class' : 'resizeTL'}, title)
-    .onmousedown = function() {LT.selectedTL = panel;};
+    .onmousedown = function() {LT.selectedTL = panel; return false;};
   LT.element('div', {'class' : 'titleStart'}, title);
   LT.element('div', {'class' : 'titleCaption'}, title, panelName);
   LT.element('div', {'class' : 'titleEnd'}, title);
   this.bar = LT.element('div', {'class' : 'panelBar', 
     'style' : 'width: ' + (width - 36) + 'px;'}, title, ' ');
-  this.bar.onmousedown = function() {LT.selectedPanel = panel;};
+  this.bar.onmousedown = function() {LT.selectedPanel = panel; return false;};
   LT.element('div', {'class' : 'close'}, title)
     .onclick = function() {panel.show();};
 
@@ -62,7 +62,7 @@ LT.Panel = function (panelName, buttonName, buttonLoc, x, y, width, height) {
   var bottom = LT.element('div', {'class' : 'panelBottom'}, this.outside);
   LT.element('div', {'class' : 'panelBL'}, bottom);
   LT.element('div', {'class' : 'resizeBR'}, bottom)
-    .onmousedown = function() {LT.selectedBR = panel;};
+    .onmousedown = function() {LT.selectedBR = panel; return false;};
 
   // Create Menu Button ------------------------------------------------------
 
@@ -99,9 +99,6 @@ LT.Panel.prototype.bringToFront = function() {
 
 // Prevent text selection while dragging in IE and Chrome.
 document.onselectstart = function () {return false;}
-
-// Prevent text selection while dragging in Firefox.
-document.onmousedown = function () {return false;}
 
 // Stop dragging when the mouse button is released.
 document.onmouseup = function () {
