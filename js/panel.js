@@ -1,8 +1,7 @@
 /*
-The LT.Panel constructor takes seven arguments:
+The LT.Panel constructor takes six arguments:
   panelName is the name that will be displayed in the panel's title bar.
   buttonName will be displayed next to the button that shows the panel.
-  buttonLoc is the parent element of the button that shows the panel.
   x is the panel's initial horizontal position.
   y is the panel's initial vertical position.
   width is the panel's initial width.
@@ -29,7 +28,7 @@ LT.clickDragGap = 0;
 
 // PANEL CLASS CONSTRUCTOR
 
-LT.Panel = function (panelName, buttonName, buttonLoc, x, y, width, height) {
+LT.Panel = function (panelName, buttonName, x, y, width, height) {
 
   var panel = this; // Remember the current 'this' during event handlers.
 
@@ -66,7 +65,7 @@ LT.Panel = function (panelName, buttonName, buttonLoc, x, y, width, height) {
 
   // Create Menu Button ------------------------------------------------------
 
-  this.button = LT.element('div', {'class' : 'buttonUnchecked'}, buttonLoc);
+  this.button = LT.element('div', {'class' : 'buttonUnchecked'}, LT.buttons);
   this.button.onclick = function() {panel.show();};
   LT.element('div', {'class' : 'buttonStart'}, this.button);
   LT.element('div', {'class' : 'buttonCaption'}, this.button, buttonName);

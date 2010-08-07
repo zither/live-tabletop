@@ -1,5 +1,5 @@
 LT.createChatPanel = function () {
-  LT.chatPanel = new LT.Panel( 'Chat', 'Chat', LT.buttonsDiv, 6, 49, 355, 130);
+  LT.chatPanel = new LT.Panel( 'Chat', 'Chat', 6, 49, 355, 130);
   LT.chatOutput = LT.element('div', { id : 'chatOutput' }, LT.chatPanel.innerPanel);
   LT.chatForm = LT.element('form', { id : 'chatForm' }, LT.chatPanel.innerPanel);
   LT.chatInput = LT.element('input', { id : 'chatInput', size : 24, 

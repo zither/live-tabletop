@@ -22,7 +22,7 @@ LT.refreshTableList = function () {
 };
 
 LT.createTablesPanel = function () {
-  LT.tablesPanel = new LT.Panel( 'Tables', 'Tables', LT.buttonsDiv, 6, 26, 175, 300);
+  LT.tablesPanel = new LT.Panel( 'Tables', 'Tables', 6, 26, 175, 300);
   //LT.refreshTableList();
   LT.tableListDiv = LT.element('div',{}, LT.tablesPanel.content);
   LT.tableRefresh = LT.element('a',{}, LT.tablesPanel.content, 'Refresh');

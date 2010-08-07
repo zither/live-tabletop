@@ -1,4 +1,4 @@
 LT.createTurnsPanel = function () {
-  LT.turnsPanel = new LT.Panel( 'Turns', 'Turns', LT.buttonsDiv, 6, 72, 175, 300);
+  LT.turnsPanel = new LT.Panel( 'Turns', 'Turns', 6, 72, 175, 300);
 };
 
