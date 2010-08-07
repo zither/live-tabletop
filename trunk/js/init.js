@@ -1,9 +1,9 @@
 onload = function () {
   //var checkInstall = LT.ajaxRequest("POST", 'php/db_config.php', {}, function(ajax){if(ajax.status != 200){}});
   var checkInstall = LT.ajaxRequest("POST", 'php/db_config.php', {});
-  if(checkInstall.status == 200){
+  if (checkInstall.status == 200) {
     LT.isInstalled = "1";
-  }else{
+  } else {
     var installRoutine = LT.ajaxRequest("POST", "php/install.php",
       {
         location: "localhost",
@@ -15,10 +15,10 @@ onload = function () {
       }
     );
   }
-  LT.pageBar = LT.element('div', { id : 'pageBar' }, document.body);
-  LT.element('div',{ id : 'logo' }, LT.pageBar);
-  LT.buttonsDiv = new LT.element('div', { id : 'buttons' }, LT.pageBar);
-  LT.tableTop = new LT.element('div', { id : 'tableTop' }, document.body);
+  LT.pageBar = LT.element('div', {id: 'pageBar'}, document.body);
+  LT.element('div', {id: 'logo'}, LT.pageBar);
+  LT.buttons = new LT.element('div', {id: 'buttons'}, LT.pageBar);
+  LT.tableTop = new LT.element('div', {id: 'tableTop'}, document.body);
   loginCheck();
   LT.createChatPanel();
   LT.createTablesPanel();
