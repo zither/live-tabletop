@@ -1,7 +1,7 @@
 /*
 The LT.Panel constructor takes six arguments:
   panelName is the name that will be displayed in the panel's title bar.
-  buttonName will be displayed next to the button that shows the panel.
+  buttonName will be displayed next to the button that toggleVisibilitys the panel.
   x is the panel's initial horizontal position.
   y is the panel's initial vertical position.
   width is the panel's initial width.
@@ -28,9 +28,10 @@ LT.clickDragGap = 0;
 
 // PANEL CLASS CONSTRUCTOR
 
-LT.Panel = function (panelName, buttonName, x, y, width, height) {
+LT.Panel = function (panelName, buttonName, x, y, width, height, buttonLoc) {
 
   var panel = this; // Remember the current 'this' during event handlers.
+  LT.Panel.order.push(this);
 
   // Create Floating Panel ---------------------------------------------------
 
@@ -38,6 +39,7 @@ LT.Panel = function (panelName, buttonName, x, y, width, height) {
     'style' : 'left: ' + x + 'px; top: ' + y + 'px; visibility: hidden;'
     }, LT.tableTop);
   this.outside.onmousedown = function() {panel.bringToFront();};
+  this.outside.style.zIndex = "" + LT.Panel.order.length;
 
   // Top: includes top-left resize button, title, close button
   var title = LT.element('div', {'class' : 'title'}, this.outside);
@@ -50,7 +52,7 @@ LT.Panel = function (panelName, buttonName, x, y, width, height) {
     'style' : 'width: ' + (width - 36) + 'px;'}, title, ' ');
   this.bar.onmousedown = function() {LT.selectedPanel = panel; return false;};
   LT.element('div', {'class' : 'close'}, title)
-    .onclick = function() {panel.show();};
+    .onclick = function() {panel.toggleVisibility();};
 
   // Middle: this.content contains elements specific to each panel
   this.content = LT.element('div', {'class' : 'innerPanel', 
@@ -65,14 +67,17 @@ LT.Panel = function (panelName, buttonName, x, y, width, height) {
 
   // Create Menu Button ------------------------------------------------------
 
-  this.button = LT.element('div', {'class' : 'buttonUnchecked'}, LT.buttons);
-  this.button.onclick = function() {panel.show();};
+  var menu = buttonLoc ? buttonLoc : LT.buttons;
+  this.button = LT.element('div', {'class' : 'buttonUnchecked'}, menu);
+  this.button.onclick = function() {panel.toggleVisibility();};
   LT.element('div', {'class' : 'buttonStart'}, this.button);
   LT.element('div', {'class' : 'buttonCaption'}, this.button, buttonName);
   LT.element('div', {'class' : 'buttonEnd'}, this.button);
 }
 
-LT.Panel.prototype.show = function() {
+LT.Panel.order = [];
+
+LT.Panel.prototype.toggleVisibility = function() {
   if(this.outside.style.visibility == "hidden") {
     this.bringToFront();
     this.button.className = "buttonChecked";
@@ -84,14 +89,17 @@ LT.Panel.prototype.show = function() {
 }
 
 LT.Panel.prototype.bringToFront = function() {
-  // Remember the current value of 'this' until the timeout executes.
-  var panel = this;
-  setTimeout(function () {
-    // We delay this until the event handler is finished to avoid strange
-    // behavior that happens when we modify the DOM during mousedown events.
-    LT.tableTop.removeChild(panel.outside);
-    LT.tableTop.appendChild(panel.outside);
-  }, 0);
+  var newOrder = [];
+  for (var i = 0; i < LT.Panel.order.length; i++) {
+    var panel = LT.Panel.order[i];
+    if (panel != this) {
+      newOrder.push(panel);
+      panel.outside.style.zIndex = "" + newOrder.length;
+    }
+  }
+  newOrder.push(this);
+  this.outside.style.zIndex = "" + newOrder.length;
+  LT.Panel.order = newOrder;
 };
 
 // DRAGGING: Use document event handlers to move and resize windows.
