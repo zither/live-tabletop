@@ -139,8 +139,8 @@ document.onmousemove = function (e) {
    }
     LT.dragX = Math.min(LT.dragX - LT.clickX, window.innerWidth - w - 25);
     LT.dragY = Math.min(LT.dragY - LT.clickY, window.innerHeight - h - 61);
-    LT.dragX = Math.max(LT.dragX, 26);
-    LT.dragY = Math.max(LT.dragY, 6);
+    LT.dragX = Math.max(LT.dragX, 6);
+    LT.dragY = Math.max(LT.dragY, 26);
     LT.selectedPanel.outside.style.top  = LT.dragY + "px";
     LT.selectedPanel.outside.style.left = LT.dragX + "px";
   }
