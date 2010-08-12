@@ -1,3 +1,16 @@
+LT.loginCheck = function () {
+  LT.userButton = LT.element('div', { id : 'loginDiv' }, LT.pageBar);
+  LT.loginForm = LT.element('form', { id : 'loginForm', 
+    style : 'float: right;'}, LT.pageBar);
+  var checkLogin = LT.ajaxRequest("POST", "php/login_check.php",{ });
+  if (checkLogin.responseXML) {
+    LT.loginAjax = checkLogin;
+    LT.createUserPanel();
+  } else {
+    LT.createLogin();
+  }
+};
+
 LT.createLogin = function () {
   var loginUsername = LT.element('input', { style : 'border: 1px solid #CCC;',
     id : 'username', size : 10 }, LT.loginForm, 'username', 1);
@@ -12,18 +25,7 @@ LT.createLogin = function () {
     LT.createUserPanel();
   }
 };
-LT.loginCheck = function () {
-  LT.loginDiv = LT.element('div', { id : 'loginDiv' }, LT.pageBar);
-  LT.loginForm = LT.element('form', { id : 'loginForm', 
-    style : 'float: right;'}, LT.loginDiv);
-  var checkLogin = LT.ajaxRequest("POST", "php/login_check.php",{ });
-  if (checkLogin.responseXML) {
-    LT.loginAjax = checkLogin;
-    LT.createUserPanel();
-  } else {
-    LT.createLogin();
-  }
-};
+
 LT.createUserPanel = function () {
   var userElement = LT.loginAjax.responseXML.getElementsByTagName('user')[0];
   if (userElement) {
@@ -31,14 +33,21 @@ LT.createUserPanel = function () {
     LT.userID = userElement.getAttribute('id');
     LT.userColor = userElement.getAttribute('color');
     LT.userPermissions = userElement.getAttribute('permissions');
-    LT.loginDiv.removeChild(LT.loginForm);
+    LT.pageBar.removeChild(LT.loginForm);
     LT.element('div', {id: 'loggedIn'}, LT.loginDiv);
     LT.userPanel = new LT.Panel('User Options',
       LT.username + "'s " + 'options', 185, 26, 150, 150, LT.loginDiv);
     LT.element('div', {id: 'logoutDiv'}, LT.userPanel.content, 'Logout')
-      .onclick = function () {LT.ajaxRequest("POST", "php/logout.php", {});};
+      .onclick = LT.logout;
   } else {
     alert('Incorrect username or password.');
   }
 };
 
+LT.logout = function () {
+  LT.ajaxRequest("POST", "php/logout.php", {});
+  LT.userPanel.toggleVisibility;
+  LT.userPanel.outside.setAttribute('visibility', 'hidden');
+  //LT.pageBar.removeChild(LT.loginDiv);
+  LT.pageBar.appendChild(LT.loginForm);
+}
