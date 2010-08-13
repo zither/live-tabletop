@@ -20,8 +20,8 @@ onload = function () {
   LT.buttons = LT.element('div', {id: 'buttons'}, LT.pageBar);
   LT.tableTop = LT.element('div', {id: 'tableTop'}, document.body);
   LT.loginCheck();
-  LT.createChatPanel();
   LT.createTablesPanel();
+  LT.createChatPanel();
   LT.createTurnsPanel();
   LT.createToolsPanel();
   LT.createFilesPanel();
