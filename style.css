@@ -118,7 +118,14 @@ body {
 .close:hover {
   background-image: url(images/closeHover.png);
 }
-.innerPanel {
+.panelHeader, .panelFooter {
+background: #D4D4D4;
+  clear: both;
+  border-left: 1px solid #666;
+  border-right: 1px solid #666;
+  margin: 0px -21px 0px -6px;
+}
+.panelContent {
   background: #D4D4D4 url(images/panel.jpg) repeat-x top left;
   clear: both;
   border-left: 1px solid #666;
@@ -129,7 +136,7 @@ body {
   padding-right: 8px;
   overflow: auto;
 }
-.innerPanel input {
+.panelContent input, .panelFooter input {
   background: #FFF;
   color: #333;
   margin-right: 4px;
