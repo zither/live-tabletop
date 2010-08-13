@@ -71,7 +71,7 @@ LT.Panel = function (panelName, buttonName, x, y, width, height, buttonLoc) {
   this.button = LT.element('div', {'class' : 'buttonUnchecked'}, menu);
   this.button.onclick = function() {panel.toggleVisibility();};
   LT.element('div', {'class' : 'buttonStart'}, this.button);
-  LT.element('div', {'class' : 'buttonCaption'}, this.button, buttonName);
+  this.buttonCaption = LT.element('div', {'class' : 'buttonCaption'}, this.button, buttonName);
   LT.element('div', {'class' : 'buttonEnd'}, this.button);
 }
 
