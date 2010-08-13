@@ -53,12 +53,16 @@ LT.Panel = function (panelName, buttonName, x, y, width, height, buttonLoc) {
   this.bar.onmousedown = function() {LT.selectedPanel = panel; return false;};
   LT.element('div', {'class' : 'close'}, title)
     .onclick = function() {panel.toggleVisibility();};
-
+  
+  this.header = LT.element('div', {'class' : 'panelHeader'}, this.outside);
+  
   // Middle: this.content contains elements specific to each panel
-  this.content = LT.element('div', {'class' : 'innerPanel', 
+  this.content = LT.element('div', {'class' : 'panelContent', 
     'style' : 'width: ' + width + 'px; height: ' + height + 'px;' 
     }, this.outside);
 
+  this.footer = LT.element('div', {'class' : 'panelFooter'}, this.outside);
+  
   // Bottom: includes bottom-right resize button
   var bottom = LT.element('div', {'class' : 'panelBottom'}, this.outside);
   LT.element('div', {'class' : 'panelBL'}, bottom);

@@ -14,7 +14,6 @@ LT.refreshTableList = function () {
       };
       LT.tableList.push(table);
     }
-  //alert(LT.tableList.length);
     for( var i = 0 ; i < LT.tableList.length; i++ ){
       LT.element('div', {}, LT.tableListDiv, LT.tableList[i].name);
     }
@@ -27,19 +26,19 @@ LT.createTablesPanel = function () {
   LT.tableRefresh = LT.element('a',{}, LT.tablesPanel.content, 'Refresh');
   LT.refreshTableList();
   LT.tablesForm = LT.element('form', { }, LT.tablesPanel.content);
-  LT.inputTableName = LT.element('input', { size : 16, type: 'text',
+  LT.inputTableName = LT.element('input', { size : 12, type: 'text',
     style : 'border: 0px solid #CCC;' }, LT.tablesForm, 'Table Name', 1);
-  LT.inputTableCols = LT.element('input', { size : 3, 
+  LT.inputTableCols = LT.element('input', { size : 1, 
     style : 'border: 1px solid #CCC;' }, LT.tablesForm, 'Cols', 1);
-  LT.inputTableRows = LT.element('input', { size : 3, 
+  LT.inputTableRows = LT.element('input', { size : 1, 
     style : 'border: 1px solid #CCC;' }, LT.tablesForm, 'Rows', 1);
-  LT.inputTileHeight = LT.element('input', { size : 3, 
+  LT.inputTileHeight = LT.element('input', { size : 1, 
     style : 'border: 1px solid #CCC;' }, LT.tablesForm, 'Height', 1);
-  LT.inputTileWidth = LT.element('input', { size : 3, 
+  LT.inputTileWidth = LT.element('input', { size : 1, 
     style : 'border: 1px solid #CCC;' }, LT.tablesForm, 'Width', 1);
   LT.tableSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
         id : 'chatSubmit', size : 8, value : 'Create' }, LT.tablesForm);
-  LT.tableSubmit.onclick = LT.createTable();
+  LT.tableSubmit.onclick = function() { LT.createTable(); };
 };
 
 LT.createTable = function () {
