@@ -33,6 +33,6 @@ $LT_SQL->query("CALL create_image($user, '$file', '$type', 0)")
 
 // Generate Output
 
-done(array(user => $user, file => $file, type => $type));
+done(array('user' => $user, 'file' => $file, 'type' => $type));
 ?>
 
