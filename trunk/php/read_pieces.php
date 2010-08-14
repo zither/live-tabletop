@@ -11,19 +11,29 @@ $table_id = $LT_SQL->real_escape_string($_REQUEST['table_id']);
 
 // Query the Database
 
-$result = $LT_SQL->query("CALL read_pieces($table_id)")
+$LT_SQL->multi_query("CALL read_pieces($table_id)")
   or die ("Query failed: " . $LT_SQL->error);
+$result = $LT_SQL->store_result();
 $pieces = array();
 while ($row = $result->fetch_assoc()) {
   $pieces[] = array('stats' => array(), 'attributes' => $row);
 }
+$result->close();
+if ($LT_SQL->more_results()) {
+  while($LT_SQL->next_result());
+}
 
 for ($i = 0; $i < count($pieces); $i++) {
   $piece_id = $pieces[$i]['attributes']['id'];
-  $result = $LT_SQL->query("CALL get_stats($piece_id)")
+  $LT_SQL->multi_query("CALL get_stats($piece_id)")
     or die ("Query failed: " . $LT_SQL->error);
+  $result = $LT_SQL->store_result();
   while ($row = $result->fetch_assoc()) {
     $pieces[$i]['stats'][$row['name']] = $row['value'];
+  }
+  $result->close();
+  if ($LT_SQL->more_results()) {
+    while($LT_SQL->next_result());
   }
 }
 
