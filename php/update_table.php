@@ -3,6 +3,7 @@
 session_start();
 
 include('db_config.php');
+include('include/query.php');
 include('include/ownership.php');
 
 // Interpret the Request
@@ -21,9 +22,8 @@ $grid_color = $LT_SQL->real_escape_string($_REQUEST['grid_color']);
 // Query the Database
 
 if (LT_can_modify_table($table_id)) {
-  $LT_SQL->query("CALL update_table($table_id, '$name', $user_id, $image_id,"
-    . " $grid_width, $grid_height, $grid_thickness, '$grid_color')")
-    or die ("Query failed: " . $LT_SQL->error);
+  LT_call('update_table', $table_id, $name, $user_id, $image_id,
+    $grid_width, $grid_height, $grid_thickness, $grid_color);
 }
 
 ?>

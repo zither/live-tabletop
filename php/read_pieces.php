@@ -4,6 +4,7 @@ session_start();
 if (!isset($_SESSION['user_id'])) die ('You are not logged in.');
 
 include('db_config.php');
+include('include/query.php');
 
 // Interpret the Request
 
@@ -11,29 +12,16 @@ $table_id = $LT_SQL->real_escape_string($_REQUEST['table_id']);
 
 // Query the Database
 
-$LT_SQL->multi_query("CALL read_pieces($table_id)")
-  or die ("Query failed: " . $LT_SQL->error);
-$result = $LT_SQL->store_result();
+$piece_rows = LT_call('read_pieces', $table_id);
 $pieces = array();
-while ($row = $result->fetch_assoc()) {
-  $pieces[] = array('stats' => array(), 'attributes' => $row);
-}
-$result->close();
-if ($LT_SQL->more_results()) {
-  while($LT_SQL->next_result());
-}
-
-for ($i = 0; $i < count($pieces); $i++) {
-  $piece_id = $pieces[$i]['attributes']['id'];
-  $LT_SQL->multi_query("CALL get_stats($piece_id)")
-    or die ("Query failed: " . $LT_SQL->error);
-  $result = $LT_SQL->store_result();
-  while ($row = $result->fetch_assoc()) {
-    $pieces[$i]['stats'][$row['name']] = $row['value'];
-  }
-  $result->close();
-  if ($LT_SQL->more_results()) {
-    while($LT_SQL->next_result());
+for ($i = 0; $i < count($piece_rows); $i++) {
+  $pieces[] = array('stats' => array(), 'attributes' => $piece_rows[$i]);
+  $piece_id = $piece_rows[$i]['id'];
+  $stat_rows = LT_call('get_stats', $piece_id);
+  for ($j = 0; $j < count($stat_rows); $j++) {
+    $name = $stat_rows[$j]['name'];
+    $value = $stat_rows[$j]['value'];
+    $pieces[$i]['stats'][$name] = $value;
   }
 }
 

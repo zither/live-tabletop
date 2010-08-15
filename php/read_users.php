@@ -4,19 +4,19 @@ session_start();
 if (!isset($_SESSION['user_id'])) die ('You are not logged in.');
 
 include('db_config.php');
+include('include/query.php');
 
 // Query the Database
 
-$result = $LT_SQL->query("CALL read_users()")
-  or die ("Query failed: " . $LT_SQL->error);
+$rows = LT_call('read_users');
 
 // Generate Output
 
 include('include/users.php');
 include('include/xml_headers.php');
 echo "<users>\n";
-while ($row = $result->fetch_assoc()) {
-  LT_write_user_row($row);
+for ($i = 0; $i < count($rows); $i++) {
+  LT_write_user_row($rows[$i]);
 }
 echo "</users>\n";
 
