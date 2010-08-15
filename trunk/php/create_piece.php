@@ -4,6 +4,7 @@ session_start();
 if (!isset($_SESSION['user_id'])) die('You are not logged in.');
 
 include('db_config.php');
+include('include/query.php');
 include('include/ownership.php');
 
 // Interpret the Request
@@ -22,9 +23,8 @@ $height = $LT_SQL->real_escape_string($_REQUEST['height']);
 // Query the Database
 
 if (LT_can_modify_table($table_id)) {
-  $LT_SQL->query("CALL create_piece($table_id, $image_id, $user_id, '$name', "
-    . "$x, $y, $x_offset, $y_offset, $width, $height)")
-    or die ("Query failed: " . $LT_SQL->error);
+  LT_call('create_piece', $table_id, $image_id, $user_id, $name,
+    $x, $y, $x_offset, $y_offset, $width, $height);
 }
 
 ?>

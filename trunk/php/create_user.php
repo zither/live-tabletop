@@ -6,6 +6,7 @@ if (strcmp($_SESSION['permissions'], 'administrator') != 0)
   die ("You do not have permission to do this.");
 
 include('db_config.php');
+include('include/query.php');
 include('include/users.php');
 
 // Interpret the Request
@@ -19,7 +20,6 @@ $hash = LT_hash_password($password, $salt);
 
 // Query the Database
 
-$LT_SQL->query("CALL create_user('$username', '$hash', '$salt', NULL,"
-  . " '$permissions')") or die ('Query failed: ' . $LT_SQL->error);
+LT_call('create_user', $username, $hash, $salt, NULL, $permissions);
 
 ?>

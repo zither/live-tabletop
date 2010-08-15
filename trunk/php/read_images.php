@@ -4,6 +4,7 @@ session_start();
 if (!isset($_SESSION['user_id'])) die ('You are not logged in.');
 
 include('db_config.php');
+include('include/query.php');
 
 // Interpret the Request
 
@@ -12,23 +13,22 @@ $type = $LT_SQL->real_escape_string($_REQUEST['type']);
 
 // Query the Database
 
-$result = $LT_SQL->query("CALL read_images('$type')")
-  or die ("Query failed: " . $LT_SQL->error);
+$rows = LT_call('read_images', $type);
 
 // Generate Output
 
 include('include/xml_headers.php');
 echo "<images>\n";
-while($row = $result->fetch_assoc()) {
+for ($i = 0; $i < count($rows); $i++) {
   echo "  <image"
     // Encode integers as strings.
-    . " id=\"{$row['id']}\""
-    . " user_id=\"{$row['user_id']}\""
-    . " public=\"{$row['public']}\""
-    . " time=\"{$row['time']}\""
+    . " id=\"{$rows[$i]['id']}\""
+    . " user_id=\"{$rows[$i]['user_id']}\""
+    . " public=\"{$rows[$i]['public']}\""
+    . " time=\"{$rows[$i]['time']}\""
     // URL-encode strings to be decoded by javascript's decodeURIComponent.
-    . " file=\"" . rawurlencode($row['file']) . "\""
-    . " type=\"" . rawurlencode($row['type']) . "\""
+    . " file=\"" . rawurlencode($rows[$i]['file']) . "\""
+    . " type=\"" . rawurlencode($rows[$i]['type']) . "\""
     . "/>\n";
 }
 echo "</images>\n";

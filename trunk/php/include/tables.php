@@ -1,6 +1,6 @@
 <?php
 
-function LT_write_tables($result) {
+function LT_write_tables($rows) {
   // Set HTTP headers and write doctype for well-formed XML.
   // This must come before any text is written to the document
   // (i.e. before any PHP echo or die statements.)
@@ -9,8 +9,8 @@ function LT_write_tables($result) {
   // so we create a document element named "tables".
   echo "<tables>\n";
   // Create a <table> element for each row of the result set.
-  while($row = $result->fetch_assoc()) {
-    LT_write_table_row($row);
+  for($i = 0; $i < count($rows); $i++) {
+    LT_write_table_row($rows[$i]);
   }
   echo "</tables>\n";
 }

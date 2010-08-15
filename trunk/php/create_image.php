@@ -12,6 +12,7 @@ function done($result) {
 if (!isset($_SESSION['user_id'])) done("You are not logged in.");
 
 include('db_config.php');
+include('include/query.php');
 include('include/images.php');
 
 // Interpret the Request
@@ -28,8 +29,8 @@ move_uploaded_file($_FILES['file']['tmp_name'], LT_image_path($type, $file))
 
 // Query the Database
 
-$LT_SQL->query("CALL create_image($user, '$file', '$type', 0)")
-  or done("Query failed: " . $LT_SQL->error);
+$rows = LT_call_silent('create_image', $user, $file, $type, 0);
+if (!is_array($rows)) done("Query failed: " . $LT_SQL->error);
 
 // Generate Output
 

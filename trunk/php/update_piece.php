@@ -3,6 +3,7 @@
 session_start();
 
 include('db_config.php');
+include('include/query.php');
 include('include/ownership.php');
 
 // Interpret the Request
@@ -22,9 +23,8 @@ $color = $LT_SQL->real_escape_string($_REQUEST['color']);
 // Query the Database
 
 if (LT_can_modify_piece($piece_id)) {
-  $LT_SQL->query("CALL update_piece($piece_id, $image_id, $user_id, '$name', "
-    . "$x, $y, $x_offset, $y_offset, $width, $height, '$color')")
-    or die ("Query failed: " . $LT_SQL->error);
+  LT_call('update_piece', $piece_id, $image_id, $user_id, $name,
+    $x, $y, $x_offset, $y_offset, $width, $height, $color);
 }
 
 ?>
