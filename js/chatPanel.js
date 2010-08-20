@@ -12,12 +12,14 @@ LT.refreshMessageList = function () {
       };
       LT.messageList.push(messagesArray);
     }
+	var countMessages = 0;
     for( var i = 0 ; i < LT.messageList.length; i++ ){
       LT.element('a', {}, LT.chatOutput, LT.messageList[i].user_id +
 	    ": " + LT.messageList[i].time + ": " + LT.messageList[i].text);
       LT.element('br', {}, LT.chatOutput);
+	  countMessages = i;
     }
-	timeWatch = LT.element('a', {}, LT.chatOutput, LT.chatTimeStamp.getTime() / 400000);
+	LT.chatTimeStamp = LT.messageList[countMessages].time;
 	LT.chatOutput.removeChild(LT.chatBottom);
 	LT.chatOutput.appendChild(LT.chatBottom);
 	LT.chatBottom.scrollIntoView(true);
@@ -25,12 +27,12 @@ LT.refreshMessageList = function () {
 };
 
 LT.createChatPanel = function () {
-  LT.chatTimeStamp = new Date;
+  LT.chatTimeStamp = 0;
   LT.chatPanel = new LT.Panel( 'Chat', 'Chat', 6, 49, 355, 130);
   LT.chatForm = LT.element('form', { id : 'chatForm' , style : "" 
     }, LT.chatPanel.footer);
   LT.chatOutput = LT.element('div', { id : 'chatOutput' }, LT.chatPanel.content);
-  LT.chatBottom = LT.element('a', {}, LT.chatOutput, "bottom");
+  LT.chatBottom = LT.element('a', {}, LT.chatOutput, " ");
   LT.chatInput = LT.element('input', { id : 'chatInput', size : 24, 
     style : 'border: 1px solid #CCC;'}, LT.chatForm, '-- Write a message. --', 1 );
   LT.chatSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
