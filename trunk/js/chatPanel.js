@@ -32,8 +32,7 @@ LT.createChatPanel = function () {
   LT.chatOutput = LT.element('div', { id : 'chatOutput' }, LT.chatPanel.content);
   LT.chatBottom = LT.element('a', {}, LT.chatOutput, "bottom");
   LT.chatInput = LT.element('input', { id : 'chatInput', size : 24, 
-    style : 'border: 1px solid #CCC;'}, LT.chatForm, '<< Write a message. >>', 1 );
-  LT.chatInput.onfocus = function(){ emptyMe(this, '<< Write a message. >>') };
+    style : 'border: 1px solid #CCC;'}, LT.chatForm, '-- Write a message. --', 1 );
   LT.chatSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
     id : 'chatSubmit', size : 8 }, LT.chatForm, 'Send');
   LT.tableID = 1;
