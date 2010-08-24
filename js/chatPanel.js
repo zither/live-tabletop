@@ -19,7 +19,8 @@ LT.refreshMessageList = function () {
       LT.element('br', {}, LT.chatOutput);
 	  countMessages = i;
     }
-	LT.chatTimeStamp = LT.messageList[countMessages].time;
+	if(LT.messageList[countMessages].time) {
+	  LT.chatTimeStamp = LT.messageList[countMessages].time; }
 	LT.chatOutput.removeChild(LT.chatBottom);
 	LT.chatOutput.appendChild(LT.chatBottom);
 	LT.chatBottom.scrollIntoView(true);
