@@ -26,4 +26,7 @@ onload = function () {
   LT.createToolsPanel();
   LT.createFilesPanel();
 };
+refreshTimestamps = function () {
+  
+}
 
