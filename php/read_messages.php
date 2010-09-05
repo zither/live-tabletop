@@ -9,11 +9,11 @@ include('include/query.php');
 // Interpret the Request
 
 $table_id = $LT_SQL->real_escape_string($_REQUEST['table_id']);
-$time = $LT_SQL->real_escape_string($_REQUEST['time']);
+$last_message = $LT_SQL->real_escape_string($_REQUEST['last_message']);
 
 // Query the Database
 
-$rows = LT_call('read_messages', $table_id, $time);
+$rows = LT_call('read_messages', $table_id, $last_message);
 
 // Generate Output
 
