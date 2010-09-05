@@ -40,15 +40,16 @@ LT.createChatPanel = function () {
   LT.chatSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
     id : 'chatSubmit', size : 8 }, LT.chatForm, 'Send');
   LT.tableID = 1;
-  LT.chatSubmit.onclick = function() { LT.createMessage(); };
+  //LT.chatSubmit.onclick = function() { LT.createMessage(); };
   LT.chatForm.onsubmit = function() { LT.createMessage(); return false; };
   LT.refreshMessageList();
 }
 
 LT.createMessage = function () {
-  var createMessageAjax = LT.ajaxRequest("POST", "php/create_message.php",
-    { table_id : LT.tableID, text : LT.chatInput.value });
+  var tempMessage = LT.chatInput.value;
   LT.chatInput.value = "";
+  var createMessageAjax = LT.ajaxRequest("POST", "php/create_message.php",
+    { table_id : LT.tableID, text : tempMessage });
   LT.chatInput.focus();
   LT.refreshMessageList();
 }
