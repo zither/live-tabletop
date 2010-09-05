@@ -66,7 +66,7 @@ TEST.tests = [
 
   {group: "READ MESSAGES",
     action: "../read_messages.php",
-    args: {table_id: 1, time: 0},
+    args: {table_id: 1, last_message: 0},
     result: function (ajax) {return TEST.count(ajax, "message", 1);}},
 
   {group: "PRIVATE ROLL",
