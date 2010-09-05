@@ -1,6 +1,9 @@
 LT.refreshTableList = function () {
   var readTables = LT.ajaxRequest("POST", "php/read_tables.php",{ });
   if (readTables.responseXML){
+    while(LT.tableListDiv.firstChild){
+      LT.tableListDiv.removeChild(LT.tableListDiv.firstChild);
+    }
     var tableElements = readTables.responseXML.getElementsByTagName('table');
     LT.tableList = [];
     for( var i = 0 ; i < tableElements.length; i++ ){
@@ -21,9 +24,9 @@ LT.refreshTableList = function () {
 };
 
 LT.createTablesPanel = function () {
-  LT.tablesPanel = new LT.Panel( 'Tables', 'Tables', 6, 26, 175, 300);
+  LT.tablesPanel = new LT.Panel( 'Tables', 'Tables', 6, 26, 300, 300);
   LT.tableListDiv = LT.element('div',{}, LT.tablesPanel.content);
-  LT.tableRefresh = LT.element('a',{}, LT.tablesPanel.content, 'Refresh');
+  LT.tableRefresh = LT.element('a',{}, LT.tablesPanel.header, 'Refresh');
   LT.refreshTableList();
   LT.tablesForm = LT.element('form', { }, LT.tablesPanel.footer);
   LT.inputTableName = LT.element('input', { size : 12, type: 'text',
