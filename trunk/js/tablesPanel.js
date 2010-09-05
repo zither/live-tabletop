@@ -5,7 +5,7 @@ LT.refreshTableList = function () {
     LT.tableList = [];
     for( var i = 0 ; i < tableElements.length; i++ ){
       var table = {
-        name : tableElements[i].getAttribute('name'),
+        name : decodeURIComponent(tableElements[i].getAttribute('name')),
         imageID : tableElements[i].getAttribute('image_id'),
         rows : tableElements[i].getAttribute('rows'),
         columns : tableElements[i].getAttribute('columns'),        
