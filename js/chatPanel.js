@@ -14,10 +14,12 @@ LT.refreshMessageList = function () {
     }
 	var countMessages = 0;
     for( var i = 0 ; i < LT.messageList.length; i++ ){
-      LT.element('a', {}, LT.chatOutput, LT.messageList[i].user_id +
-	    ": " + LT.messageList[i].time + ": " + LT.messageList[i].text);
-      LT.element('br', {}, LT.chatOutput);
-	  countMessages = i;
+	  if(LT.messageList[i].time >= LT.chatTimeStamp){
+	    LT.element('a', {}, LT.chatOutput, LT.messageList[i].user_id +
+	      ": " + LT.messageList[i].time + ": " + LT.messageList[i].text);
+        LT.element('br', {}, LT.chatOutput);
+	    countMessages = i;
+      }
     }
 	if(LT.messageList[countMessages].time) {
 	  LT.chatTimeStamp = LT.messageList[countMessages].time; }
@@ -28,7 +30,6 @@ LT.refreshMessageList = function () {
 };
 
 LT.createChatPanel = function () {
-  LT.chatTimeStamp = 0;
   LT.chatPanel = new LT.Panel( 'Chat', 'Chat', 6, 49, 355, 130);
   LT.chatForm = LT.element('form', { id : 'chatForm' , style : "" 
     }, LT.chatPanel.footer);
@@ -40,11 +41,14 @@ LT.createChatPanel = function () {
     id : 'chatSubmit', size : 8 }, LT.chatForm, 'Send');
   LT.tableID = 1;
   LT.chatSubmit.onclick = function() { LT.createMessage(); };
+  LT.chatForm.onsubmit = function() { LT.createMessage(); return false; };
   LT.refreshMessageList();
 }
 
 LT.createMessage = function () {
   var createMessageAjax = LT.ajaxRequest("POST", "php/create_message.php",
     { table_id : LT.tableID, text : LT.chatInput.value });
+  LT.chatInput.value = "";
+  LT.chatInput.focus();
   LT.refreshMessageList();
 }
