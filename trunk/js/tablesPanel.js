@@ -25,7 +25,7 @@ LT.createTablesPanel = function () {
   LT.tableListDiv = LT.element('div',{}, LT.tablesPanel.content);
   LT.tableRefresh = LT.element('a',{}, LT.tablesPanel.content, 'Refresh');
   LT.refreshTableList();
-  LT.tablesForm = LT.element('form', { }, LT.tablesPanel.content);
+  LT.tablesForm = LT.element('form', { }, LT.tablesPanel.footer);
   LT.inputTableName = LT.element('input', { size : 12, type: 'text',
     style : 'border: 0px solid #CCC;' }, LT.tablesForm, 'Table Name', 1);
   LT.inputTableCols = LT.element('input', { size : 1, 
