@@ -146,6 +146,7 @@ CREATE TABLE pieces (
 /* MESSAGES TABLE */
 
 CREATE TABLE messages (
+  id INT AUTO_INCREMENT PRIMARY KEY,
   table_id INT NOT NULL,
   user_id INT NOT NULL,
   text TEXT,
@@ -449,12 +450,10 @@ BEGIN
   COMMIT;
 END; 
 
-CREATE PROCEDURE read_messages (IN the_table INT, IN the_time INT)
+CREATE PROCEDURE read_messages (IN the_table INT, IN the_id INT)
 BEGIN
-  SELECT table_id, user_id, text, UNIX_TIMESTAMP(time_stamp) AS time
-    FROM messages 
-    WHERE table_id = the_table AND UNIX_TIMESTAMP(time_stamp) > the_time
-    ORDER BY time ASC;
+  SELECT id, table_id, user_id, text, UNIX_TIMESTAMP(time_stamp) AS time
+    FROM messages WHERE table_id = the_table AND id > the_id ORDER BY id ASC;
 END; 
 
 CREATE PROCEDURE expire_messages ()
