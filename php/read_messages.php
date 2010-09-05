@@ -21,6 +21,7 @@ include('include/xml_headers.php');
 echo "<messages>\n";
 for ($i = 0; $i < count($rows); $i++) {
   echo "  <message"
+    . " id=\"{$rows[$i]['id']}\""
     . " user_id=\"{$rows[$i]['user_id']}\""
     . " time=\"{$rows[$i]['time']}\">"
     . rawurlencode($rows[$i]['text'])
