@@ -18,7 +18,9 @@ LT.refreshTableList = function () {
       LT.tableList.push(table);
     }
     for( var i = 0 ; i < LT.tableList.length; i++ ){
-      LT.element('div', {}, LT.tableListDiv, LT.tableList[i].name);
+      var tableLink = LT.element('a', {}, LT.tableListDiv, LT.tableList[i].name);
+	  tableLink.onClick = function(){alert('howdy');};
+      LT.element('br', {}, LT.tableListDiv);
     }
   }
 };

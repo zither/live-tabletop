@@ -1,6 +1,6 @@
 var LT = {};
 
-LT.chatTimeStamp = 0;
+LT.lastMessage = 0;
 
 function emptyMe (clearMe, defaultText){
 	if( clearMe.value == defaultText ){ clearMe.value = ""; }	
