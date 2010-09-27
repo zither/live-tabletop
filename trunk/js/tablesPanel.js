@@ -9,6 +9,7 @@ LT.refreshTableList = function () {
     for( var i = 0 ; i < tableElements.length; i++ ){
       var table = {
         name : decodeURIComponent(tableElements[i].getAttribute('name')),
+        id : decodeURIComponent(tableElements[i].getAttribute('id')),
         imageID : tableElements[i].getAttribute('image_id'),
         rows : tableElements[i].getAttribute('rows'),
         columns : tableElements[i].getAttribute('columns'),        
@@ -18,8 +19,20 @@ LT.refreshTableList = function () {
       LT.tableList.push(table);
     }
     for( var i = 0 ; i < LT.tableList.length; i++ ){
-      var tableLink = LT.element('a', {}, LT.tableListDiv, LT.tableList[i].name);
-	  tableLink.onClick = function(){alert('howdy');};
+      tableLink = LT.element('a', {id: "dud"}, LT.tableListDiv, LT.tableList[i].name);
+	  tableLink.name = LT.tableList[i].name;
+	  tableLink.id = LT.tableList[i].id;
+	  tableLink.onclick = function(){
+		LT.tableID = tableLink.id;
+		//LT.tableID = LT.tableList[i].id;
+	    LT.element('a', {style: "color: 33C;"}, LT.chatOutput, 
+		  "Arriving at " + tableLink.name);
+		//  "Arriving at " + LT.tableList[i].name);
+        LT.element('br', {}, LT.chatOutput);
+        LT.chatOutput.removeChild(LT.chatBottom);
+        LT.chatOutput.appendChild(LT.chatBottom);
+        LT.chatBottom.scrollIntoView(true);
+      };
       LT.element('br', {}, LT.tableListDiv);
     }
   }
