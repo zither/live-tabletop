@@ -45,6 +45,10 @@ LT.sendLogin = function () {
   LT.loginAjax = LT.ajaxRequest("POST", "php/login.php",
   { username : LT.loginUsername.value, password : LT.loginPassword.value});
   LT.login();
+  LT.element('div', {}, LT.chatOutput, "You have logged in.");
+  LT.chatOutput.removeChild(LT.chatBottom);
+  LT.chatOutput.appendChild(LT.chatBottom);
+  LT.chatBottom.scrollIntoView(true);
 }
 LT.login = function () {
   var userElement = LT.loginAjax.responseXML.getElementsByTagName('user')[0];
