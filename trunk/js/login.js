@@ -36,6 +36,10 @@ LT.logout = function () {
   LT.userPanel.toggleVisibility();
   LT.pageBar.removeChild(LT.userButton);
   LT.pageBar.appendChild(LT.loginForm);
+  LT.element('div', {}, LT.chatOutput, "You have logged out.");
+  LT.chatOutput.removeChild(LT.chatBottom);
+  LT.chatOutput.appendChild(LT.chatBottom);
+  LT.chatBottom.scrollIntoView(true);
 }
 LT.sendLogin = function () {
   LT.loginAjax = LT.ajaxRequest("POST", "php/login.php",

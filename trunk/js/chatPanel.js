@@ -1,6 +1,6 @@
 LT.refreshMessageList = function () {
   var readMessages = LT.ajaxRequest("POST", "php/read_messages.php",{
-    table_id : LT.tableID, time : 0 });
+    table_id : LT.tableID, last_message : LT.lastMessage });
   if (readMessages.responseXML){
     var messageElements = readMessages.responseXML.getElementsByTagName('message');
     LT.messageList = [];
@@ -8,21 +8,19 @@ LT.refreshMessageList = function () {
       var messagesArray = {
         user_id : messageElements[i].getAttribute('user_id'),
         time : messageElements[i].getAttribute('time'),
+        id : messageElements[i].getAttribute('id'),
         text : decodeURIComponent(messageElements[i].textContent)
       };
       LT.messageList.push(messagesArray);
     }
 	var countMessages = 0;
     for( var i = 0 ; i < LT.messageList.length; i++ ){
-	  if(LT.messageList[i].time >= LT.chatTimeStamp){
-	    LT.element('a', {}, LT.chatOutput, LT.messageList[i].user_id +
-	      ": " + LT.messageList[i].time + ": " + LT.messageList[i].text);
-        LT.element('br', {}, LT.chatOutput);
-	    countMessages = i;
-      }
+	  LT.element('a', {}, LT.chatOutput, LT.messageList[i].user_id +
+	    ": " + LT.messageList[i].time + ": " + LT.messageList[i].text);
+      LT.element('br', {}, LT.chatOutput);
+	  countMessages = i;
+	  LT.lastMessage = LT.messageList[countMessages].id;
     }
-	if(LT.messageList[countMessages].time) {
-	  LT.chatTimeStamp = LT.messageList[countMessages].time; }
 	LT.chatOutput.removeChild(LT.chatBottom);
 	LT.chatOutput.appendChild(LT.chatBottom);
 	LT.chatBottom.scrollIntoView(true);
@@ -40,7 +38,7 @@ LT.createChatPanel = function () {
   LT.chatSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
     id : 'chatSubmit', size : 8 }, LT.chatForm, 'Send');
   LT.tableID = 1;
-  //LT.chatSubmit.onclick = function() { LT.createMessage(); };
+  LT.chatSubmit.onclick = function() { LT.createMessage(); };
   LT.chatForm.onsubmit = function() { LT.createMessage(); return false; };
   LT.refreshMessageList();
 }
