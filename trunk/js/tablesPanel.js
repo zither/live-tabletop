@@ -23,11 +23,14 @@ LT.refreshTableList = function () {
 	  tableLink.name = LT.tableList[i].name;
 	  tableLink.id = LT.tableList[i].id;
 	  tableLink.onclick = function(){
-		LT.tableID = tableLink.id;
-		//LT.tableID = LT.tableList[i].id;
+		LT.tableID = this.id;
+	    LT.element('a', {style : "color: 33C;"}, LT.chatOutput, 
+		  "Loading chat log for " + this.name);
+	    LT.element('br', {}, LT.chatOutput);
+		LT.lastMessage = 0;
+		LT.refreshMessageList();
 	    LT.element('a', {style: "color: 33C;"}, LT.chatOutput, 
-		  "Arriving at " + tableLink.name);
-		//  "Arriving at " + LT.tableList[i].name);
+		  "Arriving at " + this.name);
         LT.element('br', {}, LT.chatOutput);
         LT.chatOutput.removeChild(LT.chatBottom);
         LT.chatOutput.appendChild(LT.chatBottom);
