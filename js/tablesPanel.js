@@ -24,12 +24,12 @@ LT.refreshTableList = function () {
 	  tableLink.id = LT.tableList[i].id;
 	  tableLink.onclick = function(){
 		LT.tableID = this.id;
-	    LT.element('a', {style : "color: 33C;"}, LT.chatOutput, 
-		  "Loading chat log for " + this.name);
 	    LT.element('br', {}, LT.chatOutput);
+	    LT.element('div', {}, LT.chatOutput, 
+		  "Loading chat log for " + this.name + "...");
 		LT.lastMessage = 0;
 		LT.refreshMessageList();
-	    LT.element('a', {style: "color: 33C;"}, LT.chatOutput, 
+	    LT.element('a', {style : "height: 32px; color: 33C;"}, LT.chatOutput, 
 		  "Arriving at " + this.name);
         LT.element('br', {}, LT.chatOutput);
         LT.chatOutput.removeChild(LT.chatBottom);
