@@ -64,7 +64,7 @@ LT.login = function () {
 	LT.userPanel.buttonCaption.removeChild(LT.userPanel.buttonCaption.firstChild);
 	LT.userPanel.buttonCaption.appendChild(newUsername);
     LT.pageBar.appendChild(LT.userButton);
-    
+    if (LT.tableListDiv){ LT.refreshTableList(); }
   } else {
     alert('Incorrect username or password.');
   }
