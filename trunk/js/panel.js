@@ -81,6 +81,12 @@ LT.Panel = function (panelName, buttonName, x, y, width, height, buttonLoc) {
 
 LT.Panel.order = [];
 
+//PANEL TABS CONSTRUCTOR
+
+LT.Panel.Tabs = function (parentPanel, tabs) {
+  this.tabBar = LT.element('div', { 'class' : 'tabBar'}, parentPanel, tabs);
+}
+
 LT.Panel.prototype.toggleVisibility = function() {
   if(this.outside.style.visibility == "hidden") {
     this.bringToFront();
