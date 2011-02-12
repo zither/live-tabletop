@@ -83,8 +83,18 @@ LT.Panel.order = [];
 
 //PANEL TABS CONSTRUCTOR
 
-LT.Panel.Tabs = function (parentPanel, tabs) {
-  this.tabBar = LT.element('div', { 'class' : 'tabBar'}, parentPanel, tabs);
+LT.Tabs = function (parentPanel, tabNames) {
+  this.tabBar = LT.element('div', {'class' : 'tabBar'}, parentPanel.header);
+  parentPanel.content.style.background = "#D4D4D4";
+  var tick = 1;
+  var isActive = 'activeTab';
+  for(var name in tabNames){
+    tab = LT.element('div', {'class' : isActive}, this.tabBar);
+	LT.element('div', {'class' : 'tabStart'}, tab);
+	LT.element('div', {'class' : 'tabContent'}, tab, tabNames[name]);
+	LT.element('div', {'class' : 'tabEnd'}, tab);
+	if(tick){ tick = 0; isActive = "inactiveTab"; }
+  }
 }
 
 LT.Panel.prototype.toggleVisibility = function() {

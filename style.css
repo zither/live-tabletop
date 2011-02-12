@@ -134,6 +134,42 @@ background: #D4D4D4;
   border-right: 1px solid #666;
   margin: 0px -21px 0px -6px;
 }
+.tabBar {
+  background:  url(images/tabBar.jpg) repeat-x top left;
+  height: 23px;
+  padding: 0px 0px 0px 2px;
+}
+.activeTab, .inactiveTab, .tabStart, .tabEnd, .tabContent {
+  height: 23px;
+  float: left;
+}
+.activeTab, .inactiveTab{
+  margin: 0px 0px 0px 2px;
+}
+.activeTab {
+  background:  url(images/activeTabBG.jpg) repeat-x top left;
+}
+.inactiveTab {
+  background:  url(images/inactiveTabBG.jpg) repeat-x top left;
+}
+.tabStart, .tabEnd{
+  width: 2px;
+}
+.activeTab .tabStart {
+  background:  url(images/activeTabStart.jpg) repeat-x top left;
+}
+.activeTab .tabEnd {
+  background:  url(images/activeTabEnd.jpg) repeat-x top left;
+}
+.inactiveTab .tabStart {
+  background:  url(images/inactiveTabStart.jpg) repeat-x top left;
+}
+.inactiveTab .tabEnd {
+  background:  url(images/inactiveTabEnd.jpg) repeat-x top left;
+}
+.tabContent {
+  padding: 5px 3px 0px 3px;
+}
 .panelContent {
   background: #D4D4D4 url(images/panel.jpg) repeat-x top left;
   clear: both;
