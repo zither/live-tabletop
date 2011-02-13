@@ -238,6 +238,9 @@ body {
 .login:hover {
   text-decoration: underline;
 }
+.altList {
+  background: #CCC
+}
 #loginDiv {
   float: right;
 }

@@ -22,7 +22,7 @@ var readTiles = LT.ajaxRequest("POST", "php/read_tiles.php",{ 'table_id' : LT.ta
 	var tileText = decodeURIComponent(tableTiles[0].textContent);
 	var tilesArray = new Array();
     tilesArray = tileText.split(' ');
-    for( var i = 0 ; i < tilesArray.length; i++ ){
+    for( var i = 2 ; i < tilesArray.length; i++ ){
         LT.element('div', {
 		'style' : 'float: left; width: ' + LT.tileWidth + 
 		'px; height: ' + LT.tileHeight + 'px;'
@@ -51,8 +51,16 @@ LT.refreshTableList = function () {
       };
       LT.tableList.push(table);
     }
+	var altSwitch = 0;
     for( var i = 0 ; i < LT.tableList.length; i++ ){
-      tableLink = LT.element('a', {id: "dud"}, LT.tableListDiv, LT.tableList[i].name);
+	  var altClass = '';
+	  if(altSwitch){
+        altClass = 'altList'; altSwitch = 0;
+	  }
+	  else{
+        altSwitch = 1;
+	  }
+      tableLink = LT.element('div', { 'class' : altClass }, LT.tableListDiv, LT.tableList[i].name);
 	  tableLink.name = LT.tableList[i].name;
 	  tableLink.id = LT.tableList[i].id;
 	  tableLink.onclick = function(){
@@ -71,7 +79,6 @@ LT.refreshTableList = function () {
 		LT.loadTable();
         LT.render();
       };
-      LT.element('br', {}, LT.tableListDiv);
     }
   }
 };
