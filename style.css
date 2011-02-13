@@ -169,6 +169,7 @@ background: #D4D4D4;
 }
 .tabContent {
   padding: 5px 3px 0px 3px;
+  color: #333;
 }
 .panelContent {
   background: #D4D4D4 url(images/panel.jpg) repeat-x top left;

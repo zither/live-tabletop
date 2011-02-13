@@ -1,3 +1,7 @@
+LT.tableColumns = 0;
+LT.tableRows = 0;
+LT.tileHeight = 0;
+LT.tileWidth = 0;
 // TABLE CLASS CONSTRUCTOR
 
 LT.Table = function (element) {
