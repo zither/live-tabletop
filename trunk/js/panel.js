@@ -37,7 +37,7 @@ LT.Panel = function (panelName, buttonName, x, y, width, height, buttonLoc) {
 
   this.outside = LT.element('div', {'class' : 'outerPanel', 
     'style' : 'left: ' + x + 'px; top: ' + y + 'px; visibility: hidden;'
-    }, LT.tableTop);
+    }, document.body);
   this.outside.onmousedown = function() {panel.bringToFront();};
   this.outside.style.zIndex = "" + LT.Panel.order.length;
 

@@ -1,3 +1,36 @@
+LT.loadTable = function (){
+  for( var i = 0 ; i < LT.tableList.length; i++ ){
+    if(LT.tableList[i].id == LT.tableID){
+	  LT.tableColumns = LT.tableList[i].columns;
+	  LT.tableRows = LT.tableList[i].rows;
+	  LT.tileWidth = LT.tableList[i].tile_width;
+	  LT.tileHeight = LT.tableList[i].tile_height;
+	}
+  }
+}
+
+LT.render = function()
+{
+var readTiles = LT.ajaxRequest("POST", "php/read_tiles.php",{ 'table_id' : LT.tableID });
+  if (readTiles.responseXML){
+    while(LT.tableTop.firstChild){
+      LT.tableTop.removeChild(LT.tableTop.firstChild);
+    }
+	LT.tableTop.setAttribute('style', 'width: ' + LT.tileWidth * LT.tableColumns + 
+		'px; height: ' + LT.tileHeight * LT.TableRows + 'px; border: 1px solid black;');
+    var tableTiles = readTiles.responseXML.getElementsByTagName('tiles');
+	var tileText = decodeURIComponent(tableTiles[0].textContent);
+	var tilesArray = new Array();
+    tilesArray = tileText.split(' ');
+    for( var i = 0 ; i < tilesArray.length; i++ ){
+        LT.element('div', {
+		'style' : 'float: left; width: ' + LT.tileWidth + 
+		'px; height: ' + LT.tileHeight + 'px;'
+		}, LT.tableTop, tilesArray[i]);
+	}
+  }
+}
+
 LT.refreshTableList = function () {
   var readTables = LT.ajaxRequest("POST", "php/read_tables.php",{ });
   if (readTables.responseXML){
@@ -11,8 +44,8 @@ LT.refreshTableList = function () {
         name : decodeURIComponent(tableElements[i].getAttribute('name')),
         id : decodeURIComponent(tableElements[i].getAttribute('id')),
         imageID : tableElements[i].getAttribute('image_id'),
-        rows : tableElements[i].getAttribute('rows'),
-        columns : tableElements[i].getAttribute('columns'),        
+        rows : tableElements[i].getAttribute('tile_rows'),
+        columns : tableElements[i].getAttribute('tile_columns'),        
 		tile_height : tableElements[i].getAttribute('tile_height'),
         tile_width : tableElements[i].getAttribute('tile_width')
       };
@@ -35,6 +68,8 @@ LT.refreshTableList = function () {
         LT.chatOutput.removeChild(LT.chatBottom);
         LT.chatOutput.appendChild(LT.chatBottom);
         LT.chatBottom.scrollIntoView(true);
+		LT.loadTable();
+        LT.render();
       };
       LT.element('br', {}, LT.tableListDiv);
     }

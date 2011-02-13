@@ -25,6 +25,7 @@ onload = function () {
   LT.createTurnsPanel();
   LT.createToolsPanel();
   LT.createFilesPanel();
+  LT.render();
 };
 refreshTimestamps = function () {
   
