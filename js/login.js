@@ -59,7 +59,6 @@ LT.login = function () {
     LT.userPermissions = userElement.getAttribute('permissions');
     LT.pageBar.removeChild(LT.loginForm);
     LT.element('div', {id: 'loggedIn'}, LT.userButton);
-//    LT.userPanel.buttonTitle = "hello";
     var newUsername = document.createTextNode(LT.username + "'s options");
 	LT.userPanel.buttonCaption.removeChild(LT.userPanel.buttonCaption.firstChild);
 	LT.userPanel.buttonCaption.appendChild(newUsername);
