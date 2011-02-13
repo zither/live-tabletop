@@ -79,7 +79,6 @@ LT.refreshTableList = function () {
 LT.createTablesPanel = function () {
   LT.tablesPanel = new LT.Panel( 'Tables', 'Tables', 6, 26, 300, 300);
   LT.tableListDiv = LT.element('div',{}, LT.tablesPanel.content);
-  LT.tableRefresh = LT.element('a',{}, LT.tablesPanel.header, 'Refresh');
   LT.refreshTableList();
   LT.tablesForm = LT.element('form', { }, LT.tablesPanel.footer);
   LT.inputTableName = LT.element('input', { size : 12, type: 'text',
@@ -95,6 +94,8 @@ LT.createTablesPanel = function () {
   LT.tableSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
         id : 'chatSubmit', size : 8, value : 'Create' }, LT.tablesForm);
   LT.tableSubmit.onclick = function() { LT.createTable(); };
+  LT.tableRefresh = LT.element('input',{ type : 'button' }, LT.tablesPanel.footer, 'Refresh');
+  LT.tableRefresh.onclick = function() { LT.refreshTableList(); };
 };
 
 LT.createTable = function () {
