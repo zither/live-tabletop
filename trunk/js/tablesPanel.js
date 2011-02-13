@@ -9,7 +9,7 @@ LT.loadTable = function (){
   }
 }
 
-LT.render = function()
+LT.loadTiles = function()
 {
 var readTiles = LT.ajaxRequest("POST", "php/read_tiles.php",{ 'table_id' : LT.tableID });
   if (readTiles.responseXML){
@@ -77,7 +77,7 @@ LT.refreshTableList = function () {
         LT.chatOutput.appendChild(LT.chatBottom);
         LT.chatBottom.scrollIntoView(true);
 		LT.loadTable();
-        LT.render();
+        LT.loadTiles();
       };
     }
   }

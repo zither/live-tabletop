@@ -50,6 +50,7 @@ body {
   height: 22px;
   float: left;
   margin: 0px 0px 0px 12px;
+  color: #CCC;
 }
 .buttonUnchecked:hover, .buttonChecked:hover {
   cursor: pointer;
@@ -65,10 +66,12 @@ body {
   background: url(images/pageBar.jpg) repeat-x left top;
   height: 22px;
   float: left;
-  color: #CCC;
   font-size: 16px;
   text-decoration: none;
   padding: 2px 1px 0px 2px;
+}
+.buttonChecked:hover , .buttonUnchecked:hover{
+  color: #EEE;
 }
 .buttonEnd {
   background-image: url(images/buttonEnd.jpg);
