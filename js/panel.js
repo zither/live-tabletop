@@ -176,8 +176,10 @@ document.onmousemove = function (e) {
    }
     LT.dragX = Math.max(LT.dragX - LT.clickX, 140);
     LT.dragY = Math.max(LT.dragY - LT.clickY, 100);
-    LT.selectedBR.content.style.width = Math.min(LT.dragX,
-      window.innerWidth - panelX - 25) + "px";
+	var newWidth = Math.min(LT.dragX, window.innerWidth - panelX - 25);
+    LT.selectedBR.content.style.width = newWidth + "px";
+    LT.selectedBR.footer.style.width = newWidth + "px";
+    LT.selectedBR.header.style.width = newWidth + 12 + "px";
     LT.selectedBR.content.style.height = Math.min(LT.dragY,
       window.innerHeight - panelY - 61) + "px";
     LT.selectedBR.bar.style.width = (Math.min(LT.dragX,

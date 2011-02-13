@@ -127,15 +127,21 @@ body {
 .close:hover {
   background-image: url(images/closeHover.png);
 }
+.panelHeader{
+  margin: 0px -21px 0px -6px;
+}
+.panelFooter{
+  margin: 0px -21px 0px -6px;
+  padding: 0px 8px 0px 4px;
+}
 .panelHeader, .panelFooter {
-background: #D4D4D4;
+  background: #D4D4D4;
   clear: both;
   border-left: 1px solid #666;
   border-right: 1px solid #666;
-  margin: 0px -21px 0px -6px;
 }
 .tabBar {
-  background:  url(images/tabBar.jpg) repeat-x top left;
+  background: url(images/tabBar.jpg) repeat-x top left;
   height: 23px;
   padding: 0px 0px 0px 2px;
 }
@@ -177,9 +183,8 @@ background: #D4D4D4;
   border-left: 1px solid #666;
   border-right: 1px solid #666;
   color: #333;
-  padding: 0px 0px 0px 4px;
+  padding: 0px 8px 0px 4px;
   margin: 0px -21px 0px -6px;
-  padding-right: 8px;
   overflow: auto;
 }
 .panelContent input, .panelFooter input {
