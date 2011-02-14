@@ -34,7 +34,7 @@ LT.installer = function() {
   LT.DBSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
     id : 'DBSubmit', size : 8 }, LT.installForm, 'Install');
   LT.DBSubmit.onclick = function() {
-  //LT.installForm.onsubmit = function() {
+    LT.ajaxRequest("POST", "php/logout.php", {});
     var installRoutine = LT.ajaxRequest("POST", "php/install.php",
     {
       location: LT.DBLocation.value,
