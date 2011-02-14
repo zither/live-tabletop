@@ -187,7 +187,7 @@ body {
   border-left: 1px solid #666;
   border-right: 1px solid #666;
   color: #333;
-  padding: 0px 8px 0px 4px;
+  padding: 8px 8px 0px 4px;
   margin: 0px -21px 0px -6px;
   overflow: auto;
 }
@@ -245,8 +245,9 @@ body {
 .deleteButton {
   float: right;
 }
-.textButton, .deleteButton {
+.textButton:hover, .deleteButton:hover {
   cursor: pointer;
+  text-decoration: underline;
 }
 .altList {
   background: #CCC
