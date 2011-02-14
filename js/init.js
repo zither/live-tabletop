@@ -3,13 +3,14 @@ LT.loadLT = function () {
   LT.element('div', {id: 'logo'}, LT.pageBar);
   LT.buttons = LT.element('div', {id: 'buttons'}, LT.pageBar);
   LT.tableTop = LT.element('div', {id: 'tableTop'}, document.body);
-  LT.loginCheck();
   LT.createTablesPanel();
   LT.createChatPanel();
   LT.createTurnsPanel();
   LT.createToolsPanel();
   LT.createFilesPanel();
+  LT.loginCheck();
   LT.loadTiles();
+  LT.refreshMessageList();
 }
 
 refreshTimestamps = function () {
@@ -24,7 +25,7 @@ onload = function () {
     LT.isInstalled = "1";
     LT.loadLT();
   } else {
-    LT.loadInstaller();
+    LT.installer();
   }
 };
 

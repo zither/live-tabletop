@@ -21,7 +21,7 @@ LT.createLogin = function () {
     id : 'password', size : 10, type : 'password' }, LT.loginForm, 'password', 1);
   var loginSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
     id : 'loginSubmit', size : 8 }, LT.loginForm, 'Login');
-  loginSubmit.onclick = LT.sendLogin;
+  loginSubmit.onclick = function () {LT.sendLogin(LT.loginUsername.value, LT.loginPassword.value)};
 };
 
 LT.createUserPanel = function () {
@@ -31,24 +31,10 @@ LT.createUserPanel = function () {
     .onclick = LT.logout;
 };
 
-LT.logout = function () {
-  LT.ajaxRequest("POST", "php/logout.php", {});
-  LT.userPanel.toggleVisibility();
-  LT.pageBar.removeChild(LT.userButton);
-  LT.pageBar.appendChild(LT.loginForm);
-  LT.element('div', {}, LT.chatOutput, "You have logged out.");
-  LT.chatOutput.removeChild(LT.chatBottom);
-  LT.chatOutput.appendChild(LT.chatBottom);
-  LT.chatBottom.scrollIntoView(true);
-}
-LT.sendLogin = function () {
+LT.sendLogin = function (loginName, loginPW) {
   LT.loginAjax = LT.ajaxRequest("POST", "php/login.php",
-  { username : LT.loginUsername.value, password : LT.loginPassword.value});
+  { username : loginName, password : loginPW});
   LT.login();
-  LT.element('div', {}, LT.chatOutput, "You have logged in.");
-  LT.chatOutput.removeChild(LT.chatBottom);
-  LT.chatOutput.appendChild(LT.chatBottom);
-  LT.chatBottom.scrollIntoView(true);
 }
 LT.login = function () {
   var userElement = LT.loginAjax.responseXML.getElementsByTagName('user')[0];
@@ -64,7 +50,21 @@ LT.login = function () {
 	LT.userPanel.buttonCaption.appendChild(newUsername);
     LT.pageBar.appendChild(LT.userButton);
     if (LT.tableListDiv){ LT.refreshTableList(); }
+	LT.element('div', {}, LT.chatOutput, "You are logged in.");
+    LT.chatOutput.removeChild(LT.chatBottom);
+    LT.chatOutput.appendChild(LT.chatBottom);
+    LT.chatBottom.scrollIntoView(true);
   } else {
     alert('Incorrect username or password.');
   }
+}
+LT.logout = function () {
+  LT.ajaxRequest("POST", "php/logout.php", {});
+  LT.userPanel.toggleVisibility();
+  LT.pageBar.removeChild(LT.userButton);
+  LT.pageBar.appendChild(LT.loginForm);
+  LT.element('div', {}, LT.chatOutput, "You have logged out.");
+  LT.chatOutput.removeChild(LT.chatBottom);
+  LT.chatOutput.appendChild(LT.chatBottom);
+  LT.chatBottom.scrollIntoView(true);
 }

@@ -1,17 +1,11 @@
-LT.installLT = function () {
-  var installRoutine = LT.ajaxRequest("POST", "php/install.php",
-    {
-      /*location: "localhost",
+  /*location: "localhost",
       username: "root",
       password: "password",
       database: "livetabletop01",
       admin_username: "admin",
       admin_password: "password"*/
-    }
-  );
-}
 
-LT.loadInstaller = function() {
+LT.installer = function() {
   LT.installBox = LT.element('div', { id : 'installBox', style : 'margin: 0px auto 0px auto;'
     }, document.body);
   LT.installForm = LT.element('form', { id : 'installForm' , style : "" 
@@ -53,8 +47,9 @@ LT.loadInstaller = function() {
     );
     var checkInstall = LT.ajaxRequest("POST", 'php/db_config.php', {});
 	if (checkInstall.status == 200) {
-	  document.body.removeChild(LT.installBox);
 	  LT.loadLT();
+	  LT.sendLogin( LT.DBAdminName.value, LT.DBAdminPW.value );
+	  document.body.removeChild(LT.installBox);
 	}else{
 	  alert('Database was not properly installed. Try again.');
 	}
