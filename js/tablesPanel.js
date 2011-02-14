@@ -60,7 +60,8 @@ LT.refreshTableList = function () {
 	  else{
         altSwitch = 1;
 	  }
-      tableLink = LT.element('div', { 'class' : altClass }, LT.tableListDiv, LT.tableList[i].name);
+	  tableEntry = LT.element('div', { 'class' : altClass, 'style' : 'clear: both;' }, LT.tableListDiv, ' ')
+      tableLink = LT.element('a', {'class' : 'textButton'}, tableEntry, LT.tableList[i].name);
 	  tableLink.name = LT.tableList[i].name;
 	  tableLink.id = LT.tableList[i].id;
 	  tableLink.onclick = function(){
@@ -70,7 +71,7 @@ LT.refreshTableList = function () {
 		  "Loading chat log for " + this.name + "...");
 		LT.lastMessage = 0;
 		LT.refreshMessageList();
-	    LT.element('a', {style : "height: 32px; color: 33C;"}, LT.chatOutput, 
+	    LT.element('a', {'style' : "height: 32px; color: 33C;"}, LT.chatOutput, 
 		  "Arriving at " + this.name);
         LT.element('br', {}, LT.chatOutput);
         LT.chatOutput.removeChild(LT.chatBottom);
@@ -78,6 +79,11 @@ LT.refreshTableList = function () {
         LT.chatBottom.scrollIntoView(true);
 		LT.loadTable();
         LT.loadTiles();
+      };
+	  tableDelete = LT.element('div', { 'class' : 'deleteButton' }, tableEntry, 'Delete');
+	  tableDelete.id = LT.tableList[i].id;
+	  tableDelete.onclick = function(){
+        var deleteTable = LT.ajaxRequest("POST", "php/delete_table.php",{ 'table_id' : this.id });
       };
     }
   }

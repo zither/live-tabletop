@@ -242,6 +242,12 @@ body {
 .login:hover {
   text-decoration: underline;
 }
+.deleteButton {
+  float: right;
+}
+.textButton, .deleteButton {
+  cursor: pointer;
+}
 .altList {
   background: #CCC
 }
