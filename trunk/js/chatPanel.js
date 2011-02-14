@@ -39,7 +39,6 @@ LT.createChatPanel = function () {
     id : 'chatSubmit', size : 8 }, LT.chatForm, 'Send');
   LT.chatSubmit.onclick = function() { LT.createMessage(); };
   LT.chatForm.onsubmit = function() { LT.createMessage(); return false; };
-  //LT.refreshMessageList();
 }
 
 LT.createMessage = function () {
