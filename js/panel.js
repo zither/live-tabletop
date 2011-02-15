@@ -85,7 +85,7 @@ LT.Panel.order = [];
 
 LT.Tabs = function (parentPanel, tabNames) {
   this.tabBar = LT.element('div', {'class' : 'tabBar'}, parentPanel.header);
-  parentPanel.content.style.background = "#D4D4D4";
+  parentPanel.content.style.background = "#e7e8e9";
   var tick = 1;
   var isActive = 'activeTab';
   for(var name in tabNames){
