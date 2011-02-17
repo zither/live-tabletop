@@ -201,7 +201,10 @@ document.onmousemove = function (e) {
     LT.dragY = Math.min(LT.dragY, LT.clickCornerY - 100);
     LT.selectedTL.outside.style.left = (LT.dragX - LT.clickX) + "px";
     LT.selectedTL.outside.style.top  = (LT.dragY - LT.clickY) + "px";
-    LT.selectedTL.content.style.width  = (LT.clickCornerX - LT.dragX) + "px";
+	var newWidth = Math.min(LT.clickCornerX - LT.dragX);
+    LT.selectedTL.content.style.width = newWidth + "px";
+    LT.selectedTL.footer.style.width = newWidth + "px";
+    LT.selectedTL.header.style.width = newWidth + 12 + "px";
     LT.selectedTL.content.style.height = (LT.clickCornerY - LT.dragY) + "px";
     LT.selectedTL.bar.style.width = (LT.clickCornerX - LT.dragX - 36) + "px";
   }
