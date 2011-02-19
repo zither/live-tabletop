@@ -80,12 +80,12 @@ LT.refreshTableList = function () {
 		LT.loadTable();
         LT.loadTiles();
       };
-	  tableDelete = LT.element('div', { 'class' : 'deleteButton' }, tableEntry, 'Delete');
+	  tableDelete = LT.element('a', { 'class' : 'deleteButton' }, tableEntry, 'Delete');
 	  tableDelete.id = LT.tableList[i].id;
 	  tableDelete.onclick = function(){
         var deleteTable = LT.ajaxRequest("POST", "php/delete_table.php",{ 'table_id' : this.id });
       };
-	  LT.element('div',{'style' : 'height: 1px; background: #999; width: auto; clear: both; margin: 1px 0px 4px 0px;'}, tableEntry);
+	  LT.element('div',{'class' : 'separator'}, tableEntry);
     }
   }
 };

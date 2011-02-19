@@ -27,9 +27,11 @@ LT.createLogin = function () {
 LT.createUserPanel = function () {
   LT.userButton = LT.element('div', { id : 'loginDiv' });
   LT.userPanel = new LT.Panel('User Options', "'s options", 185, 26, 150, 150, LT.userButton);
-  LT.element('div', {id: 'logoutDiv'}, LT.userPanel.content, 'Logout')
+  LT.element('a', {id: 'logoutDiv'}, LT.userPanel.content, 'Logout')
     .onclick = LT.logout;
-  createImagesButton = LT.element('div', {}, LT.userPanel.content, 'Process Uploaded Images');
+  LT.element('div', {'class': 'separator'}, LT.userPanel.content)
+    .onclick = LT.logout;
+  createImagesButton = LT.element('a', {}, LT.userPanel.content, 'Process Uploaded Images');
   createImagesButton.onclick = function(){
     LT.ajaxRequest("POST", "php/create_images.php", {});
   }
