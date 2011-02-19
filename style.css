@@ -191,6 +191,13 @@ body {
   margin: 0px -21px 0px -6px;
   overflow: auto;
 }
+.panelContent  a{
+  cursor: pointer;
+  text-decoration: none;
+}
+.panelContent a:hover{
+  text-decoration: underline;
+}
 .panelContent input, .panelFooter input {
   background: #FFF;
   color: #333;
@@ -245,11 +252,10 @@ body {
 .deleteButton {
   float: right;
 }
-.textButton:hover, .deleteButton:hover {
-  cursor: pointer;
-  text-decoration: underline;
-}
 .altList {
+}
+.separator{
+height: 1px; background: #999; width: auto; clear: both; margin: 1px 0px 4px 0px;
 }
 #loginDiv {
   float: right;
