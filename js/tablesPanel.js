@@ -85,6 +85,7 @@ LT.refreshTableList = function () {
 	  tableDelete.onclick = function(){
         var deleteTable = LT.ajaxRequest("POST", "php/delete_table.php",{ 'table_id' : this.id });
       };
+	  LT.element('div',{'style' : 'height: 1px; background: #999; width: auto; clear: both; margin: 1px 0px 4px 0px;'}, tableEntry);
     }
   }
 };
