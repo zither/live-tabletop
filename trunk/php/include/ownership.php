@@ -1,4 +1,4 @@
-<?
+<?php
 
 // this should do nothing if these scripts have already been included.
 include_once('db_config.php');
