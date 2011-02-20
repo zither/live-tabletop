@@ -29,11 +29,24 @@ LT.createUserPanel = function () {
   LT.userPanel = new LT.Panel('User Options', "'s options", 185, 26, 150, 150, LT.userButton);
   LT.element('a', {id: 'logoutDiv'}, LT.userPanel.content, 'Logout')
     .onclick = LT.logout;
-  LT.element('div', {'class': 'separator'}, LT.userPanel.content)
-    .onclick = LT.logout;
+  
+  LT.element('div', {'class': 'separator'}, LT.userPanel.content);
+  
   createImagesButton = LT.element('a', {}, LT.userPanel.content, 'Process Uploaded Images');
   createImagesButton.onclick = function(){
     LT.ajaxRequest("POST", "php/create_images.php", {});
+  }
+  
+  LT.element('div', {'class': 'separator'}, LT.userPanel.content);
+  
+  refreshPanels = LT.element('a', {}, LT.userPanel.content, 'Refresh Panels');
+  refreshPanels.onclick = function(){
+    LT.tablesPanel.refreshPanel();
+    LT.chatPanel.refreshPanel();
+    LT.turnsPanel.refreshPanel();
+    LT.toolsPanel.refreshPanel();
+    LT.filesPanel.refreshPanel();
+    LT.userPanel.refreshPanel();
   }
 };
 
