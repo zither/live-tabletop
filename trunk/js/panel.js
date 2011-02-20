@@ -32,8 +32,13 @@ LT.Panel = function (panelName, buttonName, x, y, width, height, buttonLoc) {
 
   var panel = this; // Remember the current 'this' during event handlers.
   LT.Panel.order.push(this);
-
-  // Create Floating Panel ---------------------------------------------------
+  
+  // Set Default Paramaters
+  this.defaultX = x;
+  this.defaultY = y;
+  this.defaultWidth = width;
+  this.defaultHeight = height;
+ // Create Floating Panel 
 
   this.outside = LT.element('div', {'class' : 'outerPanel', 
     'style' : 'left: ' + x + 'px; top: ' + y + 'px; visibility: hidden;'
@@ -97,6 +102,16 @@ LT.Tabs = function (parentPanel, tabNames) {
   }
 }
 
+LT.Panel.prototype.refreshPanel = function(){
+  this.outside.style.left = this.defaultX + 'px';
+  this.outside.style.top = this.defaultY + 'px';
+  this.footer.style.width = this.defaultWidth + 'px';
+  this.header.style.width = (this.defaultWidth + 12) + 'px';
+  this.bar.style.width = (this.defaultWidth -36) + 'px';
+  this.content.style.width = this.defaultWidth + 'px';
+  this.content.style.height = this.defaultHeight + 'px';
+}
+  
 LT.Panel.prototype.toggleVisibility = function() {
   if(this.outside.style.visibility == "hidden") {
     this.bringToFront();
