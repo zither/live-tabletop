@@ -1,4 +1,4 @@
-<?
+<?php
 
 function LT_image_type_path($type) {
   return getcwd()
