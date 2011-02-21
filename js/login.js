@@ -73,6 +73,8 @@ LT.login = function () {
     LT.chatOutput.removeChild(LT.chatBottom);
     LT.chatOutput.appendChild(LT.chatBottom);
     LT.chatBottom.scrollIntoView(true);
+	LT.refreshTables();
+	LT.loadSwatches();
   } else {
     alert('Incorrect username or password.');
   }
