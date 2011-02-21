@@ -1,13 +1,9 @@
-LT.tableColumns = 0;
-LT.tableRows = 0;
-LT.tileHeight = 0;
-LT.tileWidth = 0;
 // TABLE CLASS CONSTRUCTOR
 
 LT.Table = function (element) {
   for (var i = 0; i < LT.Table.properties.length; i++) {
     var property = LT.Table.properties[i];
-    if (property == "name" || property = "grid_color") {
+    if (property == "name" || property == "grid_color") {
       this[property] = decodeURIComponent(element.getAttribute(property)); // strings
     }
     else {
@@ -16,7 +12,7 @@ LT.Table = function (element) {
   }
 };
 
-// PIECE PROPERTIES
+//  TABLE PROPERTIES
 
 LT.Table.properties = ["id", "user_id", "image_id", "name",
   "tile_rows", "tile_columns", "tile_width", "tile_height",
