@@ -10,6 +10,18 @@ LT.readTables = function(){
   }
 }
 
+LT.readImages = function(){
+  var readImages = LT.ajaxRequest("POST", "php/read_images.php",{ 'type' : 'tile'});
+  if (readImages.responseXML){
+    var imageElements = readImages.responseXML.getElementsByTagName('image');
+    LT.images = [];
+    for( var i = 0 ; i < imageElements.length; i++ ){
+      var image = new LT.Image(imageElements[i]);
+      LT.images.push(image);
+    }
+  }
+}
+
 LT.readTiles = function(){
   var readTiles = LT.ajaxRequest("POST", "php/read_tiles.php",{ 'table_id' : LT.currentTable.id });
   if (readTiles.responseXML){
@@ -31,11 +43,20 @@ LT.readTiles = function(){
       rowArray[i] = LT.element('div', {'style' : 'float : left; clear : both;'}, LT.tableTop);
       for( var n = 0; n < LT.currentTable.tile_columns; n++){
 	    var tileNumber = (i * LT.currentTable.tile_columns) + n;
-        var tile = new LT.Tile(LT.currentTable.id, n, i, 
-		  tilesArray[tileNumber + 2]);
+        var tile = new LT.Tile(LT.currentTable.id, n, i, tilesArray[tileNumber + 2]);
         LT.tiles.push(tile);
+		var tileImage = '';
+		for( var u = 0; u < LT.images.length; u++){
+		  if (LT.images[u].id == LT.tiles[u].image_id){
+		    tileImage = LT.images[u].file;
+		  }
+		  //alert(LT.images[u].file);
+		  //alert(LT.images[u].file);
+		  //alert(LT.images[u].id + ', ' + LT.tiles[u].image_id);
+		}
         LT.element('div', {'style': 'float: left; width: ' + LT.currentTable.tile_width + 
-          'px; height: ' + LT.currentTable.tile_height + 'px; border: 1px solid black;'},
+          'px; height: ' + LT.currentTable.tile_height + 'px; border: 1px solid black;' +
+		  ' background: url(images/upload/tile/' + tileImage + ');'},
           rowArray[i], LT.tiles[tileNumber].image_id );
       }
     }
@@ -44,6 +65,7 @@ LT.readTiles = function(){
 
 LT.refreshTables = function () {
   LT.readTables();
+  LT.readImages();
     while(LT.tablesDiv.firstChild){
       LT.tablesDiv.removeChild(LT.tablesDiv.firstChild);
     }
