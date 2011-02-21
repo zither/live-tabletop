@@ -28,8 +28,8 @@ LT.readTiles = function(){
     while(LT.tableTop.firstChild){
       LT.tableTop.removeChild(LT.tableTop.firstChild);
     }
-    LT.tableTop.setAttribute('style', 'width: ' + (LT.currentTable.tile_width + 2) * 
-      LT.currentTable.tile_columns + 'px; height: ' + (LT.currentTable.tile_height + 2) *
+    LT.tableTop.setAttribute('style', 'width: ' + LT.currentTable.tile_width * 
+      LT.currentTable.tile_columns + 'px; height: ' + LT.currentTable.tile_height *
       LT.currentTable.tile_rows + 'px;');
     LT.tiles = [];
     var tileElements = readTiles.responseXML.getElementsByTagName('tiles');
@@ -50,14 +50,17 @@ LT.readTiles = function(){
 		  if (LT.tiles[u] && LT.images[u].id == LT.tiles[u].image_id){
 		    tileImage = LT.images[u].file;
 		  }
-		  //alert(LT.images[u].file);
-		  //alert(LT.images[u].file);
-		  //alert(LT.images[u].id + ', ' + LT.tiles[u].image_id);
 		}
-        LT.element('div', {'style': 'float: left; width: ' + LT.currentTable.tile_width + 
-          'px; height: ' + LT.currentTable.tile_height + 'px; border: 1px solid black;' +
+        tileDiv = LT.element('div', {'style': 'float: left; width: ' + LT.currentTable.tile_width + 
+          'px; height: ' + LT.currentTable.tile_height + 'px; ' +
 		  ' background: url(images/upload/tile/' + tileImage + ');'},
-          rowArray[i], LT.tiles[tileNumber].image_id );
+          rowArray[i]);
+		tileDiv.id = tileNumber;
+		tileDiv.onclick = function (){
+		  this.style.backgroundImage = 'url(\'images/upload/tile/' + LT.selectedImage + '\')';
+		  LT.tiles[this.id].update({image_id : LT.selectedImageID});
+		  //alert(LT.tiles[this.id].x + ', ' + LT.tiles[this.id].y + ', table: ' +LT.tiles[this.id].table_id);
+		}
       }
     }
   }

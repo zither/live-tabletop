@@ -89,16 +89,35 @@ LT.Panel.order = [];
 //PANEL TABS CONSTRUCTOR
 
 LT.Tabs = function (parentPanel, tabNames) {
-  this.tabBar = LT.element('div', {'class' : 'tabBar'}, parentPanel.header);
+  tabs = this;
+  tabs.number = tabNames.length;
+  tabs.tabBar = LT.element('div', {'class' : 'tabBar'}, parentPanel.header);
   parentPanel.content.style.background = "#e7e8e9";
   var tick = 1;
   var isActive = 'activeTab';
-  for(var name in tabNames){
-    tab = LT.element('div', {'class' : isActive}, this.tabBar);
-	LT.element('div', {'class' : 'tabStart'}, tab);
-	LT.element('div', {'class' : 'tabContent'}, tab, tabNames[name]);
-	LT.element('div', {'class' : 'tabEnd'}, tab);
-	if(tick){ tick = 0; isActive = "inactiveTab"; }
+  tabs.tab = [];
+  for(var i = 0; i < tabNames.length; i++){
+    tabs.tab[i] = LT.element('div', {'class' : isActive}, tabs.tabBar);
+	LT.element('div', {'class' : 'tabStart'}, tabs.tab[i]);
+	LT.element('div', {'class' : 'tabContent'}, tabs.tab[i], tabNames[i]);
+	LT.element('div', {'class' : 'tabEnd'}, tabs.tab[i]);
+	if(tick){
+      tick = 0; isActive = "inactiveTab"; 
+	  tabs.tab[i].content = LT.element('div', {}, parentPanel.content);
+	}else{
+	  tabs.tab[i].content = LT.element('div', {});
+	}
+	tabs.parentContent = parentPanel.content;
+	tabs.tab[i].onclick = function () {
+      for(var n = 0; n < tabs.number; n++){
+	    tabs.tab[n].className = 'inactiveTab';
+        while(tabs.parentContent.firstChild){
+          tabs.parentContent.removeChild(tabs.parentContent.firstChild);
+	    }
+      }
+	  this.className = 'activeTab';
+	  tabs.parentContent.appendChild(this.content);
+	}
   }
 }
 
