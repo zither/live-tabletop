@@ -152,6 +152,10 @@ body {
   height: 23px;
   float: left;
 }
+.activeTab:hover, .inactiveTab:hover{
+text-decoration: underline;
+cursor: pointer;
+}
 .activeTab, .inactiveTab{
   margin: 0px 0px 0px 2px;
 }
@@ -175,6 +179,9 @@ body {
 }
 .inactiveTab .tabEnd {
   background:  url(images/inactiveTabEnd.jpg) repeat-x top left;
+}
+.tabContent:hover {
+  text-decoration: underline;
 }
 .tabContent {
   padding: 5px 3px 0px 3px;

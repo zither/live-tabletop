@@ -1,5 +1,6 @@
 var LT = {};
-
+LT.selectedImage = '';
+LT.selectedImageID = 1;
 LT.lastMessage = 0;
 
 function emptyMe (clearMe, defaultText){
