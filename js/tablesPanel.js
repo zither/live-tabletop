@@ -82,11 +82,11 @@ LT.refreshTables = function () {
 	  LT.tableID = this.id;
 	  LT.currentTable = LT.tables[this.table];
       LT.element('br', {}, LT.chatOutput);
-      LT.element('div', {}, LT.chatOutput, 
+      LT.element('div', {'class' : 'chat_alert'}, LT.chatOutput, 
       "Loading chat log for " + this.name + "...");
       LT.lastMessage = 0;
       LT.refreshMessageList();
-      LT.element('a', {'style' : "height: 32px; color: 33C;"}, LT.chatOutput, 
+      LT.element('a', {'class' : 'chat_alert'}, LT.chatOutput, 
         "Arriving at " + this.name);
       LT.element('br', {}, LT.chatOutput);
       LT.chatOutput.removeChild(LT.chatBottom);

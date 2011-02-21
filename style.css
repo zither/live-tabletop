@@ -264,6 +264,9 @@ cursor: pointer;
 .separator{
 height: 1px; background: #999; width: auto; clear: both; margin: 1px 0px 4px 0px;
 }
+.chat_alert{
+  color: #039;
+}
 #loginDiv {
   float: right;
 }
