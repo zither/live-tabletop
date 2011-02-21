@@ -47,7 +47,7 @@ LT.readTiles = function(){
         LT.tiles.push(tile);
 		var tileImage = '';
 		for( var u = 0; u < LT.images.length; u++){
-		  if (LT.tiles[u] && LT.images[u].id == LT.tiles[u].image_id){
+		  if (LT.images[u].id == LT.tiles[tileNumber].image_id){
 		    tileImage = LT.images[u].file;
 		  }
 		}
