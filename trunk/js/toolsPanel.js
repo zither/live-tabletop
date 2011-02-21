@@ -1,8 +1,10 @@
 LT.loadSwatches = function (){
+  while(LT.tilesTab.firstChild){
+    LT.tilesTab.removeChild(LT.tilesTab.firstChild);
+  }
   for( var i = 0 ; i < LT.images.length; i++ ){
       newImage = LT.element('img', { style : 'border: 1px solid black; margin: 1px 1px 1px 1px', 
-	    src : 'images/upload/tile/' + LT.images[i].file},
-	    LT.tilesTab);
+	    src : 'images/upload/tile/' + LT.images[i].file}, LT.tilesTab);
 	  newImage.id = LT.images[i].id;
 	  newImage.file = LT.images[i].file;
 	  newImage.onclick = function() {
@@ -21,7 +23,8 @@ LT.createToolsPanel = function () {
   LT.element('div', {}, LT.piecesTab, "HEY");
   LT.element('div', {}, LT.fogTab, "YOU");
   // POPULATE THE TILES TAB
-  LT.loadSwatches();
+  
+  //LT.loadSwatches();
   //var my_uploader = new LT.Uploader("create_image.php", LT.toolsPanel.content);
   //my_uploader.setArgument("type", "tile");
 };
