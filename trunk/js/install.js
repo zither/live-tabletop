@@ -1,11 +1,4 @@
-  /*location: "localhost",
-      username: "root",
-      password: "password",
-      database: "livetabletop01",
-      admin_username: "admin",
-      admin_password: "password"*/
-
-LT.installer = function() {
+ LT.installer = function() {
   LT.installBox = LT.element('div', { id : 'installBox', style : 'margin: 0px auto 0px auto;'
     }, document.body);
   LT.installForm = LT.element('form', { id : 'installForm' , style : "" 
@@ -54,6 +47,4 @@ LT.installer = function() {
 	  alert('Database was not properly installed. Try again.');
 	}
   };
-  //LT.installLT();
-  //LT.loadLT();
 }

@@ -26,7 +26,7 @@ LT.createLogin = function () {
 
 LT.createUserPanel = function () {
   LT.userButton = LT.element('div', { id : 'loginDiv' });
-  LT.userPanel = new LT.Panel('User Options', "'s options", 185, 26, 150, 150, LT.userButton);
+  LT.userPanel = new LT.Panel('User Options', "'s options", 185, 26, 210, 100, LT.userButton);
   LT.element('a', {id: 'logoutDiv'}, LT.userPanel.content, 'Logout')
     .onclick = LT.logout;
   
@@ -48,7 +48,27 @@ LT.createUserPanel = function () {
     LT.filesPanel.refreshPanel();
     LT.userPanel.refreshPanel();
   }
-};
+  
+  LT.userForm = LT.element('form', { }, LT.userPanel.footer);
+  LT.inputUserName = LT.element('input', { size : 8, type: 'text',
+    style : 'border: 0px solid #CCC;' }, LT.userForm, 'User Name', 1);
+  
+  LT.inputPassword = LT.element('input', { size : 8, 
+    style : 'border: 1px solid #CCC;' }, LT.userForm, 'Password', 1);
+  
+  userSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
+        id : 'chatSubmit', size : 8, value : 'Create' }, LT.userForm);
+  userSubmit.onclick = function() { LT.createUser(); };
+  userRefresh = LT.element('input',{ type : 'button' }, LT.userPanel.footer, 'Refresh');
+  userRefresh.onclick = function() { LT.refreshTables(); };
+}
+
+LT.createUser = function () {
+  var createUserAjax = LT.ajaxRequest("POST", "php/create_user.php",
+    { username : LT.inputUserName.value, permissions : 'user', 
+	 password : LT.inputPassword.value});
+	 alert
+}
 
 LT.sendLogin = function (loginName, loginPW) {
   LT.loginAjax = LT.ajaxRequest("POST", "php/login.php",
@@ -57,19 +77,25 @@ LT.sendLogin = function (loginName, loginPW) {
 }
 LT.login = function () {
   var userElement = LT.loginAjax.responseXML.getElementsByTagName('user')[0];
-  if (userElement) {
-    LT.username = userElement.getAttribute('name');
-    LT.userID = userElement.getAttribute('id');
-    LT.userColor = userElement.getAttribute('color');
-    LT.userPermissions = userElement.getAttribute('permissions');
+  LT.currentUser = new LT.User(userElement);
+  var readUsers = LT.ajaxRequest("POST", "php/read_images.php",{ 'type' : 'tile'});
+  if (readUsers.responseXML){
+    var userElements = readUsers.responseXML.getElementsByTagName('user');
+    LT.users = [];
+    for( var i = 0 ; i < userElements.length; i++ ){
+      var user = new LT.User(userElements[i]);
+      LT.users.push(user);
+    }
+  }
+  if (LT.currentUser.id) {
     LT.pageBar.removeChild(LT.loginForm);
     LT.element('div', {id: 'loggedIn'}, LT.userButton);
-    var newUsername = document.createTextNode(LT.username + "'s options");
+    var newUsername = document.createTextNode(LT.currentUser.name + "'s options");
 	LT.userPanel.buttonCaption.removeChild(LT.userPanel.buttonCaption.firstChild);
 	LT.userPanel.buttonCaption.appendChild(newUsername);
     LT.pageBar.appendChild(LT.userButton);
     if (LT.tableListDiv){ LT.refreshTableList(); }
-	LT.element('div', {}, LT.chatOutput, "You are logged in.");
+	LT.element('div', {'class' : 'chat_alert'}, LT.chatOutput, "You are logged in.");
     LT.chatOutput.removeChild(LT.chatBottom);
     LT.chatOutput.appendChild(LT.chatBottom);
     LT.chatBottom.scrollIntoView(true);
@@ -84,7 +110,7 @@ LT.logout = function () {
   LT.userPanel.toggleVisibility();
   LT.pageBar.removeChild(LT.userButton);
   LT.pageBar.appendChild(LT.loginForm);
-  LT.element('div', {}, LT.chatOutput, "You have logged out.");
+  LT.element('div', {'class' : 'chat_alert'}, LT.chatOutput, "You have logged out.");
   LT.chatOutput.removeChild(LT.chatBottom);
   LT.chatOutput.appendChild(LT.chatBottom);
   LT.chatBottom.scrollIntoView(true);
