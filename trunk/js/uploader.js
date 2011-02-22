@@ -109,7 +109,9 @@ LT.Uploader.prototype.setArguments = function (args) {
 };
 
 LT.Uploader.prototype.setArgument = function (arg_name, arg_value) {
-  this.form.removeChild(this.perm_args[arg_name]);
+  if (this.perm_args[arg_name]) {
+    this.form.removeChild(this.perm_args[arg_name]);
+  }
   this.perm_args[arg_name] = LT.element("input", {
       type: "hidden",
       name: arg_name,
