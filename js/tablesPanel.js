@@ -14,10 +14,11 @@ LT.readImages = function(){
   var readImages = LT.ajaxRequest("POST", "php/read_images.php",{ 'type' : 'tile'});
   if (readImages.responseXML){
     var imageElements = readImages.responseXML.getElementsByTagName('image');
-    LT.images = [];
+    LT.images = {};
     for( var i = 0 ; i < imageElements.length; i++ ){
       var image = new LT.Image(imageElements[i]);
-      LT.images.push(image);
+	  LT.images[image.id] = image;
+    //  LT.images.push(image);
     }
   }
 }
@@ -46,11 +47,14 @@ LT.readTiles = function(){
         var tile = new LT.Tile(LT.currentTable.id, n, i, tilesArray[tileNumber + 2]);
         LT.tiles.push(tile);
 		var tileImage = '';
+		/*
 		for( var u = 0; u < LT.images.length; u++){
 		  if (LT.images[u].id == LT.tiles[tileNumber].image_id){
 		    tileImage = LT.images[u].file;
 		  }
 		}
+		*/
+		tileImage = LT.images[LT.tiles[tileNumber].image_id].file;
         tileDiv = LT.element('div', {'style': 'float: left; width: ' + LT.currentTable.tile_width + 
           'px; height: ' + LT.currentTable.tile_height + 'px; ' +
 		  ' background: url(images/upload/tile/' + tileImage + ');'},
