@@ -1,17 +1,46 @@
+sortObject = function (map, sortBy){
+  sortedArray = [];
+  for(id in map){
+	sortedArray.push(map[id]);
+  }
+  sortedArray.sort( function (a,b){ 
+    if( a[sortBy] > b[sortBy] ){
+	  return 1;
+    }else if( a[sortBy] == b[sortBy] ){
+	  return 0;
+	}else{
+      return -1;
+	}
+  } );
+  return sortedArray;
+}
+
 LT.loadSwatches = function (){
   while(LT.tilesTab.firstChild){
     LT.tilesTab.removeChild(LT.tilesTab.firstChild);
-  }
+  }/*
   for( var i = 0 ; i < LT.images.length; i++ ){
-      newImage = LT.element('img', { style : 'border: 1px solid black; margin: 1px 1px 1px 1px', 
-	    src : 'images/upload/tile/' + LT.images[i].file}, LT.tilesTab);
-	  newImage.id = LT.images[i].id;
-	  newImage.file = LT.images[i].file;
-	  newImage.onclick = function() {
-	    LT.selectedImageID = this.id;
-        LT.selectedImage = this.file;
-	  }
-    }
+    newImage = LT.element('img', { style : 'border: 1px solid black; margin: 1px 1px 1px 1px', 
+	  src : 'images/upload/tile/' + LT.images[i].file}, LT.tilesTab);
+	newImage.id = LT.images[i].id;
+	newImage.file = LT.images[i].file;
+	newImage.onclick = function() {
+	  LT.selectedImageID = this.id;
+      LT.selectedImage = this.file;
+	}
+  }*/
+  var imagesArray = sortObject(LT.images, 'file');
+  for( var i = 0 ; i < imagesArray.length; i++ ){
+    newImage = LT.element('img', { title : imagesArray[i].file, 
+	  style : 'border: 1px solid black; margin: 1px 1px 1px 1px', 
+	  src : 'images/upload/tile/' + imagesArray[i].file}, LT.tilesTab);
+	newImage.id = imagesArray[i].id;
+	newImage.file = imagesArray[i].file;
+	newImage.onclick = function() {
+	  LT.selectedImageID = this.id;
+      LT.selectedImage = this.file;
+	}
+  }
 }
 
 LT.createToolsPanel = function () {
