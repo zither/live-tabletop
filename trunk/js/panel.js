@@ -268,7 +268,7 @@ LT.savePanels = function(){
   for(i = 0; i < LT.panelsArray.length; i++){
 	var x = parseInt(LT.panelsArray[i].outside.style.left);
 	var y = parseInt(LT.panelsArray[i].outside.style.top);
-	var w = parseInt(LT.panelsArray[i].bar.style.width);
+	var w = parseInt(LT.panelsArray[i].bar.style.width) -8;
 	var h = parseInt(LT.panelsArray[i].content.style.height);
 	var v = 0;
 	if ( LT.panelsArray[i].outside.style.visibility == "visible" ){ v = 1;
@@ -286,7 +286,10 @@ LT.loadPanels = function (){
 	if( panelShape[0] ){
       LT.panelsArray[i].outside.style.left = panelShape[0] + 'px';
       LT.panelsArray[i].outside.style.top = panelShape[1] + 'px';
-      LT.panelsArray[i].bar.style.width = panelShape[2] + 'px';
+      LT.panelsArray[i].content.style.width = parseInt(panelShape[2]) + 44 + 'px';
+      LT.panelsArray[i].bar.style.width = parseInt(panelShape[2]) + 8 + 'px';
+      LT.panelsArray[i].header.style.width = parseInt(panelShape[2]) + 56 + 'px';
+      LT.panelsArray[i].footer.style.width = parseInt(panelShape[2]) + 44 + 'px';
       LT.panelsArray[i].content.style.height = panelShape[3] + 'px';
       if(Boolean(panelShape[4] == 1)){
         if(LT.panelsArray[i].outside.style.visibility = "hidden"){
