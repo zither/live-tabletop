@@ -25,6 +25,7 @@ LT.clickY = 0; // relative vertical position of mouse when the button was presse
 LT.clickCornerX = 0;
 LT.clickCornerY = 0;
 LT.clickDragGap = 0;
+LT.panelsArray = [];
 
 // PANEL CLASS CONSTRUCTOR
 
@@ -82,6 +83,7 @@ LT.Panel = function (panelName, buttonName, x, y, width, height, buttonLoc) {
   LT.element('div', {'class' : 'buttonStart'}, this.button);
   this.buttonCaption = LT.element('div', {'class' : 'buttonCaption'}, this.button, buttonName);
   LT.element('div', {'class' : 'buttonEnd'}, this.button);
+  LT.panelsArray.push(this);
 }
 
 LT.Panel.order = [];
@@ -245,3 +247,56 @@ document.onmousemove = function (e) {
   e.preventDefault();
   return false;
 };
+
+function getCookie(c_name)
+{
+var i,x,y,ARRcookies=document.cookie.split(";");
+for (i=0;i<ARRcookies.length;i++)
+{
+  x=ARRcookies[i].substr(0,ARRcookies[i].indexOf("="));
+  y=ARRcookies[i].substr(ARRcookies[i].indexOf("=")+1);
+  x=x.replace(/^\s+|\s+$/g,"");
+  if (x==c_name)
+    {
+    return unescape(y);
+    }
+  }
+}
+
+LT.savePanels = function(){
+  var cookieString = '';
+  for(i = 0; i < LT.panelsArray.length; i++){
+	var x = parseInt(LT.panelsArray[i].outside.style.left);
+	var y = parseInt(LT.panelsArray[i].outside.style.top);
+	var w = parseInt(LT.panelsArray[i].bar.style.width);
+	var h = parseInt(LT.panelsArray[i].content.style.height);
+	var v = 0;
+	if ( LT.panelsArray[i].outside.style.visibility == "visible" ){ v = 1;
+	}else{ v = 0; }
+	cookieString = cookieString + x + ' ' + y + ' ' + w + ' ' + h + ' ' + v + '_';
+  }
+  document.cookie = 'panels=' + cookieString + ';';
+}
+
+LT.loadPanels = function (){
+  var cookieArray = getCookie('panels');
+  var panelsCookie = cookieArray.split('_');
+  for(i = 0; i < LT.panelsArray.length; i++){
+    var panelShape = panelsCookie[i].split(' ');
+	if( panelShape[0] ){
+      LT.panelsArray[i].outside.style.left = panelShape[0] + 'px';
+      LT.panelsArray[i].outside.style.top = panelShape[1] + 'px';
+      LT.panelsArray[i].bar.style.width = panelShape[2] + 'px';
+      LT.panelsArray[i].content.style.height = panelShape[3] + 'px';
+      if(Boolean(panelShape[4] == 1)){
+        if(LT.panelsArray[i].outside.style.visibility = "hidden"){
+		  LT.panelsArray[i].toggleVisibility();
+		}
+      }else{
+	    if(LT.panelsArray[i].outside.style.visibility = "visible"){
+		  LT.panelsArray[i].toggleVisibility();
+		}
+	  }
+	}
+  }
+}

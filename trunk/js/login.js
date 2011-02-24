@@ -39,8 +39,8 @@ LT.createUserPanel = function () {
   
   LT.element('div', {'class': 'separator'}, LT.userPanel.content);
   
-  refreshPanels = LT.element('a', {}, LT.userPanel.content, 'Refresh Panels');
-  refreshPanels.onclick = function(){
+  defaultPanels = LT.element('a', {}, LT.userPanel.content, 'Default Panels');
+  defaultPanels.onclick = function(){
     LT.tablesPanel.refreshPanel();
     LT.chatPanel.refreshPanel();
     LT.turnsPanel.refreshPanel();
@@ -48,6 +48,16 @@ LT.createUserPanel = function () {
     LT.filesPanel.refreshPanel();
     LT.userPanel.refreshPanel();
   }
+  LT.element('div', {'class': 'separator'}, LT.userPanel.content);
+  savePanelsButton = LT.element('a',{ }, LT.userPanel.content, 'Save Panels');
+  savePanelsButton.onclick = function() {
+    LT.savePanels();
+  };
+  LT.element('div', {'class': 'separator'}, LT.userPanel.content);
+  loadPanelsButton = LT.element('a',{ }, LT.userPanel.content, 'Load Panels');
+  loadPanelsButton.onclick = function() {
+    LT.loadPanels();
+  };
   
   LT.userForm = LT.element('form', { }, LT.userPanel.footer);
   LT.inputUserName = LT.element('input', { size : 8, type: 'text',
@@ -67,7 +77,6 @@ LT.createUser = function () {
   var createUserAjax = LT.ajaxRequest("POST", "php/create_user.php",
     { username : LT.inputUserName.value, permissions : 'user', 
 	 password : LT.inputPassword.value});
-	 alert
 }
 
 LT.sendLogin = function (loginName, loginPW) {
@@ -101,6 +110,7 @@ LT.login = function () {
     LT.chatBottom.scrollIntoView(true);
 	LT.refreshTables();
 	LT.loadSwatches();
+	LT.loadPanels();
   } else {
     alert('Incorrect username or password.');
   }

@@ -110,7 +110,7 @@ LT.refreshTables = function () {
 }
 
 LT.createTablesPanel = function () {
-  LT.tablesPanel = new LT.Panel( 'Tables', 'Tables', 6, 26, 300, 300);
+  LT.tablesPanel = new LT.Panel( 'Tables', 'Tables', 6, 26, 300, 125);
   LT.tablesDiv = LT.element('div',{}, LT.tablesPanel.content);
   LT.refreshTables();
   LT.tablesForm = LT.element('form', { }, LT.tablesPanel.footer);
