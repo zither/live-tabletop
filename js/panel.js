@@ -91,7 +91,7 @@ LT.Panel.order = [];
 //PANEL TABS CONSTRUCTOR
 
 LT.Tabs = function (parentPanel, tabNames) {
-  tabs = this;
+  var tabs = this;
   tabs.number = tabNames.length;
   tabs.tabBar = LT.element('div', {'class' : 'tabBar'}, parentPanel.header);
   parentPanel.content.style.background = "#e7e8e9";
@@ -109,16 +109,15 @@ LT.Tabs = function (parentPanel, tabNames) {
 	}else{
 	  tabs.tab[i].content = LT.element('div', {});
 	}
-	tabs.parentContent = parentPanel.content;
 	tabs.tab[i].onclick = function () {
       for(var n = 0; n < tabs.number; n++){
 	    tabs.tab[n].className = 'inactiveTab';
-        while(tabs.parentContent.firstChild){
-          tabs.parentContent.removeChild(tabs.parentContent.firstChild);
+        while(parentPanel.content.firstChild){
+          parentPanel.content.removeChild(parentPanel.content.firstChild);
 	    }
       }
 	  this.className = 'activeTab';
-	  tabs.parentContent.appendChild(this.content);
+	  parentPanel.content.appendChild(this.content);
 	}
   }
 }
@@ -158,6 +157,48 @@ LT.Panel.prototype.bringToFront = function() {
   LT.Panel.order = newOrder;
 };
 
+// Save panel Positions
+LT.savePanels = function(){
+  var cookieString = '';
+  for(i = 0; i < LT.panelsArray.length; i++){
+	var x = parseInt(LT.panelsArray[i].outside.style.left);
+	var y = parseInt(LT.panelsArray[i].outside.style.top);
+	var w = parseInt(LT.panelsArray[i].bar.style.width);
+	var h = parseInt(LT.panelsArray[i].content.style.height);
+	var v = 0;
+	if ( LT.panelsArray[i].outside.style.visibility == "visible" ){ v = 1;
+	}else{ v = 0; }
+	cookieString = cookieString + x + ' ' + y + ' ' + w + ' ' + h + ' ' + v + '_';
+  }
+  document.cookie = 'panels=' + cookieString + ';';
+}
+
+// Load Panel positions
+LT.loadPanels = function (){
+  var cookieArray = getCookie('panels');
+  var panelsCookie = cookieArray.split('_');
+  for(i = 0; i < LT.panelsArray.length; i++){
+    var panelShape = panelsCookie[i].split(' ');
+	if( panelShape[0] ){
+      LT.panelsArray[i].outside.style.left = panelShape[0] + 'px';
+      LT.panelsArray[i].outside.style.top = panelShape[1] + 'px';
+      LT.panelsArray[i].content.style.width = parseInt(panelShape[2]) + 36 + 'px';
+      LT.panelsArray[i].bar.style.width = parseInt(panelShape[2]) + 'px';
+      LT.panelsArray[i].header.style.width = parseInt(panelShape[2]) + 48 + 'px';
+      LT.panelsArray[i].footer.style.width = parseInt(panelShape[2]) + 36 + 'px';
+      LT.panelsArray[i].content.style.height = panelShape[3] + 'px';
+      if(Boolean(panelShape[4] == 1)){
+        if(LT.panelsArray[i].outside.style.visibility = "hidden"){
+		  LT.panelsArray[i].toggleVisibility();
+		}
+      }else{
+	    if(LT.panelsArray[i].outside.style.visibility = "visible"){
+		  LT.panelsArray[i].toggleVisibility();
+		}
+	  }
+	}
+  }
+}
 // DRAGGING: Use document event handlers to move and resize windows.
 
 // Prevent text selection while dragging in IE and Chrome.
@@ -169,6 +210,7 @@ document.onmouseup = function () {
   LT.selectedBR = null;
   LT.selectedTL = null;
   LT.clickDragGap = 0;
+  LT.savePanels();
 }
 
 // Move or resize a panel when the mouse is dragged.
@@ -260,46 +302,5 @@ for (i=0;i<ARRcookies.length;i++)
     {
     return unescape(y);
     }
-  }
-}
-
-LT.savePanels = function(){
-  var cookieString = '';
-  for(i = 0; i < LT.panelsArray.length; i++){
-	var x = parseInt(LT.panelsArray[i].outside.style.left);
-	var y = parseInt(LT.panelsArray[i].outside.style.top);
-	var w = parseInt(LT.panelsArray[i].bar.style.width) -8;
-	var h = parseInt(LT.panelsArray[i].content.style.height);
-	var v = 0;
-	if ( LT.panelsArray[i].outside.style.visibility == "visible" ){ v = 1;
-	}else{ v = 0; }
-	cookieString = cookieString + x + ' ' + y + ' ' + w + ' ' + h + ' ' + v + '_';
-  }
-  document.cookie = 'panels=' + cookieString + ';';
-}
-
-LT.loadPanels = function (){
-  var cookieArray = getCookie('panels');
-  var panelsCookie = cookieArray.split('_');
-  for(i = 0; i < LT.panelsArray.length; i++){
-    var panelShape = panelsCookie[i].split(' ');
-	if( panelShape[0] ){
-      LT.panelsArray[i].outside.style.left = panelShape[0] + 'px';
-      LT.panelsArray[i].outside.style.top = panelShape[1] + 'px';
-      LT.panelsArray[i].content.style.width = parseInt(panelShape[2]) + 44 + 'px';
-      LT.panelsArray[i].bar.style.width = parseInt(panelShape[2]) + 8 + 'px';
-      LT.panelsArray[i].header.style.width = parseInt(panelShape[2]) + 56 + 'px';
-      LT.panelsArray[i].footer.style.width = parseInt(panelShape[2]) + 44 + 'px';
-      LT.panelsArray[i].content.style.height = panelShape[3] + 'px';
-      if(Boolean(panelShape[4] == 1)){
-        if(LT.panelsArray[i].outside.style.visibility = "hidden"){
-		  LT.panelsArray[i].toggleVisibility();
-		}
-      }else{
-	    if(LT.panelsArray[i].outside.style.visibility = "visible"){
-		  LT.panelsArray[i].toggleVisibility();
-		}
-	  }
-	}
   }
 }
