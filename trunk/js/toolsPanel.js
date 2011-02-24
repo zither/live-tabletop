@@ -37,7 +37,7 @@ LT.loadPieces = function (){
 
 LT.createToolsPanel = function () {
   LT.toolsPanel = new LT.Panel( 'Tools', 'Tools', 6, 95, 210, 110);
-  LT.toolsPanel.tabs = new LT.Tabs(LT.toolsPanel, ['Tiles', 'Pieces', 'Fog'])
+  LT.toolsPanel.tabs = new LT.Tabs(LT.toolsPanel, ['Tiles', 'Pieces', 'Fog']);
   LT.piecesTab = LT.toolsPanel.tabs.tab[1].content;
   LT.fogTab = LT.toolsPanel.tabs.tab[2].content;
   LT.tilesTab = LT.toolsPanel.tabs.tab[0].content;

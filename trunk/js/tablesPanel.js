@@ -111,19 +111,32 @@ LT.refreshTables = function () {
 
 LT.createTablesPanel = function () {
   LT.tablesPanel = new LT.Panel( 'Tables', 'Tables', 6, 26, 300, 125);
-  LT.tablesDiv = LT.element('div',{}, LT.tablesPanel.content);
+  LT.tablesPanel.tabs = new LT.Tabs(LT.tablesPanel, ['Tables', 'Create']);
+  LT.createTableTab = LT.tablesPanel.tabs.tab[1].content;
+  LT.tablesTab = LT.tablesPanel.tabs.tab[0].content;
+  LT.tablesDiv = LT.element('div',{}, LT.tablesTab);
   LT.refreshTables();
-  LT.tablesForm = LT.element('form', { }, LT.tablesPanel.footer);
+  LT.tablesForm = LT.element('form', { }, LT.createTableTab);
+  var nameDiv = LT.element('div', { style : 'color: #000; width: 200px; float: left'
+    }, LT.tablesForm, 'Table Name: ');
   LT.inputTableName = LT.element('input', { size : 12, type: 'text',
-    style : 'border: 0px solid #CCC;' }, LT.tablesForm, 'Table Name', 1);
+    style : 'border: 1px solid #CCC;' }, nameDiv, 'Table Name', 1);
+  var columnsDiv = LT.element('div', { style : 'color: #000; width: 100px; float: left'
+    }, LT.tablesForm, 'Columns: ');
   LT.inputTableCols = LT.element('input', { size : 1, 
-    style : 'border: 1px solid #CCC;' }, LT.tablesForm, 'Cols', 1);
+    style : 'border: 1px solid #CCC;' }, columnsDiv, 'Cols', 1);
+  var rowsDiv = LT.element('div', { style : 'color: #000; width: 100px; float: left'
+    }, LT.tablesForm, 'Rows: ');
   LT.inputTableRows = LT.element('input', { size : 1, 
-    style : 'border: 1px solid #CCC;' }, LT.tablesForm, 'Rows', 1);
+    style : 'border: 1px solid #CCC;' }, rowsDiv, 'Rows', 1);
+  var heightDiv = LT.element('div', { style : 'color: #000; width: 100px; float: left'
+    }, LT.tablesForm, 'Height: ');
   LT.inputTileHeight = LT.element('input', { size : 1, 
-    style : 'border: 1px solid #CCC;' }, LT.tablesForm, 'Height', 1);
+    style : 'border: 1px solid #CCC;' }, heightDiv, 'Height', 1);
+  var widthDiv = LT.element('div', { style : 'color: #000; width: 100px; float: left'
+    }, LT.tablesForm, 'Width: ');
   LT.inputTileWidth = LT.element('input', { size : 1, 
-    style : 'border: 1px solid #CCC;' }, LT.tablesForm, 'Width', 1);
+    style : 'border: 1px solid #CCC;' }, widthDiv, 'Width', 1);
   LT.tableSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
         id : 'chatSubmit', size : 8, value : 'Create' }, LT.tablesForm);
   LT.tableSubmit.onclick = function() { LT.createTable(); };
