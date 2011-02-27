@@ -1,3 +1,10 @@
+LT.createPiece {
+  var readTables = LT.ajaxRequest("POST", "php/create_tables.php",{ });
+  if (readTables.responseXML){
+    
+  }
+}
+
 LT.readTables = function(){
   var readTables = LT.ajaxRequest("POST", "php/read_tables.php",{ });
   if (readTables.responseXML){
