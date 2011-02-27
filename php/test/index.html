@@ -356,13 +356,7 @@ TEST.tests = [
   {group: "CREATE IMAGE",
     action: TEST.uploader.form.action,
     uploader: TEST.uploader,
-    args: {
-      type: "background",
-      tile_width: "auto",
-      tile_height: "auto",
-      center_x: "auto",
-      center_y: "auto",
-      tile_mode: "rectangle"},
+    args: {type: "background"},
     result: TEST.uploaded},
 
   {group: "READ IMAGES",

@@ -84,4 +84,16 @@ function LT_query($query, $die = TRUE) {
   return $rows;
 }
 
+// Return a request variable, escaped so it can be used safely in an SQL query,
+// or a default value if the request variable has not been provided.
+function LT_request($variable, $default) {
+  global $LT_SQL;
+  if (array_key_exists($variable, $_REQUEST)) {
+    return $LT_SQL->real_escape_string($_REQUEST[$variable]);
+  }
+  else {
+    return $LT_SQL->real_escape_string($default);
+  }
+}
+
 ?>

@@ -18,24 +18,17 @@ include('include/images.php');
 // Interpret the Request
 
 $user = $LT_SQL->real_escape_string($_SESSION['user_id']);
-$type = $LT_SQL->real_escape_string($_REQUEST['type']);
-if (!LT_image_type($type)) done("Unsupported category: " . $type);
-$tile_width = $LT_SQL->real_escape_string($_REQUEST['tile_width']);
-$tile_height = $LT_SQL->real_escape_string($_REQUEST['tile_height']);
-$center_x = $LT_SQL->real_escape_string($_REQUEST['center_x']);
-$center_y = $LT_SQL->real_escape_string($_REQUEST['center_y']);
-$tile_mode = $LT_SQL->real_escape_string($_REQUEST['tile_mode']);
-$file = $LT_SQL->real_escape_string(basename( $_FILES['file']['name']));
+$file = $LT_SQL->real_escape_string(basename($_FILES['file']['name']));
 $size = getimagesize($_FILES['file']['tmp_name']);
 $width = $size[0];
 $height = $size[1];
-
-// Set Default Tile Dimensions and Center
-
-if (!is_numeric($tile_width)) $tile_width = $width;
-if (!is_numeric($tile_height)) $tile_height = $height;
-if (!is_numeric($center_x)) $center_x = $width / 2;
-if (!is_numeric($center_y)) $center_y = $height / 2;
+$center_x = LT_request('center_x', $width / 2);
+$center_y = LT_request('center_y', $height / 2);
+$tile_width = LT_request('tile_width', $width);
+$tile_height = LT_request('tile_height', $height);
+$tile_mode = LT_request('tile_mode', 'rectangle');
+$type = LT_request('type', 'no type request variable provided');
+if (!LT_image_type($type)) done("Unsupported category: " . $type);
 
 // Store the Uploaded Image
 
