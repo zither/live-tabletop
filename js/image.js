@@ -2,29 +2,37 @@ LT.Image = function (element) {
   var self = this;
   // Use array notation instead of dot notation for properties
   // because one of the properties (public) is a reserved keyword.
-  self['id'] = parseInt(element.getAttribute("id"));
-  self['file'] = decodeURIComponent(element.getAttribute("file"));
-  self['type'] = decodeURIComponent(element.getAttribute("type"));
-  self['user_id'] = parseInt(element.getAttribute("user_id"));
-  self['public'] = element.getAttribute("public") != "0";
-  // get the height and width of the image
-  self.sample = LT.element("img", {src: self.getURL()});
-  self.sample.onload = function () {
-    self.width = self.sample.width;
-    self.height = self.sample.height;
-  };
+  for (var i = 0; i < LT.Image.properties.length; i++) {
+    var property = LT.Image.properties[i];
+    if (property == "file" || property == "type" || property == "tile_mode") {
+      this[property] = decodeURIComponent(element.getAttribute(property)); // strings
+    }
+    else {
+      this[property] = parseInt(element.getAttribute(property)); // integers
+    }
+  }
 };
 
 LT.Image.prototype.getURL = function () {
   return 'images/upload/' + this.type + '/' + this.file;
 };
 
-LT.Image.prototype.update = function (newUserID, newPublic) {
-  var args = {
-    'image_id': this['id'],
-    'user_id': typeof(newUserID) == "number" ? newUserID : this['user_id'],
-    'public': typeof(newPublic) == "boolean" ? newPublic : this['public']
-  };
+LT.Image.properties = ['id', 'file', 'type', 'user_id', 'public', 'width',
+  'height', 'tile_width', 'tile_height', 'center_x', 'center_y', 'tile_mode'];
+
+LT.Image.prototype.update = function (mods) {
+  var args = {};
+  for (var i = 0; i < LT.Image.properties.length; i++) {
+    var property = LT.Image.properties[i];
+    if (typeof(mods[property]) == "undefined") {
+      args[property] = this[property];
+    }
+    else {
+      args[property] = mods[property];
+    }
+  }
+  args.image_id = args.id;
+  delete(args.id);
   LT.ajaxRequest("POST", "php/update_image.php", args, function () {return;});
 };
 

@@ -116,7 +116,8 @@ CREATE TABLE tables (
   grid_color TEXT,
   piece_stamp DATETIME,
   tile_stamp DATETIME,
-  message_stamp DATETIME
+  message_stamp DATETIME,
+  tile_mode TEXT NOT NULL
 );
 
 
@@ -162,7 +163,14 @@ CREATE TABLE images (
   file TEXT NOT NULL,
   type TEXT NOT NULL,
   public TINYINT NOT NULL DEFAULT 0,
-  time_stamp TIMESTAMP
+  time_stamp TIMESTAMP,
+  width INT NOT NULL,
+  height INT NOT NULL,
+  tile_width INT NOT NULL,
+  tile_height INT NOT NULL,
+  center_x INT NOT NULL,
+  center_y INT NOT NULL,
+  tile_mode TEXT NOT NULL
 );
 
 
@@ -307,53 +315,62 @@ END;
 /* Tables Procedures */
 
 CREATE PROCEDURE create_table (IN the_name VARCHAR(200), IN the_image INT,
-  IN the_user INT, IN the_rows SMALLINT, IN the_columns SMALLINT, 
-  IN the_width INT, IN the_height INT)
+  IN the_user INT, IN the_rows SMALLINT, IN the_columns SMALLINT,
+  IN the_width INT, IN the_height INT, IN the_tile_mode TEXT)
 BEGIN
   INSERT INTO tables (name, image_id, user_id, tile_rows, tile_columns,
-      tile_width, tile_height, grid_width, grid_height,
-      tile_stamp, message_stamp, piece_stamp)
-    VALUES (the_name, the_image, the_user, the_rows, the_columns,
-      the_width, the_height, the_width, the_height, NOW(), NOW(), NOW());
+    tile_width, tile_height, grid_width, grid_height,
+    tile_stamp, message_stamp, piece_stamp, tile_mode)
+  VALUES (the_name, the_image, the_user, the_rows, the_columns,
+    the_width, the_height, the_width, the_height, 
+    NOW(), NOW(), NOW(), the_tile_mode);
 END; 
 
 CREATE PROCEDURE read_table (IN the_table INT)
 BEGIN
-  SELECT id, user_id, image_id, name, tile_rows, tile_columns,
-    tile_width, tile_height, grid_width, grid_height, grid_thickness, grid_color, 
+  SELECT id, user_id, image_id, name, 
+    tile_rows, tile_columns, tile_width, tile_height, 
+    grid_width, grid_height, grid_thickness, grid_color, 
     UNIX_TIMESTAMP(piece_stamp) AS piece_stamp,
     UNIX_TIMESTAMP(tile_stamp) AS tile_stamp,
-    UNIX_TIMESTAMP(message_stamp) AS message_stamp
+    UNIX_TIMESTAMP(message_stamp) AS message_stamp,
+    tile_mode
  FROM tables WHERE id = the_table;
 END; 
 
 CREATE PROCEDURE read_table_by_name (IN the_name VARCHAR(200))
 BEGIN
-  SELECT id, user_id, image_id, name, tile_rows, tile_columns,
-    tile_width, tile_height, grid_width, grid_height, grid_thickness, grid_color, 
+  SELECT id, user_id, image_id, name, 
+    tile_rows, tile_columns, tile_width, tile_height, 
+    grid_width, grid_height, grid_thickness, grid_color, 
     UNIX_TIMESTAMP(piece_stamp) AS piece_stamp,
     UNIX_TIMESTAMP(tile_stamp) AS tile_stamp,
-    UNIX_TIMESTAMP(message_stamp) AS message_stamp
+    UNIX_TIMESTAMP(message_stamp) AS message_stamp,
+    tile_mode
   FROM tables WHERE name = the_name;
 END; 
 
 CREATE PROCEDURE read_tables ()
 BEGIN
-  SELECT id, user_id, image_id, name, tile_rows, tile_columns,
-    tile_width, tile_height, grid_width, grid_height, grid_thickness, grid_color, 
+  SELECT id, user_id, image_id, name,
+    tile_rows, tile_columns, tile_width, tile_height,
+    grid_width, grid_height, grid_thickness, grid_color, 
     UNIX_TIMESTAMP(piece_stamp) AS piece_stamp,
     UNIX_TIMESTAMP(tile_stamp) AS tile_stamp,
-    UNIX_TIMESTAMP(message_stamp) AS message_stamp
+    UNIX_TIMESTAMP(message_stamp) AS message_stamp,
+    tile_mode
   FROM tables ORDER BY name;
 END; 
 
 CREATE PROCEDURE read_tables_by_user_id (IN the_user INT)
 BEGIN
-  SELECT id, user_id, image_id, name, tile_rows, tile_columns,
-    tile_width, tile_height, grid_width, grid_height, grid_thickness, grid_color, 
+  SELECT id, user_id, image_id, name,
+    tile_rows, tile_columns, tile_width, tile_height,
+    grid_width, grid_height, grid_thickness, grid_color, 
     UNIX_TIMESTAMP(piece_stamp) AS piece_stamp,
     UNIX_TIMESTAMP(tile_stamp) AS tile_stamp,
-    UNIX_TIMESTAMP(message_stamp) AS message_stamp
+    UNIX_TIMESTAMP(message_stamp) AS message_stamp,
+    tile_mode
   FROM tables WHERE user_id = the_user ORDER BY name;
 END; 
 
@@ -362,17 +379,22 @@ BEGIN
   SELECT UNIX_TIMESTAMP(piece_stamp) AS piece_stamp,
          UNIX_TIMESTAMP(tile_stamp) AS tile_stamp,
          UNIX_TIMESTAMP(message_stamp) AS message_stamp
-    FROM tables WHERE table_id = the_table;
+  FROM tables WHERE table_id = the_table;
 END; 
 
 CREATE PROCEDURE update_table (IN the_table INT, IN the_name VARCHAR(200),
-  IN the_user INT, IN the_image INT, IN the_grid_width INT,
-  IN the_grid_height INT, IN the_grid_thickness INT, the_grid_color TEXT)
+  IN the_user INT, IN the_image INT,
+  IN the_tile_width INT, IN the_tile_height INT,
+  IN the_grid_width INT, IN the_grid_height INT, 
+  IN the_grid_thickness INT, the_grid_color TEXT,
+  IN the_tile_mode TEXT)
 BEGIN
   UPDATE tables SET name = the_name, user_id = the_user, image_id = the_image,
-      grid_width = the_grid_width, grid_height = the_grid_height,
-      grid_thickness = the_grid_thickness, grid_color = the_grid_color
-    WHERE id = the_table;
+    tile_width = the_tile_width, tile_height = the_tile_height,
+    grid_width = the_grid_width, grid_height = the_grid_height,
+    grid_thickness = the_grid_thickness, grid_color = the_grid_color,
+    tile_mode = the_tile_mode
+  WHERE id = the_table;
 END; 
 
 CREATE PROCEDURE delete_table (IN the_table INT)
@@ -465,33 +487,46 @@ END;
 /* Images Procedures */
 
 CREATE PROCEDURE create_image (IN the_user INT, IN the_file TEXT,
-  IN the_type TEXT, in the_public TINYINT)
+  IN the_type TEXT, IN the_public TINYINT,
+  IN the_width INT, IN the_height INT, 
+  IN the_tile_width INT, IN the_tile_height INT,
+  IN the_center_x INT, IN the_center_y INT, IN the_tile_mode TEXT)
 BEGIN
-  INSERT INTO images (user_id, file, type, public)
-    VALUES (the_user, the_file, the_type, the_public);
+  INSERT INTO images (user_id, file, type, public, width, height,
+    tile_width, tile_height, center_x, center_y, tile_mode)
+  VALUES (the_user, the_file, the_type, the_public, the_width, the_height,
+    the_tile_width, the_tile_height, the_center_x, the_center_y, the_tile_mode);
 END; 
 
-CREATE PROCEDURE read_image (IN the_image TEXT)
+CREATE PROCEDURE read_image (IN the_image INT)
 BEGIN
-  SELECT id, user_id, file, type, public, UNIX_TIMESTAMP(time_stamp) AS time
-    FROM images WHERE id = the_image;
+  SELECT id, user_id, file, type, public, UNIX_TIMESTAMP(time_stamp) AS time,
+    width, height, tile_width, tile_height, center_x, center_y, tile_mode
+  FROM images WHERE id = the_image;
 END; 
 
 CREATE PROCEDURE read_images (IN the_type TEXT)
 BEGIN
-  SELECT id, user_id, file, type, public, UNIX_TIMESTAMP(time_stamp) AS time
-    FROM images WHERE type = the_type;
+  SELECT id, user_id, file, type, public, UNIX_TIMESTAMP(time_stamp) AS time,
+     width, height, tile_width, tile_height, center_x, center_y, tile_mode
+  FROM images WHERE type = the_type;
 END; 
 
 CREATE PROCEDURE read_images_useable (IN the_user INT, IN the_type TEXT)
 BEGIN
-  SELECT id, user_id, file, type, public, UNIX_TIMESTAMP(time_stamp) AS time
-    FROM images WHERE type = the_type AND (user_id = the_user OR public = 1);
+  SELECT id, user_id, file, type, public, UNIX_TIMESTAMP(time_stamp) AS time,
+    width, height, tile_width, tile_height, center_x, center_y, tile_mode
+  FROM images WHERE type = the_type AND (user_id = the_user OR public = 1);
 END; 
 
-CREATE PROCEDURE update_image (IN the_image INT, IN the_user INT, IN the_public INT)
+CREATE PROCEDURE update_image (IN the_image INT, IN the_user INT,
+  IN the_public INT, IN the_tile_width INT, IN the_tile_height INT,
+  IN the_center_x INT, IN the_center_y INT, IN the_tile_mode TEXT)
 BEGIN
-  UPDATE images SET user_id = the_user, public = the_public WHERE id = the_image;
+  UPDATE images SET user_id = the_user, public = the_public,
+    tile_width = the_tile_width, tile_height = the_tile_height,
+    center_x = the_center_x, center_y = the_center_y, tile_mode = the_tile_mode
+  WHERE id = the_image;
 END; 
 
 CREATE PROCEDURE delete_image (IN the_image INT)

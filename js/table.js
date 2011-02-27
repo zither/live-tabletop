@@ -3,7 +3,7 @@
 LT.Table = function (element) {
   for (var i = 0; i < LT.Table.properties.length; i++) {
     var property = LT.Table.properties[i];
-    if (property == "name" || property == "grid_color") {
+    if (property == "name" || property == "grid_color" || property == "tile_mode") {
       this[property] = decodeURIComponent(element.getAttribute(property)); // strings
     }
     else {
@@ -17,7 +17,7 @@ LT.Table = function (element) {
 LT.Table.properties = ["id", "user_id", "image_id", "name",
   "tile_rows", "tile_columns", "tile_width", "tile_height",
   "grid_width", "grid_height", "grid_thickness", "grid_color",
-  "piece_stamp", "tile_stamp", "message_stamp"];
+  "piece_stamp", "tile_stamp", "message_stamp", "tile_mode"];
 
 // CLIENT-SERVER COMMUNICATION
 
