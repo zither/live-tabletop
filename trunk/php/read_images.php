@@ -26,9 +26,16 @@ for ($i = 0; $i < count($rows); $i++) {
     . " user_id=\"{$rows[$i]['user_id']}\""
     . " public=\"{$rows[$i]['public']}\""
     . " time=\"{$rows[$i]['time']}\""
+    . " width=\"{$rows[$i]['width']}\""
+    . " height=\"{$rows[$i]['height']}\""
+    . " tile_width=\"{$rows[$i]['tile_width']}\""
+    . " tile_height=\"{$rows[$i]['tile_height']}\""
+    . " center_x=\"{$rows[$i]['center_x']}\""
+    . " center_y=\"{$rows[$i]['center_y']}\""
     // URL-encode strings to be decoded by javascript's decodeURIComponent.
     . " file=\"" . rawurlencode($rows[$i]['file']) . "\""
     . " type=\"" . rawurlencode($rows[$i]['type']) . "\""
+    . " tile_mode=\"" . rawurlencode($rows[$i]['tile_mode']) . "\""
     . "/>\n";
 }
 echo "</images>\n";
