@@ -13,8 +13,7 @@ include('include/images.php');
 
 $user = $LT_SQL->real_escape_string($_SESSION['user_id']);
 
-// Load the Metadata for Uploaded Images
-
+// load the xml metadata for images in the filesystem
 $document = new DOMDocument();
 $document->load(getcwd()
   . DIRECTORY_SEPARATOR . '..'
@@ -22,22 +21,17 @@ $document->load(getcwd()
   . DIRECTORY_SEPARATOR . 'upload'
   . DIRECTORY_SEPARATOR . 'images.xml');
 
-// Map File Name and Type to Metadata
-
-$settings_map = array();
+// index <image> elements by their type and file attributes
+$settings = array();
 foreach($document->getElementsByTagName('image') as $image) {
-  $file = $image->getAttribute('file');
   $type = $image->getAttribute('type');
-  $settings_map[$type . DIRECTORY_SEPARATOR . $file] = array(
-    'tile_width' => $image->getAttribute('tile_width'),
-    'tile_height' => $image->getAttribute('tile_height'),
-    'center_x' => $image->getAttribute('center_x'),
-    'center_y' => $image->getAttribute('center_y'),
-    'tile_mode' => $image->getAttribute('tile_mode');
+  $file = $image->getAttribute('file');
+  $settings[$type . DIRECTORY_SEPARATOR . $file] = $image;
 }
 
 // Query the Database
 
+$attributes = array('tile_width', 'tile_height', 'center_x', 'center_y', 'tile_mode');
 for ($i = 0; $i < count($LT_IMAGE_TYPES); $i++) {
   $type = $LT_IMAGE_TYPES[$i];
 
@@ -55,21 +49,33 @@ for ($i = 0; $i < count($LT_IMAGE_TYPES); $i++) {
   $path = LT_image_type_path($type);
   $files = scandir($path);
   for ($j = 0; $j < count($files); $j++) {
+
+    // make sure the file is not in the database and not a directory
     if (in_array($files[$j], $ignore)) continue;
-    if (is_dir($path . DIRECTORY_SEPARATOR . $files[$j])) continue;
-    $size = getimagesize($path . DIRECTORY_SEPARATOR . $files[$j]);
+    $filename = $path . DIRECTORY_SEPARATOR . $files[$j];
+    if (is_dir($filename)) continue;
+
+    // set the default settings for the image file
+    $size = getimagesize($filename);
     $width = $size[0];
     $height = $size[1];
-    $settings = $settings_map[$type . DIRECTORY_SEPARATOR . $files[$j]];
-    $tile_width = $settings['tile_width'];
-    $tile_height = $settings['tile_height'];
-    $center_x = $settings['center_x'];
-    $center_y = $settings['center_y'];
-    if (!is_numeric($tile_width)) $tile_width = $width;
-    if (!is_numeric($tile_height)) $tile_height = $height;
-    if (!is_numeric($center_x)) $center_x = $width / 2;
-    if (!is_numeric($center_y)) $center_y = $height / 2;
-    if (!$tile_mode) $tile_mode = 'rectangle';
+    $tile_width = $width;
+    $tile_height = $height;
+    $center_x = $width / 2;
+    $center_y = $height / 2;
+    $tile_mode = 'rectangle';
+
+    // replace default settings with attributes from the metadata
+    $key = $type . DIRECTORY_SEPARATOR . $files[$j];
+    if (array_key_exists($key, $settings)) {
+      $image = $settings[$type . DIRECTORY_SEPARATOR . $files[$j]];
+      foreach ($attributes as $attribute) {
+        $value = $image->getAttribute($attribute);
+        if ($value) ${$attribute} = $value;
+      }
+    }
+
+    // send the query that adds the image to the database
     $rows = LT_call_silent('create_image', $user, $files[$j], $type, 1,
       $width, $height, $tile_width, $tile_height, $center_x, $center_y, $tile_mode);
     if (!is_array($rows)) die("Query failed: " . $LT_SQL->error);
