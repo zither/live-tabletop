@@ -51,7 +51,6 @@ LT.Grid.prototype = {
     context.translate(this._thickness / 2, this._thickness / 2);
 
     // draw grid
-
     context.strokeStyle = this._color;
     context.lineWidth = this._thickness;
     context.beginPath();
@@ -71,42 +70,56 @@ LT.Grid.prototype = {
       }
     }
     context.stroke();
-
-    // draw walls and doors
-
+    // draw walls
     for (var row = 0; row < this.getRows(); row++) {
       for (var column = 0; column < this.getColumns(); column++) {
         for (var direction in this.walls[row][column]) {
-          if (!this.walls[row][column][direction]) continue;
-          var i = this.SHAPES[this._mode].directions[direction];
-          var j = (i + 1) % points.length;
-          var x = shift.x * (row % 2);
-          var y = shift.y * (column % 2);
-          var x1 = (points[i][0] + x + column) * this._width;
-          var y1 = (points[i][1] + y + row) * this._height;
-          var x2 = (points[j][0] + x + column) * this._width;
-          var y2 = (points[j][1] + y + row) * this._height;
-          context.lineCap = "round";
-          context.strokeStyle = this._color;
-          context.lineWidth = this._thickness * 3;
-          context.beginPath();
-          context.moveTo(x1, y1);
-          context.lineTo(x2, y2);
-          context.stroke();
+          if (this.walls[row][column][direction] == "wall") {
+            var i = this.SHAPES[this._mode].directions[direction];
+            var j = (i + 1) % points.length;
+            var x = shift.x * (row % 2);
+            var y = shift.y * (column % 2);
+            var x1 = (points[i][0] + x + column) * this._width;
+            var y1 = (points[i][1] + y + row) * this._height;
+            var x2 = (points[j][0] + x + column) * this._width;
+            var y2 = (points[j][1] + y + row) * this._height;
+            context.lineCap = "round";
+            context.strokeStyle = this._color;
+            context.lineWidth = this._thickness * 3;
+            context.beginPath();
+            context.moveTo(x1, y1);
+            context.lineTo(x2, y2);
+            context.stroke();
+          }
+        }
+      }
+    }
+    // draw doors
+    for (var row = 0; row < this.getRows(); row++) {
+      for (var column = 0; column < this.getColumns(); column++) {
+        for (var direction in this.walls[row][column]) {
           if (this.walls[row][column][direction] == "door") {
+            var i = this.SHAPES[this._mode].directions[direction];
+            var j = (i + 1) % points.length;
+            var x = shift.x * (row % 2);
+            var y = shift.y * (column % 2);
+            var x1 = (points[i][0] + x + column) * this._width;
+            var y1 = (points[i][1] + y + row) * this._height;
+            var x2 = (points[j][0] + x + column) * this._width;
+            var y2 = (points[j][1] + y + row) * this._height;
+            context.lineCap = "butt";
+            context.strokeStyle = this._color;
+            context.lineWidth = this._thickness * 5;
+            context.beginPath();
+            context.moveTo(x1, y1);
+            context.lineTo(x2, y2);
+            context.stroke();
             var r = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
             var t = this._thickness / r;
             var x3 = (x1 + t * x2) / (1 + t);
             var y3 = (y1 + t * y2) / (1 + t);
             var x4 = (t * x1 + x2) / (1 + t);
             var y4 = (t * y1 + y2) / (1 + t);
-            context.lineCap = "butt";
-            context.strokeStyle = this._color;
-            context.lineWidth = this._thickness * 5;
-            context.beginPath();
-            context.moveTo(x3, y3);
-            context.lineTo(x4, y4);
-            context.stroke();
             context.strokeStyle = "white";
             context.lineWidth = this._thickness * 3;
             context.beginPath();
@@ -117,7 +130,6 @@ LT.Grid.prototype = {
         }
       }
     }
-
   },
 
   resize: function (columns, rows) {
