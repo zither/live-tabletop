@@ -1,9 +1,18 @@
-LT.refreshMessageList = function () {
-  var readMessages = LT.ajaxRequest("POST", "php/read_messages.php",{
+LT.readChat = function(){
+  var readChat = LT.ajaxRequest("POST", "php/read_messages.php",{ 
     table_id : LT.tableID, last_message : LT.lastMessage });
-  if (readMessages.responseXML){
-    var messageElements = readMessages.responseXML.getElementsByTagName('message');
-    LT.messageList = [];
+  if (readChat.responseXML){
+    var chatElements = readChat.responseXML.getElementsByTagName('message');
+    LT.messages = [];
+    for( var i = 0 ; i < chatElements.length; i++ ){
+      var message = new LT.Message(chatElements[i]);
+      LT.messages.push(message);
+    }
+  }
+}
+
+LT.refreshMessageList = function () {
+  /*
     for( var i = 0 ; i < messageElements.length; i++ ){
       var messagesArray = {
         user_id : messageElements[i].getAttribute('user_id'),
@@ -20,11 +29,16 @@ LT.refreshMessageList = function () {
       LT.element('br', {}, LT.chatOutput);
 	  countMessages = i;
 	  LT.lastMessage = LT.messageList[countMessages].id;
-    }
-	LT.chatOutput.removeChild(LT.chatBottom);
-	LT.chatOutput.appendChild(LT.chatBottom);
-	LT.chatBottom.scrollIntoView(true);
+    }*/
+  LT.readChat();
+  var messagesArray = LT.sortObject(LT.messages, 'time');
+  for( var i = 0; i < LT.messages.length; i++){
+    LT.chatOutput.appendChild(LT.messages[i].element);
   }
+  
+  LT.chatOutput.removeChild(LT.chatBottom);
+  LT.chatOutput.appendChild(LT.chatBottom);
+  LT.chatBottom.scrollIntoView(true);
 };
 
 LT.createChatPanel = function () {
