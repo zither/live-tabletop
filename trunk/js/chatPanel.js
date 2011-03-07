@@ -7,33 +7,24 @@ LT.readChat = function(){
     for( var i = 0 ; i < chatElements.length; i++ ){
       var message = new LT.Message(chatElements[i]);
       LT.messages.push(message);
+	  for( var n=0; n < LT.users.length; n++){
+        if( LT.users[n].id == LT.messages[i].user_id){
+          LT.messages[i].userName = LT.users[n].name
+	    }
+	  }
+      LT.lastMessage = LT.messages[i].id;
     }
   }
 }
 
 LT.refreshMessageList = function () {
-  /*
-    for( var i = 0 ; i < messageElements.length; i++ ){
-      var messagesArray = {
-        user_id : messageElements[i].getAttribute('user_id'),
-        time : messageElements[i].getAttribute('time'),
-        id : messageElements[i].getAttribute('id'),
-        text : decodeURIComponent(messageElements[i].textContent)
-      };
-      LT.messageList.push(messagesArray);
-    }
-	var countMessages = 0;
-    for( var i = 0 ; i < LT.messageList.length; i++ ){
-	  LT.element('a', {}, LT.chatOutput, LT.messageList[i].user_id +
-	    ": " + LT.messageList[i].time + ": " + LT.messageList[i].text);
-      LT.element('br', {}, LT.chatOutput);
-	  countMessages = i;
-	  LT.lastMessage = LT.messageList[countMessages].id;
-    }*/
   LT.readChat();
-  var messagesArray = LT.sortObject(LT.messages, 'time');
-  for( var i = 0; i < LT.messages.length; i++){
-    LT.chatOutput.appendChild(LT.messages[i].element);
+  //var messagesArray = LT.sortObject(LT.messages, 'time');
+  for( var i=0; i < LT.messages.length; i++){
+      LT.element('span', {}, LT.chatOutput, LT.messages[i].userName +
+        ": " + LT.messages[i].time + ": ");
+      LT.chatOutput.appendChild(LT.messages[i].element);
+	  LT.element('br', {}, LT.chatOutput);
   }
   
   LT.chatOutput.removeChild(LT.chatBottom);

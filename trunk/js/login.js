@@ -81,13 +81,13 @@ LT.createUser = function () {
 
 LT.sendLogin = function (loginName, loginPW) {
   LT.loginAjax = LT.ajaxRequest("POST", "php/login.php",
-  { username : loginName, password : loginPW});
+    { username : loginName, password : loginPW});
   LT.login();
 }
 LT.login = function () {
   var userElement = LT.loginAjax.responseXML.getElementsByTagName('user')[0];
   LT.currentUser = new LT.User(userElement);
-  var readUsers = LT.ajaxRequest("POST", "php/read_images.php",{ 'type' : 'tile'});
+  var readUsers = LT.ajaxRequest("POST", "php/read_users.php",{});
   if (readUsers.responseXML){
     var userElements = readUsers.responseXML.getElementsByTagName('user');
     LT.users = [];

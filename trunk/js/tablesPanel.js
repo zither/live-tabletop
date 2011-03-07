@@ -26,7 +26,6 @@ LT.readImages = function(){
     for( var i = 0 ; i < imageElements.length; i++ ){
       var image = new LT.Image(imageElements[i]);
 	  LT.images[image.id] = image;
-    //  LT.images.push(image);
     }
   }
 }
@@ -126,8 +125,8 @@ LT.createTablesPanel = function () {
   LT.refreshTables();
   LT.tablesForm = LT.element('form', { }, LT.createTableTab);
   var nameDiv = LT.element('div', { style : 'color: #000; width: 200px; float: left'
-    }, LT.tablesForm, 'Table Name: ');
-  LT.inputTableName = LT.element('input', { size : 12, type: 'text',
+    }, LT.tablesForm, 'Name: ');
+  LT.inputTableName = LT.element('input', { size : 10, type: 'text',
     style : 'border: 1px solid #CCC;' }, nameDiv, 'Table Name', 1);
   var columnsDiv = LT.element('div', { style : 'color: #000; width: 100px; float: left'
     }, LT.tablesForm, 'Columns: ');

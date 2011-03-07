@@ -18,20 +18,15 @@ LT.loadSwatches = function (){
 }
 
 LT.loadPieces = function (){
-  while(LT.tilesTab.firstChild){
-    LT.tilesTab.removeChild(LT.tilesTab.firstChild);
-  }
-  var imagesArray = LT.sortObject(LT.images, 'file');
-  for( var i = 0 ; i < imagesArray.length; i++ ){
-    newImage = LT.element('img', { title : imagesArray[i].file, 
-	  style : 'border: 1px solid black; margin: 1px 1px 1px 1px', 
-	  src : 'images/upload/tile/' + imagesArray[i].file}, LT.tilesTab);
-	newImage.id = imagesArray[i].id;
-	newImage.file = imagesArray[i].file;
-	newImage.onclick = function() {
-	  LT.selectedImageID = this.id;
-      LT.selectedImage = this.file;
-	}
+  var readPieces = LT.ajaxRequest("POST", "php/read_pieces.php",{ 'type' : 'tile'});
+  if (readPieces.responseXML){
+    var imageElements = readPieces.responseXML.getElementsByTagName('image');
+    LT.images = {};
+    for( var i = 0 ; i < imageElements.length; i++ ){
+      var image = new LT.Image(imageElements[i]);
+	  LT.images[image.id] = image;
+    //  LT.images.push(image);
+    }
   }
 }
 
