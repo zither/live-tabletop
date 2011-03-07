@@ -1,15 +1,7 @@
-/*
-LT.createPiece {
-  var readTables = LT.ajaxRequest("POST", "php/create_tables.php",{ });
-  if (readTables.responseXML){
-    
-  }
-}
-*/
 LT.readTables = function(){
-  var readTables = LT.ajaxRequest("POST", "php/read_tables.php",{ });
-  if (readTables.responseXML){
-    var tableElements = readTables.responseXML.getElementsByTagName('table');
+  var readTablesAjax = LT.ajaxRequest("POST", "php/read_tables.php",{ });
+  if (readTablesAjax.responseXML){
+    var tableElements = readTablesAjax.responseXML.getElementsByTagName('table');
     LT.tables = [];
     for( var i = 0 ; i < tableElements.length; i++ ){
       var table = new LT.Table(tableElements[i]);
@@ -77,6 +69,27 @@ LT.readTiles = function(){
   }
 }
 
+LT.loadTable = function (tableID) {
+  for( i=0; i<LT.tables.length; i++ ){
+    if(LT.tables[i].id == tableID){
+	  LT.currentTable = LT.tables[i];
+	}
+  }
+  LT.element('br', {}, LT.chatOutput);
+  LT.element('div', {'class' : 'chat_alert'}, LT.chatOutput, 
+  "Loading chat log for " + LT.currentTable.name + "...");
+  LT.lastMessage = 0;
+  LT.refreshMessageList();
+  LT.element('a', {'class' : 'chat_alert'}, LT.chatOutput, 
+    "Arriving at " + LT.currentTable.name);
+  LT.element('br', {}, LT.chatOutput);
+  LT.chatOutput.removeChild(LT.chatBottom);
+  LT.chatOutput.appendChild(LT.chatBottom);
+  LT.chatBottom.scrollIntoView(true);
+  LT.readTiles();
+  document.cookie = 'table=' + LT.currentTable.id + ';';
+}
+
 LT.refreshTables = function () {
   LT.readTables();
   LT.readImages();
@@ -85,26 +98,13 @@ LT.refreshTables = function () {
     }
   for( var i = 0 ; i < LT.tables.length; i++ ){	
     tableEntry = LT.element('div', { 'style' : 'clear: both;' }, LT.tablesDiv, ' ')
-    tableLink = LT.element('a', {'class' : 'textButton'}, tableEntry, LT.tables[i].name);
+    var tableLink = LT.element('a', {'class' : 'textButton'}, tableEntry, LT.tables[i].name);
 	tableLink.name = LT.tables[i].name;
 	tableLink.id = LT.tables[i].id;
 	tableLink.table = i;
 	tableLink.onclick = function(){
-	  LT.tableID = this.id;
-	  LT.currentTable = LT.tables[this.table];
-      LT.element('br', {}, LT.chatOutput);
-      LT.element('div', {'class' : 'chat_alert'}, LT.chatOutput, 
-      "Loading chat log for " + this.name + "...");
-      LT.lastMessage = 0;
-      LT.refreshMessageList();
-      LT.element('a', {'class' : 'chat_alert'}, LT.chatOutput, 
-        "Arriving at " + this.name);
-      LT.element('br', {}, LT.chatOutput);
-      LT.chatOutput.removeChild(LT.chatBottom);
-      LT.chatOutput.appendChild(LT.chatBottom);
-      LT.chatBottom.scrollIntoView(true);
-      LT.readTiles();
-    };
+	  LT.loadTable(this.id);
+	};
     tableDelete = LT.element('a', { 'class' : 'deleteButton' }, tableEntry, 'Delete');
     tableDelete.id = LT.tables[i].id;
     tableDelete.onclick = function(){
@@ -122,7 +122,7 @@ LT.createTablesPanel = function () {
   LT.createTableTab = LT.tablesPanel.tabs.tab[1].content;
   LT.tablesTab = LT.tablesPanel.tabs.tab[0].content;
   LT.tablesDiv = LT.element('div',{}, LT.tablesTab);
-  LT.refreshTables();
+  LT.refreshTables();  
   LT.tablesForm = LT.element('form', { }, LT.createTableTab);
   var nameDiv = LT.element('div', { style : 'color: #000; width: 200px; float: left'
     }, LT.tablesForm, 'Name: ');
