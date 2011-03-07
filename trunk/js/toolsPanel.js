@@ -18,16 +18,31 @@ LT.loadSwatches = function (){
 }
 
 LT.loadPieces = function (){
-  var readPieces = LT.ajaxRequest("POST", "php/read_pieces.php",{ 'type' : 'tile'});
+  var readPieces = LT.ajaxRequest("POST", "php/read_pieces.php",{ 'table_id' : LT.currentTable.id });
   if (readPieces.responseXML){
-    var imageElements = readPieces.responseXML.getElementsByTagName('image');
-    LT.images = {};
-    for( var i = 0 ; i < imageElements.length; i++ ){
-      var image = new LT.Image(imageElements[i]);
-	  LT.images[image.id] = image;
-    //  LT.images.push(image);
+    var pieceElements = readPieces.responseXML.getElementsByTagName('piece');
+    LT.pieces = {};
+    for( var i = 0 ; i < pieceElements.length; i++ ){
+      var piece = new LT.Piece(pieceElements[i]);
+	  LT.pieces[piece.id] = piece;
     }
   }
+}
+
+LT.createPiece = function () {
+  var createMessageAjax = LT.ajaxRequest("POST", "php/create_message.php",
+    { table_id : LT.tableID, 
+	  image_id : 0, 
+	  user_id : 0,
+	  name : 0,
+	  x : 0,
+	  y : 0, 
+	  x_offset : 0,
+	  y_offset : 0,
+	  height : 0,
+	  width : 0 });
+  LT.chatInput.focus();
+  LT.refreshMessageList();
 }
 
 LT.createToolsPanel = function () {
@@ -37,6 +52,9 @@ LT.createToolsPanel = function () {
   LT.fogTab = LT.toolsPanel.tabs.tab[2].content;
   LT.tilesTab = LT.toolsPanel.tabs.tab[0].content;
   LT.element('div', {}, LT.piecesTab, "HEY");
+  if( LT.currentTable ){
+    LT.loadPieces();
+  }
   LT.element('div', {}, LT.fogTab, "YOU");
 };
 
