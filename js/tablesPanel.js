@@ -10,18 +10,6 @@ LT.readTables = function(){
   }
 }
 
-LT.readImages = function(){
-  var readImages = LT.ajaxRequest("POST", "php/read_images.php",{ 'type' : 'tile'});
-  if (readImages.responseXML){
-    var imageElements = readImages.responseXML.getElementsByTagName('image');
-    LT.images = {};
-    for( var i = 0 ; i < imageElements.length; i++ ){
-      var image = new LT.Image(imageElements[i]);
-	  LT.images[image.id] = image;
-    }
-  }
-}
-
 LT.readTiles = function(){
   var readTiles = LT.ajaxRequest("POST", "php/read_tiles.php",{ 'table_id' : LT.currentTable.id });
   if (readTiles.responseXML){
