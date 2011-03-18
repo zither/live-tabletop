@@ -20,7 +20,7 @@ include('include/xml_headers.php');
 echo "<tiles>\n ";
 for ($i = 0; $i < count($rows); $i++) {
   $t = $rows[$i];
-  echo " {$t['fog']}{$t['right_wall']}{$t['bottom_wall']}{$t['image_id']}";
+  echo " {$t['fog']}{$t['image_id']}";
 }
 echo "\n</tiles>\n";
 ?>

@@ -63,6 +63,7 @@ LT.loadTable = function (tableID) {
 	  LT.currentTable = LT.tables[i];
 	}
   }
+  LT.currentTable.createGrid();
   LT.element('br', {}, LT.chatOutput);
   LT.element('div', {'class' : 'chat_alert'}, LT.chatOutput, 
   "Loading chat log for " + LT.currentTable.name + "...");

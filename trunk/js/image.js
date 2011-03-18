@@ -24,12 +24,10 @@ LT.Image.prototype.update = function (mods) {
   var args = {};
   for (var i = 0; i < LT.Image.properties.length; i++) {
     var property = LT.Image.properties[i];
-    if (typeof(mods[property]) == "undefined") {
-      args[property] = this[property];
+    if (typeof(mods[property]) != "undefined") {
+      this[property] = mods[property];
     }
-    else {
-      args[property] = mods[property];
-    }
+    args[property] = this[property];
   }
   args.image_id = args.id;
   delete(args.id);

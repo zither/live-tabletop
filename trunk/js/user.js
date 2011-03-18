@@ -12,12 +12,10 @@ LT.User.prototype.update = function (mods) {
   var args = {user_id: this.id};
   for (var i = 0; i < LT.User.properties.length; i++) {
     var property = LT.User.properties[i];
-    if (typeof(mods[property]) == "undefined") {
-      args[property] = this[property];
+    if (typeof(mods[property]) != "undefined") {
+      this[property] = mods[property];
     }
-    else {
-      args[property] = mods[property];
-    }
+    args[property] = this[property];
   }
   LT.ajaxRequest("POST", "update_user.php", args, function () {return;});
 };

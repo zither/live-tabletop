@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS users, tiles, tables, pieces, messages, images, stats;
+DROP TABLE IF EXISTS users, tiles, tables, pieces, messages, images, stats, walls;
 
 DROP PROCEDURE IF EXISTS create_user;
 DROP PROCEDURE IF EXISTS read_users;
@@ -38,6 +38,9 @@ DROP PROCEDURE IF EXISTS delete_image;
 DROP PROCEDURE IF EXISTS set_stat;
 DROP PROCEDURE IF EXISTS get_stats;
 DROP PROCEDURE IF EXISTS delete_stat;
+DROP PROCEDURE IF EXISTS create_wall;
+DROP PROCEDURE IF EXISTS read_walls;
+DROP PROCEDURE IF EXISTS delete_wall;
 
 
 /* USERS TABLE
@@ -86,8 +89,6 @@ CREATE TABLE tiles (
   y SMALLINT NOT NULL,
   image_id INT,
   fog TINYINT NOT NULL DEFAULT 0,
-  right_wall TINYINT NOT NULL DEFAULT 0,
-  bottom_wall TINYINT NOT NULL DEFAULT 0,
   PRIMARY KEY (table_id, x, y)
 );
 
@@ -184,6 +185,18 @@ CREATE TABLE stats (
 );
 
 
+/* WALLS TABLE */
+
+CREATE TABLE walls (
+  table_id INT NOT NULL,
+  x SMALLINT NOT NULL,
+  y SMALLINT NOT NULL,
+  direction VARCHAR(2) NOT NULL,
+  contents TEXT NOT NULL,
+  PRIMARY KEY (table_id, x, y, direction)
+);
+
+
 
 /* STORED PROCEDURES */
 
@@ -248,6 +261,8 @@ BEGIN
     SELECT id FROM tables WHERE user_id = the_user);
   DELETE FROM tiles WHERE table_id IN (
     SELECT id FROM tables WHERE user_id = the_user);
+  DELETE FROM walls WHERE table_id IN (
+    SELECT id FROM tables WHERE user_id = the_user);
   DELETE FROM tables WHERE user_id = the_user;
   DELETE FROM images WHERE user_id = the_user;
   DELETE FROM users WHERE id = the_user;
@@ -279,16 +294,15 @@ END;
 
 CREATE PROCEDURE read_tiles (IN the_table INT)
 BEGIN
-  SELECT image_id, fog, right_wall, bottom_wall FROM tiles WHERE table_id = the_table
+  SELECT image_id, fog FROM tiles WHERE table_id = the_table
     ORDER BY y, x ASC;
 END; 
 
-CREATE PROCEDURE update_tile (IN the_table INT, IN the_x SMALLINT, IN the_y SMALLINT,
-  IN the_image INT, IN the_fog TINYINT, IN the_right TINYINT, IN the_bottom TINYINT)
+CREATE PROCEDURE update_tile (IN the_table INT, IN the_x SMALLINT,
+  IN the_y SMALLINT, IN the_image INT, IN the_fog TINYINT)
 BEGIN
   START TRANSACTION;
-  UPDATE tiles SET image_id = the_image, fog = the_fog, 
-      right_wall = the_right, bottom_wall = the_bottom
+  UPDATE tiles SET image_id = the_image, fog = the_fog
     WHERE x = the_x AND y = the_y AND table_id = the_table;
   UPDATE tables SET tile_stamp = NOW() WHERE id = the_table;
   COMMIT;
@@ -403,6 +417,7 @@ BEGIN
   DELETE FROM stats WHERE piece_id IN (
     SELECT id FROM pieces WHERE table_id = the_table);
   DELETE FROM pieces WHERE table_id = the_table;
+  DELETE FROM walls WHERE table_id = the_table;
   DELETE FROM messages WHERE table_id = the_table;
   DELETE FROM tables WHERE id = the_table;
   COMMIT;
@@ -552,4 +567,24 @@ BEGIN
   DELETE FROM stats WHERE piece_id = the_piece AND name = the_name;
 END; 
 
+/* Walls Procedures */
+
+CREATE PROCEDURE create_wall (IN the_table INT, IN the_x SMALLINT,
+  IN the_y SMALLINT, IN the_direction VARCHAR(2), IN the_contents TEXT)
+BEGIN
+  REPLACE INTO walls (table_id, x, y, direction, contents)
+  VALUES (the_table, the_x, the_y, the_direction, the_contents);
+END;
+
+CREATE PROCEDURE read_walls (IN the_table INT)
+BEGIN
+  SELECT * FROM walls WHERE table_id = the_table;
+END;
+
+CREATE PROCEDURE delete_wall (IN the_table INT, IN the_x SMALLINT,
+  IN the_y SMALLINT, IN the_direction VARCHAR(2))
+BEGIN
+  DELETE FROM walls WHERE table_id = the_table AND x = the_x 
+    AND y = the_y AND direction = the_direction;
+END;
 
