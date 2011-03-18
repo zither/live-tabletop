@@ -9,6 +9,7 @@ LT.Grid = function (columns, rows, width, height, thickness, color, mode, parent
   if (parent) {
     parent.appendChild(this.canvas);
   }
+  this.canvas.className = "grid";
   this.walls = [];
   this.resize(columns, rows);
 };

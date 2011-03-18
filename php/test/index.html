@@ -404,7 +404,34 @@ TEST.tests = [
     result: TEST.blank},
   {action: "../read_images.php",
     args: {type: "background"},
-    result: function (ajax) {return TEST.count(ajax, "image", 0);}}
+    result: function (ajax) {return TEST.count(ajax, "image", 0);}},
+
+  // WALL
+
+  {group: "CREATE WALL",
+    action: "../create_wall.php",
+    args: {table_id: 1, x: 2, y: 3, direction: "sw", contents: "wall"},
+    result: TEST.blank},
+
+  {group: "READ WALLS",
+    action: "../read_walls.php",
+    args: {},
+    result: function (ajax) {
+      var wall = ajax.responseXML.getElementsByTagName("wall")[0];
+      if (wall.getAttribute("table_id") == "1"
+        && wall.getAttribute("x") == "2"
+        && wall.getAttribute("y") == "3"
+        && wall.getAttribute("direction") == "sw"
+        && wall.getAttribute("contents") == "wall"
+        ) return "PASS";
+      return "FAIL [" + ajax.responseText + "]";}},
+
+  {group: "DELETE WALL",
+    action: "../delete_wall.php",
+    args: {},
+    result: TEST.blank},
+  {action: "../read_walls.php",
+    result: function (ajax) {return TEST.count(ajax, "wall", 0);}},
 ];
 
 onload = function () {

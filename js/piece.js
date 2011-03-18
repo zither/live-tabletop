@@ -30,12 +30,10 @@ LT.Piece.prototype.update = function (mods) {
   var args = {}
   for (var i = 0; i < LT.Piece.properties.length; i++) {
     var property = LT.Piece.properties[i];
-    if (typeof(mods[property]) == "undefined") {
-      args[property] = this[property];
+    if (typeof(mods[property]) != "undefined") {
+      this[property] = mods[property];
     }
-    else {
-      args[property] = mods[property];
-    }
+    args[property] = this[property];
   }
   args.piece_id = args.id;
   delete(args.id);
