@@ -35,6 +35,8 @@ LT.createUserPanel = function () {
   createImagesButton = LT.element('a', {}, LT.userPanel.content, 'Process Uploaded Images');
   createImagesButton.onclick = function(){
     LT.ajaxRequest("POST", "php/create_images.php", {});
+    //LT.ajaxRequest("POST", "php/create_images.php", {});
+    //LT.ajaxRequest("POST", "php/create_images.php", {});
   }
   
   LT.element('div', {'class': 'separator'}, LT.userPanel.content);
@@ -48,6 +50,7 @@ LT.createUserPanel = function () {
     LT.filesPanel.refreshPanel();
     LT.userPanel.refreshPanel();
   }
+ /*
   LT.element('div', {'class': 'separator'}, LT.userPanel.content);
   savePanelsButton = LT.element('a',{ }, LT.userPanel.content, 'Save Panels');
   savePanelsButton.onclick = function() {
@@ -58,7 +61,7 @@ LT.createUserPanel = function () {
   loadPanelsButton.onclick = function() {
     LT.loadPanels();
   };
-  
+  */
   LT.userForm = LT.element('form', { }, LT.userPanel.footer);
   LT.inputUserName = LT.element('input', { size : 8, type: 'text',
     style : 'border: 0px solid #CCC;' }, LT.userForm, 'User Name', 1);
