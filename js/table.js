@@ -92,9 +92,29 @@ LT.Table.prototype = {
   // GRID FUNCTIONS
   
   createGrid: function () {
+    if (this.grid && this.grid.canvas.parent) {
+      this.grid.canvas.parent.removeChild(this.grid.canvas);
+    }
     this.grid = new LT.Grid(this.tile_columns, this.tile_rows,
       this.grid_width, this.grid_height, this.grid_thickness,
       this.grid_color, this.tile_mode, document.body);
+    var self = this;
+    var args = {table_id: this.id};
+    LT.ajaxRequest("POST", "php/read_walls.php", args, function (ajax) {
+      var walls = ajax.responseXML.getElementsByTagName("wall");
+      for (var i = 0; i < walls.length; i++) {
+        var x = parseInt(walls[i].getAttribute("x"));
+        var y = parseInt(walls[i].getAttribute("y"));
+        var direction = decodeURIComponent(walls[i].getAttribute("direction"));
+        var contents = decodeURIComponent(walls[i].getAttribute("contents"));
+        if (contents == "wall") {
+          self.wall(y, x, direction);
+        }
+        if (contents == "door") {
+          self.door(y, x, direction);
+        }
+      }
+    });
   },
   
   setWall: function (column, row, direction, type) {
