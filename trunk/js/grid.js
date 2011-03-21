@@ -39,6 +39,8 @@ LT.Grid.prototype = {
       points: [[1/3, 0], [1, 0], [4/3, 1/2], [1, 1], [1/3, 1], [0, 1/2]]}},
 
   repaint: function () {
+    if (this._thickness == 0) return;
+
     var context = this.canvas.getContext("2d");
     var margins = this.SHAPES[this._mode].margins;
     var points = this.SHAPES[this._mode].points;

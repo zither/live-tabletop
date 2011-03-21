@@ -144,6 +144,8 @@ LT.createTable = function () {
   var createTableAjax = LT.ajaxRequest("POST", "php/create_table.php",
     { name : LT.inputTableName.value, image_id : 1, default_tile: 1,
     rows : LT.inputTableRows.value, columns : LT.inputTableCols.value,
-    tile_height : LT.inputTileHeight.value, tile_width : LT.inputTileWidth.value });
+    tile_height : LT.inputTileHeight.value, 
+    tile_width : LT.inputTileWidth.value,
+    tile_mode : "rectangle" });
   LT.refreshTables();
 }
