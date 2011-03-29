@@ -1,12 +1,23 @@
-
-LT.readImages = function(){
-  var readImages = LT.ajaxRequest("POST", "php/read_images.php",{ 'type' : 'tile'});
-  if (readImages.responseXML){
-    var imageElements = readImages.responseXML.getElementsByTagName('image');
-    LT.images = {};
+LT.readTileImages = function(){
+  var readTileImages = LT.ajaxRequest("POST", "php/read_images.php",{ 'type' : 'tile'});
+  if (readTileImages.responseXML){
+    var imageElements = readTileImages.responseXML.getElementsByTagName('image');
+    LT.tileImages = {};
     for( var i = 0 ; i < imageElements.length; i++ ){
       var image = new LT.Image(imageElements[i]);
-	  LT.images[image.id] = image;
+	  LT.tileImages[image.id] = image;
+    }
+  }
+}
+
+LT.readPieceImages = function(){
+  var readPieceImages = LT.ajaxRequest("POST", "php/read_images.php",{ 'type' : 'piece'});
+  if (readPieceImages.responseXML){
+    var imageElements = readPieceImages.responseXML.getElementsByTagName('image');
+    LT.pieceImages = {};
+    for( var i = 0 ; i < imageElements.length; i++ ){
+      var image = new LT.Image(imageElements[i]);
+	  LT.pieceImages[image.id] = image;
     }
   }
 }
@@ -15,7 +26,7 @@ LT.loadSwatches = function (){
   while(LT.tilesTab.firstChild){
     LT.tilesTab.removeChild(LT.tilesTab.firstChild);
   }
-  var imagesArray = LT.sortObject(LT.images, 'file');
+  var imagesArray = LT.sortObject(LT.tileImages, 'file');
   for( var i = 0 ; i < imagesArray.length; i++ ){
     newImage = LT.element('img', { title : imagesArray[i].file, 
 	  style : 'border: 1px solid black; margin: 1px 1px 1px 1px', 
@@ -32,11 +43,11 @@ LT.loadPieceImages = function (){
   while(LT.pieceImageDiv.firstChild){
     LT.pieceImageDiv.removeChild(LT.pieceImageDiv.firstChild);
   }
-  var imagesArray = LT.sortObject(LT.images, 'file');
+  var imagesArray = LT.sortObject(LT.pieceImages, 'file');
   for( var i = 0 ; i < imagesArray.length; i++ ){
     newImage = LT.element('img', { title : imagesArray[i].file, 
 	  style : 'border: 1px solid black; margin: 1px 1px 1px 1px', 
-	  src : 'images/upload/tile/' + imagesArray[i].file}, LT.pieceImageDiv);
+	  src : 'images/upload/piece/' + imagesArray[i].file}, LT.pieceImageDiv);
 	newImage.id = imagesArray[i].id;
 	newImage.file = imagesArray[i].file;
 	newImage.onclick = function() {
@@ -77,11 +88,11 @@ LT.createPiece = function () {
   LT.refreshMessageList();
 }
 populatePiecesTab = function () {
- piecesForm = LT.element('form', { }, LT.piecesTab);
+  piecesForm = LT.element('form', { }, LT.piecesTab);
   var nameDiv = LT.element('div', { 'class' : 'fLabel' }, piecesForm, 'Name: ');
   inputPieceName = LT.element('input', { size : 10, type: 'text',
     'class' : 'fInput' }, nameDiv, 'Piece Name', 1);
-  LT.pieceImageDiv = LT.element('div', { 'class' : 'fLabel' }, piecesForm, 'Columns: ');
+  LT.pieceImageDiv = LT.element('div', { 'style' : 'clear: both;' }, LT.piecesTab, 'Columns: ');
   LT.loadPieceImages();
   
   var rowsDiv = LT.element('div', { 'class' : 'fLabel' }, piecesForm, 'Rows: ');

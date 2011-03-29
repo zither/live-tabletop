@@ -41,7 +41,7 @@ LT.readTiles = function(){
 		  }
 		}
 		*/
-		tileImage = LT.images[LT.tiles[tileNumber].image_id].file;
+		tileImage = LT.tileImages[LT.tiles[tileNumber].image_id].file;
         tileDiv = LT.element('div', {'style': 'float: left; width: ' + LT.currentTable.tile_width + 
           'px; height: ' + LT.currentTable.tile_height + 'px; ' +
 		  ' background: url(images/upload/tile/' + tileImage + ');'},
@@ -81,7 +81,8 @@ LT.loadTable = function (tableID) {
 
 LT.refreshTables = function () {
   LT.readTables();
-  LT.readImages();
+  LT.readTileImages();
+  LT.readPieceImages();
     while(LT.tablesDiv.firstChild){
       LT.tablesDiv.removeChild(LT.tablesDiv.firstChild);
     }
