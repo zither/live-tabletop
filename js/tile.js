@@ -10,7 +10,7 @@ LT.Tile = function (tableID, x, y, tileCode) {
 
 // TILE PROPERTIES
 
-LT.Tile.properties = ["fog", "image_id"];
+LT.Tile.properties = ["fog", "image_id", "x", "y", "table_id"];
 
 // CLIENT-SERVER COMMUNICATION
 
