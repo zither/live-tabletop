@@ -6,6 +6,21 @@ LT.Tile = function (tableID, x, y, tileCode) {
   this.y = y;
   this.fog = parseInt(tileCode[0]);
   this.image_id = parseInt(tileCode.slice(1));
+  var tWidth = LT.currentTable.tile_width;
+  var tHeight = LT.currentTable.tile_height;
+  this.clickDiv = LT.element('div', {'style': 'position: absolute; left: ' + (x * tWidth)
+    + 'px; top: ' + (y * tHeight) + 'px; width: ' + tWidth + 'px; height: ' + tHeight + 'px; '},
+    LT.clickLayer);
+  this.imageDiv = LT.element('div', {'style': 'position: absolute; left: ' + (x * tWidth)
+    + 'px; top: ' + (y * tHeight) + 'px; width: ' + tWidth + 'px; height: ' + tHeight + 'px; ' +    
+	' background: url(images/upload/tile/' + LT.tileImages[this.image_id].file + ');'},
+    LT.tileLayer);
+  var self = this;
+  this.clickDiv.onclick = function (){
+    self.imageDiv.style.backgroundImage = 'url(\'images/upload/tile/' + LT.selectedImage + '\')';
+    self.setImageID(LT.selectedImageID);
+  }
+  //this.clickDiv = ;
 };
 
 // TILE PROPERTIES
