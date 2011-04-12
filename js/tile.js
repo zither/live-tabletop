@@ -1,4 +1,5 @@
 // TILE CLASS CONSTRUCTOR
+LT.tileDragging = 0;
 
 LT.Tile = function (tableID, x, y, tileCode) {
   this.table_id = tableID;
@@ -17,9 +18,19 @@ LT.Tile = function (tableID, x, y, tileCode) {
     LT.tileLayer);
   var self = this;
   this.clickDiv.onclick = function (){
+
+  }
+  this.clickDiv.onmousedown = function() {
+    LT.tileDragging = 1;
     self.imageDiv.style.backgroundImage = 'url(\'images/upload/tile/' + LT.selectedImage + '\')';
     self.setImageID(LT.selectedImageID);
-  }
+  };
+  this.clickDiv.onmouseover = function() {
+    if (LT.tileDragging == 1){
+	  self.imageDiv.style.backgroundImage = 'url(\'images/upload/tile/' + LT.selectedImage + '\')';
+      self.setImageID(LT.selectedImageID);
+	}
+  };
   //this.clickDiv = ;
 };
 
