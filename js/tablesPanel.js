@@ -49,8 +49,7 @@ LT.readTiles = function(){
 		tileDiv.id = tileNumber;
 		tileDiv.onclick = function (){
 		  this.style.backgroundImage = 'url(\'images/upload/tile/' + LT.selectedImage + '\')';
-		  LT.tiles[this.id].update({image_id : LT.selectedImageID});
-		  //alert(LT.tiles[this.id].x + ', ' + LT.tiles[this.id].y + ', table: ' +LT.tiles[this.id].table_id);
+		  LT.tiles[this.id].setImageID(LT.selectedImageID);
 		}
       }
     }
