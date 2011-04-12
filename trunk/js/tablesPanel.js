@@ -104,19 +104,19 @@ LT.createTablesPanel = function () {
   var columnsDiv = LT.element('div', { style : 'color: #000; width: 100px; float: left'
     }, LT.tablesForm, 'Columns: ');
   LT.inputTableCols = LT.element('input', { size : 1, 
-    style : 'border: 1px solid #CCC;' }, columnsDiv, 'Cols', 1);
+    style : 'border: 1px solid #CCC;' }, columnsDiv, '8', 1);
   var rowsDiv = LT.element('div', { style : 'color: #000; width: 100px; float: left'
     }, LT.tablesForm, 'Rows: ');
   LT.inputTableRows = LT.element('input', { size : 1, 
-    style : 'border: 1px solid #CCC;' }, rowsDiv, 'Rows', 1);
+    style : 'border: 1px solid #CCC;' }, rowsDiv, '8', 1);
   var heightDiv = LT.element('div', { style : 'color: #000; width: 100px; float: left'
     }, LT.tablesForm, 'Height: ');
   LT.inputTileHeight = LT.element('input', { size : 1, 
-    style : 'border: 1px solid #CCC;' }, heightDiv, 'Height', 1);
+    style : 'border: 1px solid #CCC;' }, heightDiv, '45', 1);
   var widthDiv = LT.element('div', { style : 'color: #000; width: 100px; float: left'
     }, LT.tablesForm, 'Width: ');
   LT.inputTileWidth = LT.element('input', { size : 1, 
-    style : 'border: 1px solid #CCC;' }, widthDiv, 'Width', 1);
+    style : 'border: 1px solid #CCC;' }, widthDiv, '45', 1);
   LT.tableSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
         id : 'chatSubmit', size : 8, value : 'Create' }, LT.tablesForm);
   LT.tableSubmit.onclick = function() { LT.createTable(); };
@@ -126,7 +126,7 @@ LT.createTablesPanel = function () {
 
 LT.createTable = function () {
   var createTableAjax = LT.ajaxRequest("POST", "php/create_table.php",
-    { name : LT.inputTableName.value, image_id : 1, default_tile: 1,
+    { name : LT.inputTableName.value, image_id : 1, default_tile: -1,
     rows : LT.inputTableRows.value, columns : LT.inputTableCols.value,
     tile_height : LT.inputTileHeight.value, 
     tile_width : LT.inputTileWidth.value,
