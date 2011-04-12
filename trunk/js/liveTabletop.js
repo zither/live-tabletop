@@ -2,6 +2,7 @@ var LT = {};
 LT.selectedImage = '';
 LT.selectedImageID = 1;
 LT.images = [];
+LT.messages = [];
 LT.lastMessage = 0;
 
 function emptyMe (clearMe, defaultText){

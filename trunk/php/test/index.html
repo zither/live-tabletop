@@ -212,7 +212,7 @@ TEST.tests = [
       var tiles = text.replace(/^\s+|\s+$/g, '').split(' ');
       if (tiles.length != 5000) return "FAIL [" + tiles.length + " tiles]";
       for (var i = 0; i < tiles.length; i++)
-         if (tiles[i] != "0002") return "FAIL [" + i + ": " + tiles[i] + "]";
+         if (tiles[i] != "02") return "FAIL [" + i + ": " + tiles[i] + "]";
       return "PASS";}},
 
   {group: "UPDATE TILE",
@@ -233,7 +233,7 @@ TEST.tests = [
       var tiles = text.replace(/^\s+|\s+$/g, '').split(' ');
       if (tiles.length != 5000) return "FAIL [" + tiles.length + " tiles]";
       for (var i = 0; i < tiles.length; i++) {
-         var target = (i == 507) ? "1214" : "0002";
+         var target = (i == 507) ? "14" : "02";
          if (tiles[i] != target) return "FAIL [" + i + ": " + tiles[i] + "]";
       }
       return "PASS";}},
@@ -247,7 +247,7 @@ TEST.tests = [
       var tiles = text.replace(/^\s+|\s+$/g, '').split(' ');
       if (tiles.length != 5000) return "FAIL [" + tiles.length + " tiles]";
       for (var i = 0; i < tiles.length; i++) {
-         var target = (i == 507) ? "1214" : "1002";
+         var target = (i == 507) ? "14" : "12";
          if (tiles[i] != target) return "FAIL [" + i + ": " + tiles[i] + "]";
       }
       return "PASS";}},
@@ -261,7 +261,7 @@ TEST.tests = [
       var tiles = text.replace(/^\s+|\s+$/g, '').split(' ');
       if (tiles.length != 5000) return "FAIL [" + tiles.length + " tiles]";
       for (var i = 0; i < tiles.length; i++) {
-         var target = (i == 507) ? "0214" : "0002";
+         var target = (i == 507) ? "04" : "02";
          if (tiles[i] != target) return "FAIL [" + i + ": " + tiles[i] + "]";
       }
       return "PASS";}},
@@ -415,11 +415,10 @@ TEST.tests = [
 
   {group: "READ WALLS",
     action: "../read_walls.php",
-    args: {},
+    args: {table_id: 1},
     result: function (ajax) {
       var wall = ajax.responseXML.getElementsByTagName("wall")[0];
-      if (wall.getAttribute("table_id") == "1"
-        && wall.getAttribute("x") == "2"
+      if (wall.getAttribute("x") == "2"
         && wall.getAttribute("y") == "3"
         && wall.getAttribute("direction") == "sw"
         && wall.getAttribute("contents") == "wall"
@@ -428,7 +427,7 @@ TEST.tests = [
 
   {group: "DELETE WALL",
     action: "../delete_wall.php",
-    args: {},
+    args: {table_id: 1, x: 2, y: 3, direction: "sw"},
     result: TEST.blank},
   {action: "../read_walls.php",
     result: function (ajax) {return TEST.count(ajax, "wall", 0);}},
