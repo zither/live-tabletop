@@ -115,9 +115,6 @@ LT.createToolsPanel = function () {
   LT.fogTab = LT.toolsPanel.tabs.tab[2].content;
   LT.tilesTab = LT.toolsPanel.tabs.tab[0].content;
   populatePiecesTab();
-  if( LT.currentTable ){
-    LT.loadPieces();
-  }
   LT.element('div', {}, LT.fogTab, "YOU");
 };
 
