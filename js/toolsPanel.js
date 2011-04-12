@@ -73,8 +73,8 @@ LT.loadPieces = function (){
 }
 
 LT.createPiece = function () {
-  var createMessageAjax = LT.ajaxRequest("POST", "php/create_message.php",
-    { table_id : LT.tableID, 
+  var createPieceAjax = LT.ajaxRequest("POST", "php/create_piece.php",
+    { table_id : LT.currentTable.id, 
 	  image_id : 0, 
 	  user_id : 0,
 	  name : 0,
@@ -83,9 +83,9 @@ LT.createPiece = function () {
 	  x_offset : 0,
 	  y_offset : 0,
 	  height : 0,
-	  width : 0 });
-  LT.chatInput.focus();
-  LT.refreshMessageList();
+	  width : 0 
+	}
+  );
 }
 populatePiecesTab = function () {
   piecesForm = LT.element('form', { }, LT.piecesTab);
@@ -106,7 +106,7 @@ populatePiecesTab = function () {
     'class' : 'fInput' }, widthDiv, 'Width', 1);
   tableSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
         id : 'chatSubmit', size : 8, value : 'Create' }, piecesForm);
-  tableSubmit.onclick = function() { LT.createTable(); };
+  tableSubmit.onclick = function() { LT.createPiece(); };
 }
 LT.createToolsPanel = function () {
   LT.toolsPanel = new LT.Panel( 'Tools', 'Tools', 6, 95, 210, 110);
