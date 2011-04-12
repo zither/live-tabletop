@@ -9,12 +9,16 @@ LT.Tile = function (tableID, x, y, tileCode) {
   this.image_id = parseInt(tileCode.slice(1));
   var tWidth = LT.currentTable.tile_width;
   var tHeight = LT.currentTable.tile_height;
+  var tBackground = '';
+  if (this.image_id >= 0) {
+    tBackground = LT.tileImages[this.image_id].file;
+  }
   this.clickDiv = LT.element('div', {'style': 'position: absolute; left: ' + (x * tWidth)
     + 'px; top: ' + (y * tHeight) + 'px; width: ' + tWidth + 'px; height: ' + tHeight + 'px; '},
     LT.clickLayer);
   this.imageDiv = LT.element('div', {'style': 'position: absolute; left: ' + (x * tWidth)
     + 'px; top: ' + (y * tHeight) + 'px; width: ' + tWidth + 'px; height: ' + tHeight + 'px; ' +    
-	' background: url(images/upload/tile/' + LT.tileImages[this.image_id].file + ');'},
+	' background: url(images/upload/tile/' + tBackground + ');'},
     LT.tileLayer);
   var self = this;
   this.clickDiv.onclick = function (){
