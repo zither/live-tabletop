@@ -210,6 +210,7 @@ document.onmouseup = function () {
   LT.selectedBR = null;
   LT.selectedTL = null;
   LT.clickDragGap = 0;
+  LT.tileDragging = 0;
   LT.savePanels();
 }
 
