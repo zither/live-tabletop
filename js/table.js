@@ -97,7 +97,7 @@ LT.Table.prototype = {
     }
     this.grid = new LT.Grid(this.tile_columns, this.tile_rows,
       this.grid_width, this.grid_height, this.grid_thickness,
-      this.grid_color, this.tile_mode, document.body);
+      this.grid_color, this.tile_mode, LT.wallLayer);
     var self = this;
     var args = {table_id: this.id};
     LT.ajaxRequest("POST", "php/read_walls.php", args, function (ajax) {

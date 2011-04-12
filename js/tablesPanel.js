@@ -13,8 +13,14 @@ LT.readTables = function(){
 LT.readTiles = function(){
   var readTiles = LT.ajaxRequest("POST", "php/read_tiles.php",{ 'table_id' : LT.currentTable.id });
   if (readTiles.responseXML){
-    while(LT.tableTop.firstChild){
-      LT.tableTop.removeChild(LT.tableTop.firstChild);
+    while(LT.tileLayer.firstChild){
+      LT.tileLayer.removeChild(LT.tileLayer.firstChild);
+    }
+    while(LT.wallLayer.firstChild){
+      LT.wallLayer.removeChild(LT.wallLayer.firstChild);
+    }
+    while(LT.clickLayer.firstChild){
+      LT.clickLayer.removeChild(LT.clickLayer.firstChild);
     }
     LT.tableTop.setAttribute('style', 'width: ' + LT.currentTable.tile_width * 
       LT.currentTable.tile_columns + 'px; height: ' + LT.currentTable.tile_height *
@@ -25,33 +31,11 @@ LT.readTiles = function(){
 	var tileText = decodeURIComponent(tileElements[0].textContent);
 	var tilesArray = new Array();
     tilesArray = tileText.split(' ');
-		
-    for( var i = 0; i < LT.currentTable.tile_rows; i++){
-      rowArray = []
-      rowArray[i] = LT.element('div', {'style' : 'float : left; clear : both;'}, LT.tableTop);
-      for( var n = 0; n < LT.currentTable.tile_columns; n++){
-	    var tileNumber = (i * LT.currentTable.tile_columns) + n;
-        var tile = new LT.Tile(LT.currentTable.id, n, i, tilesArray[tileNumber + 2]);
-        LT.tiles.push(tile);
-		var tileImage = '';
-		/*
-		for( var u = 0; u < LT.images.length; u++){
-		  if (LT.images[u].id == LT.tiles[tileNumber].image_id){
-		    tileImage = LT.images[u].file;
-		  }
-		}
-		*/
-		tileImage = LT.tileImages[LT.tiles[tileNumber].image_id].file;
-        tileDiv = LT.element('div', {'style': 'float: left; width: ' + LT.currentTable.tile_width + 
-          'px; height: ' + LT.currentTable.tile_height + 'px; ' +
-		  ' background: url(images/upload/tile/' + tileImage + ');'},
-          rowArray[i]);
-		tileDiv.id = tileNumber;
-		tileDiv.onclick = function (){
-		  this.style.backgroundImage = 'url(\'images/upload/tile/' + LT.selectedImage + '\')';
-		  LT.tiles[this.id].setImageID(LT.selectedImageID);
-		}
-      }
+    for(i = 0; i < tilesArray.length; i++){
+	  x = i % LT.currentTable.tile_columns;
+	  y = Math.floor(i / LT.currentTable.tile_columns);
+      var tile = new LT.Tile(LT.currentTable.id, x, y, tilesArray[i]);
+      LT.tiles.push(tile);
     }
   }
 }

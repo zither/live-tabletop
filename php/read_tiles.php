@@ -17,10 +17,13 @@ $rows = LT_call('read_tiles', $table_id);
 // Generate Output
 
 include('include/xml_headers.php');
-echo "<tiles>\n ";
+echo "<tiles>";
 for ($i = 0; $i < count($rows); $i++) {
   $t = $rows[$i];
-  echo " {$t['fog']}{$t['image_id']}";
+  echo "{$t['fog']}{$t['image_id']}";
+  if ($i != count($rows) - 1) {
+    echo " ";
+  }
 }
-echo "\n</tiles>\n";
+echo "</tiles>\n";
 ?>
