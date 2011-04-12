@@ -59,6 +59,7 @@ LT.loadTable = function (tableID) {
   LT.chatOutput.appendChild(LT.chatBottom);
   LT.chatBottom.scrollIntoView(true);
   LT.readTiles();
+  LT.loadPieces();
   document.cookie = 'table=' + LT.currentTable.id + ';';
 }
 
