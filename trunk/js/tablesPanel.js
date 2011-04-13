@@ -16,9 +16,6 @@ LT.readTiles = function(){
     while(LT.tileLayer.firstChild){
       LT.tileLayer.removeChild(LT.tileLayer.firstChild);
     }
-    while(LT.wallLayer.firstChild){
-      LT.wallLayer.removeChild(LT.wallLayer.firstChild);
-    }
     while(LT.clickLayer.firstChild){
       LT.clickLayer.removeChild(LT.clickLayer.firstChild);
     }

@@ -19,7 +19,10 @@ function LT_write_table_row($row) {
   echo "  <table";
   // Convert each column of the row into an XML element attribute.
   foreach ($row as $key => $value) {
-    if ($key == 'name' or $key == 'grid_color' or $key == 'tile_mode') {
+    if ($key == 'name' 
+     or $key == 'grid_color'
+     or $key == 'wall_color'
+     or $key == 'tile_mode') {
       // URL-encode strings to be decoded by javascript's decodeURIComponent.
       echo " $key=\"" . rawurlencode($value) . "\"";
     }
