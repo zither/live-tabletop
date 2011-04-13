@@ -1,10 +1,12 @@
 
-LT.Grid = function (columns, rows, width, height, thickness, color, mode, parent) {
+LT.Grid = function (columns, rows, width, height, thickness, color, wall_thickness, wall_color, mode, parent) {
   this._mode = mode;
   this._width = width;
   this._height = height;
   this._thickness = thickness;
   this._color = color;
+  this._wall_thickness = wall_thickness;
+  this._wall_color = wall_color;
   this.canvas = document.createElement("canvas");
   if (parent) {
     parent.appendChild(this.canvas);
@@ -87,8 +89,8 @@ LT.Grid.prototype = {
             var x2 = (points[j][0] + x + column) * this._width;
             var y2 = (points[j][1] + y + row) * this._height;
             context.lineCap = "round";
-            context.strokeStyle = this._color;
-            context.lineWidth = this._thickness * 3;
+            context.strokeStyle = this._wall_color;
+            context.lineWidth = this._wall_thickness;
             context.beginPath();
             context.moveTo(x1, y1);
             context.lineTo(x2, y2);
@@ -111,8 +113,8 @@ LT.Grid.prototype = {
             var x2 = (points[j][0] + x + column) * this._width;
             var y2 = (points[j][1] + y + row) * this._height;
             context.lineCap = "butt";
-            context.strokeStyle = this._color;
-            context.lineWidth = this._thickness * 5;
+            context.strokeStyle = this._wall_color;
+            context.lineWidth = this._wall_thickness * 2;
             context.beginPath();
             context.moveTo(x1, y1);
             context.lineTo(x2, y2);
@@ -124,7 +126,7 @@ LT.Grid.prototype = {
             var x4 = (t * x1 + x2) / (1 + t);
             var y4 = (t * y1 + y2) / (1 + t);
             context.strokeStyle = "white";
-            context.lineWidth = this._thickness * 3;
+            context.lineWidth = this._wall_thickness;
             context.beginPath();
             context.moveTo(x3, y3);
             context.lineTo(x4, y4);
@@ -181,11 +183,15 @@ LT.Grid.prototype = {
 
   getColor: function () {return this._color;},
   getThickness: function () {return this._thickness;},
+  getWallColor: function () {return this._wall_color;},
+  getWallThickness: function () {return this._wall_thickness;},
   getWidth: function () {return this._width;},
   getHeight: function () {return this._height;},
 
   setColor: function (value) {this._color = value; this.repaint();},
   setThickness: function (value) {this._thickness = value; this.repaint();},
+  setWallColor: function (value) {this._wall_color = value; this.repaint();},
+  setWallThickness: function (value) {this._wall_thickness = value; this.repaint();},
   setWidth: function (value) {this._width = value; this.repaint();},
   setHeight: function (value) {this._height = value; this.repaint();},
 

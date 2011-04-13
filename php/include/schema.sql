@@ -111,10 +111,10 @@ CREATE TABLE tables (
   tile_columns SMALLINT NOT NULL,
   tile_width INT NOT NULL DEFAULT 45,
   tile_height INT NOT NULL DEFAULT 45,
-  grid_width INT NOT NULL DEFAULT 45,
-  grid_height INT NOT NULL DEFAULT 45,
   grid_thickness INT NOT NULL DEFAULT 0,
   grid_color TEXT,
+  wall_thickness INT NOT NULL DEFAULT 3,
+  wall_color TEXT,
   piece_stamp DATETIME,
   tile_stamp DATETIME,
   message_stamp DATETIME,
@@ -333,18 +333,16 @@ CREATE PROCEDURE create_table (IN the_name VARCHAR(200), IN the_image INT,
   IN the_width INT, IN the_height INT, IN the_tile_mode TEXT)
 BEGIN
   INSERT INTO tables (name, image_id, user_id, tile_rows, tile_columns,
-    tile_width, tile_height, grid_width, grid_height,
-    tile_stamp, message_stamp, piece_stamp, tile_mode)
+    tile_width, tile_height, tile_stamp, message_stamp, piece_stamp, tile_mode)
   VALUES (the_name, the_image, the_user, the_rows, the_columns,
-    the_width, the_height, the_width, the_height, 
-    NOW(), NOW(), NOW(), the_tile_mode);
+    the_width, the_height, NOW(), NOW(), NOW(), the_tile_mode);
 END; 
 
 CREATE PROCEDURE read_table (IN the_table INT)
 BEGIN
   SELECT id, user_id, image_id, name, 
     tile_rows, tile_columns, tile_width, tile_height, 
-    grid_width, grid_height, grid_thickness, grid_color, 
+    grid_thickness, grid_color, wall_thickness, wall_color, 
     UNIX_TIMESTAMP(piece_stamp) AS piece_stamp,
     UNIX_TIMESTAMP(tile_stamp) AS tile_stamp,
     UNIX_TIMESTAMP(message_stamp) AS message_stamp,
@@ -356,7 +354,7 @@ CREATE PROCEDURE read_table_by_name (IN the_name VARCHAR(200))
 BEGIN
   SELECT id, user_id, image_id, name, 
     tile_rows, tile_columns, tile_width, tile_height, 
-    grid_width, grid_height, grid_thickness, grid_color, 
+    grid_thickness, grid_color, wall_thickness, wall_color,
     UNIX_TIMESTAMP(piece_stamp) AS piece_stamp,
     UNIX_TIMESTAMP(tile_stamp) AS tile_stamp,
     UNIX_TIMESTAMP(message_stamp) AS message_stamp,
@@ -368,7 +366,7 @@ CREATE PROCEDURE read_tables ()
 BEGIN
   SELECT id, user_id, image_id, name,
     tile_rows, tile_columns, tile_width, tile_height,
-    grid_width, grid_height, grid_thickness, grid_color, 
+    grid_thickness, grid_color, wall_thickness, wall_color,
     UNIX_TIMESTAMP(piece_stamp) AS piece_stamp,
     UNIX_TIMESTAMP(tile_stamp) AS tile_stamp,
     UNIX_TIMESTAMP(message_stamp) AS message_stamp,
@@ -380,7 +378,7 @@ CREATE PROCEDURE read_tables_by_user_id (IN the_user INT)
 BEGIN
   SELECT id, user_id, image_id, name,
     tile_rows, tile_columns, tile_width, tile_height,
-    grid_width, grid_height, grid_thickness, grid_color, 
+    grid_thickness, grid_color, wall_thickness, wall_color,
     UNIX_TIMESTAMP(piece_stamp) AS piece_stamp,
     UNIX_TIMESTAMP(tile_stamp) AS tile_stamp,
     UNIX_TIMESTAMP(message_stamp) AS message_stamp,
@@ -399,14 +397,14 @@ END;
 CREATE PROCEDURE update_table (IN the_table INT, IN the_name VARCHAR(200),
   IN the_user INT, IN the_image INT,
   IN the_tile_width INT, IN the_tile_height INT,
-  IN the_grid_width INT, IN the_grid_height INT, 
-  IN the_grid_thickness INT, the_grid_color TEXT,
+  IN the_grid_thickness INT, IN the_grid_color TEXT,
+  IN the_wall_thickness INT, IN the_wall_color TEXT,
   IN the_tile_mode TEXT)
 BEGIN
   UPDATE tables SET name = the_name, user_id = the_user, image_id = the_image,
     tile_width = the_tile_width, tile_height = the_tile_height,
-    grid_width = the_grid_width, grid_height = the_grid_height,
     grid_thickness = the_grid_thickness, grid_color = the_grid_color,
+    wall_thickness = the_wall_thickness, wall_color = the_wall_color,
     tile_mode = the_tile_mode
   WHERE id = the_table;
 END; 
