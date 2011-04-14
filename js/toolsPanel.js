@@ -88,25 +88,32 @@ LT.createPiece = function () {
   );
 }
 populatePiecesTab = function () {
-  piecesForm = LT.element('form', { }, LT.piecesTab);
-  var nameDiv = LT.element('div', { 'class' : 'fLabel' }, piecesForm, 'Name: ');
+  alert(toString(LT.piecesTab.style));
+  LT.piecesTab.style = 'overflow: hidden';
+  alert(toString(LT.piecesTab.style));
+  LT.piecesForm = LT.element('form', { }, LT.piecesTab);
+  var nameDiv = LT.element('div', { 'class' : 'fLabel' }, LT.piecesForm, 'Name: ');
   inputPieceName = LT.element('input', { size : 10, type: 'text',
     'class' : 'fInput' }, nameDiv, 'Piece Name', 1);
-  LT.pieceImageDiv = LT.element('div', { 'style' : 'clear: both;' }, LT.piecesTab, 'Columns: ');
-  LT.loadPieceImages();
+
   
-  var rowsDiv = LT.element('div', { 'class' : 'fLabel' }, piecesForm, 'Rows: ');
-  inputTableRows = LT.element('input', { size : 1, 
-    'class' : 'fInput' }, rowsDiv, 'Rows', 1);
-  var heightDiv = LT.element('div', { 'class' : 'fLabel' }, piecesForm, 'Height: ');
-  inputTileHeight = LT.element('input', { size : 1, 
-    'class' : 'fInput' }, heightDiv, 'Height', 1);
-  var widthDiv = LT.element('div', { 'class' : 'fLabel' }, piecesForm, 'Width: ');
-  inputTileWidth = LT.element('input', { size : 1, 
-    'class' : 'fInput' }, widthDiv, 'Width', 1);
+  var yDiv = LT.element('div', { 'class' : 'fLabel' }, LT.piecesForm, 'Y Pos: ');
+  LT.piecesForm.y = LT.element('input', { size : 1, 
+    'class' : 'fInput' }, yDiv, '0', 1);
+  var xDiv = LT.element('div', { 'class' : 'fLabel' }, LT.piecesForm, 'X Pos: ');
+  LT.piecesForm.x = LT.element('input', { size : 1, 
+    'class' : 'fInput' }, xDiv, '0', 1);
+  var hDiv = LT.element('div', { 'class' : 'fLabel' }, LT.piecesForm, 'Height Offset: ');
+  LT.heightOffset = LT.element('input', { size : 1, 
+    'class' : 'fInput' }, hDiv, '0', 1);  
+  var wDiv = LT.element('div', { 'class' : 'fLabel' }, LT.piecesForm, 'Width Offset: ');
+  LT.widthOffset = LT.element('input', { size : 1, 
+    'class' : 'fInput' }, wDiv, '0', 1);
   tableSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
-        id : 'chatSubmit', size : 8, value : 'Create' }, piecesForm);
+        id : 'chatSubmit', size : 8, value : 'Create' }, LT.piecesForm);
   tableSubmit.onclick = function() { LT.createPiece(); };
+  LT.pieceImageDiv = LT.element('div', { 'style' : 'clear: both; overflow: scroll;' }, LT.piecesTab, 'Columns: ');
+  LT.loadPieceImages();
 }
 LT.createToolsPanel = function () {
   LT.toolsPanel = new LT.Panel( 'Tools', 'Tools', 6, 95, 210, 110);
