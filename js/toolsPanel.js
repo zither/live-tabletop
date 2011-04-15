@@ -77,40 +77,38 @@ LT.createPiece = function () {
     { table_id : LT.currentTable.id, 
 	  image_id : 0, 
 	  user_id : 0,
-	  name : 0,
-	  x : 0,
-	  y : 0, 
-	  x_offset : 0,
-	  y_offset : 0,
-	  height : 0,
-	  width : 0 
+	  name : LT.pForm.pName.value,
+	  x : LT.pForm.x.value,
+	  y : LT.pForm.y.value, 
+	  x_offset : LT.pForm.xOff.value,
+	  y_offset : LT.pForm.yOff.value,
+	  height : 10,
+	  width : 10 
 	}
   );
 }
 populatePiecesTab = function () {
-  alert(toString(LT.piecesTab.style));
-  LT.piecesTab.style = 'overflow: hidden';
-  alert(toString(LT.piecesTab.style));
-  LT.piecesForm = LT.element('form', { }, LT.piecesTab);
-  var nameDiv = LT.element('div', { 'class' : 'fLabel' }, LT.piecesForm, 'Name: ');
-  inputPieceName = LT.element('input', { size : 10, type: 'text',
+  //LT.piecesTab.style.overflow = 'scroll';
+  LT.pForm = LT.element('form', { }, LT.piecesTab);
+  var nameDiv = LT.element('div', { 'class' : 'fLabel' }, LT.pForm, 'Name: ');
+  LT.pForm.pName = LT.element('input', { size : 10, type: 'text',
     'class' : 'fInput' }, nameDiv, 'Piece Name', 1);
 
   
-  var yDiv = LT.element('div', { 'class' : 'fLabel' }, LT.piecesForm, 'Y Pos: ');
-  LT.piecesForm.y = LT.element('input', { size : 1, 
+  var yDiv = LT.element('div', { 'class' : 'fLabel' }, LT.pForm, 'Y Pos: ');
+  LT.pForm.y = LT.element('input', { size : 1, 
     'class' : 'fInput' }, yDiv, '0', 1);
-  var xDiv = LT.element('div', { 'class' : 'fLabel' }, LT.piecesForm, 'X Pos: ');
-  LT.piecesForm.x = LT.element('input', { size : 1, 
+  var xDiv = LT.element('div', { 'class' : 'fLabel' }, LT.pForm, 'X Pos: ');
+  LT.pForm.x = LT.element('input', { size : 1, 
     'class' : 'fInput' }, xDiv, '0', 1);
-  var hDiv = LT.element('div', { 'class' : 'fLabel' }, LT.piecesForm, 'Height Offset: ');
-  LT.heightOffset = LT.element('input', { size : 1, 
+  var hDiv = LT.element('div', { 'class' : 'fLabel' }, LT.pForm, 'Height Offset: ');
+  LT.pForm.yOff = LT.element('input', { size : 1, 
     'class' : 'fInput' }, hDiv, '0', 1);  
-  var wDiv = LT.element('div', { 'class' : 'fLabel' }, LT.piecesForm, 'Width Offset: ');
-  LT.widthOffset = LT.element('input', { size : 1, 
+  var wDiv = LT.element('div', { 'class' : 'fLabel' }, LT.pForm, 'Width Offset: ');
+  LT.pForm.xOff = LT.element('input', { size : 1, 
     'class' : 'fInput' }, wDiv, '0', 1);
   tableSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
-        id : 'chatSubmit', size : 8, value : 'Create' }, LT.piecesForm);
+        id : 'chatSubmit', size : 8, value : 'Create' }, LT.pForm);
   tableSubmit.onclick = function() { LT.createPiece(); };
   LT.pieceImageDiv = LT.element('div', { 'style' : 'clear: both; overflow: scroll;' }, LT.piecesTab, 'Columns: ');
   LT.loadPieceImages();
