@@ -43,21 +43,23 @@ LT.loadTable = function (tableID) {
 	  LT.currentTable = LT.tables[i];
 	}
   }
-  LT.currentTable.createGrid();
-  LT.element('br', {}, LT.chatOutput);
-  LT.element('div', {'class' : 'chat_alert'}, LT.chatOutput, 
-  "Loading chat log for " + LT.currentTable.name + "...");
-  LT.lastMessage = 0;
-  LT.refreshMessageList();
-  LT.element('a', {'class' : 'chat_alert'}, LT.chatOutput, 
-    "Arriving at " + LT.currentTable.name);
-  LT.element('br', {}, LT.chatOutput);
-  LT.chatOutput.removeChild(LT.chatBottom);
-  LT.chatOutput.appendChild(LT.chatBottom);
-  LT.chatBottom.scrollIntoView(true);
-  LT.readTiles();
-  LT.loadPieces();
-  document.cookie = 'table=' + LT.currentTable.id + ';';
+  if(LT.currentTable){
+    LT.currentTable.createGrid();
+    LT.element('br', {}, LT.chatOutput);
+    LT.element('div', {'class' : 'chat_alert'}, LT.chatOutput, 
+      "Loading chat log for " + LT.currentTable.name + "...");
+    LT.lastMessage = 0;
+    LT.refreshMessageList();
+    LT.element('a', {'class' : 'chat_alert'}, LT.chatOutput, 
+      "Arriving at " + LT.currentTable.name);
+    LT.element('br', {}, LT.chatOutput);
+    LT.chatOutput.removeChild(LT.chatBottom);
+    LT.chatOutput.appendChild(LT.chatBottom);
+    LT.chatBottom.scrollIntoView(true);
+    LT.readTiles();
+    LT.loadPieces();
+    document.cookie = 'table=' + LT.currentTable.id + ';';
+  }
 }
 
 LT.refreshTables = function () {
@@ -124,8 +126,12 @@ LT.createTablesPanel = function () {
 
 LT.createTable = function () {
   var createTableAjax = LT.ajaxRequest("POST", "php/create_table.php",
-    { name : LT.inputTableName.value, image_id : 1, default_tile: -1,
-    rows : LT.inputTableRows.value, columns : LT.inputTableCols.value,
+    {
+	name : LT.inputTableName.value,
+	image_id : 1,
+	default_tile: -1,
+    rows : LT.inputTableRows.value,
+	columns : LT.inputTableCols.value,
     tile_height : LT.inputTileHeight.value, 
     tile_width : LT.inputTileWidth.value,
     tile_mode : "rectangle" });

@@ -23,19 +23,29 @@ LT.readPieceImages = function(){
 }
 
 LT.loadSwatches = function (){
+  LT.selectedImageID = -1;
+  LT.selectedImage = '';
   while(LT.tilesTab.firstChild){
     LT.tilesTab.removeChild(LT.tilesTab.firstChild);
+  }
+  var eraser = LT.element('div', { style :
+    'float : left; border : 1px solid black; margin : 1px 1px 1px 1px; height : 45px; width: 45px;',},
+     LT.tilesTab, 'erase');
+  eraser.onclick = function() {
+	LT.selectedImageID = -1;
+	LT.selectedImage = '';
   }
   var imagesArray = LT.sortObject(LT.tileImages, 'file');
   for( var i = 0 ; i < imagesArray.length; i++ ){
     newImage = LT.element('img', { title : imagesArray[i].file, 
-	  style : 'border: 1px solid black; margin: 1px 1px 1px 1px', 
+	  'class' : 'swatch', 
 	  src : 'images/upload/tile/' + imagesArray[i].file}, LT.tilesTab);
 	newImage.id = imagesArray[i].id;
 	newImage.file = imagesArray[i].file;
 	newImage.onclick = function() {
 	  LT.selectedImageID = this.id;
       LT.selectedImage = this.file;
+	  //this.
 	}
   }
 }
@@ -51,7 +61,7 @@ LT.loadPieceImages = function (){
 	newImage.id = imagesArray[i].id;
 	newImage.file = imagesArray[i].file;
 	newImage.onclick = function() {
-	  LT.selectedImageID = this.id;
+      LT.selectedPieceImage = this.id;
       LT.selectedImage = this.file;
 	}
   }
@@ -75,7 +85,7 @@ LT.loadPieces = function (){
 LT.createPiece = function () {
   var createPieceAjax = LT.ajaxRequest("POST", "php/create_piece.php",
     { table_id : LT.currentTable.id, 
-	  image_id : 0, 
+	  image_id : LT.selectedPieceImage, 
 	  user_id : 0,
 	  name : LT.pForm.pName.value,
 	  x : LT.pForm.x.value,
@@ -107,9 +117,9 @@ populatePiecesTab = function () {
   var wDiv = LT.element('div', { 'class' : 'fLabel' }, LT.pForm, 'Width Offset: ');
   LT.pForm.xOff = LT.element('input', { size : 1, 
     'class' : 'fInput' }, wDiv, '0', 1);
-  tableSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
+  pSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
         id : 'chatSubmit', size : 8, value : 'Create' }, LT.pForm);
-  tableSubmit.onclick = function() { LT.createPiece(); };
+  pSubmit.onclick = function() { LT.createPiece(); };
   LT.pieceImageDiv = LT.element('div', { 'style' : 'clear: both; overflow: scroll;' }, LT.piecesTab, 'Columns: ');
   LT.loadPieceImages();
 }
