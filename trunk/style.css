@@ -280,6 +280,14 @@ height: 1px; background: #999; width: auto; clear: both; margin: 1px 0px 4px 0px
   color: #000; width: 200px;
   float: left;
 }
+.swatch{
+  border: 1px solid black;
+  margin: 1px 1px 1px 1px
+}
+.selected_swatch{
+  border: 1px solid #F00;
+  margin: 1px 1px 1px 1px
+}
 #loginDiv {
   float: right;
 }

@@ -22,7 +22,6 @@ refreshTimestamps = function () {
   
 }
 
-
 onload = function () {
   //var checkInstall = LT.ajaxRequest("POST", 'php/db_config.php', {}, function(ajax){if(ajax.status != 200){}});
   var checkInstall = LT.ajaxRequest("POST", 'php/db_config.php', {});
@@ -33,4 +32,3 @@ onload = function () {
     LT.installer();
   }
 };
-
