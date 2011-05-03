@@ -136,8 +136,84 @@ LT.Table.prototype = {
           self.door(y, x, direction);
         }
       }
+      self.createGridClickDetectors();
     });
 
+  },
+
+  createGridClickDetectors: function () {
+    // Remove any existing grid click detectors.
+    while(LT.clickWallLayer.firstChild){
+      LT.clickWallLayer.removeChild(LT.clickWallLayer.firstChild);
+    }
+    // Add new click detectors for each tile.
+    for (var row = 0; row < this.tile_rows; row++) {
+      for (var column = 0; column < this.tile_columns; column++) {
+        if (this.tile_mode == 'rectangle') {
+          this.createGridClickDetector(row, column, "n",  1/4, -1/4, 1/2, 1/2);
+          this.createGridClickDetector(row, column, "w", -1/4,  1/4, 1/2, 1/2);
+          if (row == this.tile_rows - 1) {
+            this.createGridClickDetector(row, column, "s",  1/4,  3/4, 1/2, 1/2);
+          }
+          if (column == this.tile_columns - 1) {
+            this.createGridClickDetector(row, column, "e",  3/4,  1/4, 1/2, 1/2);
+          }
+        }
+        if (this.tile_mode == 'isometric') {
+          var offset = (row % 2) / 2;
+          this.createGridClickDetector(row, column, "ne", offset + 1/2, 0, 1/2, 1);
+          this.createGridClickDetector(row, column, "nw", offset,       0, 1/2, 1);
+          if (row == this.tile_rows - 1) {
+            this.createGridClickDetector(row, column, "se", offset + 1/2, 1, 1/2, 1);
+            this.createGridClickDetector(row, column, "sw", offset,       1, 1/2, 1);
+          }
+          else {
+            if (column == 0 && row % 2 == 0) {
+              this.createGridClickDetector(row, column, "sw", offset,       1, 1/2, 1);
+            }
+            if (column == this.tile_columns - 1 && row % 2 == 1) {
+              this.createGridClickDetector(row, column, "se", offset + 1/2, 1, 1/2, 1);
+            }
+          }
+        }
+        if (this.tile_mode == 'hex rows') {
+          var offset = (row % 2) / 2;
+          this.createGridClickDetector(row, column, "ne", offset + 1/2,  0,  1/2, 1/3);
+          this.createGridClickDetector(row, column, "e",  offset + 3/4, 1/3, 1/2, 2/3);
+          this.createGridClickDetector(row, column, "se", offset + 1/2,  1,  1/2, 1/3);
+          this.createGridClickDetector(row, column, "sw", offset,        1,  1/2, 1/3);
+          this.createGridClickDetector(row, column, "w",  offset - 1/4, 1/4, 1/2, 2/3);
+          this.createGridClickDetector(row, column, "nw", offset,        0,  1/2, 1/3);
+        }
+        if (this.tile_mode == 'hex columns') {
+          var offset = (column % 2) / 2;
+          this.createGridClickDetector(row, column, "n",  1/3, offset - 1/4, 2/3, 1/2);
+          this.createGridClickDetector(row, column, "ne",  1,  offset,       1/3, 1/2);
+          this.createGridClickDetector(row, column, "se",  1,  offset + 1/2, 1/3, 1/2);
+          this.createGridClickDetector(row, column, "s",  1/3, offset + 3/4, 2/3, 1/2);
+          this.createGridClickDetector(row, column, "sw",  0,  offset + 1/2, 1/3, 1/2);
+          this.createGridClickDetector(row, column, "nw",  0,  offset,       1/3, 1/2);
+        }
+      }
+    }
+  },
+
+  createGridClickDetector: function (row, column, direction, left, top, width, height) {
+    var clickDiv = LT.element("div", {style: "position: absolute;"
+      + "left: " + (this.tile_width  * (column + left)) + "px;"
+      + "top: " + (this.tile_height * (row + top)) + "px;"
+      + "width: " + (this.tile_width  * width) + "px;"
+      + "height: " + (this.tile_height * height) + "px;"
+      }, LT.clickWallLayer);
+    var self = this;
+    clickDiv.onclick = function () {
+      self.click(row, column, direction);
+    }
+  },
+
+  click: function (row, column, direction) {
+    // TODO: depending on which tool is selected, call this.door(...) or this.clear(...)
+    this.wall(row, column, direction);
   },
   
   setWall: function (column, row, direction, type) {
