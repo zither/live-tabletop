@@ -123,8 +123,8 @@ populatePiecesTab = function () {
 LT.createToolsPanel = function () {
   LT.toolsPanel = new LT.Panel( 'Tools', 'Tools', 6, 95, 210, 110);
   LT.toolsPanel.makeTab('Tiles', LT.bringForward(LT.tableTop, LT.clickTileLayer));
-  LT.toolsPanel.makeTab('Pieces', LT.bringForward(LT.tableTop, LT.clickTileLayer));
-  LT.toolsPanel.makeTab('Fog', LT.bringForward(LT.tableTop, LT.clickTileLayer));
+  LT.toolsPanel.makeTab('Pieces', LT.bringForward(LT.tableTop, LT.clickPieceLayer));
+  LT.toolsPanel.makeTab('Fog', LT.bringForward(LT.tableTop, LT.clickFogLayer));
   LT.toolsPanel.makeTab('Walls', LT.bringForward(LT.tableTop, LT.clickWallLayer));
   LT.piecesTab = LT.toolsPanel.tabs[1].content;
   LT.fogTab = LT.toolsPanel.tabs[2].content;
