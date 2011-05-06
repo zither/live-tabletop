@@ -9,16 +9,11 @@ LT.readTables = function(){
     }
   }
 }
-
 LT.readTiles = function(){
   var readTiles = LT.ajaxRequest("POST", "php/read_tiles.php",{ 'table_id' : LT.currentTable.id });
   if (readTiles.responseXML){
-    while(LT.tileLayer.firstChild){
-      LT.tileLayer.removeChild(LT.tileLayer.firstChild);
-    }
-    while(LT.clickLayer.firstChild){
-      LT.clickLayer.removeChild(LT.clickLayer.firstChild);
-    }
+    LT.fill(LT.tileLayer);
+    LT.fill(LT.clickTileLayer);
     LT.tableTop.setAttribute('style', 'width: ' + LT.currentTable.tile_width * 
       LT.currentTable.tile_columns + 'px; height: ' + LT.currentTable.tile_height *
       LT.currentTable.tile_rows + 'px;');
@@ -66,9 +61,7 @@ LT.refreshTables = function () {
   LT.readTables();
   LT.readTileImages();
   LT.readPieceImages();
-    while(LT.tablesDiv.firstChild){
-      LT.tablesDiv.removeChild(LT.tablesDiv.firstChild);
-    }
+  LT.fill(LT.tablesDiv);
   for( var i = 0 ; i < LT.tables.length; i++ ){	
     tableEntry = LT.element('div', { 'style' : 'clear: both;' }, LT.tablesDiv, ' ')
     var tableLink = LT.element('a', {'class' : 'textButton'}, tableEntry, LT.tables[i].name);
@@ -91,9 +84,10 @@ LT.refreshTables = function () {
 
 LT.createTablesPanel = function () {
   LT.tablesPanel = new LT.Panel( 'Tables', 'Tables', 6, 26, 300, 125);
-  LT.tablesPanel.tabs = new LT.Tabs(LT.tablesPanel, ['Tables', 'Create']);
-  LT.createTableTab = LT.tablesPanel.tabs.tab[1].content;
-  LT.tablesTab = LT.tablesPanel.tabs.tab[0].content;
+  LT.tablesPanel.makeTab('List');
+  LT.tablesPanel.makeTab('Create');
+  LT.createTableTab = LT.tablesPanel.tabs[1].content;
+  LT.tablesTab = LT.tablesPanel.tabs[0].content;
   LT.tablesDiv = LT.element('div',{}, LT.tablesTab);
   LT.refreshTables();  
   LT.tablesForm = LT.element('form', { }, LT.createTableTab);

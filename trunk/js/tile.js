@@ -15,7 +15,7 @@ LT.Tile = function (tableID, x, y, tileCode) {
   }
   this.clickDiv = LT.element('div', {'style': 'position: absolute; left: ' + (x * tWidth)
     + 'px; top: ' + (y * tHeight) + 'px; width: ' + tWidth + 'px; height: ' + tHeight + 'px; '},
-    LT.clickLayer);
+    LT.clickTileLayer);
   this.imageDiv = LT.element('div', {'style': 'position: absolute; left: ' + (x * tWidth)
     + 'px; top: ' + (y * tHeight) + 'px; width: ' + tWidth + 'px; height: ' + tHeight + 'px; ' +    
 	' background: url(images/upload/tile/' + tBackground + ');'},

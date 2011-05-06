@@ -33,7 +33,7 @@ LT.Panel = function (panelName, buttonName, x, y, width, height, buttonLoc) {
 
   var panel = this; // Remember the current 'this' during event handlers.
   LT.Panel.order.push(this);
-  
+  this.tabs = [];
   // Set Default Paramaters
   this.defaultX = x;
   this.defaultY = y;
@@ -88,36 +88,34 @@ LT.Panel = function (panelName, buttonName, x, y, width, height, buttonLoc) {
 
 LT.Panel.order = [];
 
-//PANEL TABS CONSTRUCTOR
-
-LT.Tabs = function (parentPanel, tabNames) {
-  var tabs = this;
-  tabs.number = tabNames.length;
-  tabs.tabBar = LT.element('div', {'class' : 'tabBar'}, parentPanel.header);
-  parentPanel.content.style.background = "#e7e8e9";
-  var tick = 1;
+//PANEL TABS FUNCTION
+LT.Panel.prototype.makeTab = function(name, action){
+  if(!this.tabBar){
+    this.tabBar = LT.element('div', {'class' : 'tabBar'}, this.header);
+  }
+  this.content.style.background = "#e7e8e9";
   var isActive = 'activeTab';
-  tabs.tab = [];
-  for(var i = 0; i < tabNames.length; i++){
-    tabs.tab[i] = LT.element('div', {'class' : isActive}, tabs.tabBar);
-	LT.element('div', {'class' : 'tabStart'}, tabs.tab[i]);
-	LT.element('div', {'class' : 'tabContent'}, tabs.tab[i], tabNames[i]);
-	LT.element('div', {'class' : 'tabEnd'}, tabs.tab[i]);
-	if(tick){
-      tick = 0; isActive = "inactiveTab"; 
-	  tabs.tab[i].content = LT.element('div', {}, parentPanel.content);
-	}else{
-	  tabs.tab[i].content = LT.element('div', {});
-	}
-	tabs.tab[i].onclick = function () {
-      for(var n = 0; n < tabs.number; n++){
-	    tabs.tab[n].className = 'inactiveTab';
-        while(parentPanel.content.firstChild){
-          parentPanel.content.removeChild(parentPanel.content.firstChild);
-	    }
-      }
-	  this.className = 'activeTab';
-	  parentPanel.content.appendChild(this.content);
+  if (this.tabs.length > 0){
+    isActive = 'inactiveTab';
+  }
+  var tabLabel = LT.element('div', {'class' : isActive}, this.tabBar);
+  LT.element('div', {'class' : 'tabStart'}, tabLabel);
+  LT.element('div', {'class' : 'tabContent'}, tabLabel, name);
+  LT.element('div', {'class' : 'tabEnd'}, tabLabel);
+  var tabContent = LT.element('div', {});
+  this.tabs.push({label : tabLabel, content : tabContent});
+  if (this.tabs.length == 1){
+    this.content.appendChild(tabContent);
+  }
+  var self = this;
+  tabLabel.onclick = function () {
+    for(var n = 0; n < self.tabs.length; n++){
+      self.tabs[n].label.className = 'inactiveTab';
+    }
+    tabLabel.className = 'activeTab';
+	LT.fill(self.content, tabContent);
+	if (action) {
+        action();
 	}
   }
 }

@@ -110,9 +110,7 @@ LT.Table.prototype = {
   createGrid: function () {
 
     // Remove any grid which is currently in the wall layer.
-    while(LT.wallLayer.firstChild){
-      LT.wallLayer.removeChild(LT.wallLayer.firstChild);
-    }
+	LT.fill(LT.wallLayer);
 
     // Add a new grid to the wall layer.
     this.grid = new LT.Grid(this.tile_columns, this.tile_rows,
@@ -143,9 +141,7 @@ LT.Table.prototype = {
 
   createGridClickDetectors: function () {
     // Remove any existing grid click detectors.
-    while(LT.clickWallLayer.firstChild){
-      LT.clickWallLayer.removeChild(LT.clickWallLayer.firstChild);
-    }
+	LT.fill(LT.clickWallLayer);
     // Add new click detectors for each tile.
     for (var row = 0; row < this.tile_rows; row++) {
       for (var column = 0; column < this.tile_columns; column++) {
