@@ -2,8 +2,12 @@ LT.loadLT = function () {
   LT.tableTop = LT.element('div', {id: 'tableTop'}, document.body);
   LT.tileLayer = LT.element('div', {}, LT.tableTop);
   LT.wallLayer = LT.element('div', {}, LT.tableTop);
+  LT.pieceLayer = LT.element('div', {}, LT.tableTop);
+  LT.fogLayer = LT.element('div', {}, LT.tableTop);
   LT.clickTileLayer = LT.element('div', {}, LT.tableTop);
   LT.clickWallLayer = LT.element('div', {style: 'display: none'}, LT.tableTop);
+  LT.clickPieceLayer = LT.element('div', {}, LT.tableTop);
+  LT.clickFogLayer = LT.element('div', {}, LT.tableTop);
   LT.pageBar = LT.element('div', {id: 'pageBar'}, document.body);
   LT.element('div', {id: 'logo'}, LT.pageBar);
   LT.buttons = LT.element('div', {id: 'buttons'}, LT.pageBar);
