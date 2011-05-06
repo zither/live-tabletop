@@ -25,9 +25,7 @@ LT.readPieceImages = function(){
 LT.loadSwatches = function (){
   LT.selectedImageID = -1;
   LT.selectedImage = '';
-  while(LT.tilesTab.firstChild){
-    LT.tilesTab.removeChild(LT.tilesTab.firstChild);
-  }
+  LT.fill(LT.tilesTab);
   var eraser = LT.element('div', { style :
     'float : left; border : 1px solid black; margin : 1px 1px 1px 1px; height : 45px; width: 45px;',},
      LT.tilesTab, 'erase');
@@ -50,9 +48,7 @@ LT.loadSwatches = function (){
   }
 }
 LT.loadPieceImages = function (){
-  while(LT.pieceImageDiv.firstChild){
-    LT.pieceImageDiv.removeChild(LT.pieceImageDiv.firstChild);
-  }
+  LT.fill(LT.pieceImageDiv);
   var imagesArray = LT.sortObject(LT.pieceImages, 'file');
   for( var i = 0 ; i < imagesArray.length; i++ ){
     newImage = LT.element('img', { title : imagesArray[i].file, 
@@ -123,12 +119,16 @@ populatePiecesTab = function () {
   LT.pieceImageDiv = LT.element('div', { 'style' : 'clear: both; overflow: scroll;' }, LT.piecesTab, 'Columns: ');
   LT.loadPieceImages();
 }
+
 LT.createToolsPanel = function () {
   LT.toolsPanel = new LT.Panel( 'Tools', 'Tools', 6, 95, 210, 110);
-  LT.toolsPanel.tabs = new LT.Tabs(LT.toolsPanel, ['Tiles', 'Pieces', 'Fog']);
-  LT.piecesTab = LT.toolsPanel.tabs.tab[1].content;
-  LT.fogTab = LT.toolsPanel.tabs.tab[2].content;
-  LT.tilesTab = LT.toolsPanel.tabs.tab[0].content;
+  LT.toolsPanel.makeTab('Tiles', LT.bringForward(LT.tableTop, LT.clickTileLayer));
+  LT.toolsPanel.makeTab('Pieces', LT.bringForward(LT.tableTop, LT.clickTileLayer));
+  LT.toolsPanel.makeTab('Fog', LT.bringForward(LT.tableTop, LT.clickTileLayer));
+  LT.toolsPanel.makeTab('Walls', LT.bringForward(LT.tableTop, LT.clickWallLayer));
+  LT.piecesTab = LT.toolsPanel.tabs[1].content;
+  LT.fogTab = LT.toolsPanel.tabs[2].content;
+  LT.tilesTab = LT.toolsPanel.tabs[0].content;
   populatePiecesTab();
   LT.element('div', {}, LT.fogTab, "YOU");
 };

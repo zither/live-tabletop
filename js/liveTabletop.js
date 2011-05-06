@@ -113,3 +113,19 @@ LT.sortObject = function (map, sortBy){
   } );
   return sortedArray;
 }
+
+// Clears parent element and adds child
+LT.fill = function (pObject, cObject){
+  while(pObject.firstChild){
+    pObject.removeChild(pObject.firstChild);
+  }
+  if (cObject){
+    pObject.appendChild(cObject);
+  }
+}
+
+// Brings element to the forground
+LT.bringForward = function (pObject, cObject){
+  pObject.removeChild(cObject);
+  pObject.appendChild(cObject);
+}
