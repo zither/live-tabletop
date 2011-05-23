@@ -302,4 +302,8 @@ height: 1px; background: #999; width: auto; clear: both; margin: 1px 0px 4px 0px
   color: #333;
   margin-right: 4px;
 }
+.roll {
+  font-style: italic;
+  color: #900;
+}
 
