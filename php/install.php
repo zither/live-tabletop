@@ -10,14 +10,19 @@ include('include/users.php');
 $location = $_REQUEST['location'];
 $username = $_REQUEST['username'];
 $password = $_REQUEST['password'];
-$database = $_REQUEST['database'];
 
-$LT_SQL = new mysqli($location , $username , $password, $database);
+$LT_SQL = new mysqli($location, $username, $password);
 if ($LT_SQL->connect_errno != 0) die('Could not connect.');
 
+$database = $LT_SQL->real_escape_string($_REQUEST['database']);
 $admin_username = $LT_SQL->real_escape_string($_REQUEST['admin_username']);
 $admin_password = $LT_SQL->real_escape_string($_REQUEST['admin_password']);
 
+$LT_SQL->query("CREATE DATABASE IF NOT EXISTS $database")
+  or die ("Query failed: "  . $LT_SQL->error);
+
+$LT_SQL->query("USE $database")
+  or die ("Query failed: "  . $LT_SQL->error);
 
 // Create the Database Schema (tables and stored procedures)
 
