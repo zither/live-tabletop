@@ -30,16 +30,17 @@ function LT_roll($roll) {
   return $total;
 }
 
-// Replaces text in square brackets with <span> elements 
-// whose title attributes are the text between the square bracket, 
-// but whose contents are the result of passing that text through LT_roll().
-// The title is displayed as a tooltip in most browsers.
+// replace text in square brackets with corresponding dice rolls
 function LT_expand_rolls($string) {
   $left = explode('[', htmlspecialchars($string));
   $output = $left[0];
   for ($i = 1; $i < count($left); $i++) {
     $right = explode(']', $left[$i]);
+/*
     $output .= (count($right) == 2) ? "<span title=\"{$right[0]}\">"
+      . LT_roll($right[0]) . "</span>{$right[1]}" : $left[$i];
+*/
+    $output .= (count($right) == 2) ? "<span class=\"roll\">{$right[0]} = "
       . LT_roll($right[0]) . "</span>{$right[1]}" : $left[$i];
   }
   return $output;
