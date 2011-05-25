@@ -9,14 +9,24 @@ LT.readTables = function(){
     }
   }
 }
+
+LT.resizeLayer = function (pObject){
+    pObject.setAttribute('style', 'width: ' + LT.currentTable.tile_width * 
+      LT.currentTable.tile_columns + 'px; height: ' + LT.currentTable.tile_height *
+      LT.currentTable.tile_rows + 'px;');
+}
+
 LT.readTiles = function(){
   var readTiles = LT.ajaxRequest("POST", "php/read_tiles.php",{ 'table_id' : LT.currentTable.id });
   if (readTiles.responseXML){
     LT.fill(LT.tileLayer);
     LT.fill(LT.clickTileLayer);
-    LT.tableTop.setAttribute('style', 'width: ' + LT.currentTable.tile_width * 
+	LT.resizeLayer(LT.tableTop);
+	LT.resizeLayer(LT.clickWallLayer);
+	LT.resizeLayer(LT.clickFogLayer);
+    /*LT.tableTop.setAttribute('style', 'width: ' + LT.currentTable.tile_width * 
       LT.currentTable.tile_columns + 'px; height: ' + LT.currentTable.tile_height *
-      LT.currentTable.tile_rows + 'px;');
+      LT.currentTable.tile_rows + 'px;');*/
     LT.tiles = [];
     var tileElements = readTiles.responseXML.getElementsByTagName('tiles');
 
