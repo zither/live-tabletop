@@ -72,8 +72,12 @@ LT.loadPieces = function (){
       var piece = new LT.Piece(pieceElements[i]);
 	  LT.pieces[piece.id] = piece;
       var newPiece = LT.element('div', { title : pieceElements[i].file, 
-	  style : 'position: absolute; margin: 1px 1px 1px 1px', 
-	  src : 'images/upload/piece/' + pieceElements[i].file}, LT.tableTop);
+	  style : 'height: ' + pieceElements[i].getAttribute('width') + 'px; '
+        + 'width: ' + pieceElements[i].getAttribute('width') + 'px; '
+        + 'margin-left: ' + pieceElements[i].getAttribute('x')  + 'px; '
+        + 'margin-top: ' + pieceElements[i].getAttribute('y') + 'px; '
+		+ 'position: absolute; background: #FFF;', 
+	    src : 'images/upload/piece/' + pieceElements[i].file}, LT.pieceLayer);
     }
   }
 }
@@ -88,10 +92,11 @@ LT.createPiece = function () {
 	  y : LT.pForm.y.value, 
 	  x_offset : LT.pForm.xOff.value,
 	  y_offset : LT.pForm.yOff.value,
-	  height : 10,
-	  width : 10 
+	  height : LT.pForm.hInput.value,
+	  width : LT.pForm.wInput.value 
 	}
   );
+  LT.loadPieces();
 }
 populatePiecesTab = function () {
   //LT.piecesTab.style.overflow = 'scroll';
@@ -99,20 +104,24 @@ populatePiecesTab = function () {
   var nameDiv = LT.element('div', { 'class' : 'fLabel' }, LT.pForm, 'Name: ');
   LT.pForm.pName = LT.element('input', { size : 10, type: 'text',
     'class' : 'fInput' }, nameDiv, 'Piece Name', 1);
-
-  
+  var hDiv = LT.element('div', { 'class' : 'fLabel' }, LT.pForm, 'Height: ');
+  LT.pForm.hInput = LT.element('input', { size : 1, 
+    'class' : 'fInput' }, hDiv, '0', 1);  
+  var wDiv = LT.element('div', { 'class' : 'fLabel' }, LT.pForm, 'Width: ');
+  LT.pForm.wInput = LT.element('input', { size : 1, 
+    'class' : 'fInput' }, wDiv, '0', 1);
   var yDiv = LT.element('div', { 'class' : 'fLabel' }, LT.pForm, 'Y Pos: ');
   LT.pForm.y = LT.element('input', { size : 1, 
     'class' : 'fInput' }, yDiv, '0', 1);
   var xDiv = LT.element('div', { 'class' : 'fLabel' }, LT.pForm, 'X Pos: ');
   LT.pForm.x = LT.element('input', { size : 1, 
     'class' : 'fInput' }, xDiv, '0', 1);
-  var hDiv = LT.element('div', { 'class' : 'fLabel' }, LT.pForm, 'Height Offset: ');
+  var hOffDiv = LT.element('div', { 'class' : 'fLabel' }, LT.pForm, 'Height Offset: ');
   LT.pForm.yOff = LT.element('input', { size : 1, 
-    'class' : 'fInput' }, hDiv, '0', 1);  
-  var wDiv = LT.element('div', { 'class' : 'fLabel' }, LT.pForm, 'Width Offset: ');
+    'class' : 'fInput' }, hOffDiv, '0', 1);  
+  var wOffDiv = LT.element('div', { 'class' : 'fLabel' }, LT.pForm, 'Width Offset: ');
   LT.pForm.xOff = LT.element('input', { size : 1, 
-    'class' : 'fInput' }, wDiv, '0', 1);
+    'class' : 'fInput' }, wOffDiv, '0', 1);
   pSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
         id : 'chatSubmit', size : 8, value : 'Create' }, LT.pForm);
   pSubmit.onclick = function() { LT.createPiece(); };
