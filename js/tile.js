@@ -5,6 +5,7 @@ LT.Tile = function (tableID, x, y, tileCode) {
   this.y = y;
   this.fog = parseInt(tileCode[0]);
   this.image_id = parseInt(tileCode.slice(1));
+  this.image = LT.element('div', {}, LT.tileLayer);
   this.createImage();
   this.createClickableElement();
 };
@@ -45,12 +46,9 @@ LT.Tile.prototype = {
 
   // CREATE A PROPERLY SCALED AND POSITIONED IMAGE
   createImage: function () {
-    // if the tile already has an image, remove it
-    if (this.image) {
-      this.image.parentNode.removeChild(this.image);
-      delete(this.image);
-    }
-    // if the tile is not empty, create an image
+    // if the tile is empty, replace the image with a placeholder
+    var replacement = LT.element('div', {style: 'display:none;'});
+    // if the tile is not empty, create a new image
     if (this.image_id != -1) {
       var image = LT.tileImages[this.image_id];
       var tile_width = LT.currentTable.tile_width;
@@ -63,12 +61,13 @@ LT.Tile.prototype = {
       var margin_top = -Math.round(image.center_y * yScale);
       var left = Math.round((this.x + 0.5) * tile_width);
       var top = Math.round((this.y + 0.5) * tile_height);
-      this.image = LT.element('img', {'src' : image.getURL(),
+      replacement = LT.element('img', {'src' : image.getURL(),
         'style': 'position: absolute; left: ' + left + 'px; top: ' + top + 'px; '
         + 'width: ' + image_width + 'px; height: ' + image_height + 'px; '
-        + 'margin-left: ' + margin_left + 'px; margin-top: ' + margin_top + 'px; '},
-        LT.tileLayer);
+        + 'margin-left: ' + margin_left + 'px; margin-top: ' + margin_top + 'px; '});
     }
+    this.image.parentNode.replaceChild(replacement, this.image);
+    this.image = replacement
   },
 
   // CREATE AN ELEMENT YOU CAN CLICK ON TO CHANGE THE TILE
