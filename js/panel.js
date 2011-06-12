@@ -208,13 +208,14 @@ document.onmouseup = function () {
   LT.selectedBR = null;
   LT.selectedTL = null;
   LT.clickDragGap = 0;
-  LT.tileDragging = 0;
+  LT.Tile.dragging = 0;
   LT.savePanels();
 }
 
 // Move or resize a panel when the mouse is dragged.
 document.onmousemove = function (e) {
   if (!e) var e = window.event;
+
 
   // grab the X and Y position of the mouse cursor
   if (document.all) { // IE browser
