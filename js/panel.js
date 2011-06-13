@@ -89,7 +89,7 @@ LT.Panel = function (panelName, buttonName, x, y, width, height, buttonLoc) {
 LT.Panel.order = [];
 
 //PANEL TABS FUNCTION
-LT.Panel.prototype.makeTab = function(name, action){
+LT.Panel.prototype.makeTab = function (name, action) {
   if(!this.tabBar){
     this.tabBar = LT.element('div', {'class' : 'tabBar'}, this.header);
   }
@@ -103,21 +103,26 @@ LT.Panel.prototype.makeTab = function(name, action){
   LT.element('div', {'class' : 'tabContent'}, tabLabel, name);
   LT.element('div', {'class' : 'tabEnd'}, tabLabel);
   var tabContent = LT.element('div', {});
-  this.tabs.push({label : tabLabel, content : tabContent});
+  this.tabs.push({'label' : tabLabel, 'content' : tabContent, 'action' : action});
   if (this.tabs.length == 1){
     this.content.appendChild(tabContent);
   }
   var self = this;
+  var tabNumber = this.tabs.length - 1;
   tabLabel.onclick = function () {
-    for(var n = 0; n < self.tabs.length; n++){
-      self.tabs[n].label.className = 'inactiveTab';
-    }
-    tabLabel.className = 'activeTab';
-	LT.fill(self.content, tabContent);
-	if (action) {
-        action();
-	}
+    self.selectTab(tabNumber);
   }
+}
+LT.Panel.prototype.selectTab = function (tabNumber) {
+  var tab = this.tabs[tabNumber];
+  for(var n = 0; n < this.tabs.length; n++){
+    this.tabs[n].label.className = 'inactiveTab';
+  }
+  tab.label.className = 'activeTab';
+  LT.fill(this.content, tab.content);
+  if (tab.action) {
+    tab.action();
+  }  
 }
 
 LT.Panel.prototype.refreshPanel = function(){
