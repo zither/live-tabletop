@@ -103,9 +103,9 @@ LT.loadPieces = function () {
 	    style : 'position: absolute; height: '
           + imageSource.height + 'px; width: '
 		  + imageSource.width + 'px; background: #000; opacity: .5; '
-          + 'margin-left: ' + piecesArray[i].x_offset + 'px; '
-          + 'margin-top: ' + piecesArray[i].y_offset + 'px; '
-		}, LT.clickPieceLayer);
+          + 'margin-left: ' + (piecesArray[i].x + piecesArray[i].x_offset)
+		  + 'px; margin-top: ' + (piecesArray[i].y + piecesArray[i].y_offset)
+		  + 'px; '}, LT.clickPieceLayer);
 	 
     }
   }
