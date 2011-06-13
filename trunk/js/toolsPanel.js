@@ -41,9 +41,10 @@ LT.loadSwatches = function (){
 	newImage.id = imagesArray[i].id;
 	newImage.file = imagesArray[i].file;
 	newImage.onclick = function() {
+	  var tileH = LT.pForm.hInput.value;
+	  var tileW = LT.pForm.wInput.value;
+	  LT.pForm.yOff.setAttribute('value', LT.currentTable.tile_height);
 	  LT.selectedImageID = this.id;
-      LT.selectedImage = this.file;
-	  //this.
 	}
   }
 }
@@ -58,12 +59,12 @@ LT.loadPieceImages = function (){
 	newImage.file = imagesArray[i].file;
 	newImage.onclick = function() {
       LT.selectedPieceImage = this.id;
-      LT.selectedImage = this.file;
 	}
   }
 }
 
 LT.loadPieces = function (){
+  LT.fill(LT.pieceLayer);
   var readPieces = LT.ajaxRequest("POST", "php/read_pieces.php",{ 'table_id' : LT.currentTable.id });
   if (readPieces.responseXML){
     var pieceElements = readPieces.responseXML.getElementsByTagName('piece');
@@ -71,13 +72,23 @@ LT.loadPieces = function (){
     for( var i = 0 ; i < pieceElements.length; i++ ){
       var piece = new LT.Piece(pieceElements[i]);
 	  LT.pieces[piece.id] = piece;
-      var newPiece = LT.element('div', { title : pieceElements[i].file, 
-	  style : 'height: ' + pieceElements[i].getAttribute('width') + 'px; '
-        + 'width: ' + pieceElements[i].getAttribute('width') + 'px; '
-        + 'margin-left: ' + pieceElements[i].getAttribute('x')  + 'px; '
-        + 'margin-top: ' + pieceElements[i].getAttribute('y') + 'px; '
-		+ 'position: absolute; background: #FFF;', 
-	    src : 'images/upload/piece/' + pieceElements[i].file}, LT.pieceLayer);
+	}
+	var piecesArray = LT.sortObject(LT.pieces, 'id');
+	for( var i = 0; i < piecesArray.length; i++) {
+      var newPiece = LT.element('div', { title : piecesArray[i].id, 
+	  style : 'height: ' + piecesArray[i].height + 'px; '
+        + 'width: ' + piecesArray[i].width + 'px; '
+        + 'margin-left: ' + piecesArray[i].x + 'px; '
+        + 'margin-top: ' + piecesArray[i].y + 'px; '
+		+ 'position: absolute; background: #FFF;'}, LT.pieceLayer);
+	  var imagesArray = LT.sortObject(LT.pieceImages, 'file');
+	  for ( var n = 0 ; n < imagesArray.length; n++ ) {
+	    if (piecesArray[i].image_id == imagesArray[n].id) {
+		   imageSource = imagesArray[n].file;
+		}
+	  }
+	  var pieceImage = LT.element('img', {
+	    src : 'images/upload/piece/' + imageSource}, newPiece, imageSource);
     }
   }
 }

@@ -64,6 +64,8 @@ LT.loadTable = function (tableID) {
     LT.readTiles();
     LT.loadPieces();
     document.cookie = 'table=' + LT.currentTable.id + ';';
+    LT.pForm.wInput.setAttribute('value', LT.currentTable.tile_width);
+    LT.pForm.hInput.setAttribute('value', LT.currentTable.tile_height);
   }
 }
 
