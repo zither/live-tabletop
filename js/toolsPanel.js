@@ -44,6 +44,7 @@ LT.loadSwatches = function (){
 	  var tileH = LT.pForm.hInput.value;
 	  var tileW = LT.pForm.wInput.value;
 	  LT.pForm.yOff.setAttribute('value', LT.currentTable.tile_height);
+	  alert('hello');
 	  LT.selectedImageID = this.id;
 	}
   }
