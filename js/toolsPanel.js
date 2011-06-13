@@ -41,12 +41,17 @@ LT.loadSwatches = function (){
 	newImage.id = imagesArray[i].id;
 	newImage.file = imagesArray[i].file;
 	newImage.onclick = function() {
-	  var tileH = LT.pForm.hInput.value;
-	  var tileW = LT.pForm.wInput.value;
-	  LT.pForm.yOff.setAttribute('value', LT.currentTable.tile_height);
-	  alert('hello');
 	  LT.selectedImageID = this.id;
 	}
+  }
+}
+selectPiece = function (i){ //=========DELETE
+  if(LT.currentTable.tile_height){
+    var tileH = LT.currentTable.tile_height;
+    var tileW = LT.currentTable.tile_width;
+  }else{
+    var tileH = LT.pForm.hInput.value;
+    var tileW = LT.pForm.wInput.value;
   }
 }
 LT.loadPieceImages = function (){
@@ -57,9 +62,10 @@ LT.loadPieceImages = function (){
 	  style : 'border: 1px solid black; margin: 1px 1px 1px 1px', 
 	  src : 'images/upload/piece/' + imagesArray[i].file}, LT.pieceImageDiv);
 	newImage.id = imagesArray[i].id;
-	newImage.file = imagesArray[i].file;
-	newImage.onclick = function() {
-      LT.selectedPieceImage = this.id;
+	newImage.height = imagesArray[i].height;
+	newImage.onclick = function (){
+	  LT.selectedPieceImage = this.id;
+      LT.pForm.yOff.setAttribute('value', this.height);
 	}
   }
 }
