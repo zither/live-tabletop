@@ -29,9 +29,6 @@ LT.readTiles = function(){
 	LT.resizeLayer(LT.tableTop);
 	LT.resizeLayer(LT.clickWallLayer);
 	LT.resizeLayer(LT.clickFogLayer);
-    /*LT.tableTop.setAttribute('style', 'width: ' + LT.currentTable.tile_width * 
-      LT.currentTable.tile_columns + 'px; height: ' + LT.currentTable.tile_height *
-      LT.currentTable.tile_rows + 'px;');*/
     LT.tiles = [];
     var tileElements = readTiles.responseXML.getElementsByTagName('tiles');
 

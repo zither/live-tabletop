@@ -45,7 +45,7 @@ LT.loadSwatches = function (){
 	}
   }
 }
-makeSelectPieceHandler = function (image) { //=========DELETE
+makeSelectPieceHandler = function (image) {
   return function () {
     if (LT.currentTable.tile_height) {
       var tileH = LT.currentTable.tile_height;
@@ -55,48 +55,58 @@ makeSelectPieceHandler = function (image) { //=========DELETE
       var tileW = LT.pForm.wInput.value;
     }
     LT.selectedPieceImage = image.id;
-    LT.pForm.yOff.setAttribute('value', image.height);
+    LT.pForm.yOff.setAttribute('value', (image.height - tileH) * -1 );
+    LT.pForm.xOff.setAttribute('value', (image.width - tileW) / -2 );
   };
 }
-LT.loadPieceImages = function (){
+LT.loadPieceImages = function () {
   LT.fill(LT.pieceImageDiv);
   var imagesArray = LT.sortObject(LT.pieceImages, 'file');
-  for( var i = 0 ; i < imagesArray.length; i++ ){
+  for ( var i = 0 ; i < imagesArray.length; i++ ) {
     newImage = LT.element('img', { title : imagesArray[i].file, 
 	  style : 'border: 1px solid black; margin: 1px 1px 1px 1px', 
 	  src : 'images/upload/piece/' + imagesArray[i].file}, LT.pieceImageDiv);
-	newImage.id = imagesArray[i].id;
-	newImage.height = imagesArray[i].height;
 	newImage.onclick = makeSelectPieceHandler(imagesArray[i]);
   }
 }
 
-LT.loadPieces = function (){
+LT.loadPieces = function () {
   LT.fill(LT.pieceLayer);
   var readPieces = LT.ajaxRequest("POST", "php/read_pieces.php",{ 'table_id' : LT.currentTable.id });
-  if (readPieces.responseXML){
+  if (readPieces.responseXML) {
     var pieceElements = readPieces.responseXML.getElementsByTagName('piece');
     LT.pieces = {};
-    for( var i = 0 ; i < pieceElements.length; i++ ){
+    for ( var i = 0 ; i < pieceElements.length; i++ ) {
       var piece = new LT.Piece(pieceElements[i]);
 	  LT.pieces[piece.id] = piece;
 	}
 	var piecesArray = LT.sortObject(LT.pieces, 'id');
-	for( var i = 0; i < piecesArray.length; i++) {
-      var newPiece = LT.element('div', { title : piecesArray[i].id, 
-	  style : 'height: ' + piecesArray[i].height + 'px; '
-        + 'width: ' + piecesArray[i].width + 'px; '
-        + 'margin-left: ' + piecesArray[i].x + 'px; '
-        + 'margin-top: ' + piecesArray[i].y + 'px; '
-		+ 'position: absolute; background: #FFF;'}, LT.pieceLayer);
+	for ( var i = 0; i < piecesArray.length; i++) {
+      var newPiece = LT.element('div', {
+	    style : 'height: ' + piecesArray[i].height + 'px; '
+          + 'width: ' + piecesArray[i].width + 'px; '
+          + 'margin-left: ' + piecesArray[i].x + 'px; '
+          + 'margin-top: ' + piecesArray[i].y + 'px; '
+		  + 'position: absolute; background: #FFF;'}, LT.pieceLayer);
 	  var imagesArray = LT.sortObject(LT.pieceImages, 'file');
 	  for ( var n = 0 ; n < imagesArray.length; n++ ) {
 	    if (piecesArray[i].image_id == imagesArray[n].id) {
-		   imageSource = imagesArray[n].file;
+		   imageSource = imagesArray[n];
 		}
 	  }
-	  var pieceImage = LT.element('img', {
-	    src : 'images/upload/piece/' + imageSource}, newPiece, imageSource);
+	  var pieceImage = LT.element('img', { 
+	    style: ' margin-top: '
+	      + piecesArray[i].y_offset + 'px; margin-left: ' 
+	      + piecesArray[i].x_offset + 'px;',
+	    src : 'images/upload/piece/' + imageSource.file}, newPiece);
+	  var movePiece = LT.element('div', { title : piecesArray[i].id,
+	    style : 'position: absolute; height: '
+          + imageSource.height + 'px; width: '
+		  + imageSource.width + 'px; background: #000; opacity: .5; '
+          + 'margin-left: ' + piecesArray[i].x_offset + 'px; '
+          + 'margin-top: ' + piecesArray[i].y_offset + 'px; '
+		}, LT.clickPieceLayer);
+	 
     }
   }
 }
