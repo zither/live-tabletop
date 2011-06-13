@@ -32,6 +32,7 @@ for ($i = 0; $i < count($rows); $i++) {
     . " tile_height=\"{$rows[$i]['tile_height']}\""
     . " center_x=\"{$rows[$i]['center_x']}\""
     . " center_y=\"{$rows[$i]['center_y']}\""
+    . " layer=\"{$rows[$i]['layer']}\""
     // URL-encode strings to be decoded by javascript's decodeURIComponent.
     . " file=\"" . rawurlencode($rows[$i]['file']) . "\""
     . " type=\"" . rawurlencode($rows[$i]['type']) . "\""

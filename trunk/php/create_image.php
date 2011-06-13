@@ -27,6 +27,7 @@ $center_y = LT_request('center_y', $height / 2);
 $tile_width = LT_request('tile_width', $width);
 $tile_height = LT_request('tile_height', $height);
 $tile_mode = LT_request('tile_mode', 'rectangle');
+$layer = LT_request('layer', 0);
 $type = LT_request('type', 'no type request variable provided');
 if (!LT_image_type($type)) done("Unsupported category: " . $type);
 
@@ -38,7 +39,7 @@ move_uploaded_file($_FILES['file']['tmp_name'], LT_image_path($type, $file))
 // Query the Database
 
 $rows = LT_call_silent('create_image', $user, $file, $type, 0, $width, $height,
-  $tile_width, $tile_height, $center_x, $center_y, $tile_mode);
+  $tile_width, $tile_height, $center_x, $center_y, $tile_mode, $layer);
 if (!is_array($rows)) done("Query failed: " . $LT_SQL->error);
 
 // Generate Output

@@ -171,7 +171,8 @@ CREATE TABLE images (
   tile_height INT NOT NULL,
   center_x INT NOT NULL,
   center_y INT NOT NULL,
-  tile_mode TEXT NOT NULL
+  tile_mode TEXT NOT NULL,
+  layer INT NOT NULL DEFAULT 0
 );
 
 
@@ -503,42 +504,46 @@ CREATE PROCEDURE create_image (IN the_user INT, IN the_file TEXT,
   IN the_type TEXT, IN the_public TINYINT,
   IN the_width INT, IN the_height INT, 
   IN the_tile_width INT, IN the_tile_height INT,
-  IN the_center_x INT, IN the_center_y INT, IN the_tile_mode TEXT)
+  IN the_center_x INT, IN the_center_y INT,
+  IN the_tile_mode TEXT, IN the_layer INT)
 BEGIN
   INSERT INTO images (user_id, file, type, public, width, height,
-    tile_width, tile_height, center_x, center_y, tile_mode)
+    tile_width, tile_height, center_x, center_y, tile_mode, layer)
   VALUES (the_user, the_file, the_type, the_public, the_width, the_height,
-    the_tile_width, the_tile_height, the_center_x, the_center_y, the_tile_mode);
+    the_tile_width, the_tile_height, the_center_x, the_center_y,
+    the_tile_mode, the_layer);
 END; 
 
 CREATE PROCEDURE read_image (IN the_image INT)
 BEGIN
   SELECT id, user_id, file, type, public, UNIX_TIMESTAMP(time_stamp) AS time,
-    width, height, tile_width, tile_height, center_x, center_y, tile_mode
+    width, height, tile_width, tile_height, center_x, center_y, tile_mode, layer
   FROM images WHERE id = the_image;
 END; 
 
 CREATE PROCEDURE read_images (IN the_type TEXT)
 BEGIN
   SELECT id, user_id, file, type, public, UNIX_TIMESTAMP(time_stamp) AS time,
-     width, height, tile_width, tile_height, center_x, center_y, tile_mode
+    width, height, tile_width, tile_height, center_x, center_y, tile_mode, layer
   FROM images WHERE type = the_type;
 END; 
 
 CREATE PROCEDURE read_images_useable (IN the_user INT, IN the_type TEXT)
 BEGIN
   SELECT id, user_id, file, type, public, UNIX_TIMESTAMP(time_stamp) AS time,
-    width, height, tile_width, tile_height, center_x, center_y, tile_mode
+    width, height, tile_width, tile_height, center_x, center_y, tile_mode, layer
   FROM images WHERE type = the_type AND (user_id = the_user OR public = 1);
 END; 
 
 CREATE PROCEDURE update_image (IN the_image INT, IN the_user INT,
   IN the_public INT, IN the_tile_width INT, IN the_tile_height INT,
-  IN the_center_x INT, IN the_center_y INT, IN the_tile_mode TEXT)
+  IN the_center_x INT, IN the_center_y INT, IN the_tile_mode TEXT,
+  IN the_layer INT)
 BEGIN
   UPDATE images SET user_id = the_user, public = the_public,
     tile_width = the_tile_width, tile_height = the_tile_height,
-    center_x = the_center_x, center_y = the_center_y, tile_mode = the_tile_mode
+    center_x = the_center_x, center_y = the_center_y,
+    tile_mode = the_tile_mode, layer = the_layer
   WHERE id = the_image;
 END; 
 
