@@ -45,14 +45,18 @@ LT.loadSwatches = function (){
 	}
   }
 }
-selectPiece = function (i){ //=========DELETE
-  if(LT.currentTable.tile_height){
-    var tileH = LT.currentTable.tile_height;
-    var tileW = LT.currentTable.tile_width;
-  }else{
-    var tileH = LT.pForm.hInput.value;
-    var tileW = LT.pForm.wInput.value;
-  }
+makeSelectPieceHandler = function (image) { //=========DELETE
+  return function () {
+    if (LT.currentTable.tile_height) {
+      var tileH = LT.currentTable.tile_height;
+      var tileW = LT.currentTable.tile_width;
+    } else {
+      var tileH = LT.pForm.hInput.value;
+      var tileW = LT.pForm.wInput.value;
+    }
+    LT.selectedPieceImage = image.id;
+    LT.pForm.yOff.setAttribute('value', image.height);
+  };
 }
 LT.loadPieceImages = function (){
   LT.fill(LT.pieceImageDiv);
@@ -63,10 +67,7 @@ LT.loadPieceImages = function (){
 	  src : 'images/upload/piece/' + imagesArray[i].file}, LT.pieceImageDiv);
 	newImage.id = imagesArray[i].id;
 	newImage.height = imagesArray[i].height;
-	newImage.onclick = function (){
-	  LT.selectedPieceImage = this.id;
-      LT.pForm.yOff.setAttribute('value', this.height);
-	}
+	newImage.onclick = makeSelectPieceHandler(imagesArray[i]);
   }
 }
 
