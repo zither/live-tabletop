@@ -21,8 +21,6 @@ LT.loadLT = function () {
   LT.refreshMessageList();
   var tableCookie = parseInt(getCookie('table'));
   LT.loadTable(tableCookie);
-  LT.pForm.wInput.setAttribute('value', LT.currentTable.tile_width);
-  LT.pForm.hInput.setAttribute('value', LT.currentTable.tile_height);
 }
 
 refreshTimestamps = function () {
