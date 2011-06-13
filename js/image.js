@@ -15,8 +15,9 @@ LT.Image = function (element) {
 };
 
 // GLOBAL VARIABLES
-LT.Image.PROPERTIES = ['id', 'file', 'type', 'user_id', 'public', 'width',
-  'height', 'tile_width', 'tile_height', 'center_x', 'center_y', 'tile_mode'];
+LT.Image.PROPERTIES = ['id', 'file', 'type', 'user_id', 'public',
+  'width', 'height', 'tile_width', 'tile_height', 'center_x', 'center_y',
+  'tile_mode', 'layer'];
 
 // METHODS OF IMAGE OBJECTS
 LT.Image.prototype = {

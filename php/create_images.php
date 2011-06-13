@@ -31,7 +31,9 @@ foreach($document->getElementsByTagName('image') as $image) {
 
 // Query the Database
 
-$attributes = array('tile_width', 'tile_height', 'center_x', 'center_y', 'tile_mode');
+$attributes = array('tile_width', 'tile_height', 'center_x', 'center_y',
+  'tile_mode', 'layer');
+
 for ($i = 0; $i < count($LT_IMAGE_TYPES); $i++) {
   $type = $LT_IMAGE_TYPES[$i];
 
@@ -64,6 +66,7 @@ for ($i = 0; $i < count($LT_IMAGE_TYPES); $i++) {
     $center_x = $width / 2;
     $center_y = $height / 2;
     $tile_mode = 'rectangle';
+    $layer = 0;
 
     // replace default settings with attributes from the metadata
     $key = $type . DIRECTORY_SEPARATOR . $files[$j];
@@ -77,7 +80,8 @@ for ($i = 0; $i < count($LT_IMAGE_TYPES); $i++) {
 
     // send the query that adds the image to the database
     $rows = LT_call_silent('create_image', $user, $files[$j], $type, 1,
-      $width, $height, $tile_width, $tile_height, $center_x, $center_y, $tile_mode);
+      $width, $height, $tile_width, $tile_height, $center_x, $center_y,
+      $tile_mode, $layer);
     if (!is_array($rows)) die("Query failed: " . $LT_SQL->error);
   }
 }
