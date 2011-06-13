@@ -7,6 +7,11 @@ LT.readTables = function(){
       var table = new LT.Table(tableElements[i]);
       LT.tables.push(table);
     }
+	if (!LT.currentTable){
+       LT.currentTable = LT.tables[0];
+	}else{
+	  LT.currentTable = {};
+	}
   }
 }
 

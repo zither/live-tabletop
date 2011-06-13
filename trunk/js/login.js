@@ -114,6 +114,7 @@ LT.login = function () {
 	LT.refreshTables();
 	LT.loadSwatches();
 	LT.loadPanels();
+	LT.loadPieceImages();
   } else {
     alert('Incorrect username or password.');
   }
