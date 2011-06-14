@@ -132,4 +132,19 @@ LT.Piece.prototype.decoration = function () {
   return document.createTextNode(this.name);
 };
 
-
+// Move piece.
+LT.movePiece = function () {
+    var w = parseInt(LT.selectedPiece.movementPiece.style.width);
+    var h = parseInt(LT.selectedPiece.movementPiece.style.height);
+    if (LT.clickDragGap == 0) {
+      LT.clickX = LT.dragX - parseInt(LT.selectedPiece.movementPiece.style.left);
+      LT.clickY = LT.dragY - parseInt(LT.selectedPiece.movementPiece.style.top);
+      LT.clickDragGap = 1;
+   }
+    LT.dragX = Math.min(LT.dragX - LT.clickX, window.innerWidth - w - 25);
+    LT.dragY = Math.min(LT.dragY - LT.clickY, window.innerHeight - h - 61);
+    LT.dragX = Math.max(LT.dragX, 6);
+    LT.dragY = Math.max(LT.dragY, 26);
+    LT.selectedPiece.movementPiece.style.top  = LT.dragY + "px";
+    LT.selectedPiece.movementPiece.style.left = LT.dragX + "px";
+}

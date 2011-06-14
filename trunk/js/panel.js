@@ -202,37 +202,9 @@ LT.loadPanels = function (){
 	}
   }
 }
-// DRAGGING: Use document event handlers to move and resize windows.
 
-// Prevent text selection while dragging in IE and Chrome.
-document.onselectstart = function () {return false;}
-
-// Stop dragging when the mouse button is released.
-document.onmouseup = function () {
-  LT.selectedPanel = null;
-  LT.selectedBR = null;
-  LT.selectedTL = null;
-  LT.clickDragGap = 0;
-  LT.Tile.dragging = 0;
-  LT.savePanels();
-}
-
-// Move or resize a panel when the mouse is dragged.
-document.onmousemove = function (e) {
-  if (!e) var e = window.event;
-
-
-  // grab the X and Y position of the mouse cursor
-  if (document.all) { // IE browser
-    LT.dragX = e.clientX + document.body.scrollLeft;
-    LT.dragY = e.clientY + document.body.scrollTop;
-  } else { // NS browser
-    LT.dragX = e.pageX;
-    LT.dragY = e.pageY;
-  }
-  
-  // Move panel.
-  if (LT.selectedPanel) {
+// Move panel.
+LT.movePanel = function () {
     var w = parseInt(LT.selectedPanel.content.style.width);
     var h = parseInt(LT.selectedPanel.content.style.height);
     if (LT.clickDragGap == 0) {
@@ -246,10 +218,10 @@ document.onmousemove = function (e) {
     LT.dragY = Math.max(LT.dragY, 26);
     LT.selectedPanel.outside.style.top  = LT.dragY + "px";
     LT.selectedPanel.outside.style.left = LT.dragX + "px";
-  }
+}
 
-  // Resize panel using the bottom-right handle.
-  if (LT.selectedBR) {
+// Resize panel using the bottom-right handle.
+LT.resizePanelBR = function () {
     var panelX = parseInt(LT.selectedBR.outside.style.left);
     var panelY = parseInt(LT.selectedBR.outside.style.top);
     if (LT.clickDragGap == 0) {
@@ -267,10 +239,10 @@ document.onmousemove = function (e) {
       window.innerHeight - panelY - 61) + "px";
     LT.selectedBR.bar.style.width = (Math.min(LT.dragX,
       window.innerWidth - panelX - 25) - 36) + "px";
-  }
+}
 
-  // Resize panel using the top-left handle.
-  if (LT.selectedTL) {
+// Resize panel using the top-left handle.
+LT.resizePanelTL = function () {
     if (LT.clickDragGap == 0) {
       LT.clickX = LT.dragX - parseInt(LT.selectedTL.outside.style.left);
       LT.clickY = LT.dragY - parseInt(LT.selectedTL.outside.style.top);
@@ -290,10 +262,7 @@ document.onmousemove = function (e) {
     LT.selectedTL.header.style.width = newWidth + 12 + "px";
     LT.selectedTL.content.style.height = (LT.clickCornerY - LT.dragY) + "px";
     LT.selectedTL.bar.style.width = (LT.clickCornerX - LT.dragX - 36) + "px";
-  }
-  e.preventDefault();
-  return false;
-};
+}
 
 function getCookie(c_name)
 {
