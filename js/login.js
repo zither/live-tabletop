@@ -3,8 +3,7 @@ LT.loginCheck = function () {
   LT.createUserPanel();
   var checkLogin = LT.ajaxRequest("POST", "php/login_check.php",{ });
   if (checkLogin.responseXML) {
-    LT.loginAjax = checkLogin;
-    LT.login();
+    LT.login(checkLogin);
     LT.pageBar.appendChild(LT.userButton);
   } else {
     LT.pageBar.appendChild(LT.loginForm);
@@ -83,12 +82,12 @@ LT.createUser = function () {
 }
 
 LT.sendLogin = function (loginName, loginPW) {
-  LT.loginAjax = LT.ajaxRequest("POST", "php/login.php",
+  var loginAjax = LT.ajaxRequest("POST", "php/login.php",
     { username : loginName, password : loginPW});
-  LT.login();
+  LT.login(loginAjax);
 }
-LT.login = function () {
-  var userElement = LT.loginAjax.responseXML.getElementsByTagName('user')[0];
+LT.login = function (loginAjax) {
+  var userElement = loginAjax.responseXML.getElementsByTagName('user')[0];
   LT.currentUser = new LT.User(userElement);
   var readUsers = LT.ajaxRequest("POST", "php/read_users.php",{});
   if (readUsers.responseXML){

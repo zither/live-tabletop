@@ -75,42 +75,48 @@ LT.loadPieces = function () {
   var readPieces = LT.ajaxRequest("POST", "php/read_pieces.php",{ 'table_id' : LT.currentTable.id });
   if (readPieces.responseXML) {
     var pieceElements = readPieces.responseXML.getElementsByTagName('piece');
-    LT.pieces = {};
+    LT.pieces = [];
     for ( var i = 0 ; i < pieceElements.length; i++ ) {
       var piece = new LT.Piece(pieceElements[i]);
-	  LT.pieces[piece.id] = piece;
+	  LT.pieces.push(piece);
 	}
 	var piecesArray = LT.sortObject(LT.pieces, 'id');
-	for ( var i = 0; i < piecesArray.length; i++) {
-      var newPiece = LT.element('div', {
-	    style : 'height: ' + piecesArray[i].height + 'px; '
-          + 'width: ' + piecesArray[i].width + 'px; '
-          + 'margin-left: ' + piecesArray[i].x + 'px; '
-          + 'margin-top: ' + piecesArray[i].y + 'px; '
+	for (var i = 0; i < LT.pieces.length; i++) {
+	  generatePieceElements(i);
+	}
+  }
+}
+generatePieceElements = function (pieceID) {
+      LT.pieces[pieceID].pieceDiv = LT.element('div', {
+	    style : 'height: ' + LT.pieces[pieceID].height + 'px; '
+          + 'width: ' + LT.pieces[pieceID].width + 'px; '
+          + 'margin-left: ' + LT.pieces[pieceID].x + 'px; '
+          + 'margin-top: ' + LT.pieces[pieceID].y + 'px; '
 		  + 'position: absolute; background: #FFF;'}, LT.pieceLayer);
 	  var imagesArray = LT.sortObject(LT.pieceImages, 'file');
 	  for ( var n = 0 ; n < imagesArray.length; n++ ) {
-	    if (piecesArray[i].image_id == imagesArray[n].id) {
+	    if (LT.pieces[pieceID].image_id == imagesArray[n].id) {
 		   imageSource = imagesArray[n];
 		}
 	  }
-	  var pieceImage = LT.element('img', { 
+	  LT.pieces[pieceID].pieceImage = LT.element('img', { 
 	    style: ' margin-top: '
-	      + piecesArray[i].y_offset + 'px; margin-left: ' 
-	      + piecesArray[i].x_offset + 'px;',
-	    src : 'images/upload/piece/' + imageSource.file}, newPiece);
-	  var movePiece = LT.element('div', { title : piecesArray[i].id,
+	      +LT.pieces[pieceID].y_offset + 'px; margin-left: ' 
+	      + LT.pieces[pieceID].x_offset + 'px;',
+	    src : 'images/upload/piece/' + imageSource.file}, LT.pieces[pieceID].pieceDiv);
+	  LT.pieces[pieceID].movementPiece = LT.element('div', { title : LT.pieces[pieceID].id,
 	    style : 'position: absolute; height: '
           + imageSource.height + 'px; width: '
 		  + imageSource.width + 'px; background: #000; opacity: .5; '
-          + 'margin-left: ' + (piecesArray[i].x + piecesArray[i].x_offset)
-		  + 'px; margin-top: ' + (piecesArray[i].y + piecesArray[i].y_offset)
+          + 'margin-left: ' + (LT.pieces[pieceID].x + LT.pieces[pieceID].x_offset)
+		  + 'px; margin-top: ' + (LT.pieces[pieceID].y + LT.pieces[pieceID].y_offset)
 		  + 'px; '}, LT.clickPieceLayer);
-	 
-    }
-  }
+	   LT.pieces[pieceID].movementPiece.onmousedown = function () { 
+	     movePiece(LT.pieces[pieceID].id); };
 }
-
+movePiece = function (pieceID) {
+  LT.selectedPiece = LT.pieces[pieceID];
+}
 LT.createPiece = function () {
   var createPieceAjax = LT.ajaxRequest("POST", "php/create_piece.php",
     { table_id : LT.currentTable.id, 

@@ -123,3 +123,43 @@ LT.fill = function (pObject, cObject){
     pObject.appendChild(cObject);
   }
 }
+
+document.onselectstart = function () {return false;}
+
+// Stop dragging when the mouse button is released.
+document.onmouseup = function () {
+  LT.selectedPanel = null;
+  LT.selectedBR = null;
+  LT.selectedTL = null;
+  LT.clickDragGap = 0;
+  LT.Tile.dragging = 0;
+  LT.selectedPiece = 0;
+  LT.savePanels();
+}
+
+// Move or resize a panel when the mouse is dragged.
+document.onmousemove = function (e) {
+  if (!e) var e = window.event;
+  // grab the X and Y position of the mouse cursor
+  if (document.all) { // IE browser
+    LT.dragX = e.clientX + document.body.scrollLeft;
+    LT.dragY = e.clientY + document.body.scrollTop;
+  } else { // NS browser
+    LT.dragX = e.pageX;
+    LT.dragY = e.pageY;
+  }
+  if (LT.selectedPiece) {
+    LT.movePiece();
+  }
+  if (LT.selectedPanel) {
+    LT.movePanel();
+  }
+  if (LT.selectedBR) {
+    LT.resizePanelBR();
+  }
+  if (LT.selectedTL) {
+    LT.resizePanelTL();
+  }
+  e.preventDefault();
+  return false;
+};
