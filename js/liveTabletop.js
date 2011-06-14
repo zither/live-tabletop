@@ -123,9 +123,3 @@ LT.fill = function (pObject, cObject){
     pObject.appendChild(cObject);
   }
 }
-
-// Brings element to the forground
-LT.bringForward = function (pObject, cObject){
-  pObject.removeChild(cObject);
-  pObject.appendChild(cObject);
-}

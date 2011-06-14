@@ -27,7 +27,7 @@ LT.loadSwatches = function (){
   LT.selectedImage = '';
   LT.fill(LT.tilesTab);
   var eraser = LT.element('div', { style :
-    'float : left; border : 1px solid black; margin : 1px 1px 1px 1px; height : 45px; width: 45px;',},
+    'float : left; border : 1px solid black; margin : 1px 1px 1px 1px; height : 50px; width: 45px;',},
      LT.tilesTab, 'erase');
   eraser.onclick = function() {
 	LT.selectedImageID = -1;
@@ -158,12 +158,17 @@ populatePiecesTab = function () {
   LT.loadPieceImages();
 }
 
+// Brings element to the forground
+bringForward = function (cObject) {
+  LT.fill(LT.clickLayers);
+  LT.clickLayers.appendChild(cObject);
+}
 LT.createToolsPanel = function () {
   LT.toolsPanel = new LT.Panel( 'Tools', 'Tools', 6, 95, 210, 110);
-  LT.toolsPanel.makeTab('Tiles', LT.bringForward(LT.tableTop, LT.clickTileLayer));
-  LT.toolsPanel.makeTab('Pieces', LT.bringForward(LT.tableTop, LT.clickPieceLayer));
-  LT.toolsPanel.makeTab('Fog', LT.bringForward(LT.tableTop, LT.clickFogLayer));
-  LT.toolsPanel.makeTab('Walls', LT.bringForward(LT.tableTop, LT.clickWallLayer));
+  LT.toolsPanel.makeTab('Tiles', function () { bringForward(LT.clickTileLayer) });
+  LT.toolsPanel.makeTab('Pieces', function () { bringForward(LT.clickPieceLayer) });
+  LT.toolsPanel.makeTab('Fog', function () { bringForward(LT.clickFogLayer) });
+  LT.toolsPanel.makeTab('Walls', function () { bringForward(LT.clickWallLayer) });
   LT.piecesTab = LT.toolsPanel.tabs[1].content;
   LT.fogTab = LT.toolsPanel.tabs[2].content;
   LT.tilesTab = LT.toolsPanel.tabs[0].content;
