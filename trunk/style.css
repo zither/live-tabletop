@@ -38,9 +38,12 @@ body {
 #tableTop {
   position: relative;
   background: #999 url(images/abaddon45.png) no-repeat;
-  width: 1145px;
-  height: 945px;
   margin: 200px 200px 200px 200px;
+}
+.clickLayer{
+  position: absolute;
+  top: 0px;
+  left: 0px;
 }
 .grid {
   position: absolute;
@@ -282,7 +285,8 @@ height: 1px; background: #999; width: auto; clear: both; margin: 1px 0px 4px 0px
 }
 .swatch{
   border: 1px solid black;
-  margin: 1px 1px 1px 1px
+  margin: 1px 1px 1px 1px;
+  max-width: 50px;
 }
 .selected_swatch{
   border: 1px solid #F00;
