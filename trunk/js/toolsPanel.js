@@ -90,8 +90,8 @@ generatePieceElements = function (pieceID) {
       LT.pieces[pieceID].pieceDiv = LT.element('div', {
 	    style : 'height: ' + LT.pieces[pieceID].height + 'px; '
           + 'width: ' + LT.pieces[pieceID].width + 'px; '
-          + 'margin-left: ' + LT.pieces[pieceID].x + 'px; '
-          + 'margin-top: ' + LT.pieces[pieceID].y + 'px; '
+          + 'left: ' + LT.pieces[pieceID].x + 'px; '
+          + 'top: ' + LT.pieces[pieceID].y + 'px; '
 		  + 'position: absolute; background: #FFF;'}, LT.pieceLayer);
 	  var imagesArray = LT.sortObject(LT.pieceImages, 'file');
 	  for ( var n = 0 ; n < imagesArray.length; n++ ) {
@@ -101,21 +101,41 @@ generatePieceElements = function (pieceID) {
 	  }
 	  LT.pieces[pieceID].pieceImage = LT.element('img', { 
 	    style: ' margin-top: '
-	      +LT.pieces[pieceID].y_offset + 'px; margin-left: ' 
+	      + LT.pieces[pieceID].y_offset + 'px; margin-left: ' 
 	      + LT.pieces[pieceID].x_offset + 'px;',
 	    src : 'images/upload/piece/' + imageSource.file}, LT.pieces[pieceID].pieceDiv);
-	  LT.pieces[pieceID].movementPiece = LT.element('div', { title : LT.pieces[pieceID].id,
+	  LT.pieces[pieceID].movementPiece = LT.element('div', { 
+	    title : LT.pieces[pieceID].id, // << this id is one number too high
 	    style : 'position: absolute; height: '
           + imageSource.height + 'px; width: '
-		  + imageSource.width + 'px; background: #000; opacity: .5; '
-          + 'margin-left: ' + (LT.pieces[pieceID].x + LT.pieces[pieceID].x_offset)
-		  + 'px; margin-top: ' + (LT.pieces[pieceID].y + LT.pieces[pieceID].y_offset)
+		  + imageSource.width + 'px; opacity: .5; '
+          + 'left: ' + LT.pieces[pieceID].x
+		  + 'px; top: ' + LT.pieces[pieceID].y
+          + 'px; margin-left: ' + LT.pieces[pieceID].x_offset
+		  + 'px; margin-top: ' + LT.pieces[pieceID].y_offset
 		  + 'px; '}, LT.clickPieceLayer);
+	   var funcPiece = (LT.pieces[pieceID].id -1);
 	   LT.pieces[pieceID].movementPiece.onmousedown = function () { 
-	     movePiece(LT.pieces[pieceID].id); };
+	     movePiece(funcPiece); };
+	   LT.pieces[pieceID].movementPiece.onmouseover = function () { 
+	     highlightPiece(funcPiece); };
+	   LT.pieces[pieceID].movementPiece.onmouseout = function () { 
+	     unHighlightPiece(funcPiece); };
 }
 movePiece = function (pieceID) {
   LT.selectedPiece = LT.pieces[pieceID];
+}
+highlightPiece = function (pieceID) {
+  LT.pieces[pieceID].movementPiece.style.border = '1px solid black';
+  LT.pieces[pieceID].movementPiece.style.margin =
+    (LT.pieces[pieceID].y_offset -1) + 'px 0px 0px '
+	+ (LT.pieces[pieceID].x_offset -1) + 'px';
+}
+unHighlightPiece = function (pieceID) {
+  LT.pieces[pieceID].movementPiece.style.border = '0px';
+  LT.pieces[pieceID].movementPiece.style.margin = 
+    LT.pieces[pieceID].y_offset + 'px 0px 0px '
+	+ LT.pieces[pieceID].x_offset + 'px';
 }
 LT.createPiece = function () {
   var createPieceAjax = LT.ajaxRequest("POST", "php/create_piece.php",
