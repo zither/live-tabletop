@@ -54,9 +54,12 @@ makeSelectPieceHandler = function (image) {
       var tileH = LT.pForm.hInput.value;
       var tileW = LT.pForm.wInput.value;
     }
+	var imageNLength = image.file.length -4;
+	var imageName = image.file.substr(0, imageNLength);
     LT.selectedPieceImage = image.id;
     LT.pForm.yOff.setAttribute('value', (image.height - tileH) * -1 );
     LT.pForm.xOff.setAttribute('value', (image.width - tileW) / -2 );
+	LT.pForm.pName.setAttribute('value', imageName);
   };
 }
 LT.loadPieceImages = function () {
@@ -105,7 +108,7 @@ generatePieceElements = function (pieceID) {
 	      + LT.pieces[pieceID].x_offset + 'px;',
 	    src : 'images/upload/piece/' + imageSource.file}, LT.pieces[pieceID].pieceDiv);
 	  LT.pieces[pieceID].movementPiece = LT.element('div', { 
-	    title : LT.pieces[pieceID].id, // << this id is one number too high
+	    title : LT.pieces[pieceID].name, // << this id is one number too high
 	    style : 'position: absolute; height: '
           + imageSource.height + 'px; width: '
 		  + imageSource.width + 'px; opacity: .5; '
@@ -114,15 +117,15 @@ generatePieceElements = function (pieceID) {
           + 'px; margin-left: ' + LT.pieces[pieceID].x_offset
 		  + 'px; margin-top: ' + LT.pieces[pieceID].y_offset
 		  + 'px; '}, LT.clickPieceLayer);
-	   var funcPiece = (LT.pieces[pieceID].id -1);
+	   //var funcPiece = (LT.pieces[pieceID].id -1);
 	   LT.pieces[pieceID].movementPiece.onmousedown = function () { 
-	     movePiece(funcPiece);
+	     movePiece(pieceID);
          return false; };
 	   LT.pieces[pieceID].movementPiece.onmouseover = function () { 
-	     highlightPiece(funcPiece);
+	     highlightPiece(pieceID);
          return false; };
 	   LT.pieces[pieceID].movementPiece.onmouseout = function () { 
-	     unHighlightPiece(funcPiece);
+	     unHighlightPiece(pieceID);
          return false; };
 }
 LT.updatePiece = function (pieceObject) {
