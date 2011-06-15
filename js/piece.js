@@ -131,26 +131,3 @@ The default piece decoration script just shows the piece's name:
 LT.Piece.prototype.decoration = function () {
   return document.createTextNode(this.name);
 };
-
-// Move piece.
-LT.movePiece = function () {
-  var w = parseInt(LT.selectedPiece.pieceDiv.style.width);
-  var h = parseInt(LT.selectedPiece.pieceDiv.style.height);
-  if (LT.clickDragGap == 0) {
-    LT.clickX = LT.dragX - parseInt(LT.selectedPiece.pieceDiv.style.left);
-    LT.clickY = LT.dragY - parseInt(LT.selectedPiece.pieceDiv.style.top);
-    LT.clickDragGap = 1;
-  }
-  var tableHeight = parseInt(LT.tableTop.style.height);
-  var tableWidth = parseInt(LT.tableTop.style.width);
-  LT.dragX = Math.min(LT.dragX - LT.clickX, tableWidth - w );
-  LT.dragY = Math.min(LT.dragY - LT.clickY, tableHeight - h );
-  LT.dragX = Math.max(LT.dragX, 0);
-  LT.dragY = Math.max(LT.dragY, 0);
-  LT.selectedPiece.pieceDiv.style.top  = LT.dragY + "px";
-  LT.selectedPiece.pieceDiv.style.left = LT.dragX + "px";
-  LT.selectedPiece.pieceImage.style.top  = LT.dragY + "px";
-  LT.selectedPiece.pieceImage.style.left = LT.dragX + "px";
-  LT.selectedPiece.movementPiece.style.top  = LT.dragY + "px";
-  LT.selectedPiece.movementPiece.style.left = LT.dragX + "px";
-}
