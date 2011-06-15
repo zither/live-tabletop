@@ -116,11 +116,20 @@ generatePieceElements = function (pieceID) {
 		  + 'px; '}, LT.clickPieceLayer);
 	   var funcPiece = (LT.pieces[pieceID].id -1);
 	   LT.pieces[pieceID].movementPiece.onmousedown = function () { 
-	     movePiece(funcPiece); };
+	     movePiece(funcPiece);
+         return false; };
 	   LT.pieces[pieceID].movementPiece.onmouseover = function () { 
-	     highlightPiece(funcPiece); };
+	     highlightPiece(funcPiece);
+         return false; };
 	   LT.pieces[pieceID].movementPiece.onmouseout = function () { 
-	     unHighlightPiece(funcPiece); };
+	     unHighlightPiece(funcPiece);
+         return false; };
+}
+LT.updatePiece = function (pieceObject) {
+  pieceObject.x = parseInt(pieceObject.pieceDiv.style.left);
+  pieceObject.y = parseInt(pieceObject.pieceDiv.style.top);
+  pieceObject.update({x: pieceObject.x, y: pieceObject.y});
+  LT.selectedPiece = 0;
 }
 movePiece = function (pieceID) {
   LT.selectedPiece = LT.pieces[pieceID];
@@ -200,5 +209,29 @@ LT.createToolsPanel = function () {
   LT.tilesTab = LT.toolsPanel.tabs[0].content;
   populatePiecesTab();
   LT.element('div', {}, LT.fogTab, "YOU");
+  LT.toolsPanel.selectTab(LT.toolsPanel.selectedTab);
 };
 
+
+// Move piece.
+LT.movePiece = function () {
+  var w = parseInt(LT.selectedPiece.pieceDiv.style.width);
+  var h = parseInt(LT.selectedPiece.pieceDiv.style.height);
+  if (LT.clickDragGap == 0) {
+    LT.clickX = LT.dragX - parseInt(LT.selectedPiece.pieceDiv.style.left);
+    LT.clickY = LT.dragY - parseInt(LT.selectedPiece.pieceDiv.style.top);
+    LT.clickDragGap = 1;
+  }
+  var tableHeight = parseInt(LT.tableTop.style.height);
+  var tableWidth = parseInt(LT.tableTop.style.width);
+  LT.dragX = Math.min(LT.dragX - LT.clickX, tableWidth - w );
+  LT.dragY = Math.min(LT.dragY - LT.clickY, tableHeight - h );
+  LT.dragX = Math.max(LT.dragX, 0);
+  LT.dragY = Math.max(LT.dragY, 0);
+  LT.selectedPiece.pieceDiv.style.top  = LT.dragY + "px";
+  LT.selectedPiece.pieceDiv.style.left = LT.dragX + "px";
+  LT.selectedPiece.pieceImage.style.top  = LT.dragY + "px";
+  LT.selectedPiece.pieceImage.style.left = LT.dragX + "px";
+  LT.selectedPiece.movementPiece.style.top  = LT.dragY + "px";
+  LT.selectedPiece.movementPiece.style.left = LT.dragX + "px";
+}

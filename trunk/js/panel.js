@@ -39,6 +39,7 @@ LT.Panel = function (panelName, buttonName, x, y, width, height, buttonLoc) {
   this.defaultY = y;
   this.defaultWidth = width;
   this.defaultHeight = height;
+  this.selectedTab = 0;
  // Create Floating Panel 
 
   this.outside = LT.element('div', {'class' : 'outerPanel', 
@@ -56,9 +57,12 @@ LT.Panel = function (panelName, buttonName, x, y, width, height, buttonLoc) {
   LT.element('div', {'class' : 'titleEnd'}, title);
   this.bar = LT.element('div', {'class' : 'panelBar', 
     'style' : 'width: ' + (width - 36) + 'px;'}, title, ' ');
-  this.bar.onmousedown = function() {LT.selectedPanel = panel; return false;};
+  this.bar.onmousedown = function () {LT.selectedPanel = panel; return false;};
   LT.element('div', {'class' : 'close'}, title)
-    .onclick = function() {panel.toggleVisibility();};
+    .onclick = function () {
+	panel.toggleVisibility();
+    return false;
+  };
   
   this.header = LT.element('div', {'class' : 'panelHeader'}, this.outside);
   
@@ -79,7 +83,10 @@ LT.Panel = function (panelName, buttonName, x, y, width, height, buttonLoc) {
 
   var menu = buttonLoc ? buttonLoc : LT.buttons;
   this.button = LT.element('div', {'class' : 'buttonUnchecked'}, menu);
-  this.button.onclick = function() {panel.toggleVisibility();};
+  this.button.onclick = function () {
+    panel.toggleVisibility();
+    return false;
+  };
   LT.element('div', {'class' : 'buttonStart'}, this.button);
   this.buttonCaption = LT.element('div', {'class' : 'buttonCaption'}, this.button, buttonName);
   LT.element('div', {'class' : 'buttonEnd'}, this.button);
@@ -111,6 +118,7 @@ LT.Panel.prototype.makeTab = function (name, action) {
   var tabNumber = this.tabs.length - 1;
   tabLabel.onclick = function () {
     self.selectTab(tabNumber);
+    return false;
   }
 }
 LT.Panel.prototype.selectTab = function (tabNumber) {
@@ -120,6 +128,7 @@ LT.Panel.prototype.selectTab = function (tabNumber) {
   }
   tab.label.className = 'activeTab';
   LT.fill(this.content, tab.content);
+  this.selectedTab = tabNumber;
   if (tab.action) {
     tab.action();
   }  
@@ -169,9 +178,10 @@ LT.savePanels = function(){
 	var w = parseInt(LT.panelsArray[i].bar.style.width);
 	var h = parseInt(LT.panelsArray[i].content.style.height);
 	var v = 0;
+	var t = LT.panelsArray[i].selectedTab;
 	if ( LT.panelsArray[i].outside.style.visibility == "visible" ){ v = 1;
 	}else{ v = 0; }
-	cookieString = cookieString + x + ' ' + y + ' ' + w + ' ' + h + ' ' + v + '_';
+	cookieString = cookieString + x + ' ' + y + ' ' + w + ' ' + h + ' ' + v + ' ' + t + '_';
   }
   document.cookie = 'panels=' + cookieString + ';';
 }
@@ -190,6 +200,14 @@ LT.loadPanels = function (){
       LT.panelsArray[i].header.style.width = parseInt(panelShape[2]) + 48 + 'px';
       LT.panelsArray[i].footer.style.width = parseInt(panelShape[2]) + 36 + 'px';
       LT.panelsArray[i].content.style.height = panelShape[3] + 'px';
+	  if (panelShape[5]) {
+        LT.panelsArray[i].selectedTab = parseInt(panelShape[5]);
+	  } else {
+        LT.panelsArray[i].selectedTab = 0;
+	  }
+	  if (LT.panelsArray[i].tabBar) {
+	    LT.panelsArray[i].selectTab(LT.panelsArray[i].selectedTab);
+	  }
       if(Boolean(panelShape[4] == 1)){
         if(LT.panelsArray[i].outside.style.visibility = "hidden"){
 		  LT.panelsArray[i].toggleVisibility();

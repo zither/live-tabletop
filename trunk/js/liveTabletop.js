@@ -133,7 +133,9 @@ document.onmouseup = function () {
   LT.selectedTL = null;
   LT.clickDragGap = 0;
   LT.Tile.dragging = 0;
-  LT.selectedPiece = 0;
+  if (LT.selectedPiece) {
+    LT.updatePiece(LT.selectedPiece);
+  }
   LT.savePanels();
 }
 
