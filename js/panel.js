@@ -248,7 +248,7 @@ LT.resizePanelBR = function () {
       LT.clickDragGap = 1;
    }
     LT.dragX = Math.max(LT.dragX - LT.clickX, 140);
-    LT.dragY = Math.max(LT.dragY - LT.clickY, 100);
+    LT.dragY = Math.max(LT.dragY - LT.clickY, 50);
 	var newWidth = Math.min(LT.dragX, window.innerWidth - panelX - 25);
     LT.selectedBR.content.style.width = newWidth + "px";
     LT.selectedBR.footer.style.width = newWidth + "px";
@@ -271,7 +271,7 @@ LT.resizePanelTL = function () {
     LT.dragX = Math.max(LT.dragX, LT.clickX + 6);
     LT.dragY = Math.max(LT.dragY, LT.clickY + 26);
     LT.dragX = Math.min(LT.dragX, LT.clickCornerX - 140);
-    LT.dragY = Math.min(LT.dragY, LT.clickCornerY - 100);
+    LT.dragY = Math.min(LT.dragY, LT.clickCornerY - 50);
     LT.selectedTL.outside.style.left = (LT.dragX - LT.clickX) + "px";
     LT.selectedTL.outside.style.top  = (LT.dragY - LT.clickY) + "px";
 	var newWidth = Math.min(LT.clickCornerX - LT.dragX);

@@ -139,7 +139,7 @@ movePiece = function (pieceID) {
   LT.selectedPiece = LT.pieces[pieceID];
 }
 highlightPiece = function (pieceID) {
-  LT.pieces[pieceID].movementPiece.style.border = '1px solid black';
+  LT.pieces[pieceID].movementPiece.style.border = '1px dotted black';
   LT.pieces[pieceID].movementPiece.style.margin =
     (LT.pieces[pieceID].y_offset -1) + 'px 0px 0px '
 	+ (LT.pieces[pieceID].x_offset -1) + 'px';
