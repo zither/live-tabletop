@@ -6,6 +6,7 @@ LT.Tile = function (tableID, x, y, tileCode) {
   this.fog = parseInt(tileCode[0]);
   this.image_id = parseInt(tileCode.slice(1));
   this.createImage();
+  this.createFogElement();
   this.createClickableElement();
 };
 
@@ -63,11 +64,16 @@ LT.Tile.prototype = {
   setImageID: function (newImageID) {
     this.update({image_id: newImageID});
     this.createImage();
-//    LT.sortTileLayer(LT.tiles[newImageID].layer);
   },
   hasFog: function () {return this.fog == 1;},
-  makeFog: function () {this.update({fog: 1});},
-  clearFog: function () {this.update({fog: 0});},
+  makeFog: function () {
+    this.update({fog: 1});
+    this.createFogElement();
+  },
+  clearFog: function () {
+    this.update({fog: 0});
+    this.createFogElement();
+  },
 
   // CREATE A PROPERLY SCALED AND POSITIONED IMAGE
   createImage: function () {
@@ -154,6 +160,31 @@ LT.Tile.prototype = {
         self.setImageID(LT.selectedImageID);
 	  }
     };
+  },
+
+  // CREATE FOG OBSCURING THE TILE
+  createFogElement: function () {
+    if (this.fogElement) {
+      this.fogElement.parentNode.removeChild(this.fogElement);
+      delete(this.fogElement);
+    }
+    if (this.fog) {
+      var table = LT.currentTable;
+      var left = this.x * table.tile_width;
+      var top = this.y * table.tile_height;
+      // stagger isometric or hex tiles
+      if (table.tile_mode == "isometric" || table.tile_mode == "hex rows") {
+        left += Math.round(0.5 * table.tile_width * (this.y % 2));
+      }
+      else if (table.tile_mode == "hex columns") {
+        top += Math.round(0.5 * table.tile_height * (this.x % 2));
+      }
+      // create the new clickable element
+      this.fogElement = LT.element('div', {'class': 'fog',
+        'style': 'left: ' + left + 'px; top:' + top
+        + 'px; width: ' + table.tile_width + 'px; height: ' + table.tile_height
+        + 'px; '}, LT.fogLayer);
+    }
   },
 };
 
