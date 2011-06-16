@@ -153,8 +153,8 @@ body {
   border-right: 1px solid #666;
 }
 .tabBar {
-  background: url(images/tabBar.jpg) repeat-x top left;
-  height: 23px;
+  background: url(images/tabBar.jpg) repeat top left;
+  min-height: 23px;
   padding: 0px 0px 0px 2px;
 }
 .activeTab, .inactiveTab, .tabStart, .tabEnd, .tabContent {
@@ -310,4 +310,9 @@ height: 1px; background: #999; width: auto; clear: both; margin: 1px 0px 4px 0px
   font-style: italic;
   color: #900;
 }
-
+.clearBoth {
+  height: 1px;
+  width: 1px;
+  margin-top: -1px;
+  clear: both;
+}
