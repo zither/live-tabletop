@@ -1,13 +1,38 @@
 var LT = {};
+
 LT.selectedImage = '';
 LT.selectedImageID = 1;
 LT.images = [];
 LT.messages = [];
 LT.lastMessage = 0;
 
-function emptyMe (clearMe, defaultText){
-	if( clearMe.value == defaultText ){ clearMe.value = ""; }	
+LT.clickDragGap = 0; 
+LT.dragX = 0; // current horizontal mouse position
+LT.dragY = 0; // current vertical mouse position
+LT.clickX = 0; // relative horizontal position of mouse when the button was pressed
+LT.clickY = 0; // relative vertical position of mouse when the button was pressed
+
+// FIXME: This function is only used in a commented-out line in login.js
+function emptyMe(clearMe, defaultText) {
+  if (clearMe.value == defaultText) {
+    clearMe.value = "";
+  }
 }
+
+// Get a string stored in the browser's cookie for this page.
+LT.getCookie = function (cookieName) {
+  var cookieStrings = document.cookie.split(";");
+  for (var i = 0; i < cookieStrings.length; i++) {
+    var equalsPosition = cookieStrings[i].indexOf("=");
+    var left = cookieStrings[i].substr(0, equalsPosition);
+    var right = cookieStrings[i].substr(equalsPosition + 1);
+    left = left.replace(/^\s+|\s+$/g, ""); // trim white space
+    if (left == cookieName) {
+      return unescape(right);
+    }
+  }
+};
+
 /*
 LT.element creates a new HTML element and inserts it into the document.
 
@@ -128,9 +153,7 @@ document.onselectstart = function () {return false;}
 
 // Stop dragging when the mouse button is released.
 document.onmouseup = function () {
-  LT.selectedPanel = null;
-  LT.selectedBR = null;
-  LT.selectedTL = null;
+  LT.Panel.stopDragging();
   LT.clickDragGap = 0;
   LT.Tile.dragging = 0;
   if (LT.selectedPiece) {
@@ -153,15 +176,7 @@ document.onmousemove = function (e) {
   if (LT.selectedPiece) {
     LT.movePiece();
   }
-  if (LT.selectedPanel) {
-    LT.movePanel();
-  }
-  if (LT.selectedBR) {
-    LT.resizePanelBR();
-  }
-  if (LT.selectedTL) {
-    LT.resizePanelTL();
-  }
+  LT.Panel.drag();
   e.preventDefault();
   return false;
 };

@@ -20,7 +20,7 @@ LT.loadLT = function () {
   LT.createFilesPanel();
   LT.loginCheck();
   LT.refreshMessageList();
-  var tableCookie = parseInt(getCookie('table'));
+  var tableCookie = parseInt(LT.getCookie('table'));
   LT.loadTable(tableCookie);
 }
 
