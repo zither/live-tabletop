@@ -191,6 +191,7 @@ LT.loadPanels = function (){
   var cookieArray = getCookie('panels');
   var panelsCookie = cookieArray.split('_');
   for(i = 0; i < LT.panelsArray.length; i++){
+    LT.element('div', {'class' : 'clearBoth'}, LT.panelsArray[i].tabBar);
     var panelShape = panelsCookie[i].split(' ');
 	if( panelShape[0] ){
       LT.panelsArray[i].outside.style.left = panelShape[0] + 'px';
