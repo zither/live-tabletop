@@ -13,6 +13,8 @@ LT.Tile = function (tableID, x, y, tileCode) {
 // GLOBAL VARIABLES
 LT.Tile.PROPERTIES = ["fog", "image_id", "x", "y", "table_id"];
 LT.Tile.dragging = 0;
+LT.Tile.mode = "change image";
+LT.Tile.toggleFogValue = 1;
 
 // GLOBAL FUNCTIONS FOR SORTING TILES IN ROW, COLUMN ORDER
 LT.sortTileRule = function (a, b) {
@@ -65,15 +67,14 @@ LT.Tile.prototype = {
     this.update({image_id: newImageID});
     this.createImage();
   },
+  getFog: function () {return this.fog;},
+  setFog: function (newFogValue) {
+    this.update({fog: newFogValue});
+    this.createFogElement();
+  },
   hasFog: function () {return this.fog == 1;},
-  makeFog: function () {
-    this.update({fog: 1});
-    this.createFogElement();
-  },
-  clearFog: function () {
-    this.update({fog: 0});
-    this.createFogElement();
-  },
+  makeFog: function () {this.setFog(1);},
+  clearFog: function () {this.setFog(0);},
 
   // CREATE A PROPERLY SCALED AND POSITIONED IMAGE
   createImage: function () {
@@ -153,11 +154,22 @@ LT.Tile.prototype = {
     var self = this;
     this.clickDiv.onmousedown = function() {
       LT.Tile.dragging = 1;
-      self.setImageID(LT.selectedImageID);
+      if (LT.Tile.mode == 'change image') {
+        self.setImageID(LT.selectedImageID);
+      }
+      else if (LT.Tile.mode == 'toggle fog') {
+        LT.Tile.toggleFogValue = self.fog == 0 ? 1 : 0;
+        self.setFog(LT.Tile.toggleFogValue);
+      }
     };
     this.clickDiv.onmouseover = function() {
       if (LT.Tile.dragging == 1) {
-        self.setImageID(LT.selectedImageID);
+        if (LT.Tile.mode == 'change image') {
+          self.setImageID(LT.selectedImageID);
+        }
+        else if (LT.Tile.mode == 'toggle fog') {
+          self.setFog(LT.Tile.toggleFogValue);
+        }
 	  }
     };
   },
@@ -170,8 +182,8 @@ LT.Tile.prototype = {
     }
     if (this.fog) {
       var table = LT.currentTable;
-      var left = this.x * table.tile_width;
-      var top = this.y * table.tile_height;
+      var left = (this.x - 0.5) * table.tile_width;
+      var top = (this.y - 0.5) * table.tile_height;
       // stagger isometric or hex tiles
       if (table.tile_mode == "isometric" || table.tile_mode == "hex rows") {
         left += Math.round(0.5 * table.tile_width * (this.y % 2));
@@ -179,10 +191,10 @@ LT.Tile.prototype = {
       else if (table.tile_mode == "hex columns") {
         top += Math.round(0.5 * table.tile_height * (this.x % 2));
       }
-      // create the new clickable element
-      this.fogElement = LT.element('div', {'class': 'fog',
-        'style': 'left: ' + left + 'px; top:' + top
-        + 'px; width: ' + table.tile_width + 'px; height: ' + table.tile_height
+      // create the new fog element
+      this.fogElement = LT.element('img', {'src': 'images/fog.png',
+        'style': 'position: absolute; left: ' + left + 'px; top:' + top + 'px; '
+        + 'width: ' + table.tile_width * 2 + 'px; height: ' + table.tile_height * 2
         + 'px; '}, LT.fogLayer);
     }
   },

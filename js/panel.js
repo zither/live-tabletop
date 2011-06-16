@@ -60,7 +60,8 @@ LT.Panel = function (panelName, buttonName, x, y, width, height, buttonLoc) {
   };
   var close = LT.element('div', {'class' : 'close'}, title);
   close.onclick = function () {
-	self.toggleVisibility();
+	self.hide();
+    LT.Panel.saveCookie();
     return false;
   };
   
@@ -84,7 +85,9 @@ LT.Panel = function (panelName, buttonName, x, y, width, height, buttonLoc) {
   var menu = buttonLoc ? buttonLoc : LT.buttons;
   this.button = LT.element('div', {'class' : 'buttonUnchecked'}, menu);
   this.button.onclick = function () {
-    self.toggleVisibility();
+    if (self.outside.style.visibility == "hidden") self.show();
+    else self.hide();
+    LT.Panel.saveCookie();
     return false;
   };
   LT.element('div', {'class' : 'buttonStart'}, this.button);
@@ -151,15 +154,6 @@ LT.Panel.prototype = {
     this.bar.style.width = (this.defaultWidth - 36) + 'px';
     this.content.style.width = this.defaultWidth + 'px';
     this.content.style.height = this.defaultHeight + 'px';
-  },
-
-  // Show or hide this panel
-  toggleVisibility: function () {
-    if (this.outside.style.visibility == "hidden") {
-      this.show();
-    } else {
-      this.hide();
-    }
   },
 
   // Show this panel
