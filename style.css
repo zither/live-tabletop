@@ -4,22 +4,23 @@
   border: 0px;
   background: no-repeat;
 }
-BODY{
-scrollbar-face-color:#8080FF;
-scrollbar-arrow-color:#FFFFFF;
-scrollbar-track-color:#DDDDFF;
-scrollbar-shadow-color:'';
-scrollbar-highlight-color:'';
-scrollbar-3dlight-color:'';
-scrollbar-darkshadow-Color:'';
-} 
-div {
+
+BODY {
+  scrollbar-face-color:#8080FF;
+  scrollbar-arrow-color:#FFFFFF;
+  scrollbar-track-color:#DDDDFF;
+  scrollbar-shadow-color:'';
+  scrollbar-highlight-color:'';
+  scrollbar-3dlight-color:'';
+  scrollbar-darkshadow-Color:'';
+  background: #999;
+}
+
+DIV {
   font-family: Arial,Helvetica,sans-serif;
   font-size: 14px;
 }
-body {
-  background: #999;
-}
+
 #pageBar {
   background: url(images/pageBar.jpg) repeat-x left top;
   height: 26px;
@@ -27,6 +28,7 @@ body {
   position: fixed;
   top: 0px;
 }
+
 #logo {
   background-image: url(images/logo.png);
   width: 170px;
@@ -35,35 +37,32 @@ body {
   left: 10px;
   top: 0px;
 }
+
 #tableTop {
   position: relative;
   background: #999 url(images/abaddon45.png) no-repeat;
   margin: 200px 200px 200px 200px;
 }
-.clickLayer{
-  position: absolute;
-  top: 0px;
-  left: 0px;
-}
-.grid {
-  position: absolute;
-  left: 0;
-  top: 0;
-}
+
+/* SHOW/HIDE PANEL BUTTONS AT THE TOP OF THE PAGE */
+
 #buttons {
   margin-left: 155px;
   position: relative;
   
 }
+
 .buttonUnchecked, .buttonChecked {
   height: 22px;
   float: left;
   margin: 0px 0px 0px 12px;
   color: #CCC;
 }
+
 .buttonUnchecked:hover, .buttonChecked:hover {
   cursor: pointer;
 }
+
 .buttonStart {
   background-image: url(images/buttonUncheck.png);
   width: 19px;
@@ -71,6 +70,7 @@ body {
   float: left;
   margin-top: 4px;
 }
+
 .buttonCaption {
   background: url(images/pageBar.jpg) repeat-x left top;
   height: 22px;
@@ -79,21 +79,44 @@ body {
   text-decoration: none;
   padding: 2px 1px 0px 2px;
 }
-.buttonChecked:hover , .buttonUnchecked:hover{
+
+.buttonChecked:hover , .buttonUnchecked:hover {
   color: #EEE;
 }
+
 .buttonEnd {
   background-image: url(images/buttonEnd.jpg);
   width: 5px;
   height: 22px;
   float: left;
 }
+
 .buttonChecked .buttonStart {
   background-image: url(images/buttonCheck.png);
 }
+
 .buttonChecked .buttonEnd {
   background-image: url();
 }
+
+/* MOVEABLE, RESIZEABLE PANELS */
+
+.panelHeader {
+  margin: 0px -21px 0px -6px;
+}
+
+.panelFooter {
+  margin: 0px -21px 0px -6px;
+  padding: 0px 8px 0px 4px;
+}
+
+.panelHeader, .panelFooter {
+  background: #e7e8e9;
+  clear: both;
+  border-left: 1px solid #666;
+  border-right: 1px solid #666;
+}
+
 .resizeTL {
   background: url(images/resizeTL.png);
   width: 22px;
@@ -101,101 +124,6 @@ body {
   float: left;
   margin-left: -6px;
   cursor: nw-resize;
-}
-.title {
-  position: relative;
-}
-.titleStart {
-  background-image: url(images/titleStart.jpg);
-  width: 5px;
-  height: 23px;
-  margin-left: 1px;
-  float: left;
-}
-.titleCaption {
-  background: url(images/titleBG.jpg) repeat-x top left;
-  height: 21px;
-  float: left;
-  color: #CCC;
-  font-size: 16px;
-  text-decoration: none;
-  padding: 2px 0px 0px 0px;
-}
-.titleEnd {
-  background-image: url(images/titleEnd.jpg);
-  width: 5px;
-  height: 23px;
-  float: left;
-  margin-right: 1px;
-}
-.close {
-  background-image: url(images/close.png);
-  width: 27px;
-  height: 23px;
-  float: right;
-  margin-right: -21px;
-  cursor: pointer;
-}
-.close:hover {
-  background-image: url(images/closeHover.png);
-}
-.panelHeader{
-  margin: 0px -21px 0px -6px;
-}
-.panelFooter{
-  margin: 0px -21px 0px -6px;
-  padding: 0px 8px 0px 4px;
-}
-.panelHeader, .panelFooter {
-  background: #e7e8e9;
-  clear: both;
-  border-left: 1px solid #666;
-  border-right: 1px solid #666;
-}
-.tabBar {
-  background: url(images/tabBar.jpg) repeat top left;
-  min-height: 23px;
-  padding: 0px 0px 0px 2px;
-}
-.activeTab, .inactiveTab, .tabStart, .tabEnd, .tabContent {
-  height: 23px;
-  float: left;
-}
-.activeTab:hover, .inactiveTab:hover{
-text-decoration: underline;
-cursor: pointer;
-}
-.activeTab, .inactiveTab{
-  margin: 0px 0px 0px 2px;
-}
-.activeTab {
-  background:  url(images/activeTabBG.jpg) repeat-x top left;
-}
-.inactiveTab {
-  background:  url(images/inactiveTabBG.jpg) repeat-x top left;
-}
-.tabStart, .tabEnd{
-  width: 2px;
-}
-.activeTab .tabStart {
-  background:  url(images/activeTabStart.jpg) repeat-x top left;
-}
-.activeTab .tabEnd {
-  background:  url(images/activeTabEnd.jpg) repeat-x top left;
-}
-.inactiveTab .tabStart {
-  background:  url(images/inactiveTabStart.jpg) repeat-x top left;
-}
-.inactiveTab .tabEnd {
-  background:  url(images/inactiveTabEnd.jpg) repeat-x top left;
-}
-.tabContent:hover {
-  text-decoration: underline;
-}
-.tabContent {
-  padding: 5px 3px 0px 3px;
-  color: #333;
-  font-size: 13px;
 }
 .panelContent {
   background: #e7e8e9 url(images/panel.jpg) repeat-x top left;
@@ -207,18 +135,22 @@ cursor: pointer;
   margin: 0px -21px 0px -6px;
   overflow: auto;
 }
-.panelContent  a{
+
+.panelContent  a {
   cursor: pointer;
   text-decoration: none;
 }
-.panelContent a:hover{
+
+.panelContent a:hover {
   text-decoration: underline;
 }
+
 .panelContent input, .panelFooter input {
   background: #FFF;
   color: #333;
   margin-right: 4px;
 }
+
 .panelBar {
   position: absolute;
   height: 23px;
@@ -227,12 +159,14 @@ cursor: pointer;
   left: 0px;
   top: 0px;
 }
+
 .panelBottom {
   background: #e7e8e9;
   width: auto;
   height:20px;
   border-bottom: 1px solid #666;
 }
+
 .panelBL {
   background: url(images/bottomCorner.png);
   height: 21px;
@@ -240,6 +174,7 @@ cursor: pointer;
   float: left;
   margin-left: -6px;
 }
+
 .resizeBR {
   background: url(images/resizeBR.png);
   height: 21px;
@@ -248,12 +183,122 @@ cursor: pointer;
   margin-right: -21px;
   cursor: se-resize;
 }
+
 .outerPanel {
   background: url(images/panelBar.jpg) repeat-x top left;
   position: fixed;
   visibility: hidden;
   z-index: 0;
 }
+
+
+/* PANEL TITLES */
+
+.title {
+  position: relative;
+}
+
+.titleStart {
+  background-image: url(images/titleStart.jpg);
+  width: 5px;
+  height: 23px;
+  margin-left: 1px;
+  float: left;
+}
+
+.titleCaption {
+  background: url(images/titleBG.jpg) repeat-x top left;
+  height: 21px;
+  float: left;
+  color: #CCC;
+  font-size: 16px;
+  text-decoration: none;
+  padding: 2px 0px 0px 0px;
+}
+
+.titleEnd {
+  background-image: url(images/titleEnd.jpg);
+  width: 5px;
+  height: 23px;
+  float: left;
+  margin-right: 1px;
+}
+
+.close {
+  background-image: url(images/close.png);
+  width: 27px;
+  height: 23px;
+  float: right;
+  margin-right: -21px;
+  cursor: pointer;
+}
+
+.close:hover {
+  background-image: url(images/closeHover.png);
+}
+
+/* PANEL TABS */
+
+.tabBar {
+  background: url(images/tabBar.jpg) repeat top left;
+  min-height: 23px;
+  padding: 0px 0px 0px 2px;
+}
+
+.activeTab, .inactiveTab, .tabStart, .tabEnd, .tabContent {
+  height: 23px;
+  float: left;
+}
+
+.activeTab:hover, .inactiveTab:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.activeTab, .inactiveTab {
+  margin: 0px 0px 0px 2px;
+}
+
+.activeTab {
+  background:  url(images/activeTabBG.jpg) repeat-x top left;
+}
+
+.inactiveTab {
+  background:  url(images/inactiveTabBG.jpg) repeat-x top left;
+}
+
+.tabStart, .tabEnd {
+  width: 2px;
+}
+
+.activeTab .tabStart {
+  background:  url(images/activeTabStart.jpg) repeat-x top left;
+}
+
+.activeTab .tabEnd {
+  background:  url(images/activeTabEnd.jpg) repeat-x top left;
+}
+
+.inactiveTab .tabStart {
+  background:  url(images/inactiveTabStart.jpg) repeat-x top left;
+}
+
+.inactiveTab .tabEnd {
+  background:  url(images/inactiveTabEnd.jpg) repeat-x top left;
+}
+
+.tabContent:hover {
+  text-decoration: underline;
+}
+
+.tabContent {
+  padding: 5px 3px 0px 3px;
+  color: #333;
+  font-size: 13px;
+}
+
+/* LOGIN FORM */
+
 .login {
   color: #CCC;
   float: right;
@@ -262,57 +307,94 @@ cursor: pointer;
   cursor: pointer;
   position: relative
 }
+
 .login:hover {
   text-decoration: underline;
 }
-.deleteButton {
-  float: right;
-}
-.altList {
-}
-.separator{
-height: 1px; background: #999; width: auto; clear: both; margin: 1px 0px 4px 0px;
-}
-.chat_alert{
-  color: #039;
-}
-.fInput{
-  border: 1px solid #CCC;
-}
-.fLabel{
-  color: #000; width: 200px;
-  float: left;
-}
-.swatch{
-  border: 1px solid black;
-  margin: 1px 1px 1px 1px;
-  max-width: 50px;
-}
-.selected_swatch{
-  border: 1px solid #F00;
-  margin: 1px 1px 1px 1px
-}
+
 #loginDiv {
   float: right;
 }
+
 #loginForm {
   background: #000;
   margin-top: 3px;
   color: #999;
   padding: 1px 1px 1px 1px;;
 }
+
 #loginForm input {
   background: #CCC;
   color: #333;
   margin-right: 4px;
 }
+
+/* ??? */
+
+.deleteButton {
+  float: right;
+}
+
+.altList {
+}
+
+.separator {
+height: 1px; background: #999; width: auto; clear: both; margin: 1px 0px 4px 0px;
+}
+
+.chat_alert {
+  color: #039;
+}
+
+.fInput {
+  border: 1px solid #CCC;
+}
+
+.fLabel {
+  color: #000; width: 200px;
+  float: left;
+}
+
+.swatch {
+  border: 1px solid black;
+  margin: 1px 1px 1px 1px;
+  max-width: 50px;
+}
+
+.selected_swatch {
+  border: 1px solid #F00;
+  margin: 1px 1px 1px 1px
+}
+
+
 .roll {
   font-style: italic;
   color: #900;
 }
+
 .clearBoth {
   height: 1px;
   width: 1px;
   margin-top: -1px;
   clear: both;
 }
+
+/* LAYERS */
+
+.clickLayer {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+
+.grid {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.fog {
+  position: absolute;
+  background: black;
+}
+
