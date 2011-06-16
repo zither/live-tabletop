@@ -12,13 +12,6 @@ LT.dragY = 0; // current vertical mouse position
 LT.clickX = 0; // relative horizontal position of mouse when the button was pressed
 LT.clickY = 0; // relative vertical position of mouse when the button was pressed
 
-// FIXME: This function is only used in a commented-out line in login.js
-function emptyMe(clearMe, defaultText) {
-  if (clearMe.value == defaultText) {
-    clearMe.value = "";
-  }
-}
-
 // Get a string stored in the browser's cookie for this page.
 LT.getCookie = function (cookieName) {
   var cookieStrings = document.cookie.split(";");
@@ -159,7 +152,7 @@ document.onmouseup = function () {
   if (LT.selectedPiece) {
     LT.updatePiece(LT.selectedPiece);
   }
-  LT.savePanels();
+  LT.Panel.saveCookie();
 }
 
 // Move or resize a panel when the mouse is dragged.

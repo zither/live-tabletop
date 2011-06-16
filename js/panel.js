@@ -46,7 +46,7 @@ LT.Panel = function (panelName, buttonName, x, y, width, height, buttonLoc) {
   var title = LT.element('div', {'class' : 'title'}, this.outside);
   var resizeTL = LT.element('div', {'class' : 'resizeTL'}, title)
   resizeTL.onmousedown = function() {
-    LT.selectedTL = self;
+    LT.Panel.selectedTL = self;
     return false;
   };
   LT.element('div', {'class' : 'titleStart'}, title);
@@ -55,7 +55,7 @@ LT.Panel = function (panelName, buttonName, x, y, width, height, buttonLoc) {
   this.bar = LT.element('div', {'class' : 'panelBar', 
     'style' : 'width: ' + (width - 36) + 'px;'}, title, ' ');
   this.bar.onmousedown = function () {
-    LT.selectedPanel = self;
+    LT.Panel.selected = self;
     return false;
   };
   var close = LT.element('div', {'class' : 'close'}, title);
@@ -77,7 +77,7 @@ LT.Panel = function (panelName, buttonName, x, y, width, height, buttonLoc) {
   var bottom = LT.element('div', {'class' : 'panelBottom'}, this.outside);
   LT.element('div', {'class' : 'panelBL'}, bottom);
   LT.element('div', {'class' : 'resizeBR'}, bottom)
-    .onmousedown = function() {LT.selectedBR = self; return false;};
+    .onmousedown = function() {LT.Panel.selectedBR = self; return false;};
 
   // Create Menu Button ------------------------------------------------------
 
@@ -293,9 +293,9 @@ LT.Panel.prototype = {
 LT.Panel.order = []; // panels in back-to-front order
 LT.Panel.list = []; // panels in the order they were created
 
-LT.selectedPanel = null; // panel being moved, null if no panel is being moved
-LT.selectedBR = null; // panel being resized with the bottom right handle
-LT.selectedTL = null; // panel being resized with the top left handle
+LT.Panel.selected = null; // panel being moved, null if no panel is being moved
+LT.Panel.selectedBR = null; // panel being resized with the bottom right handle
+LT.Panel.selectedTL = null; // panel being resized with the top left handle
 
 LT.clickCornerX = 0; // horizontal position of corner being resized
 LT.clickCornerY = 0; // vertical position of corner being resized
@@ -304,7 +304,7 @@ LT.clickCornerY = 0; // vertical position of corner being resized
 // STATIC FUNCTIONS
 
 // Save panel Positions
-LT.savePanels = function(){
+LT.Panel.saveCookie = function(){
   var cookieString = '';
   for (i = 0; i < LT.Panel.list.length; i++) {
 	cookieString += LT.Panel.list[i].getCookieString();
@@ -313,7 +313,7 @@ LT.savePanels = function(){
 }
 
 // Load Panel positions
-LT.loadPanels = function (){
+LT.Panel.loadCookie = function (){
   var cookieArray = LT.getCookie('panels');
   var panelsCookie = cookieArray.split('_');
   for(i = 0; i < LT.Panel.list.length; i++){
@@ -323,22 +323,22 @@ LT.loadPanels = function (){
 
 // If a panel is being moved or resized, update it's dimensions.
 LT.Panel.drag = function () {
-  if (LT.selectedPanel) {
-    LT.selectedPanel.move();
+  if (LT.Panel.selected) {
+    LT.Panel.selected.move();
   }
-  if (LT.selectedBR) {
-    LT.selectedBR.resizeBR();
+  if (LT.Panel.selectedBR) {
+    LT.Panel.selectedBR.resizeBR();
   }
-  if (LT.selectedTL) {
-    LT.selectedTL.resizeTL();
+  if (LT.Panel.selectedTL) {
+    LT.Panel.selectedTL.resizeTL();
   }
 }
 
 // Stop moving or resizing panels.
 LT.Panel.stopDragging = function () {
-  LT.selectedPanel = null;
-  LT.selectedBR = null;
-  LT.selectedTL = null;
+  LT.Panel.selected = null;
+  LT.Panel.selectedBR = null;
+  LT.Panel.selectedTL = null;
 }
 
 

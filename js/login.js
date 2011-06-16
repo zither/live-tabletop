@@ -15,7 +15,6 @@ LT.createLogin = function () {
     style : 'float: right;'}, LT.pageBar);
   LT.loginUsername = LT.element('input', { style : 'border: 1px solid #CCC;',
     id : 'username', size : 10 }, LT.loginForm, 'username', 1);
-  //loginUsername.onfocus = function(){ emptyMe(this, 'username') };
   LT.loginPassword = LT.element('input', { style : 'border: 1px solid #CCC;',
     id : 'password', size : 10, type : 'password' }, LT.loginForm, 'password', 1);
   var loginSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
@@ -53,12 +52,12 @@ LT.createUserPanel = function () {
   LT.element('div', {'class': 'separator'}, LT.userPanel.content);
   savePanelsButton = LT.element('a',{ }, LT.userPanel.content, 'Save Panels');
   savePanelsButton.onclick = function() {
-    LT.savePanels();
+    LT.Panel.saveCookie();
   };
   LT.element('div', {'class': 'separator'}, LT.userPanel.content);
   loadPanelsButton = LT.element('a',{ }, LT.userPanel.content, 'Load Panels');
   loadPanelsButton.onclick = function() {
-    LT.loadPanels();
+    LT.Panel.loadCookie();
   };
   */
   LT.userForm = LT.element('form', { }, LT.userPanel.footer);
@@ -112,7 +111,7 @@ LT.login = function (loginAjax) {
     LT.chatBottom.scrollIntoView(true);
 	LT.refreshTables();
 	LT.loadSwatches();
-	LT.loadPanels();
+	LT.Panel.loadCookie();
 	LT.loadPieceImages();
   } else {
     alert('Incorrect username or password.');
