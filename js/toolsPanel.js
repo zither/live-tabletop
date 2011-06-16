@@ -75,6 +75,7 @@ LT.loadPieceImages = function () {
 
 LT.loadPieces = function () {
   LT.fill(LT.pieceLayer);
+  LT.fill(LT.clickPieceLayer);
   var readPieces = LT.ajaxRequest("POST", "php/read_pieces.php",{ 'table_id' : LT.currentTable.id });
   if (readPieces.responseXML) {
     var pieceElements = readPieces.responseXML.getElementsByTagName('piece');
