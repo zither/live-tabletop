@@ -293,12 +293,12 @@ LT.Panel.prototype = {
 LT.Panel.order = []; // panels in back-to-front order
 LT.Panel.list = []; // panels in the order they were created
 
-LT.selectedPanel = null;
-LT.selectedBR = null;
-LT.selectedTL = null;
+LT.selectedPanel = null; // panel being moved, null if no panel is being moved
+LT.selectedBR = null; // panel being resized with the bottom right handle
+LT.selectedTL = null; // panel being resized with the top left handle
 
-LT.clickCornerX = 0;
-LT.clickCornerY = 0;
+LT.clickCornerX = 0; // horizontal position of corner being resized
+LT.clickCornerY = 0; // vertical position of corner being resized
 
 
 // STATIC FUNCTIONS
