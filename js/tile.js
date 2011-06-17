@@ -13,7 +13,6 @@ LT.Tile = function (tableID, x, y, tileCode) {
 // GLOBAL VARIABLES
 LT.Tile.PROPERTIES = ["fog", "image_id", "x", "y", "table_id"];
 LT.Tile.dragging = 0;
-LT.Tile.mode = "change image";
 LT.Tile.toggleFogValue = 1;
 
 // GLOBAL FUNCTIONS FOR SORTING TILES IN ROW, COLUMN ORDER
@@ -154,20 +153,20 @@ LT.Tile.prototype = {
     var self = this;
     this.clickDiv.onmousedown = function() {
       LT.Tile.dragging = 1;
-      if (LT.Tile.mode == 'change image') {
+      if (LT.brush == 'tile') {
         self.setImageID(LT.selectedImageID);
       }
-      else if (LT.Tile.mode == 'toggle fog') {
+      else if (LT.brush == 'fog') {
         LT.Tile.toggleFogValue = self.fog == 0 ? 1 : 0;
         self.setFog(LT.Tile.toggleFogValue);
       }
     };
     this.clickDiv.onmouseover = function() {
       if (LT.Tile.dragging == 1) {
-        if (LT.Tile.mode == 'change image') {
+        if (LT.brush == 'tile') {
           self.setImageID(LT.selectedImageID);
         }
-        else if (LT.Tile.mode == 'toggle fog') {
+        else if (LT.brush == 'fog') {
           self.setFog(LT.Tile.toggleFogValue);
         }
 	  }
