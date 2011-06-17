@@ -102,27 +102,34 @@ DIV {
 
 
 .panelHeader, .panelFooter {
-  background: #e7e8e9;
+  background: #FFF;
   clear: both;
-  border-left: 1px solid #666;
-  border-right: 1px solid #666;
+  border-left: 1px solid #333;
+  border-right: 1px solid #333;
   margin: 0px -5px 0px -5px;
   padding: 0px 5px 0px 5px;
 }
-
 .resizeTL {
   background: url(images/resizeTL.png);
-  width: 22px;
+  width: 15px;
   height: 23px;
   float: left;
   cursor: nw-resize;
   margin-left: -5px;
 }
+.resizeTR {
+  background: url(images/resizeTR.png);
+  width: 10px;
+  height: 23px;
+  float: right;
+  cursor: ne-resize;
+  margin-right: -5px;
+}
 .panelContent {
-  background: #e7e8e9 url(images/panel.jpg) repeat-x top left;
   clear: both;
-  border-left: 1px solid #666;
-  border-right: 1px solid #666;
+  background: #FFF;
+  border-left: 1px solid #333;
+  border-right: 1px solid #333;
   color: #333;
   overflow: auto;
   margin: 0px -5px 0px -5px;
@@ -154,33 +161,32 @@ DIV {
 }
 .tabBar {
   background: url(images/tabBar.jpg) repeat top left;
-  min-height: 23px;
   clear: both;
-  border-left: 1px solid #666;
-  border-right: 1px solid #666;
+  border-left: 1px solid #333;
+  border-right: 1px solid #333;
   margin: 0px -5px 0px -5px;
   padding: 0px 5px 0px 5px;
 }
 
 .panelBottom {
-  background: #e7e8e9;
+  background: #FFF;
   width: auto;
-  height:20px;
-  border-bottom: 1px solid #666;
+  height:12px;
+  border-bottom: 1px solid #333;
 }
 
 .panelBL {
-  background: url(images/bottomCorner.png);
-  height: 21px;
-  width: 6px;
+  background: url(images/resizeBL.png);
+  height: 13px;
+  width: 13px;
   float: left;
   margin-left: -5px;
 }
 
 .resizeBR {
   background: url(images/resizeBR.png);
-  height: 21px;
-  width: 21px;
+  height: 13px;
+  width: 13px;
   float: right;
   cursor: se-resize;
   margin-right: -5px;
@@ -202,19 +208,11 @@ DIV {
   height: 23px;
 }
 
-.titleStart {
-  background-image: url(images/titleStart.jpg);
-  width: 5px;
-  height: 23px;
-  margin-left: 1px;
-  float: left;
-}
-
 .titleCaption {
   background: url(images/titleBG.jpg) repeat-x top left;
   height: 21px;
   float: left;
-  color: #CCC;
+  color: #333;
   font-size: 16px;
   text-decoration: none;
   padding: 2px 0px 0px 0px;
@@ -244,7 +242,7 @@ DIV {
 /* PANEL TABS */
 
 .activeTab, .inactiveTab, .tabStart, .tabEnd, .tabContent {
-  height: 23px;
+  height: 21px;
   float: left;
 }
 
@@ -254,7 +252,7 @@ DIV {
 }
 
 .activeTab, .inactiveTab {
-  margin: 0px 0px 0px 2px;
+  margin: 0px 0px 0px 1px;
 }
 
 .activeTab {
@@ -290,7 +288,7 @@ DIV {
 }
 
 .tabContent {
-  padding: 5px 3px 0px 3px;
+  padding: 3px 3px 0px 3px;
   color: #333;
   font-size: 13px;
 }
