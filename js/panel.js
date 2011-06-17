@@ -58,6 +58,11 @@ LT.Panel = function (panelName, buttonName, x, y, width, height, buttonLoc) {
     LT.Panel.selected = self;
     return false;
   };
+  var resizeTR = LT.element('div', {'class' : 'resizeTR'}, title)
+  resizeTR.onmousedown = function() {
+    LT.Panel.selectedTR = self;
+    return false;
+  };
   var close = LT.element('div', {'class' : 'close'}, title);
   close.onclick = function () {
 	self.hide();
@@ -106,7 +111,6 @@ LT.Panel.prototype = {
     //  this.tabBar = LT.element('div', {'class' : 'tabBar'}, this.header);
     //}
     // FIXME: magic number (color)
-    this.content.style.background = "#e7e8e9";
     var isActive = 'activeTab';
     if (this.tabs.length > 0){
       isActive = 'inactiveTab';
