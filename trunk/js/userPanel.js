@@ -1,20 +1,27 @@
 
-LT.createUserPanel = function () {
+LT.createUserPanel = function () {  
   LT.userButton = LT.element('div', { id : 'loginDiv' });
   LT.userPanel = new LT.Panel('User Options', "'s options", 185, 26, 210, 100, LT.userButton);
-  LT.element('a', {id: 'logoutDiv'}, LT.userPanel.content, 'Logout')
-    .onclick = LT.logout;
   
-  LT.element('div', {'class': 'separator'}, LT.userPanel.content);
+  LT.userPanel.makeTab('my options');
+  LT.userPanel.makeTab('list');
+  LT.userPanel.makeTab('admin');
+  LT.myOptionsTab = LT.userPanel.tabs[0].content;
+  LT.userListTab = LT.userPanel.tabs[1].content;
+  LT.adminTab = LT.userPanel.tabs[2].content;
   
-  createImagesButton = LT.element('a', {}, LT.userPanel.content, 'Process Uploaded Images');
+  LT.element('a', {id: 'logoutDiv'}, LT.myOptionsTab, 'Logout').onclick = LT.logout;
+  
+  LT.element('div', {'class': 'separator'}, LT.myOptionsTab);
+  
+  createImagesButton = LT.element('a', {}, LT.myOptionsTab, 'Process Uploaded Images');
   createImagesButton.onclick = function(){
     LT.ajaxRequest("POST", "php/create_images.php", {});
   }
   
-  LT.element('div', {'class': 'separator'}, LT.userPanel.content);
+  LT.element('div', {'class': 'separator'}, LT.myOptionsTab);
   
-  defaultPanels = LT.element('a', {}, LT.userPanel.content, 'Default Panels');
+  defaultPanels = LT.element('a', {}, LT.myOptionsTab, 'Default Panels');
   defaultPanels.onclick = function(){
     LT.tablesPanel.refreshPanel();
     LT.chatPanel.refreshPanel();
@@ -23,7 +30,11 @@ LT.createUserPanel = function () {
     LT.filesPanel.refreshPanel();
     LT.userPanel.refreshPanel();
   }
-  LT.userForm = LT.element('form', { }, LT.userPanel.footer);
+  
+  
+  LT.element('div', {'class': 'separator'}, LT.myOptionsTab);
+  
+  LT.userForm = LT.element('form', { }, LT.myOptionsTab);
   LT.inputUserName = LT.element('input', { size : 8, type: 'text',
     style : 'border: 0px solid #CCC;' }, LT.userForm, 'User Name', 1);
   
@@ -33,6 +44,4 @@ LT.createUserPanel = function () {
   userSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
         id : 'chatSubmit', size : 8, value : 'Create' }, LT.userForm);
   userSubmit.onclick = function() { LT.createUser(); };
-  userRefresh = LT.element('input',{ type : 'button' }, LT.userPanel.footer, 'Refresh');
-  userRefresh.onclick = function() { LT.refreshTables(); };
 }

@@ -101,12 +101,9 @@ DIV {
 /* MOVEABLE, RESIZEABLE PANELS */
 
 .panelHeader {
-  margin: 0px -21px 0px -6px;
 }
 
 .panelFooter {
-  margin: 0px -21px 0px -6px;
-  padding: 0px 8px 0px 4px;
 }
 
 .panelHeader, .panelFooter {
@@ -121,8 +118,8 @@ DIV {
   width: 22px;
   height: 23px;
   float: left;
-  margin-left: -6px;
   cursor: nw-resize;
+  margin-left: -5px;
 }
 .panelContent {
   background: #e7e8e9 url(images/panel.jpg) repeat-x top left;
@@ -130,9 +127,9 @@ DIV {
   border-left: 1px solid #666;
   border-right: 1px solid #666;
   color: #333;
-  padding: 8px 8px 0px 4px;
-  margin: 0px -21px 0px -6px;
   overflow: auto;
+  margin: 0px -5px 0px -5px;
+  padding: 0px 5px 0px 5px;
 }
 
 .panelContent  a {
@@ -158,6 +155,15 @@ DIV {
   left: 0px;
   top: 0px;
 }
+.tabBar {
+  background: url(images/tabBar.jpg) repeat top left;
+  min-height: 23px;
+  clear: both;
+  border-left: 1px solid #666;
+  border-right: 1px solid #666;
+  margin: 0px -5px 0px -5px;
+  padding: 0px 5px 0px 5px;
+}
 
 .panelBottom {
   background: #e7e8e9;
@@ -171,7 +177,7 @@ DIV {
   height: 21px;
   width: 6px;
   float: left;
-  margin-left: -6px;
+  margin-left: -5px;
 }
 
 .resizeBR {
@@ -179,22 +185,24 @@ DIV {
   height: 21px;
   width: 21px;
   float: right;
-  margin-right: -21px;
   cursor: se-resize;
+  margin-right: -5px;
 }
 
 .outerPanel {
-  background: url(images/panelBar.jpg) repeat-x top left;
   position: fixed;
   visibility: hidden;
   z-index: 0;
+  margin: 0px -5px 0px -5px;
+  padding: 0px 5px 0px 5px;
 }
-
 
 /* PANEL TITLES */
 
 .title {
   position: relative;
+  background: url(images/panelBar.jpg) repeat-x top left;
+  height: 23px;
 }
 
 .titleStart {
@@ -228,7 +236,7 @@ DIV {
   width: 27px;
   height: 23px;
   float: right;
-  margin-right: -21px;
+  margin-right: -5px;
   cursor: pointer;
 }
 
@@ -237,12 +245,6 @@ DIV {
 }
 
 /* PANEL TABS */
-
-.tabBar {
-  background: url(images/tabBar.jpg) repeat top left;
-  min-height: 23px;
-  padding: 0px 0px 0px 2px;
-}
 
 .activeTab, .inactiveTab, .tabStart, .tabEnd, .tabContent {
   height: 23px;
