@@ -146,55 +146,55 @@ LT.Table.prototype = {
     for (var row = 0; row < this.tile_rows; row++) {
       for (var column = 0; column < this.tile_columns; column++) {
         if (this.tile_mode == 'rectangle') {
-          this.createGridClickDetector(row, column, "n",  1/4, -1/4, 1/2, 1/2);
-          this.createGridClickDetector(row, column, "w", -1/4,  1/4, 1/2, 1/2);
+          this.createGridClickDetector(column, row, "n",  1/4, -1/4, 1/2, 1/2);
+          this.createGridClickDetector(column, row, "w", -1/4,  1/4, 1/2, 1/2);
           if (row == this.tile_rows - 1) {
-            this.createGridClickDetector(row, column, "s",  1/4,  3/4, 1/2, 1/2);
+            this.createGridClickDetector(column, row, "s",  1/4,  3/4, 1/2, 1/2);
           }
           if (column == this.tile_columns - 1) {
-            this.createGridClickDetector(row, column, "e",  3/4,  1/4, 1/2, 1/2);
+            this.createGridClickDetector(column, row, "e",  3/4,  1/4, 1/2, 1/2);
           }
         }
         if (this.tile_mode == 'isometric') {
           var offset = (row % 2) / 2;
-          this.createGridClickDetector(row, column, "ne", offset + 1/2, 0, 1/2, 1);
-          this.createGridClickDetector(row, column, "nw", offset,       0, 1/2, 1);
+          this.createGridClickDetector(column, row, "ne", offset + 1/2, 0, 1/2, 1);
+          this.createGridClickDetector(column, row, "nw", offset,       0, 1/2, 1);
           if (row == this.tile_rows - 1) {
-            this.createGridClickDetector(row, column, "se", offset + 1/2, 1, 1/2, 1);
-            this.createGridClickDetector(row, column, "sw", offset,       1, 1/2, 1);
+            this.createGridClickDetector(column, row, "se", offset + 1/2, 1, 1/2, 1);
+            this.createGridClickDetector(column, row, "sw", offset,       1, 1/2, 1);
           }
           else {
             if (column == 0 && row % 2 == 0) {
-              this.createGridClickDetector(row, column, "sw", offset,       1, 1/2, 1);
+              this.createGridClickDetector(column, row, "sw", offset,       1, 1/2, 1);
             }
             if (column == this.tile_columns - 1 && row % 2 == 1) {
-              this.createGridClickDetector(row, column, "se", offset + 1/2, 1, 1/2, 1);
+              this.createGridClickDetector(column, row, "se", offset + 1/2, 1, 1/2, 1);
             }
           }
         }
         if (this.tile_mode == 'hex rows') {
           var offset = (row % 2) / 2;
-          this.createGridClickDetector(row, column, "ne", offset + 1/2,  0,  1/2, 1/3);
-          this.createGridClickDetector(row, column, "e",  offset + 3/4, 1/3, 1/2, 2/3);
-          this.createGridClickDetector(row, column, "se", offset + 1/2,  1,  1/2, 1/3);
-          this.createGridClickDetector(row, column, "sw", offset,        1,  1/2, 1/3);
-          this.createGridClickDetector(row, column, "w",  offset - 1/4, 1/4, 1/2, 2/3);
-          this.createGridClickDetector(row, column, "nw", offset,        0,  1/2, 1/3);
+          this.createGridClickDetector(column, row, "ne", offset + 1/2,  0,  1/2, 1/3);
+          this.createGridClickDetector(column, row, "e",  offset + 3/4, 1/3, 1/2, 2/3);
+          this.createGridClickDetector(column, row, "se", offset + 1/2,  1,  1/2, 1/3);
+          this.createGridClickDetector(column, row, "sw", offset,        1,  1/2, 1/3);
+          this.createGridClickDetector(column, row, "w",  offset - 1/4, 1/4, 1/2, 2/3);
+          this.createGridClickDetector(column, row, "nw", offset,        0,  1/2, 1/3);
         }
         if (this.tile_mode == 'hex columns') {
           var offset = (column % 2) / 2;
-          this.createGridClickDetector(row, column, "n",  1/3, offset - 1/4, 2/3, 1/2);
-          this.createGridClickDetector(row, column, "ne",  1,  offset,       1/3, 1/2);
-          this.createGridClickDetector(row, column, "se",  1,  offset + 1/2, 1/3, 1/2);
-          this.createGridClickDetector(row, column, "s",  1/3, offset + 3/4, 2/3, 1/2);
-          this.createGridClickDetector(row, column, "sw",  0,  offset + 1/2, 1/3, 1/2);
-          this.createGridClickDetector(row, column, "nw",  0,  offset,       1/3, 1/2);
+          this.createGridClickDetector(column, row, "n",  1/3, offset - 1/4, 2/3, 1/2);
+          this.createGridClickDetector(column, row, "ne",  1,  offset,       1/3, 1/2);
+          this.createGridClickDetector(column, row, "se",  1,  offset + 1/2, 1/3, 1/2);
+          this.createGridClickDetector(column, row, "s",  1/3, offset + 3/4, 2/3, 1/2);
+          this.createGridClickDetector(column, row, "sw",  0,  offset + 1/2, 1/3, 1/2);
+          this.createGridClickDetector(column, row, "nw",  0,  offset,       1/3, 1/2);
         }
       }
     }
   },
 
-  createGridClickDetector: function (row, column, direction, left, top, width, height) {
+  createGridClickDetector: function (column, row, direction, left, top, width, height) {
     var clickDiv = LT.element("div", {style: "position: absolute;"
       + "left: " + (this.tile_width  * (column + left)) + "px;"
       + "top: " + (this.tile_height * (row + top)) + "px;"
@@ -203,13 +203,20 @@ LT.Table.prototype = {
       }, LT.clickWallLayer);
     var self = this;
     clickDiv.onclick = function () {
-      self.click(row, column, direction);
+      self.click(column, row, direction);
     }
   },
 
-  click: function (row, column, direction) {
+  click: function (column, row, direction) {
     // TODO: depending on which tool is selected, call this.door(...) or this.clear(...)
-    this.wall(row, column, direction);
+    var type = this.getWall(column, row, direction);
+    if (type == "wall") this.door(column, row, direction);
+    else if (type == "door") this.clear(column, row, direction);
+    else this.wall(column, row, direction);
+  },
+
+  getWall: function (column, row, direction) {
+    return this.grid.getWall(column, row, direction);
   },
   
   setWall: function (column, row, direction, type) {
@@ -234,11 +241,11 @@ LT.Table.prototype = {
   },
   
   door: function(column, row, direction) {
-    this.setWall(row, column, direction, "door");
+    this.setWall(column, row, direction, "door");
   },
   
   clear: function(column, row, direction) {
-    this.setWall(row, column, direction, "none");
+    this.setWall(column, row, direction, "none");
   },
 
 }

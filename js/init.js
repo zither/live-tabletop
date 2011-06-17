@@ -8,7 +8,6 @@ LT.loadLT = function () {
   LT.clickTileLayer = LT.element('div', { 'class' : 'clickLayer' }, LT.clickLayers);
   LT.clickWallLayer = LT.element('div', { 'class' : 'clickLayer' }, LT.clickLayers);
   LT.clickPieceLayer = LT.element('div', { 'class' : 'clickLayer' }, LT.clickLayers);
-  LT.clickFogLayer = LT.element('div', { 'class' : 'clickLayer' }, LT.clickLayers);
   LT.pageBar = LT.element('div', {id: 'pageBar'}, document.body);
   LT.element('div', {id: 'logo'}, LT.pageBar);
   LT.buttons = LT.element('div', {id: 'buttons'}, LT.pageBar);
