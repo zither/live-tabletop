@@ -50,7 +50,7 @@ LT.refreshMessageList = function () {
 };
 
 LT.createChatPanel = function () {
-  LT.chatPanel = new LT.Panel( 'Chat', 'Chat', 6, 49, 355, 130);
+  LT.chatPanel = new LT.Panel( 'Chat', 'Chat', 6, 95, 355, 130);
   LT.chatForm = LT.element('form', { id : 'chatForm' , style : "" 
     }, LT.chatPanel.footer);
   LT.chatOutput = LT.element('div', { id : 'chatOutput' }, LT.chatPanel.content);

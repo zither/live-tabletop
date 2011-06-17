@@ -29,20 +29,21 @@
   LT.DBSubmit.onclick = function() {
     LT.ajaxRequest("POST", "php/logout.php", {});
     var installRoutine = LT.ajaxRequest("POST", "php/install.php",
-    {
+      {
       location: LT.DBLocation.value,
       username: LT.DBusername.value,
       password: LT.DBpassword.value,
       database: LT.DBName.value,
       admin_username: LT.DBAdminName.value,
       admin_password: LT.DBAdminPW.value
-    }
+      }
     );
     var checkInstall = LT.ajaxRequest("POST", 'php/db_config.php', {});
 	if (checkInstall.status == 200) {
+	  LT.ajaxRequest("POST", "php/create_images.php", {});
+	  document.body.removeChild(LT.installBox);
 	  LT.loadLT();
 	  LT.sendLogin( LT.DBAdminName.value, LT.DBAdminPW.value );
-	  document.body.removeChild(LT.installBox);
 	}else{
 	  alert('Database was not properly installed. Try again.');
 	}

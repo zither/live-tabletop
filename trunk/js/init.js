@@ -13,9 +13,9 @@ LT.loadLT = function () {
   LT.buttons = LT.element('div', {id: 'buttons'}, LT.pageBar);
   LT.tables = [];
   LT.createTablesPanel();
+  LT.createToolsPanel();
   LT.createChatPanel();
   LT.createTurnsPanel();
-  LT.createToolsPanel();
   LT.createFilesPanel();
   LT.loginCheck();
   LT.refreshMessageList();

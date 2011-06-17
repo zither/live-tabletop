@@ -203,7 +203,7 @@ bringForward = function (cObject) {
   LT.clickLayers.appendChild(cObject);
 }
 LT.createToolsPanel = function () {
-  LT.toolsPanel = new LT.Panel( 'Tools', 'Tools', 6, 95, 210, 110);
+  LT.toolsPanel = new LT.Panel( 'Tools', 'Tools', 6, 49, 140, 180);
   LT.toolsPanel.makeTab('Tiles', function () { bringForward(LT.clickTileLayer) });
   LT.toolsPanel.makeTab('Pieces', function () { bringForward(LT.clickPieceLayer) });
   LT.toolsPanel.makeTab('Fog', function () { bringForward(LT.clickTileLayer) });
