@@ -194,7 +194,7 @@ populatePiecesTab = function () {
         id : 'chatSubmit', size : 8, value : 'Create' }, LT.pForm);
   pSubmit.onclick = function() { LT.createPiece(); };
   LT.element('div', { 'class' : 'clearBoth' }, LT.piecesTab.header);
-  LT.pieceImageDiv = LT.element('div', { 'style' : 'clear: both; overflow: scroll;' },
+  LT.pieceImageDiv = LT.element('div', { 'style' : 'clear: both; overflow: none;' },
     LT.piecesTab.content, 'Columns: ');
   LT.loadPieceImages();
 }
