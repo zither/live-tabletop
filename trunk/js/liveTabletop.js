@@ -6,6 +6,8 @@ LT.images = [];
 LT.messages = [];
 LT.lastMessage = 0;
 
+LT.brush = null; // paint 'tile', 'wall' or 'fog'
+
 LT.clickDragGap = 0; 
 LT.dragX = 0; // current horizontal mouse position
 LT.dragY = 0; // current vertical mouse position

@@ -204,10 +204,21 @@ bringForward = function (cObject) {
 }
 LT.createToolsPanel = function () {
   LT.toolsPanel = new LT.Panel( 'Tools', 'Tools', 6, 49, 140, 180);
-  LT.toolsPanel.makeTab('Tiles', function () { bringForward(LT.clickTileLayer) });
-  LT.toolsPanel.makeTab('Pieces', function () { bringForward(LT.clickPieceLayer) });
-  LT.toolsPanel.makeTab('Fog', function () { bringForward(LT.clickTileLayer) });
-  LT.toolsPanel.makeTab('Walls', function () { bringForward(LT.clickWallLayer) });
+  LT.toolsPanel.makeTab('Tiles', function () {
+    bringForward(LT.clickTileLayer);
+    LT.brush = "tile";
+  });
+  LT.toolsPanel.makeTab('Pieces', function () {
+    bringForward(LT.clickPieceLayer);
+  });
+  LT.toolsPanel.makeTab('Fog', function () {
+    bringForward(LT.clickTileLayer);
+    LT.brush = "fog";
+  });
+  LT.toolsPanel.makeTab('Walls', function () {
+    bringForward(LT.clickWallLayer);
+    LT.brush = "wall";
+  });
   LT.piecesTab = LT.toolsPanel.tabs[1].content;
   LT.fogTab = LT.toolsPanel.tabs[2].content;
   LT.tilesTab = LT.toolsPanel.tabs[0].content;
