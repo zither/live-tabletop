@@ -123,15 +123,15 @@ LT.Table.prototype = {
     LT.ajaxRequest("POST", "php/read_walls.php", args, function (ajax) {
       var walls = ajax.responseXML.getElementsByTagName("wall");
       for (var i = 0; i < walls.length; i++) {
-        var x = parseInt(walls[i].getAttribute("x"));
-        var y = parseInt(walls[i].getAttribute("y"));
+        var column = parseInt(walls[i].getAttribute("x"));
+        var row = parseInt(walls[i].getAttribute("y"));
         var direction = decodeURIComponent(walls[i].getAttribute("direction"));
         var contents = decodeURIComponent(walls[i].getAttribute("contents"));
         if (contents == "wall") {
-          self.wall(y, x, direction);
+          self.wall(column, row, direction);
         }
         if (contents == "door") {
-          self.door(y, x, direction);
+          self.door(column, row, direction);
         }
       }
       self.createGridClickDetectors();
