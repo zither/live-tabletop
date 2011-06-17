@@ -4,9 +4,9 @@ LT.Grid = function (columns, rows, width, height, thickness, color, wall_thickne
   this._width = width;
   this._height = height;
   this._thickness = thickness;
-  this._color = color;
+  this._color = color || "black";
   this._wall_thickness = wall_thickness;
-  this._wall_color = wall_color;
+  this._wall_color = wall_color || "black";
   this.canvas = document.createElement("canvas");
   if (parent) {
     parent.appendChild(this.canvas);
@@ -282,6 +282,11 @@ LT.Grid.prototype = {
     return {column: column, row: row, direction: direction};
   },
 
+  getWall: function (column, row, direction) {
+    var c = this.normalize(column, row, direction);
+    return this.walls[c.row][c.column][c.direction];
+  },
+
   setWall: function (column, row, direction, type) {
     var c = this.normalize(column, row, direction);
     if (type != "door" && type != "wall") {
@@ -298,11 +303,11 @@ LT.Grid.prototype = {
   },
 
   door: function(column, row, direction) {
-    this.setWall(row, column, direction, "door");
+    this.setWall(column, row, direction, "door");
   },
 
   clear: function(column, row, direction) {
-    this.setWall(row, column, direction, "none");
+    this.setWall(column, row, direction, "none");
   },
 
 };

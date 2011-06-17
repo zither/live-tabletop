@@ -206,7 +206,7 @@ LT.createToolsPanel = function () {
   LT.toolsPanel = new LT.Panel( 'Tools', 'Tools', 6, 95, 210, 110);
   LT.toolsPanel.makeTab('Tiles', function () { bringForward(LT.clickTileLayer) });
   LT.toolsPanel.makeTab('Pieces', function () { bringForward(LT.clickPieceLayer) });
-  LT.toolsPanel.makeTab('Fog', function () { bringForward(LT.clickFogLayer) });
+  LT.toolsPanel.makeTab('Fog', function () { bringForward(LT.clickTileLayer) });
   LT.toolsPanel.makeTab('Walls', function () { bringForward(LT.clickWallLayer) });
   LT.piecesTab = LT.toolsPanel.tabs[1].content;
   LT.fogTab = LT.toolsPanel.tabs[2].content;

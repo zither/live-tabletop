@@ -26,9 +26,9 @@ LT.readTiles = function(){
   if (readTiles.responseXML){
     LT.fill(LT.tileLayer);
     LT.fill(LT.clickTileLayer);
+    LT.fill(LT.fogLayer);
 	LT.resizeLayer(LT.tableTop);
 	LT.resizeLayer(LT.clickWallLayer);
-	LT.resizeLayer(LT.clickFogLayer);
     LT.tiles = [];
     var tileElements = readTiles.responseXML.getElementsByTagName('tiles');
 
