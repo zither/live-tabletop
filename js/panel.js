@@ -64,7 +64,7 @@ LT.Panel = function (panelName, buttonName, x, y, width, height, buttonLoc) {
     LT.Panel.saveCookie();
     return false;
   };
-  
+  this.tabBar = LT.element('div', {'class' : 'tabBar'}, this.outside)
   this.header = LT.element('div', {'class' : 'panelHeader'}, this.outside);
   
   // Middle: this.content contains elements specific to each panel
@@ -102,9 +102,9 @@ LT.Panel.prototype = {
 
   // Create a tab
   makeTab: function (name, tabAction) {
-    if (!this.tabBar) {
-      this.tabBar = LT.element('div', {'class' : 'tabBar'}, this.header);
-    }
+    //if (!this.tabBar) {
+    //  this.tabBar = LT.element('div', {'class' : 'tabBar'}, this.header);
+    //}
     // FIXME: magic number (color)
     this.content.style.background = "#e7e8e9";
     var isActive = 'activeTab';
@@ -149,10 +149,7 @@ LT.Panel.prototype = {
     // FIXME: magic numbers 12 and 36
     this.outside.style.left = this.defaultX + 'px';
     this.outside.style.top = this.defaultY + 'px';
-    this.footer.style.width = this.defaultWidth + 'px';
-    this.header.style.width = (this.defaultWidth + 12) + 'px';
-    this.bar.style.width = (this.defaultWidth - 36) + 'px';
-    this.content.style.width = this.defaultWidth + 'px';
+	this.setWidth(this.defaultWidth);
     this.content.style.height = this.defaultHeight + 'px';
   },
 
@@ -188,7 +185,7 @@ LT.Panel.prototype = {
   getCookieString: function () {
 	var x = parseInt(this.outside.style.left);
 	var y = parseInt(this.outside.style.top);
-	var w = parseInt(this.bar.style.width);
+	var w = parseInt(this.content.style.width);
 	var h = parseInt(this.content.style.height);
     var v = this.outside.style.visibility == "visible" ? 1 : 0;
 	var t = this.selectedTab;
@@ -204,10 +201,7 @@ LT.Panel.prototype = {
       var width = parseInt(panelShape[2]);
       this.outside.style.left = panelShape[0] + 'px';
       this.outside.style.top = panelShape[1] + 'px';
-      this.content.style.width = width + 36 + 'px';
-      this.bar.style.width = width + 'px';
-      this.header.style.width = width + 48 + 'px';
-      this.footer.style.width = width + 36 + 'px';
+	  this.setWidth(width);
       this.content.style.height = panelShape[3] + 'px';
       this.selectTab(parseInt(panelShape[5]));
       if (parseInt(panelShape[4]) == 1) {
@@ -228,9 +222,9 @@ LT.Panel.prototype = {
       LT.clickDragGap = 1;
     }
     // FIXME: magic numbers
-    LT.dragX = Math.min(LT.dragX - LT.clickX, window.innerWidth - w - 25);
+    LT.dragX = Math.min(LT.dragX - LT.clickX, window.innerWidth - w - 7);
     LT.dragY = Math.min(LT.dragY - LT.clickY, window.innerHeight - h - 61);
-    LT.dragX = Math.max(LT.dragX, 6);
+    LT.dragX = Math.max(LT.dragX, 5);
     LT.dragY = Math.max(LT.dragY, 26);
     this.outside.style.top  = LT.dragY + "px";
     this.outside.style.left = LT.dragX + "px";
@@ -249,11 +243,8 @@ LT.Panel.prototype = {
     LT.dragX = Math.max(LT.dragX - LT.clickX, 140);
     LT.dragY = Math.max(LT.dragY - LT.clickY, 50);
 	var newWidth = Math.min(LT.dragX, window.innerWidth - panelX - 25);
-    this.content.style.width = newWidth + "px";
-    this.footer.style.width = newWidth + "px";
-    this.header.style.width = newWidth + 12 + "px";
     this.content.style.height = Math.min(LT.dragY, window.innerHeight - panelY - 61) + "px";
-    this.bar.style.width = (Math.min(LT.dragX, window.innerWidth - panelX - 25) - 36) + "px";
+    this.setWidth(newWidth);
   },
 
   // Resize panel using the top-left handle.
@@ -266,20 +257,25 @@ LT.Panel.prototype = {
       LT.clickDragGap = 1;
     }
     // FIXME: magic numbers
-    LT.dragX = Math.max(LT.dragX, LT.clickX + 6);
+    LT.dragX = Math.max(LT.dragX, LT.clickX + 5);
     LT.dragY = Math.max(LT.dragY, LT.clickY + 26);
     LT.dragX = Math.min(LT.dragX, LT.clickCornerX - 140);
     LT.dragY = Math.min(LT.dragY, LT.clickCornerY - 50);
     this.outside.style.left = (LT.dragX - LT.clickX) + "px";
     this.outside.style.top  = (LT.dragY - LT.clickY) + "px";
 	var newWidth = Math.min(LT.clickCornerX - LT.dragX);
+    this.content.style.height = (LT.clickCornerY - LT.dragY) + "px";
+	this.setWidth(newWidth);
+  },
+	
+  setWidth: function (newWidth) {
+    //this.outside.style.width = newWidth + "px";
     this.content.style.width = newWidth + "px";
     this.footer.style.width = newWidth + "px";
-    this.header.style.width = newWidth + 12 + "px";
-    this.content.style.height = (LT.clickCornerY - LT.dragY) + "px";
-    this.bar.style.width = (LT.clickCornerX - LT.dragX - 36) + "px";
-  },
-
+    this.header.style.width = newWidth + "px";
+    this.tabBar.style.width = newWidth + "px";
+    this.bar.style.width = newWidth - 36 + "px";
+  }
 };
 
 // GLOBAL VARIABLES
