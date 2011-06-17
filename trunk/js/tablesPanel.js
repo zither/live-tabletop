@@ -163,7 +163,7 @@ populateEditTableTab = function () {
   eTF.inputWallThickness = LT.element('input', { size : 1, 
     style : 'border: 1px solid #CCC;' }, wallThicknessDiv, '1', 1);
   var tileModeDiv = LT.element('div', { 'class' : 'inputDiv' }, eTF, 'Tile Mode: ');
-  eTF.inputTileMode = LT.element('select', { size : 1, name : 'tileMode', 
+  eTF.inputTileMode = LT.element('select', { size : 1, name : 'eTileMode', 
     style : 'border: 1px solid #CCC;' }, tileModeDiv);
   eTF.inputTMRectangle = LT.element('option', { value : 'rectangle'},
     eTF.inputTileMode, 'Rectangles');
@@ -218,7 +218,7 @@ populateCreateTableTab = function () {
   cTF.inputWallThickness = LT.element('input', { size : 1, 
     style : 'border: 1px solid #CCC;' }, wallThicknessDiv, '1', 1);
   var tileModeDiv = LT.element('div', { 'class' : 'inputDiv' }, cTF, 'Tile Mode: ');
-  cTF.inputTileMode = LT.element('select', { size : 1, name : 'tileMode', 
+  cTF.inputTileMode = LT.element('select', { size : 1, name : 'cTileMode', 
     style : 'border: 1px solid #CCC;' }, tileModeDiv);
   LT.element('option', { value : 'rectangle'}, cTF.inputTileMode, 'Rectangles');
   LT.element('option', { value : 'isometric'}, cTF.inputTileMode, 'Isometric');
