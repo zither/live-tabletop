@@ -146,6 +146,7 @@ document.onselectstart = function () {return false;}
 
 // Stop dragging when the mouse button is released.
 document.onmouseup = function () {
+  LT.holdTimestamps = 0;
   LT.Panel.stopDragging();
   LT.clickDragGap = 0;
   LT.Tile.dragging = 0;
@@ -153,6 +154,9 @@ document.onmouseup = function () {
     LT.updatePiece(LT.selectedPiece);
   }
   LT.Panel.saveCookie();
+}
+document.onmousedown = function () {
+  LT.holdTimestamps = 1;
 }
 
 // Move or resize a panel when the mouse is dragged.
