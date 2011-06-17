@@ -116,9 +116,11 @@ LT.Panel.prototype = {
     LT.element('div', {'class' : 'tabContent'}, tabLabel, name);
     LT.element('div', {'class' : 'tabEnd'}, tabLabel);
     var tabContent = LT.element('div', {});
-    this.tabs.push({label : tabLabel, content : tabContent, action : tabAction});
+    var tabHeader = LT.element('div', {});
+    this.tabs.push({label : tabLabel, content : tabContent, header : tabHeader, action : tabAction});
     if (this.tabs.length == 1){
       this.content.appendChild(tabContent);
+      this.header.appendChild(tabHeader);
     }
     var self = this;
     var tabNumber = this.tabs.length - 1;
@@ -137,6 +139,7 @@ LT.Panel.prototype = {
       }
       tab.label.className = 'activeTab';
       LT.fill(this.content, tab.content);
+      LT.fill(this.header, tab.header);
       this.selectedTab = tabNumber;
       if (tab.action) {
         tab.action();

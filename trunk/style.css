@@ -100,17 +100,14 @@ DIV {
 
 /* MOVEABLE, RESIZEABLE PANELS */
 
-.panelHeader {
-}
-
-.panelFooter {
-}
 
 .panelHeader, .panelFooter {
   background: #e7e8e9;
   clear: both;
   border-left: 1px solid #666;
   border-right: 1px solid #666;
+  margin: 0px -5px 0px -5px;
+  padding: 0px 5px 0px 5px;
 }
 
 .resizeTL {
