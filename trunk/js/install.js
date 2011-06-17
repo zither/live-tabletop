@@ -40,7 +40,7 @@
     );
     var checkInstall = LT.ajaxRequest("POST", 'php/db_config.php', {});
 	if (checkInstall.status == 200) {
-	  LT.ajaxRequest("POST", "php/create_images.php", {});
+	  LT.ajaxRequest("POST", "php/create_images.php", {}); // <<< broken
 	  document.body.removeChild(LT.installBox);
 	  LT.loadLT();
 	  LT.sendLogin( LT.DBAdminName.value, LT.DBAdminPW.value );
