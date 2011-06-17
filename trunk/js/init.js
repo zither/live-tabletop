@@ -20,10 +20,21 @@ LT.loadLT = function () {
   LT.loginCheck();
   LT.refreshMessageList();
   LT.loadTable();
+  setInterval('LT.checkTimestamps()', 2000);
 }
-
-refreshTimestamps = function () {
-  
+LT.checkTimestamps = function () {
+  if (LT.currentTable) {
+    cT = LT.currentTable
+    var args = {table_id: LT.currentTable.id};
+    LT.ajaxRequest("POST", "php/read_table.php", args, function (ajax) {
+      var tableResponse = ajax.responseXML.getElementsByTagName("table");
+      var table = new LT.Table(tableResponse[0]);
+	  if (cT.piece_stamp < table.piece_stamp) {
+	    cT.piece_stamp = table.piece_stamp;
+		LT.loadPieces();
+	  }
+    });
+  }
 }
 
 onload = function () {
