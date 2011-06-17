@@ -44,6 +44,7 @@
 	  document.body.removeChild(LT.installBox);
 	  LT.loadLT();
 	  LT.sendLogin( LT.DBAdminName.value, LT.DBAdminPW.value );
+	  LT.tablesPanel.show();
 	}else{
 	  alert('Database was not properly installed. Try again.');
 	}
