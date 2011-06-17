@@ -125,7 +125,7 @@ deleteTable = function (table) {
 }
 
 LT.createTablesPanel = function () {
-  LT.tablesPanel = new LT.Panel( 'Tables', 'Tables', 6, 26, 300, 125);
+  LT.tablesPanel = new LT.Panel( 'Tables', 'Tables', 6, 26, 140, 180);
   LT.tablesPanel.makeTab('List');
   LT.tablesPanel.makeTab('Edit');
   LT.tablesPanel.makeTab('Create');

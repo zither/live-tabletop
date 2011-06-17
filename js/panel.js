@@ -309,9 +309,11 @@ LT.Panel.saveCookie = function(){
 // Load Panel positions
 LT.Panel.loadCookie = function (){
   var cookieArray = LT.getCookie('panels');
-  var panelsCookie = cookieArray.split('_');
-  for(i = 0; i < LT.Panel.list.length; i++){
-    LT.Panel.list[i].restoreFromCookieString(panelsCookie[i]);
+  if (cookieArray) {
+    var panelsCookie = cookieArray.split('_');
+    for(i = 0; i < LT.Panel.list.length; i++){
+      LT.Panel.list[i].restoreFromCookieString(panelsCookie[i]);
+    }
   }
 }
 
