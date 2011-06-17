@@ -128,10 +128,10 @@ LT.Table.prototype = {
         var direction = decodeURIComponent(walls[i].getAttribute("direction"));
         var contents = decodeURIComponent(walls[i].getAttribute("contents"));
         if (contents == "wall") {
-          self.wall(column, row, direction);
+          self.grid.wall(column, row, direction);
         }
         if (contents == "door") {
-          self.door(column, row, direction);
+          self.grid.door(column, row, direction);
         }
       }
       self.createGridClickDetectors();
