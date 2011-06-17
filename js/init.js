@@ -20,10 +20,11 @@ LT.loadLT = function () {
   LT.loginCheck();
   LT.refreshMessageList();
   LT.loadTable();
+  LT.holdTimestamps = 0;
   setInterval('LT.checkTimestamps()', 2000);
 }
 LT.checkTimestamps = function () {
-  if (LT.currentTable) {
+  if (LT.currentTable && !LT.holdTimestamps) {
     cT = LT.currentTable
     var args = {table_id: LT.currentTable.id};
     LT.ajaxRequest("POST", "php/read_table.php", args, function (ajax) {
@@ -32,6 +33,14 @@ LT.checkTimestamps = function () {
 	  if (cT.piece_stamp < table.piece_stamp) {
 	    cT.piece_stamp = table.piece_stamp;
 		LT.loadPieces();
+	  }
+	  if (cT.tile_stamp < table.tile_stamp) {
+	    cT.tile_stamp = table.tile_stamp;
+		LT.readTiles();
+	  }
+	  if (cT.message_stamp < table.message_stamp) {
+	    cT.message_stamp = table.message_stamp;
+		//LT.loadPieces();
 	  }
     });
   }
