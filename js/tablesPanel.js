@@ -150,10 +150,10 @@ populateEditTableTab = function () {
   var rowsDiv = LT.element('div', { 'class' : 'inputDiv' }, eTF, 'Rows: ');
   eTF.inputTableRows = LT.element('input', { size : 1, 
     style : 'border: 1px solid #CCC;' }, rowsDiv);
-  var heightDiv = LT.element('div', { 'class' : 'inputDiv' }, eTF, 'Height: ');
+  var heightDiv = LT.element('div', { 'class' : 'inputDiv' }, eTF, 'Tile Height: ');
   eTF.inputTileHeight = LT.element('input', { size : 1, 
     style : 'border: 1px solid #CCC;' }, heightDiv);
-  var widthDiv = LT.element('div', { 'class' : 'inputDiv' }, eTF, 'Width: ');
+  var widthDiv = LT.element('div', { 'class' : 'inputDiv' }, eTF, 'Tile Width: ');
   eTF.inputTileWidth = LT.element('input', { size : 1, 
     style : 'border: 1px solid #CCC;' }, widthDiv);
   var thicknessDiv = LT.element('div', { 'class' : 'inputDiv' }, eTF, 'Grid Thickness: ');
