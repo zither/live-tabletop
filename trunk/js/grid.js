@@ -81,6 +81,7 @@ LT.Grid.prototype = {
         for (var direction in this.walls[row][column]) {
           if (this.walls[row][column][direction] == "wall") {
             var i = this.SHAPES[this._mode].directions[direction];
+            if (typeof(i) == 'undefined') continue;
             var j = (i + 1) % points.length;
             var x = shift.x * (row % 2);
             var y = shift.y * (column % 2);
@@ -105,6 +106,7 @@ LT.Grid.prototype = {
         for (var direction in this.walls[row][column]) {
           if (this.walls[row][column][direction] == "door") {
             var i = this.SHAPES[this._mode].directions[direction];
+            if (typeof(i) == 'undefined') continue;
             var j = (i + 1) % points.length;
             var x = shift.x * (row % 2);
             var y = shift.y * (column % 2);
