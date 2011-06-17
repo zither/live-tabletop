@@ -19,8 +19,7 @@ LT.loadLT = function () {
   LT.createFilesPanel();
   LT.loginCheck();
   LT.refreshMessageList();
-  var tableCookie = parseInt(LT.getCookie('table'));
-  LT.loadTable(tableCookie);
+  LT.loadTable();
 }
 
 refreshTimestamps = function () {

@@ -2,15 +2,14 @@ LT.readTables = function(){
   var readTablesAjax = LT.ajaxRequest("POST", "php/read_tables.php",{ });
   if (readTablesAjax.responseXML){
     var tableElements = readTablesAjax.responseXML.getElementsByTagName('table');
+    var tableCookie = parseInt(LT.getCookie('table'));
     LT.tables = [];
     for( var i = 0 ; i < tableElements.length; i++ ){
       var table = new LT.Table(tableElements[i]);
       LT.tables.push(table);
-    }
-	if (!LT.currentTable){
-       LT.currentTable = LT.tables[0];
-	}else{
-	  LT.currentTable = {};
+	  if (!LT.currentTable && LT.tables[i].id == tableCookie){
+         LT.currentTable = LT.tables[i];
+      }
 	}
   }
 }
@@ -44,60 +43,62 @@ LT.readTiles = function(){
     //LT.sortAllTileLayers();
   }
 }
+LT.loadTableHandler = function (table) {
+  return function () { LT.loadTable(table); };
+}
+LT.loadTable = function (table) {	
 
-LT.loadTable = function (tableID) {
-  for( i=0; i<LT.tables.length; i++ ){
-    if(LT.tables[i].id == tableID){
-	  LT.currentTable = LT.tables[i];
-	}
-  }
-  if(LT.currentTable){
-    LT.currentTable.createGrid();
-    LT.element('br', {}, LT.chatOutput);
-    LT.element('div', {'class' : 'chat_alert'}, LT.chatOutput, 
-      "Loading chat log for " + LT.currentTable.name + "...");
-    LT.lastMessage = 0;
-    LT.refreshMessageList();
-    LT.element('a', {'class' : 'chat_alert'}, LT.chatOutput, 
-      "Arriving at " + LT.currentTable.name);
-    LT.element('br', {}, LT.chatOutput);
-    LT.chatOutput.removeChild(LT.chatBottom);
-    LT.chatOutput.appendChild(LT.chatBottom);
-    LT.chatBottom.scrollIntoView(true);
-    LT.readTiles();
-    LT.loadPieces();
-    document.cookie = 'table=' + LT.currentTable.id + ';';
-    LT.pForm.wInput.setAttribute('value', LT.currentTable.tile_width);
-    LT.pForm.hInput.setAttribute('value', LT.currentTable.tile_height);
+    if (table) {
+      LT.currentTable = table;
+    }
+    if(LT.currentTable){
+	  LT.refreshTables;
+      LT.currentTable.createGrid();
+      LT.element('br', {}, LT.chatOutput);
+      LT.element('div', {'class' : 'chat_alert'}, LT.chatOutput, 
+        "Loading chat log for " + LT.currentTable.name + "...");
+      LT.lastMessage = 0;
+      LT.refreshMessageList();
+      LT.element('a', {'class' : 'chat_alert'}, LT.chatOutput, 
+        "Arriving at " + LT.currentTable.name);
+      LT.element('br', {}, LT.chatOutput);
+      LT.chatOutput.removeChild(LT.chatBottom);
+      LT.chatOutput.appendChild(LT.chatBottom);
+      LT.chatBottom.scrollIntoView(true);
+      LT.readTiles();
+      LT.loadPieces();
+      document.cookie = 'table=' + LT.currentTable.id + ';';
+      LT.pForm.wInput.setAttribute('value', LT.currentTable.tile_width);
+      LT.pForm.hInput.setAttribute('value', LT.currentTable.tile_height);
 	
-    var eTF = LT.editTablesForm
-	var cT = LT.currentTable
-	eTF.inputTableName.setAttribute('value', cT.name);
-	eTF.inputTableCols.setAttribute('value', cT.tile_columns);
-	eTF.inputTableRows.setAttribute('value', cT.tile_rows);
-	eTF.inputTileHeight.setAttribute('value', cT.tile_height);
-	eTF.inputTileWidth.setAttribute('value', cT.tile_width);
-	eTF.inputGridThickness.setAttribute('value', cT.grid_thickness);
-	eTF.inputWallThickness.setAttribute('value', cT.wall_thickness);
-	eTF.inputTMRectangle.removeAttribute('selected');
-	eTF.inputTMIsometric.removeAttribute('selected');
-	eTF.inputTMHexColumns.removeAttribute('selected');
-	eTF.inputTMHexRows.removeAttribute('selected');
-	if (cT.tile_mode == 'rectangle') {
-	  eTF.inputTMRectangle.setAttribute('selected', 'select');
-	}
-	if (cT.tile_mode == 'isometric') {
-	  eTF.inputTMIsometric.setAttribute('selected', 'select');
-	}
-	if (cT.tile_mode == 'hex columns') {
-	  eTF.inputTMHexColumns.setAttribute('selected', 'select');
-	}
-	if (cT.tile_mode == 'hex rows') {
-	  eTF.inputTMHexRows.setAttribute('selected', 'select');
-	}
-  }
-}  
-
+      var eTF = LT.editTablesForm
+      var cT = LT.currentTable
+	  eTF.inputTableName.setAttribute('value', cT.name);
+	  eTF.inputTableCols.setAttribute('value', cT.tile_columns);
+	  eTF.inputTableRows.setAttribute('value', cT.tile_rows);
+	  eTF.inputTileHeight.setAttribute('value', cT.tile_height);
+	  eTF.inputTileWidth.setAttribute('value', cT.tile_width);
+	  eTF.inputGridThickness.setAttribute('value', cT.grid_thickness);
+	  eTF.inputWallThickness.setAttribute('value', cT.wall_thickness);
+	  eTF.inputTMRectangle.removeAttribute('selected');
+	  eTF.inputTMIsometric.removeAttribute('selected');
+	  eTF.inputTMHexColumns.removeAttribute('selected');
+	  eTF.inputTMHexRows.removeAttribute('selected');
+	  if (cT.tile_mode == 'rectangle') {
+	    eTF.inputTMRectangle.setAttribute('selected', 'select');
+	  }
+	  if (cT.tile_mode == 'isometric') {
+	    eTF.inputTMIsometric.setAttribute('selected', 'select');
+	  }
+	  if (cT.tile_mode == 'hex columns') {
+	    eTF.inputTMHexColumns.setAttribute('selected', 'select');
+	  }
+      if (cT.tile_mode == 'hex rows') {
+        eTF.inputTMHexRows.setAttribute('selected', 'select');
+	  }
+    }
+ 
+}
 LT.refreshTables = function () {
   LT.readTables();
   LT.readTileImages();
@@ -106,20 +107,20 @@ LT.refreshTables = function () {
   for( var i = 0 ; i < LT.tables.length; i++ ){	
     tableEntry = LT.element('div', { 'style' : 'clear: both;' }, LT.tablesDiv, ' ')
     var tableLink = LT.element('a', {'class' : 'textButton'}, tableEntry, LT.tables[i].name);
-	tableLink.name = LT.tables[i].name;
-	tableLink.id = LT.tables[i].id;
-	tableLink.table = i;
-	tableLink.onclick = function(){
-	  LT.loadTable(this.id);
-	};
+	tableLink.onclick = LT.loadTableHandler(LT.tables[i]);
     tableDelete = LT.element('a', { 'class' : 'deleteButton' }, tableEntry, 'Delete');
-    tableDelete.id = LT.tables[i].id;
-    tableDelete.onclick = function(){
-        //var deleteTable = function(){LT.tables[i].remove;};
-      var deleteTable = LT.ajaxRequest("POST", "php/delete_table.php",{ 'table_id' : this.id });
-	  LT.refreshTables();
-    };
+    tableDelete.onclick = deleteTable(LT.tables[i]);
     LT.element('div',{'class' : 'separator'}, tableEntry);
+  }
+}
+deleteTable = function (table) {
+  return function () {
+    var confirmDel =  confirm('Are you sure you want to delete '
+      + table.name + '?');
+    if (confirmDel) {
+      LT.ajaxRequest("POST", "php/delete_table.php",{ 'table_id' : table.id });
+      LT.refreshTables();
+    }
   }
 }
 
@@ -131,6 +132,8 @@ LT.createTablesPanel = function () {
   LT.tablesTab = LT.tablesPanel.tabs[0].content;
   LT.editTableTab = LT.tablesPanel.tabs[1].content;
   LT.createTableTab = LT.tablesPanel.tabs[2].content;
+  LT.tableRefresh = LT.element('input',{ type : 'button' }, LT.tablesTab, 'Refresh');
+  LT.tableRefresh.onclick = function() { LT.refreshTables(); };
   LT.tablesDiv = LT.element('div',{}, LT.tablesTab);
   LT.refreshTables();  
   populateCreateTableTab();
@@ -174,7 +177,7 @@ populateEditTableTab = function () {
   eTF.inputTMHexColumns = LT.element('option', { value : 'hex columns'},
     eTF.inputTileMode, 'Hex Columns');
   eTF.tableSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
-        id : 'chatSubmit', size : 8, value : 'Edit' }, eTF);
+        id : 'chatSubmit', size : 8, value : 'Apply Changes' }, eTF);
   eTF.tableSubmit.onclick = function() { LT.editTable(); };
 }
 LT.editTable = function () {
@@ -226,11 +229,19 @@ populateCreateTableTab = function () {
   LT.element('option', { value : 'hex columns'}, cTF.inputTileMode, 'Hex Columns');
   cTF.tableSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
         id : 'chatSubmit', size : 8, value : 'Create' }, cTF);
-  cTF.tableSubmit.onclick = function() { LT.createTable(); };
-  LT.tableRefresh = LT.element('input',{ type : 'button' }, LT.tablesPanel.footer, 'Refresh');
-  LT.tableRefresh.onclick = function() { LT.refreshTables(); };
+  cTF.tableSubmit.onclick = LT.createTableHandler();
 }
-
+LT.createTableHandler = function () {
+  return function () {
+    LT.createTable();
+    for( var i = 0 ; i < LT.tables.length; i++ ){
+	  if (LT.tables[i].name == LT.tableListForm.inputTableName.value) {
+         LT.currentTable = LT.tables[i];
+      }
+	}
+	LT.loadTable();
+  };
+}
 LT.createTable = function () {
   var cTF = LT.tableListForm;
   var createTableAjax = LT.ajaxRequest("POST", "php/create_table.php",
