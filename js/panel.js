@@ -53,7 +53,7 @@ LT.Panel = function (panelName, buttonName, x, y, width, height, buttonLoc) {
   LT.element('div', {'class' : 'titleCaption'}, title, panelName);
   LT.element('div', {'class' : 'titleEnd'}, title);
   this.bar = LT.element('div', {'class' : 'panelBar', 
-    'style' : 'width: ' + (width - 36) + 'px;'}, title, ' ');
+    'style' : 'width: ' + (width - 42) + 'px;'}, title, ' ');
   this.bar.onmousedown = function () {
     LT.Panel.selected = self;
     return false;
@@ -81,7 +81,7 @@ LT.Panel = function (panelName, buttonName, x, y, width, height, buttonLoc) {
   
   // Bottom: includes bottom-right resize button
   var bottom = LT.element('div', {'class' : 'panelBottom'}, this.outside);
-  LT.element('div', {'class' : 'panelBL'}, bottom);
+  LT.element('div', {'class' : 'resizeBL'}, bottom);
   LT.element('div', {'class' : 'resizeBR'}, bottom)
     .onmousedown = function() {LT.Panel.selectedBR = self; return false;};
 
@@ -275,13 +275,34 @@ LT.Panel.prototype = {
 	this.setWidth(newWidth);
   },
 	
+  // Resize panel using the top-right handle.
+  resizeTR: function () {
+    var panelX = parseInt(this.outside.style.left);
+    var panelY = parseInt(this.outside.style.top);
+    if (LT.clickDragGap == 0) {
+      LT.clickX = LT.dragX - (panelX + parseInt(this.content.style.width));
+      LT.clickY = LT.dragY - parseInt(this.outside.style.top);
+      LT.clickCornerY = LT.dragY + parseInt(this.content.style.height);
+      LT.clickDragGap = 1;
+    }
+    // FIXME: magic numbers
+    //LT.dragX = Math.max(LT.dragX, LT.clickX + 5);
+    LT.dragY = Math.min(LT.dragY, LT.clickCornerY - 50);
+    this.outside.style.top  = (LT.dragY - LT.clickY) + "px";
+    LT.dragX = Math.max(LT.dragX, panelX + 140);
+    //var newWidth = Math.max(LT.dragX, LT.dragX - panelX + LT.clickX);
+	var newWidth = Math.min(LT.dragX - LT.clickX, window.innerWidth - LT.clickX);
+    this.content.style.height = (LT.clickCornerY - LT.dragY) + "px";
+	this.setWidth(newWidth);
+  },
+  
   setWidth: function (newWidth) {
     //this.outside.style.width = newWidth + "px";
     this.content.style.width = newWidth + "px";
     this.footer.style.width = newWidth + "px";
     this.header.style.width = newWidth + "px";
     this.tabBar.style.width = newWidth + "px";
-    this.bar.style.width = newWidth - 36 + "px";
+    this.bar.style.width = newWidth - 42 + "px";
   }
 };
 
@@ -325,8 +346,14 @@ LT.Panel.drag = function () {
   if (LT.Panel.selected) {
     LT.Panel.selected.move();
   }
+  if (LT.Panel.selectedBL) {
+    LT.Panel.selectedBL.resizeBL();
+  }
   if (LT.Panel.selectedBR) {
     LT.Panel.selectedBR.resizeBR();
+  }
+  if (LT.Panel.selectedTR) {
+    LT.Panel.selectedTR.resizeTR();
   }
   if (LT.Panel.selectedTL) {
     LT.Panel.selectedTL.resizeTL();
@@ -336,8 +363,10 @@ LT.Panel.drag = function () {
 // Stop moving or resizing panels.
 LT.Panel.stopDragging = function () {
   LT.Panel.selected = null;
-  LT.Panel.selectedBR = null;
+  LT.Panel.selectedTR = null;
   LT.Panel.selectedTL = null;
+  LT.Panel.selectedBR = null;
+  LT.Panel.selectedBL = null;
 }
 
 
