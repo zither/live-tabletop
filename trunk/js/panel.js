@@ -81,7 +81,8 @@ LT.Panel = function (panelName, buttonName, x, y, width, height, buttonLoc) {
   
   // Bottom: includes bottom-right resize button
   var bottom = LT.element('div', {'class' : 'panelBottom'}, this.outside);
-  LT.element('div', {'class' : 'resizeBL'}, bottom);
+  LT.element('div', {'class' : 'resizeBL'}, bottom)
+    .onmousedown = function() {LT.Panel.selectedBL = self; return false;};
   LT.element('div', {'class' : 'resizeBR'}, bottom)
     .onmousedown = function() {LT.Panel.selectedBR = self; return false;};
 
@@ -249,8 +250,8 @@ LT.Panel.prototype = {
     // FIXME: magic numbers
     LT.dragX = Math.max(LT.dragX - LT.clickX, 140);
     LT.dragY = Math.max(LT.dragY - LT.clickY, 50);
-	var newWidth = Math.min(LT.dragX, window.innerWidth - panelX - 25);
-    this.content.style.height = Math.min(LT.dragY, window.innerHeight - panelY - 61) + "px";
+	var newWidth = Math.min(LT.dragX, window.innerWidth - panelX - 6);
+    this.content.style.height = Math.min(LT.dragY, window.innerHeight - panelY - 56) + "px";
     this.setWidth(newWidth);
   },
 
@@ -278,24 +279,48 @@ LT.Panel.prototype = {
   // Resize panel using the top-right handle.
   resizeTR: function () {
     var panelX = parseInt(this.outside.style.left);
-    var panelY = parseInt(this.outside.style.top);
     if (LT.clickDragGap == 0) {
-      LT.clickX = LT.dragX - (panelX + parseInt(this.content.style.width));
-      LT.clickY = LT.dragY - parseInt(this.outside.style.top);
-      LT.clickCornerY = LT.dragY + parseInt(this.content.style.height);
+      LT.clickX = LT.dragX;
+      LT.clickY = LT.dragY;
+      LT.clickH = parseInt(this.content.style.height);
+      LT.clickW = parseInt(this.content.style.width);
+      LT.clickT = parseInt(this.outside.style.top);
       LT.clickDragGap = 1;
     }
     // FIXME: magic numbers
-    //LT.dragX = Math.max(LT.dragX, LT.clickX + 5);
-    LT.dragY = Math.min(LT.dragY, LT.clickCornerY - 50);
-    this.outside.style.top  = (LT.dragY - LT.clickY) + "px";
-    LT.dragX = Math.max(LT.dragX, panelX + 140);
-    //var newWidth = Math.max(LT.dragX, LT.dragX - panelX + LT.clickX);
-	var newWidth = Math.min(LT.dragX - LT.clickX, window.innerWidth - LT.clickX);
-    this.content.style.height = (LT.clickCornerY - LT.dragY) + "px";
+    LT.dragY = Math.max(LT.dragY, LT.clickY - LT.clickT + 26);
+    LT.dragY = Math.min(LT.dragY, LT.clickY + LT.clickH - 50);
+	var newWidth = LT.clickW + (LT.dragX - LT.clickX);
+	newWidth = Math.min( newWidth, window.innerWidth - panelX - 6);
+	newWidth = Math.max( newWidth, 140 );
 	this.setWidth(newWidth);
+    var newHeight = LT.clickH + LT.clickY - LT.dragY;
+	var newTop = LT.clickT - LT.clickY + LT.dragY;
+    this.outside.style.top = newTop + "px";
+    this.content.style.height = newHeight + "px";
   },
   
+  // Resize panel using the bottom-left handle.
+  resizeBL: function () {
+    var panelY = parseInt(this.outside.style.top);
+    if (LT.clickDragGap == 0) {
+      LT.clickX = LT.dragX - parseInt(this.outside.style.left);
+      LT.clickY = LT.dragY;
+      LT.clickH = parseInt(this.content.style.height);
+      LT.clickCornerX = LT.dragX + parseInt(this.content.style.width);
+      LT.clickDragGap = 1;
+    }
+    // FIXME: magic numbers
+    LT.dragX = Math.max(LT.dragX, LT.clickX + 5);
+    LT.dragX = Math.min(LT.dragX, LT.clickCornerX - 140);
+    this.outside.style.left = (LT.dragX - LT.clickX) + "px";
+    LT.dragY = Math.max(LT.dragY, panelY + 100);
+    LT.dragY = Math.min(LT.dragY, window.innerHeight - 5);
+	var newWidth = Math.min(LT.clickCornerX - LT.dragX);
+    this.content.style.height = (LT.clickH - LT.clickY + LT.dragY) + "px";
+	this.setWidth(newWidth);
+  },
+	
   setWidth: function (newWidth) {
     //this.outside.style.width = newWidth + "px";
     this.content.style.width = newWidth + "px";
