@@ -161,6 +161,7 @@ DIV {
 }
 .tabBar {
   background: url(images/tabBar.jpg) repeat top left;
+  min-height: 1px;
   max-height: 42px;
   clear: both;
   border-left: 1px solid #333;
@@ -176,11 +177,12 @@ DIV {
   border-bottom: 1px solid #333;
 }
 
-.panelBL {
+.resizeBL {
   background: url(images/resizeBL.png);
   height: 13px;
   width: 13px;
   float: left;
+  cursor: sw-resize;
   margin-left: -5px;
 }
 
@@ -229,10 +231,9 @@ DIV {
 
 .close {
   background-image: url(images/close.png);
-  width: 27px;
+  width: 22px;
   height: 23px;
   float: right;
-  margin-right: -5px;
   cursor: pointer;
 }
 
