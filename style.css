@@ -161,6 +161,7 @@ DIV {
 }
 .tabBar {
   background: url(images/tabBar.jpg) repeat top left;
+  max-height: 42px;
   clear: both;
   border-left: 1px solid #333;
   border-right: 1px solid #333;
@@ -289,7 +290,6 @@ DIV {
 
 .tabContent {
   float: left;
-  height: 17px;
   padding: 2px 3px 0px 3px;
   color: #333;
   font-size: 13px;
@@ -371,7 +371,7 @@ height: 1px; background: #999; width: auto; clear: both; margin: 1px 0px 4px 0px
 }
 
 .clearBoth {
-  height: 1px;
+  height: 0px;
   width: 1px;
   margin-top: -1px;
   clear: both;
