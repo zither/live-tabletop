@@ -314,6 +314,12 @@ LT.movePiece = function () {
   LT.dragY = Math.min(LT.dragY - LT.clickY, tableHeight - h );
   LT.dragX = Math.max(LT.dragX, 0);
   LT.dragY = Math.max(LT.dragY, 0);
+  if (LT.currentTable.tile_height) {
+    var tileH = LT.currentTable.tile_height;
+    var tileW = LT.currentTable.tile_width;
+	LT.dragY = LT.dragY - (LT.dragY % tileH);
+	LT.dragX = LT.dragX - (LT.dragX % tileW);
+  }
   LT.selectedPiece.pieceDiv.style.top  = LT.dragY + "px";
   LT.selectedPiece.pieceDiv.style.left = LT.dragX + "px";
   LT.selectedPiece.pieceImage.style.top  = LT.dragY + "px";
