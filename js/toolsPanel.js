@@ -25,23 +25,43 @@ LT.readPieceImages = function(){
 LT.loadSwatches = function (){
   LT.selectedImageID = -1;
   LT.selectedImage = '';
-  LT.fill(LT.tilesTab);
+  LT.fill(LT.tilesTab.content);
   var eraser = LT.element('div', { style :
-    'float : left; border : 1px solid black; margin : 1px 1px 1px 1px; height : 50px; width: 45px;',},
-     LT.tilesTab, 'erase');
+    'float : left; border : 1px solid black; margin : 1px 1px 1px 1px; height : 40px; width: 40px;',},
+     LT.tilesTab.header, 'erase');
   eraser.onclick = function() {
 	LT.selectedImageID = -1;
+    LT.brush = "tile";
 	LT.selectedImage = '';
+	bringForward(LT.clickTileLayer);
   }
+  var eraser = LT.element('div', { style :
+    'float : left; border : 1px solid black; margin : 1px 1px 1px 1px; height : 40px; width: 40px;',},
+     LT.tilesTab.header, 'fog');
+  eraser.onclick = function() {
+    LT.brush = "fog";
+	bringForward(LT.clickTileLayer);
+  }
+  var eraser = LT.element('div', { style :
+    'float : left; border : 1px solid black; margin : 1px 1px 1px 1px; height : 40px; width: 40px;',},
+     LT.tilesTab.header, 'wall');
+  eraser.onclick = function() {
+    LT.brush = "wall";
+	bringForward(LT.clickWallLayer);
+  }
+  LT.element('div', { 'class' : 'clearBoth' }, LT.tilesTab.header);
+  
   var imagesArray = LT.sortObject(LT.tileImages, 'file');
   for( var i = 0 ; i < imagesArray.length; i++ ){
     newImage = LT.element('img', { title : imagesArray[i].file, 
 	  'class' : 'swatch', 
-	  src : 'images/upload/tile/' + imagesArray[i].file}, LT.tilesTab);
+	  src : 'images/upload/tile/' + imagesArray[i].file}, LT.tilesTab.content);
 	newImage.id = imagesArray[i].id;
 	newImage.file = imagesArray[i].file;
 	newImage.onclick = function() {
 	  LT.selectedImageID = this.id;
+	  bringForward(LT.clickTileLayer);
+      LT.brush = "tile";
 	}
   }
 }
@@ -51,15 +71,15 @@ makeSelectPieceHandler = function (image) {
       var tileH = LT.currentTable.tile_height;
       var tileW = LT.currentTable.tile_width;
     } else {
-      var tileH = LT.pForm.hInput.value;
-      var tileW = LT.pForm.wInput.value;
+      var tileH = LT.cPForm.hInput.value;
+      var tileW = LT.cPForm.wInput.value;
     }
 	var imageNLength = image.file.length -4;
 	var imageName = image.file.substr(0, imageNLength);
     LT.selectedPieceImage = image.id;
-    LT.pForm.yOff.setAttribute('value', (image.height - tileH) * -1 );
-    LT.pForm.xOff.setAttribute('value', (image.width - tileW) / -2 );
-	LT.pForm.pName.setAttribute('value', imageName);
+    LT.cPForm.yOff.setAttribute('value', (image.height - tileH) * -1 );
+    LT.cPForm.xOff.setAttribute('value', (image.width - tileW) / -2 );
+	LT.cPForm.pName.setAttribute('value', imageName);
   };
 }
 LT.loadPieceImages = function () {
@@ -112,7 +132,7 @@ generatePieceElements = function (pieceID) {
 	    title : LT.pieces[pieceID].name, // << this id is one number too high
 	    style : 'position: absolute; height: '
           + imageSource.height + 'px; width: '
-		  + imageSource.width + 'px; opacity: .5; '
+		  + imageSource.width + 'px; opacity: .8; '
           + 'left: ' + LT.pieces[pieceID].x
 		  + 'px; top: ' + LT.pieces[pieceID].y
           + 'px; margin-left: ' + LT.pieces[pieceID].x_offset
@@ -155,47 +175,77 @@ LT.createPiece = function () {
     { table_id : LT.currentTable.id, 
 	  image_id : LT.selectedPieceImage, 
 	  user_id : 0,
-	  name : LT.pForm.pName.value,
-	  x : LT.pForm.x.value,
-	  y : LT.pForm.y.value, 
-	  x_offset : LT.pForm.xOff.value,
-	  y_offset : LT.pForm.yOff.value,
-	  height : LT.pForm.hInput.value,
-	  width : LT.pForm.wInput.value 
+	  name : LT.cPForm.pName.value,
+	  x : LT.cPForm.x.value,
+	  y : LT.cPForm.y.value, 
+	  x_offset : LT.cPForm.xOff.value,
+	  y_offset : LT.cPForm.yOff.value,
+	  height : LT.cPForm.hInput.value,
+	  width : LT.cPForm.wInput.value 
 	}
   );
   LT.loadPieces();
 }
-populatePiecesTab = function () {
-  //LT.piecesTab.style.overflow = 'scroll';
-  LT.pForm = LT.element('form', { }, LT.piecesTab.header);
-  var nameDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.pForm, 'Name: ');
-  LT.pForm.pName = LT.element('input', { size : 10, type: 'text',
+populateEditPiecesTab = function () {
+  LT.ePForm = LT.element('form', { }, LT.editPiecesTab.header);
+  var nameDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.ePForm, 'Name: ');
+  LT.ePForm.pName = LT.element('input', { size : 10, type: 'text',
     'class' : 'fInput' }, nameDiv, 'Piece Name', 1);
-  var hDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.pForm, 'Height: ');
-  LT.pForm.hInput = LT.element('input', { size : 1, 
+  var hDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.ePForm, 'Height: ');
+  LT.ePForm.hInput = LT.element('input', { size : 1, 
     'class' : 'fInput' }, hDiv, '0', 1);  
-  var wDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.pForm, 'Width: ');
-  LT.pForm.wInput = LT.element('input', { size : 1, 
+  var wDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.ePForm, 'Width: ');
+  LT.ePForm.wInput = LT.element('input', { size : 1, 
     'class' : 'fInput' }, wDiv, '0', 1);
-  var yDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.pForm, 'Y Pos: ');
-  LT.pForm.y = LT.element('input', { size : 1, 
+  var yDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.ePForm, 'Y Pos: ');
+  LT.ePForm.y = LT.element('input', { size : 1, 
     'class' : 'fInput' }, yDiv, '0', 1);
-  var xDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.pForm, 'X Pos: ');
-  LT.pForm.x = LT.element('input', { size : 1, 
+  var xDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.ePForm, 'X Pos: ');
+  LT.ePForm.x = LT.element('input', { size : 1, 
     'class' : 'fInput' }, xDiv, '0', 1);
-  var hOffDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.pForm, 'Height Offset: ');
-  LT.pForm.yOff = LT.element('input', { size : 1, 
+  var hOffDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.ePForm, 'Height Offset: ');
+  LT.ePForm.yOff = LT.element('input', { size : 1, 
     'class' : 'fInput' }, hOffDiv, '0', 1);  
-  var wOffDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.pForm, 'Width Offset: ');
-  LT.pForm.xOff = LT.element('input', { size : 1, 
+  var wOffDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.ePForm, 'Width Offset: ');
+  LT.ePForm.xOff = LT.element('input', { size : 1, 
     'class' : 'fInput' }, wOffDiv, '0', 1);
   pSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
-        id : 'chatSubmit', size : 8, value : 'Create' }, LT.pForm);
+        id : 'chatSubmit', size : 8, value : 'Create' }, LT.ePForm);
   pSubmit.onclick = function() { LT.createPiece(); };
-  LT.element('div', { 'class' : 'clearBoth' }, LT.piecesTab.header);
+  LT.element('div', { 'class' : 'clearBoth' }, LT.editPiecesTab.header);
   LT.pieceImageDiv = LT.element('div', { 'style' : 'clear: both; overflow: none;' },
-    LT.piecesTab.content, 'Columns: ');
+    LT.editPiecesTab.content, 'Columns: ');
+  LT.loadPieceImages();
+}
+populateCreatePiecesTab = function () {
+  LT.cPForm = LT.element('form', { }, LT.createPiecesTab.header);
+  var nameDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.cPForm, 'Name: ');
+  LT.cPForm.pName = LT.element('input', { size : 10, type: 'text',
+    'class' : 'fInput' }, nameDiv, 'Piece Name', 1);
+  var hDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.cPForm, 'Height: ');
+  LT.cPForm.hInput = LT.element('input', { size : 1, 
+    'class' : 'fInput' }, hDiv, '0', 1);  
+  var wDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.cPForm, 'Width: ');
+  LT.cPForm.wInput = LT.element('input', { size : 1, 
+    'class' : 'fInput' }, wDiv, '0', 1);
+  var yDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.cPForm, 'Y Pos: ');
+  LT.cPForm.y = LT.element('input', { size : 1, 
+    'class' : 'fInput' }, yDiv, '0', 1);
+  var xDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.cPForm, 'X Pos: ');
+  LT.cPForm.x = LT.element('input', { size : 1, 
+    'class' : 'fInput' }, xDiv, '0', 1);
+  var hOffDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.cPForm, 'Height Offset: ');
+  LT.cPForm.yOff = LT.element('input', { size : 1, 
+    'class' : 'fInput' }, hOffDiv, '0', 1);  
+  var wOffDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.cPForm, 'Width Offset: ');
+  LT.cPForm.xOff = LT.element('input', { size : 1, 
+    'class' : 'fInput' }, wOffDiv, '0', 1);
+  pSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
+        id : 'chatSubmit', size : 8, value : 'Create' }, LT.cPForm);
+  pSubmit.onclick = function() { LT.createPiece(); };
+  LT.element('div', { 'class' : 'clearBoth' }, LT.createPiecesTab.header);
+  LT.pieceImageDiv = LT.element('div', { 'style' : 'clear: both; overflow: none;' },
+    LT.createPiecesTab.content, 'Columns: ');
   LT.loadPieceImages();
 }
 
@@ -210,22 +260,17 @@ LT.createToolsPanel = function () {
     bringForward(LT.clickTileLayer);
     LT.brush = "tile";
   });
-  LT.toolsPanel.makeTab('Pieces', function () {
+  LT.toolsPanel.makeTab('Edit Pieces', function () {
     bringForward(LT.clickPieceLayer);
   });
-  LT.toolsPanel.makeTab('Fog', function () {
-    bringForward(LT.clickTileLayer);
-    LT.brush = "fog";
+  LT.toolsPanel.makeTab('Create Pieces', function () {
+    bringForward(LT.clickPieceLayer);
   });
-  LT.toolsPanel.makeTab('Walls', function () {
-    bringForward(LT.clickWallLayer);
-    LT.brush = "wall";
-  });
-  LT.piecesTab = LT.toolsPanel.tabs[1];
-  LT.fogTab = LT.toolsPanel.tabs[2].content;
-  LT.tilesTab = LT.toolsPanel.tabs[0].content;
-  populatePiecesTab();
-  LT.element('div', {}, LT.fogTab, "YOU");
+  LT.editPiecesTab = LT.toolsPanel.tabs[1];
+  LT.createPiecesTab = LT.toolsPanel.tabs[2];
+  LT.tilesTab = LT.toolsPanel.tabs[0];
+  populateEditPiecesTab();
+  populateCreatePiecesTab();
   LT.toolsPanel.selectTab(LT.toolsPanel.selectedTab);
 };
 

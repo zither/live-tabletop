@@ -68,8 +68,8 @@ LT.loadTable = function (table) {
       LT.readTiles();
       LT.loadPieces();
       document.cookie = 'table=' + LT.currentTable.id + ';';
-      LT.pForm.wInput.setAttribute('value', LT.currentTable.tile_width);
-      LT.pForm.hInput.setAttribute('value', LT.currentTable.tile_height);
+      LT.cPForm.wInput.setAttribute('value', LT.currentTable.tile_width);
+      LT.cPForm.hInput.setAttribute('value', LT.currentTable.tile_height);
 	
       var eTF = LT.editTablesForm
       var cT = LT.currentTable
