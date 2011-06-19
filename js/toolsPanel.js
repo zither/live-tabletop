@@ -53,7 +53,7 @@ LT.loadSwatches = function (){
   
   var imagesArray = LT.sortObject(LT.tileImages, 'file');
   for( var i = 0 ; i < imagesArray.length; i++ ){
-    newImage = LT.element('img', { title : imagesArray[i].file, 
+    var newImage = LT.element('img', { title : imagesArray[i].file, 
 	  'class' : 'swatch', 
 	  src : 'images/upload/tile/' + imagesArray[i].file}, LT.tilesTab.content);
 	newImage.id = imagesArray[i].id;
@@ -77,8 +77,8 @@ createPieceImageHandler = function (image) {
 	var imageNLength = image.file.length -4;
 	var imageName = image.file.substr(0, imageNLength);
     LT.selectedPieceImage = image.id;
-    LT.cPForm.yOff.setAttribute('value', (image.height - tileH) * -1 );
-    LT.cPForm.xOff.setAttribute('value', (image.width - tileW) / -2 );
+    LT.cPForm.yOff.setAttribute('value', (image.height - parseInt(LT.cPForm.hInput.value)) * -1 );
+    LT.cPForm.xOff.setAttribute('value', (image.width - parseInt(LT.cPForm.wInput.value)) / -2 );
 	LT.cPForm.pName.setAttribute('value', imageName);
   };
 }
@@ -107,8 +107,8 @@ editPieceImageHandler = function (obj) {
       var tileW = LT.ePForm.wInput.value;
     }
 	LT.selectedEditPiece.image_id = obj.id;
-    LT.ePForm.xOff.value = (obj.width - tileW) / -2;
-    LT.ePForm.yOff.value = 0 - (obj.height - tileH);
+    LT.ePForm.xOff.value = (obj.width - LT.selectedEditPiece.width) / -2;
+    LT.ePForm.yOff.value = 0 - (obj.height - LT.selectedEditPiece.height);
   }
 }
 
@@ -130,60 +130,77 @@ LT.loadPieces = function () {
   }
 }
 generatePieceElements = function (pieceID) {
-      LT.pieces[pieceID].pieceDiv = LT.element('div', {
-	    style : 'height: ' + LT.pieces[pieceID].height + 'px; '
-          + 'width: ' + LT.pieces[pieceID].width + 'px; '
-          + 'left: ' + LT.pieces[pieceID].x + 'px; '
-          + 'top: ' + LT.pieces[pieceID].y + 'px; '
-		  + 'position: absolute; background: #FFF;'}, LT.pieceLayer);
-	  var imagesArray = LT.sortObject(LT.pieceImages, 'file');
-	  for ( var n = 0 ; n < imagesArray.length; n++ ) {
-	    if (LT.pieces[pieceID].image_id == imagesArray[n].id) {
-		   imageSource = imagesArray[n];
-		}
-	  }
-	  LT.pieces[pieceID].pieceImage = LT.element('img', { 
-	    style: ' margin-top: '
-	      + LT.pieces[pieceID].y_offset + 'px; margin-left: ' 
-	      + LT.pieces[pieceID].x_offset + 'px;',
-	    src : 'images/upload/piece/' + imageSource.file}, LT.pieces[pieceID].pieceDiv);
-	  LT.pieces[pieceID].movementPiece = LT.element('div', { 
-	    title : LT.pieces[pieceID].name, // << this id is one number too high
-	    style : 'position: absolute; height: '
-          + imageSource.height + 'px; width: '
-		  + imageSource.width + 'px; opacity: .8; '
-          + 'left: ' + LT.pieces[pieceID].x
-		  + 'px; top: ' + LT.pieces[pieceID].y
-          + 'px; margin-left: ' + LT.pieces[pieceID].x_offset
-		  + 'px; margin-top: ' + LT.pieces[pieceID].y_offset
-		  + 'px; '}, LT.clickPieceLayer);
-	   //var funcPiece = (LT.pieces[pieceID].id -1);
-	   LT.pieces[pieceID].movementPiece.onmousedown = function () {
-	     movePiece(pieceID);
-         return false; };
-	   LT.pieces[pieceID].movementPiece.onmouseover = function () { 
-	     highlightPiece(pieceID);
-         return false; };
-	   LT.pieces[pieceID].movementPiece.onmouseout = function () { 
-	     unHighlightPiece(pieceID);
-         return false; };
+  LT.pieces[pieceID].pieceDiv = LT.element('div', {
+    style : 'height: ' + LT.pieces[pieceID].height + 'px; '
+    + 'width: ' + LT.pieces[pieceID].width + 'px; '
+    + 'left: ' + LT.pieces[pieceID].x + 'px; '
+    + 'top: ' + LT.pieces[pieceID].y + 'px; '
+    + 'position: absolute;'}, LT.pieceLayer);
+  var imagesArray = LT.sortObject(LT.pieceImages, 'file');
+  for ( var n = 0 ; n < imagesArray.length; n++ ) {
+    if (LT.pieces[pieceID].image_id == imagesArray[n].id) {
+	   imageSource = imagesArray[n];
+	}
+  }
+  LT.pieces[pieceID].pieceImage = LT.element('img', { 
+    style: ' margin-top: '
+      + LT.pieces[pieceID].y_offset + 'px; margin-left: ' 
+      + LT.pieces[pieceID].x_offset + 'px;',
+    src : 'images/upload/piece/' + imageSource.file}, LT.pieces[pieceID].pieceDiv);
+  LT.pieces[pieceID].movementPiece = LT.element('div', { 
+    title : LT.pieces[pieceID].name,
+    style : 'position: absolute; height: '
+      + imageSource.height + 'px; width: '
+	  + imageSource.width + 'px; opacity: .8; '
+      + 'left: ' + LT.pieces[pieceID].x
+	  + 'px; top: ' + LT.pieces[pieceID].y
+      + 'px; margin-left: ' + LT.pieces[pieceID].x_offset
+	  + 'px; margin-top: ' + LT.pieces[pieceID].y_offset
+	  + 'px; '}, LT.clickPieceLayer);
+  if (LT.selectedPiece) {  
+	if ( LT.pieces[pieceID].id == LT.selectedPiece.id ) {
+    LT.pieces[pieceID].movementPiece.style.border = '1px dashed black';
+    LT.pieces[pieceID].movementPiece.style.margin =
+      (LT.pieces[pieceID].y_offset -1) + 'px 0px 0px '
+      + (LT.pieces[pieceID].x_offset -1) + 'px';
+    }
+  }
+      
+  LT.pieces[pieceID].movementPiece.onmousedown = function () {
+    movePiece(pieceID);
+    return false; 
+  };
+  LT.pieces[pieceID].movementPiece.onmouseover = function () { 
+    LT.pieces[pieceID].pieceDiv.style.background = '#FFF';
+    return false;
+  };
+	LT.pieces[pieceID].movementPiece.onmouseout = function () { 
+    LT.pieces[pieceID].pieceDiv.style.background = '';
+    return false;
+  };
 }
 LT.placePiece = function (pieceObject) {
   pieceObject.x = parseInt(pieceObject.pieceDiv.style.left);
   pieceObject.y = parseInt(pieceObject.pieceDiv.style.top);
   pieceObject.update({});
-  LT.selectedPiece = 0;
+  LT.isPieceMoving = 0;
 }
 movePiece = function (pieceID) {
   LT.selectedPiece = LT.pieces[pieceID];
+  LT.isPieceMoving = 1;
+  for ( i = 0; i < LT.pieces.length; i++ ) {
+    unhighlightPiece(i);
+  }
+  highlightPiece(pieceID);
 }
 highlightPiece = function (pieceID) {
+  LT.pieces[pieceID].pieceDiv.style.background = '#FFF';
   LT.pieces[pieceID].movementPiece.style.border = '1px dashed black';
   LT.pieces[pieceID].movementPiece.style.margin =
     (LT.pieces[pieceID].y_offset -1) + 'px 0px 0px '
 	+ (LT.pieces[pieceID].x_offset -1) + 'px';
 }
-unHighlightPiece = function (pieceID) {
+unhighlightPiece = function (pieceID) {
   LT.pieces[pieceID].movementPiece.style.border = '0px';
   LT.pieces[pieceID].movementPiece.style.margin = 
     LT.pieces[pieceID].y_offset + 'px 0px 0px '
@@ -236,7 +253,9 @@ populateEditPiecesTab = function () {
   pRemove = LT.element('input', { type : 'button', style : 'cursor: pointer', 
         id : 'chatSubmit', size : 8, value : 'Delete Piece' }, LT.ePForm);
   pRemove.onclick = function() {
-    LT.selectedEditPiece.remove({});
+    var confirmDel =  confirm('Are you sure you want to delete '
+      + LT.selectedEditPiece.name + '?');
+    if (confirmDel) { LT.selectedEditPiece.remove({}); }
   };
   LT.element('div', { 'class' : 'clearBoth' }, LT.editPiecesTab.header);
   LT.editPieceImageDiv = LT.element('div', { 'style' : 'clear: both; overflow: none;' },
