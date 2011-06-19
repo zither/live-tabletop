@@ -15,31 +15,6 @@ LT.Tile.PROPERTIES = ["fog", "image_id", "x", "y", "table_id"];
 LT.Tile.dragging = 0;
 LT.Tile.toggleFogValue = 1;
 
-// GLOBAL FUNCTIONS FOR SORTING TILES IN ROW, COLUMN ORDER
-LT.sortTileRule = function (a, b) {
-  // if b.style.top - a.style.top is 0, the OR operator ||
-  // will treat that as false and return b.style.left - a.style.left
-  return parseInt(a.style.top) - parseInt(b.style.top)
-    || parseInt(a.style.left) - parseInt(b.style.left);
-};
-LT.sortTileLayer = function (layerNumber) {
-  // sort the nodes in this sublayer by row then column
-  var nodes = [];
-  var layer = LT.tileLayer.childNodes.item(layerNumber);
-  while (layer.hasChildNodes()) {
-    nodes.push(layer.removeChild(layer.firstChild));
-  }
-  nodes.sort(LT.sortTileRule);
-  for (var i = 0; i < nodes.length; i++) {
-    layer.appendChild(nodes[i]);
-  }
-};
-LT.sortAllTileLayers = function () {
-  for (var i = 0; i < LT.tileLayer.childNodes.length; i++) {
-    LT.sortTileLayer(i);
-  }
-};
-
 // METHODS OF TILE OBJECTS
 LT.Tile.prototype = {
 
@@ -197,5 +172,6 @@ LT.Tile.prototype = {
         + 'px; '}, LT.fogLayer);
     }
   },
+
 };
 

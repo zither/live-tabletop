@@ -1,8 +1,7 @@
-// TABLE CLASS CONSTRUCTOR
-
+// TABLE CONSTRUCTOR
 LT.Table = function (element) {
-  for (var i = 0; i < LT.Table.properties.length; i++) {
-    var property = LT.Table.properties[i];
+  for (var i = 0; i < LT.Table.PROPERTIES.length; i++) {
+    var property = LT.Table.PROPERTIES[i];
     var value = element.getAttribute(property);
     if (property == "name"
      || property == "grid_color"
@@ -16,21 +15,21 @@ LT.Table = function (element) {
   }
 };
 
-//  TABLE PROPERTIES
-
-LT.Table.properties = ["id", "user_id", "image_id", "name",
+// GLOBAL VARIABLES
+LT.Table.PROPERTIES = ["id", "user_id", "image_id", "name",
   "tile_rows", "tile_columns", "tile_width", "tile_height",
   "grid_thickness", "grid_color", "wall_thickness", "wall_color",
   "piece_stamp", "tile_stamp", "message_stamp", "tile_mode"];
 
+// METHODS OF TABLE OBJECTS
 LT.Table.prototype = {
 
   // CLIENT-SERVER COMMUNICATION
 
   update: function (mods) {
     var args = {}
-    for (var i = 0; i < LT.Table.properties.length; i++) {
-      var property = LT.Table.properties[i];
+    for (var i = 0; i < LT.Table.PROPERTIES.length; i++) {
+      var property = LT.Table.PROPERTIES[i];
       if (typeof(mods[property]) != "undefined") {
         this[property] = mods[property];
       }
