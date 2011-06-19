@@ -107,8 +107,10 @@ LT.ajaxRequest = function(method, url, args, callback) {
   if (method == "POST") {
     ajax.open(method, url, asynchronous);
     ajax.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    ajax.setRequestHeader("Content-length", argument_string.length);
-    ajax.setRequestHeader("Connection", "close");
+    // some ajax tutorials say we should set the following request headers
+    // but the W3C standard says that browsers should ignore them
+    //ajax.setRequestHeader("Content-length", argument_string.length);
+    //ajax.setRequestHeader("Connection", "close");
     ajax.send(argument_string);
   }
 
