@@ -175,7 +175,7 @@ document.onmousemove = function (e) {
     LT.dragX = e.pageX;
     LT.dragY = e.pageY;
   }
-  if (LT.selectedPiece) {
+  if (LT.isPieceMoving) {
     LT.movePiece();
   }
   LT.Panel.drag();
