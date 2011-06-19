@@ -329,6 +329,13 @@ LT.movePiece = function () {
 }
 
 LT.getEditPiece = function (piece) {
+  if (LT.currentTable.tile_height) {
+    var tileH = LT.currentTable.tile_height;
+    var tileW = LT.currentTable.tile_width;
+  } else {
+    var tileH = LT.ePForm.hInput.value;
+    var tileW = LT.ePForm.wInput.value;
+  }
   LT.selectedEditPiece = piece;
   LT.ePForm.pName.value = piece.name;
   LT.ePForm.x.value = piece.x;
@@ -339,14 +346,14 @@ LT.getEditPiece = function (piece) {
   LT.ePForm.hInput.value = piece.height;
 }
 
-LT.editPieceHandler = function (changePiece) {
-  changePiece.image_id = LT.selectedEditPiece.image_id;
-  changePiece.name = LT.ePForm.pName.value;
-  changePiece.x = LT.ePForm.x.value;
-  changePiece.y = LT.ePForm.y.value
-  changePiece.x_offset = LT.ePForm.xOff.value;
-  changePiece.y_offset = LT.ePForm.yOff.value;
-  changePiece.width = LT.ePForm.wInput.value;
-  changePiece.height = LT.ePForm.hInput.value;
-  changePiece.update({});
+LT.editPieceHandler = function (piece) {
+  piece.image_id = LT.selectedEditPiece.image_id;
+  piece.name = LT.ePForm.pName.value;
+  piece.x = LT.ePForm.x.value;
+  piece.y = LT.ePForm.y.value
+  piece.x_offset = LT.ePForm.xOff.value;
+  piece.y_offset = LT.ePForm.yOff.value;
+  piece.width = LT.ePForm.wInput.value;
+  piece.height = LT.ePForm.hInput.value;
+  piece.update({});
 }
