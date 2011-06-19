@@ -65,7 +65,7 @@ LT.loadSwatches = function (){
 	}
   }
 }
-makeSelectPieceHandler = function (image) {
+createPieceImageHandler = function (image) {
   return function () {
     if (LT.currentTable.tile_height) {
       var tileH = LT.currentTable.tile_height;
@@ -83,13 +83,32 @@ makeSelectPieceHandler = function (image) {
   };
 }
 LT.loadPieceImages = function () {
-  LT.fill(LT.pieceImageDiv);
+  LT.fill(LT.editPieceImageDiv);
+  LT.fill(LT.createPieceImageDiv);
   var imagesArray = LT.sortObject(LT.pieceImages, 'file');
   for ( var i = 0 ; i < imagesArray.length; i++ ) {
-    newImage = LT.element('img', { title : imagesArray[i].file, 
+    var cImage = LT.element('img', { title : imagesArray[i].file, 
 	  style : 'border: 1px solid black; margin: 1px 1px 1px 1px', 
-	  src : 'images/upload/piece/' + imagesArray[i].file}, LT.pieceImageDiv);
-	newImage.onclick = makeSelectPieceHandler(imagesArray[i]);
+	  src : 'images/upload/piece/' + imagesArray[i].file}, LT.createPieceImageDiv);
+	cImage.onclick = createPieceImageHandler(imagesArray[i]);
+    var eImage = LT.element('img', { title : imagesArray[i].file, 
+	  style : 'border: 1px solid black; margin: 1px 1px 1px 1px', 
+	  src : 'images/upload/piece/' + imagesArray[i].file}, LT.editPieceImageDiv);
+	eImage.onclick = editPieceImageHandler(imagesArray[i]);
+  }
+}
+editPieceImageHandler = function (obj) {
+  return function () {
+    if (LT.currentTable.tile_height) {
+      var tileH = LT.currentTable.tile_height;
+      var tileW = LT.currentTable.tile_width;
+    } else {
+      var tileH = LT.ePForm.hInput.value;
+      var tileW = LT.ePForm.wInput.value;
+    }
+	LT.selectedEditPiece.image_id = obj.id;
+    LT.ePForm.xOff.value = (obj.width - tileW) / -2;
+    LT.ePForm.yOff.value = 0 - (obj.height - tileH);
   }
 }
 
@@ -139,7 +158,7 @@ generatePieceElements = function (pieceID) {
 		  + 'px; margin-top: ' + LT.pieces[pieceID].y_offset
 		  + 'px; '}, LT.clickPieceLayer);
 	   //var funcPiece = (LT.pieces[pieceID].id -1);
-	   LT.pieces[pieceID].movementPiece.onmousedown = function () { 
+	   LT.pieces[pieceID].movementPiece.onmousedown = function () {
 	     movePiece(pieceID);
          return false; };
 	   LT.pieces[pieceID].movementPiece.onmouseover = function () { 
@@ -149,10 +168,10 @@ generatePieceElements = function (pieceID) {
 	     unHighlightPiece(pieceID);
          return false; };
 }
-LT.updatePiece = function (pieceObject) {
+LT.placePiece = function (pieceObject) {
   pieceObject.x = parseInt(pieceObject.pieceDiv.style.left);
   pieceObject.y = parseInt(pieceObject.pieceDiv.style.top);
-  pieceObject.update({x: pieceObject.x, y: pieceObject.y});
+  pieceObject.update({});
   LT.selectedPiece = 0;
 }
 movePiece = function (pieceID) {
@@ -210,12 +229,18 @@ populateEditPiecesTab = function () {
   LT.ePForm.xOff = LT.element('input', { size : 1, 
     'class' : 'fInput' }, wOffDiv, '0', 1);
   pSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
-        id : 'chatSubmit', size : 8, value : 'Create' }, LT.ePForm);
-  pSubmit.onclick = function() { LT.createPiece(); };
+        id : 'chatSubmit', size : 8, value : 'Apply Changes' }, LT.ePForm);
+  pSubmit.onclick = function() {
+    LT.editPieceHandler(LT.selectedEditPiece);
+  };
+  pRemove = LT.element('input', { type : 'button', style : 'cursor: pointer', 
+        id : 'chatSubmit', size : 8, value : 'Delete Piece' }, LT.ePForm);
+  pRemove.onclick = function() {
+    LT.selectedEditPiece.remove({});
+  };
   LT.element('div', { 'class' : 'clearBoth' }, LT.editPiecesTab.header);
-  LT.pieceImageDiv = LT.element('div', { 'style' : 'clear: both; overflow: none;' },
+  LT.editPieceImageDiv = LT.element('div', { 'style' : 'clear: both; overflow: none;' },
     LT.editPiecesTab.content, 'Columns: ');
-  LT.loadPieceImages();
 }
 populateCreatePiecesTab = function () {
   LT.cPForm = LT.element('form', { }, LT.createPiecesTab.header);
@@ -244,9 +269,8 @@ populateCreatePiecesTab = function () {
         id : 'chatSubmit', size : 8, value : 'Create' }, LT.cPForm);
   pSubmit.onclick = function() { LT.createPiece(); };
   LT.element('div', { 'class' : 'clearBoth' }, LT.createPiecesTab.header);
-  LT.pieceImageDiv = LT.element('div', { 'style' : 'clear: both; overflow: none;' },
+  LT.createPieceImageDiv = LT.element('div', { 'style' : 'clear: both; overflow: none;' },
     LT.createPiecesTab.content, 'Columns: ');
-  LT.loadPieceImages();
 }
 
 // Brings element to the forground
@@ -260,10 +284,10 @@ LT.createToolsPanel = function () {
     bringForward(LT.clickTileLayer);
     LT.brush = "tile";
   });
-  LT.toolsPanel.makeTab('Edit Pieces', function () {
+  LT.toolsPanel.makeTab('Edit Piece', function () {
     bringForward(LT.clickPieceLayer);
   });
-  LT.toolsPanel.makeTab('Create Pieces', function () {
+  LT.toolsPanel.makeTab('Add Piece', function () {
     bringForward(LT.clickPieceLayer);
   });
   LT.editPiecesTab = LT.toolsPanel.tabs[1];
@@ -271,9 +295,9 @@ LT.createToolsPanel = function () {
   LT.tilesTab = LT.toolsPanel.tabs[0];
   populateEditPiecesTab();
   populateCreatePiecesTab();
+  LT.loadPieceImages();
   LT.toolsPanel.selectTab(LT.toolsPanel.selectedTab);
 };
-
 
 // Move piece.
 LT.movePiece = function () {
@@ -296,4 +320,27 @@ LT.movePiece = function () {
   LT.selectedPiece.pieceImage.style.left = LT.dragX + "px";
   LT.selectedPiece.movementPiece.style.top  = LT.dragY + "px";
   LT.selectedPiece.movementPiece.style.left = LT.dragX + "px";
+}
+
+LT.getEditPiece = function (piece) {
+  LT.selectedEditPiece = piece;
+  LT.ePForm.pName.value = piece.name;
+  LT.ePForm.x.value = piece.x;
+  LT.ePForm.y.value = piece.y;
+  LT.ePForm.xOff.value = piece.x_offset;
+  LT.ePForm.yOff.value = piece.y_offset;
+  LT.ePForm.wInput.value = piece.width;
+  LT.ePForm.hInput.value = piece.height;
+}
+
+LT.editPieceHandler = function (changePiece) {
+  changePiece.image_id = LT.selectedEditPiece.image_id;
+  changePiece.name = LT.ePForm.pName.value;
+  changePiece.x = LT.ePForm.x.value;
+  changePiece.y = LT.ePForm.y.value
+  changePiece.x_offset = LT.ePForm.xOff.value;
+  changePiece.y_offset = LT.ePForm.yOff.value;
+  changePiece.width = LT.ePForm.wInput.value;
+  changePiece.height = LT.ePForm.hInput.value;
+  changePiece.update({});
 }
