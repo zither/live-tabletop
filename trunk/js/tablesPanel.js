@@ -40,7 +40,6 @@ LT.readTiles = function(){
       var tile = new LT.Tile(LT.currentTable.id, x, y, tilesArray[i]);
       LT.tiles.push(tile);
     }
-    //LT.sortAllTileLayers();
   }
 }
 LT.loadTableHandler = function (table) {

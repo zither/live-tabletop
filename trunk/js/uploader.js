@@ -1,4 +1,6 @@
 /*
+ASYNCHRONOUS UPLOADER
+
 EXAMPLE USAGE (CLIENT SIDE):
 
 <script type="text/javascript">
@@ -29,7 +31,7 @@ $result = move_uploaded_file($_FILES['file']['tmp_name'], getcwd()
 </script>
 */
 
-// asynchronous uploader class
+// UPLOADER CONSTRUCTOR
 LT.Uploader = function (url, container) {
 
   // psuedo-event-handler callback you can set
@@ -77,61 +79,12 @@ LT.Uploader = function (url, container) {
   this.iframe.style.width = "0";
 };
 
-// submit the form with optional arguments
-// if you want to submit the form without arguments
-// and 
-LT.Uploader.prototype.submit = function (args) {
-
-  // remove old temporary arguments
-  for (var i = 0; i < this.temp_args.length; i++) {
-    this.form.removeChild(this.temp_args[i]);
-  }
-
-  // create new temporary arguments
-  this.temp_args = [];
-  for (var arg_name in args) {
-    this.temp_args.push(
-      LT.element("input", {
-          type: "hidden",
-          name: arg_name,
-          value: args[arg_name]
-        }, this.form));
-  }
-
-  // submit form
-  this.form.submit();
-};
-
-LT.Uploader.prototype.setArguments = function (args) {
-   for (var arg_name in args) {
-     this.setArgument(arg_name, args[arg_name]);
-   }
-};
-
-LT.Uploader.prototype.setArgument = function (arg_name, arg_value) {
-  if (this.perm_args[arg_name]) {
-    this.form.removeChild(this.perm_args[arg_name]);
-  }
-  this.perm_args[arg_name] = LT.element("input", {
-      type: "hidden",
-      name: arg_name,
-      value: arg_value
-    }, this.form);
-};
-
-LT.Uploader.prototype.deleteArguments = function (arg_names) {
-  for (var i = 0; i < args.length; i++) {
-    this.deleteArgument(args[i]);
-  }
-};
-
-LT.Uploader.prototype.deleteArgument = function (arg_name) {
-  this.form.removeChild(this.perm_args[arg_name]);
-  delete (this.perm_args[arg_name]);
-};
+// GLOBAL VARIABLES
 
 // do not modify
 LT.Uploader.uploaders = [];
+
+// STATIC METHODS OF THE UPLOADER CLASS
 
 // do not modify
 LT.Uploader.finish = function (index, result) {
@@ -139,6 +92,64 @@ LT.Uploader.finish = function (index, result) {
   if (uploader.onload) {
     uploader.onload(result);
   }
-}
+};
 
+// METHODS OF UPLOADER OBJECTS
+
+LT.Uploader.prototype = {
+
+  // submit the form with optional arguments
+  // if you want to submit the form without arguments
+  // and 
+  submit: function (args) {
+
+    // remove old temporary arguments
+    for (var i = 0; i < this.temp_args.length; i++) {
+      this.form.removeChild(this.temp_args[i]);
+    }
+
+    // create new temporary arguments
+    this.temp_args = [];
+    for (var arg_name in args) {
+      this.temp_args.push(
+        LT.element("input", {
+            type: "hidden",
+            name: arg_name,
+            value: args[arg_name]
+          }, this.form));
+    }
+
+    // submit form
+    this.form.submit();
+  },
+
+  setArguments: function (args) {
+     for (var arg_name in args) {
+       this.setArgument(arg_name, args[arg_name]);
+     }
+  },
+
+  setArgument: function (arg_name, arg_value) {
+    if (this.perm_args[arg_name]) {
+      this.form.removeChild(this.perm_args[arg_name]);
+    }
+    this.perm_args[arg_name] = LT.element("input", {
+        type: "hidden",
+        name: arg_name,
+        value: arg_value
+      }, this.form);
+  },
+
+  deleteArguments: function (arg_names) {
+    for (var i = 0; i < args.length; i++) {
+      this.deleteArgument(args[i]);
+    }
+  },
+
+  deleteArgument: function (arg_name) {
+    this.form.removeChild(this.perm_args[arg_name]);
+    delete (this.perm_args[arg_name]);
+  },
+
+};
 

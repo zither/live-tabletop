@@ -1,4 +1,4 @@
-
+// GRID CONSTRUCTOR
 LT.Grid = function (columns, rows, width, height, thickness, color, wall_thickness, wall_color, mode, parent) {
   this._mode = mode;
   this._width = width;
@@ -17,6 +17,8 @@ LT.Grid = function (columns, rows, width, height, thickness, color, wall_thickne
 };
 
 LT.Grid.prototype = {
+
+  // CONSTANTS
 
   SHAPES: {
     "rectangle": {
@@ -39,6 +41,8 @@ LT.Grid.prototype = {
       margins: {right: 1/3, bottom: 1/2},
       directions: {n: 0, ne: 1, se: 2, s: 3, sw: 4, nw: 5},
       points: [[1/3, 0], [1, 0], [4/3, 1/2], [1, 1], [1/3, 1], [0, 1/2]]}},
+
+  // METHODS OF GRID OBJECTS
 
   repaint: function () {
     if (this._thickness == 0) return;
