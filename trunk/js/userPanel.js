@@ -7,8 +7,8 @@ LT.createUserPanel = function () {
   LT.userPanel.makeTab('list');
   LT.userPanel.makeTab('admin');
   LT.myOptionsTab = LT.userPanel.tabs[0];
-  LT.userListTab = LT.userPanel.tabs[1].content;
-  LT.adminTab = LT.userPanel.tabs[2].content;
+  LT.userListTab = LT.userPanel.tabs[1];
+  LT.adminTab = LT.userPanel.tabs[2];
   
   LT.element('a', {id: 'logoutDiv'}, LT.myOptionsTab.content, 'Logout').onclick = LT.logout;
   
@@ -30,8 +30,11 @@ LT.createUserPanel = function () {
     LT.filesPanel.refreshPanel();
     LT.userPanel.refreshPanel();
   }
-  
-  LT.userForm = LT.element('form', { }, LT.userListTab);
+  populateAdminTab();
+}
+
+populateAdminTab = function () {
+  LT.userForm = LT.element('form', { }, LT.adminTab.content);
   LT.inputUserName = LT.element('input', { size : 8, type: 'text',
     style : 'border: 0px solid #CCC;' }, LT.userForm, 'User Name', 1);
   
@@ -41,4 +44,12 @@ LT.createUserPanel = function () {
   userSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
         id : 'chatSubmit', size : 8, value : 'Create' }, LT.userForm);
   userSubmit.onclick = function() { LT.createUser(); };
+}
+
+LT.createUserList = function () {
+  //LT.fill(LT.userListTab.content);
+  for ( i = 0; i < LT.users.length; i++) {
+  
+    LT.element('a', {}, LT.userListTab.content, LT.users[i].name);
+  }
 }
