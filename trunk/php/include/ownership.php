@@ -8,7 +8,9 @@ include_once('include/query.php');
 // Returns FALSE if this user does not have permission to modify the image.
 // A FALSE result could also mean an SQL error or bad image id.
 function LT_can_modify_image($image_id) {
-
+  
+  global $LT_SQL;
+  
   // you must be logged in to modify images
   if (!isset($_SESSION['user_id'])) return FALSE;
 
@@ -28,7 +30,9 @@ function LT_can_modify_image($image_id) {
 // Returns FALSE if this user does not have permission to modify the table.
 // A FALSE result could also mean an SQL error or bad table id.
 function LT_can_modify_table($table_id) {
-
+  
+  global $LT_SQL;
+  
   // you must be logged in to modify tables
   if (!isset($_SESSION['user_id'])) return FALSE;
 
@@ -48,7 +52,9 @@ function LT_can_modify_table($table_id) {
 // Returns FALSE if this user does not have permission to modify the piece.
 // A FALSE result could also mean an SQL error or bad piece id.
 function LT_can_modify_piece($piece_id) {
-
+  
+  global $LT_SQL;
+  
   // you must be logged in to modify pieces
   if (!isset($_SESSION['user_id'])) return FALSE;
 
