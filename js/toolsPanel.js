@@ -33,21 +33,21 @@ LT.loadSwatches = function (){
 	LT.selectedImageID = -1;
     LT.brush = "tile";
 	LT.selectedImage = '';
-	bringForward(LT.clickTileLayer);
+	LT.bringForward(LT.clickTileLayer);
   }
   var eraser = LT.element('div', { style :
     'float : left; border : 1px solid black; margin : 1px 1px 1px 1px; height : 40px; width: 40px;',},
      LT.tilesTab.header, 'fog');
   eraser.onclick = function() {
     LT.brush = "fog";
-	bringForward(LT.clickTileLayer);
+	LT.bringForward(LT.clickTileLayer);
   }
   var eraser = LT.element('div', { style :
     'float : left; border : 1px solid black; margin : 1px 1px 1px 1px; height : 40px; width: 40px;',},
      LT.tilesTab.header, 'wall');
   eraser.onclick = function() {
     LT.brush = "wall";
-	bringForward(LT.clickWallLayer);
+	LT.bringForward(LT.clickWallLayer);
   }
   LT.element('div', { 'class' : 'clearBoth' }, LT.tilesTab.header);
   
@@ -168,6 +168,7 @@ generatePieceElements = function (pieceID) {
       
   LT.pieces[pieceID].movementPiece.onmousedown = function () {
     movePiece(pieceID);
+	LT.placingPiece = 1;
     return false; 
   };
   LT.pieces[pieceID].movementPiece.onmouseover = function () { 
@@ -293,25 +294,25 @@ populateCreatePiecesTab = function () {
 }
 
 // Brings element to the forground
-bringForward = function (cObject) {
+LT.bringForward = function (cObject) {
   LT.fill(LT.clickLayers);
   LT.clickLayers.appendChild(cObject);
 }
 LT.createToolsPanel = function () {
   LT.toolsPanel = new LT.Panel( 'Tools', 'Tools', 6, 49, 140, 180);
-  LT.toolsPanel.makeTab('Tiles', function () {
-    bringForward(LT.clickTileLayer);
-    LT.brush = "tile";
+  LT.toolsPanel.makeTab('Add Piece', function () {
+    LT.bringForward(LT.clickPieceLayer);
   });
   LT.toolsPanel.makeTab('Edit Piece', function () {
-    bringForward(LT.clickPieceLayer);
+    LT.bringForward(LT.clickPieceLayer);
   });
-  LT.toolsPanel.makeTab('Add Piece', function () {
-    bringForward(LT.clickPieceLayer);
+  LT.toolsPanel.makeTab('Tiles', function () {
+    LT.bringForward(LT.clickTileLayer);
+    LT.brush = "tile";
   });
   LT.editPiecesTab = LT.toolsPanel.tabs[1];
-  LT.createPiecesTab = LT.toolsPanel.tabs[2];
-  LT.tilesTab = LT.toolsPanel.tabs[0];
+  LT.createPiecesTab = LT.toolsPanel.tabs[0];
+  LT.tilesTab = LT.toolsPanel.tabs[2];
   populateEditPiecesTab();
   populateCreatePiecesTab();
   LT.loadPieceImages();

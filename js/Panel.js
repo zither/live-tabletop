@@ -108,15 +108,12 @@ LT.Panel.prototype = {
 
   // Create a tab
   makeTab: function (name, tabAction) {
-    //if (!this.tabBar) {
-    //  this.tabBar = LT.element('div', {'class' : 'tabBar'}, this.header);
-    //}
     // FIXME: magic number (color)
     var isActive = 'activeTab';
     if (this.tabs.length > 0){
       isActive = 'inactiveTab';
     }
-    var tabLabel = LT.element('div', {'class' : isActive}, this.tabBar);
+    tabLabel = LT.element('div', {'class' : isActive}, this.tabBar);
     LT.element('div', {'class' : 'tabStart'}, tabLabel);
     LT.element('div', {'class' : 'tabContent'}, tabLabel, name);
     LT.element('div', {'class' : 'tabEnd'}, tabLabel);
@@ -137,6 +134,7 @@ LT.Panel.prototype = {
 
   // Select a tab
   selectTab: function (tabNumber) {
+    this.selectedTab = tabNumber;
     if (this.tabs.length > 0) {
       var tab = this.tabs[tabNumber];
       for(var n = 0; n < this.tabs.length; n++){
@@ -151,6 +149,20 @@ LT.Panel.prototype = {
       }
     }  
   },
+
+  // Hide tab
+  hideTab: function (tabNumber) {
+    this.tabs[tabNumber].label.style.display = 'none';
+    this.tabs[tabNumber].header.style.display = 'none';
+    this.tabs[tabNumber].content.style.display = 'none';
+  },
+  
+  // Show tab
+  showTab: function (tabNumber) {
+    this.tabs[tabNumber].label.style.display = 'block';
+    this.tabs[tabNumber].header.style.display = 'block';
+    this.tabs[tabNumber].content.style.display = 'block';
+  },  
   
   // Restore default dimensions
   refreshPanel: function() {
@@ -172,6 +184,16 @@ LT.Panel.prototype = {
   hide: function () {
     this.button.className = "buttonUnchecked";
     this.outside.style.visibility = "hidden";
+  },
+
+  // Show this panel's button
+  showButton: function () {
+    this.button.style.display = "block";
+  },
+  
+  // Hide this panel's button
+  hideButton: function () {
+    this.button.style.display = "none";
   },
 
   // Move this panel to the top of the stack

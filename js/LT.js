@@ -154,9 +154,10 @@ document.onmouseup = function () {
   LT.Panel.stopDragging();
   LT.clickDragGap = 0;
   LT.Tile.dragging = 0;
-  if (LT.selectedPiece) {
+  if (LT.placingPiece) {
 	LT.getEditPiece(LT.selectedPiece);
     LT.placePiece(LT.selectedPiece);
+	LT.placingPiece = 0;
   }
   LT.Panel.saveCookie();
 }
