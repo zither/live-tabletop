@@ -165,20 +165,24 @@ generatePieceElements = function (pieceID) {
       + (LT.pieces[pieceID].x_offset -1) + 'px';
     }
   }
-      
-  LT.pieces[pieceID].movementPiece.onmousedown = function () {
-    movePiece(pieceID);
-	LT.placingPiece = 1;
-    return false; 
-  };
-  LT.pieces[pieceID].movementPiece.onmouseover = function () { 
-    LT.pieces[pieceID].pieceDiv.style.background = '#FFF';
-    return false;
-  };
-	LT.pieces[pieceID].movementPiece.onmouseout = function () { 
-    LT.pieces[pieceID].pieceDiv.style.background = '';
-    return false;
-  };
+
+  if (LT.currentTable.user_id == LT.currentUser.id 
+    || LT.pieces[pieceID].user_id == LT.currentUser.id 
+    || LT.currentUser.permissions == 'administrator') {
+    LT.pieces[pieceID].movementPiece.onmousedown = function () {
+      movePiece(pieceID);
+      LT.placingPiece = 1;
+      return false; 
+    };
+    LT.pieces[pieceID].movementPiece.onmouseover = function () { 
+      LT.pieces[pieceID].pieceDiv.style.background = '#FFF';
+      return false;
+    };
+      LT.pieces[pieceID].movementPiece.onmouseout = function () { 
+      LT.pieces[pieceID].pieceDiv.style.background = '';
+      return false;
+    };
+  }
 }
 LT.placePiece = function (pieceObject) {
   pieceObject.x = parseInt(pieceObject.pieceDiv.style.left);
