@@ -19,7 +19,9 @@ DIV {
   font-family: Arial,Helvetica,sans-serif;
   font-size: 14px;
 }
-
+input {
+  border: 1px solid #CCC;
+}
 #pageBar {
   background: url(images/pageBar.jpg) repeat-x left top;
   height: 26px;

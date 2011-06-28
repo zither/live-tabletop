@@ -156,31 +156,24 @@ LT.createTablesPanel = function () {
 
 populateEditTableTab = function () {
   LT.editTablesForm = LT.element('form', { }, LT.editTableTab);
-  var eTF = LT.editTablesForm
+  var eTF = LT.editTablesForm;
   var nameDiv = LT.element('div', { 'class' : 'inputDiv' }, eTF, 'Name: ');
-  eTF.inputTableName = LT.element('input', { size : 10, type: 'text',
-    style : 'border: 1px solid #CCC;' }, nameDiv);
+  eTF.inputTableName = LT.element('input', { size : 10, type: 'text' }, nameDiv);
   var columnsDiv = LT.element('div', { 'class' : 'inputDiv' }, eTF, 'Columns: ');
-  eTF.inputTableCols = LT.element('input', { size : 1, 
-    style : 'border: 1px solid #CCC;' }, columnsDiv);
+  eTF.inputTableCols = LT.element('input', { size : 1, }, columnsDiv);
   var rowsDiv = LT.element('div', { 'class' : 'inputDiv' }, eTF, 'Rows: ');
-  eTF.inputTableRows = LT.element('input', { size : 1, 
-    style : 'border: 1px solid #CCC;' }, rowsDiv);
+  eTF.inputTableRows = LT.element('input', { size : 1, }, rowsDiv);
   var heightDiv = LT.element('div', { 'class' : 'inputDiv' }, eTF, 'Tile Height: ');
-  eTF.inputTileHeight = LT.element('input', { size : 1, 
-    style : 'border: 1px solid #CCC;' }, heightDiv);
+  eTF.inputTileHeight = LT.element('input', { size : 1, }, heightDiv);
   var widthDiv = LT.element('div', { 'class' : 'inputDiv' }, eTF, 'Tile Width: ');
-  eTF.inputTileWidth = LT.element('input', { size : 1, 
-    style : 'border: 1px solid #CCC;' }, widthDiv);
+  eTF.inputTileWidth = LT.element('input', { size : 1, }, widthDiv);
   var thicknessDiv = LT.element('div', { 'class' : 'inputDiv' }, eTF, 'Grid Thickness: ');
-  eTF.inputGridThickness = LT.element('input', { size : 1, 
-    style : 'border: 1px solid #CCC;' }, thicknessDiv, '1', 1);
+  eTF.inputGridThickness = LT.element('input', { size : 1, }, thicknessDiv, '1', 1);
   var wallThicknessDiv = LT.element('div', { 'class' : 'inputDiv' }, eTF, 'Wall Thickness: ');
-  eTF.inputWallThickness = LT.element('input', { size : 1, 
-    style : 'border: 1px solid #CCC;' }, wallThicknessDiv, '1', 1);
+  eTF.inputWallThickness = LT.element('input', { size : 1, }, wallThicknessDiv, '1', 1);
   var tileModeDiv = LT.element('div', { 'class' : 'inputDiv' }, eTF, 'Tile Mode: ');
   eTF.inputTileMode = LT.element('select', { size : 1, name : 'eTileMode', 
-    style : 'border: 1px solid #CCC;' }, tileModeDiv);
+    }, tileModeDiv);
   eTF.inputTMRectangle = LT.element('option', { value : 'rectangle'},
     eTF.inputTileMode, 'Rectangles');
   eTF.inputTMIsometric = LT.element('option', { value : 'isometric'},
@@ -214,28 +207,28 @@ populateCreateTableTab = function () {
   cTF = LT.tableListForm;
   var nameDiv = LT.element('div', { 'class' : 'inputDiv' }, cTF, 'Name: ');
   cTF.inputTableName = LT.element('input', { size : 10, type: 'text',
-    style : 'border: 1px solid #CCC;' }, nameDiv, 'Table Name', 1);
+    }, nameDiv, 'Table Name', 1);
   var columnsDiv = LT.element('div', { 'class' : 'inputDiv' }, cTF, 'Columns: ');
   cTF.inputTableCols = LT.element('input', { size : 1, 
-    style : 'border: 1px solid #CCC;' }, columnsDiv, '8', 1);
+    }, columnsDiv, '8', 1);
   var rowsDiv = LT.element('div', { 'class' : 'inputDiv' }, cTF, 'Rows: ');
   cTF.inputTableRows = LT.element('input', { size : 1, 
-    style : 'border: 1px solid #CCC;' }, rowsDiv, '8', 1);
+    }, rowsDiv, '8', 1);
   var heightDiv = LT.element('div', { 'class' : 'inputDiv' }, cTF, 'Tile Height: ');
   cTF.inputTileHeight = LT.element('input', { size : 1, 
-    style : 'border: 1px solid #CCC;' }, heightDiv, '45', 1);
+    }, heightDiv, '45', 1);
   var widthDiv = LT.element('div', { 'class' : 'inputDiv' }, cTF, 'Tile Width: ');
   cTF.inputTileWidth = LT.element('input', { size : 1, 
-    style : 'border: 1px solid #CCC;' }, widthDiv, '45', 1);
+    }, widthDiv, '45', 1);
   var thicknessDiv = LT.element('div', { 'class' : 'inputDiv' }, cTF, 'Grid Thickness: ');
   cTF.inputGridThickness = LT.element('input', { size : 1, 
-    style : 'border: 1px solid #CCC;' }, thicknessDiv, '1', 1);
+    }, thicknessDiv, '1', 1);
   var wallThicknessDiv = LT.element('div', { 'class' : 'inputDiv' }, cTF, 'Wall Thickness: ');
   cTF.inputWallThickness = LT.element('input', { size : 1, 
-    style : 'border: 1px solid #CCC;' }, wallThicknessDiv, '1', 1);
+    }, wallThicknessDiv, '1', 1);
   var tileModeDiv = LT.element('div', { 'class' : 'inputDiv' }, cTF, 'Tile Mode: ');
   cTF.inputTileMode = LT.element('select', { size : 1, name : 'cTileMode', 
-    style : 'border: 1px solid #CCC;' }, tileModeDiv);
+    }, tileModeDiv);
   LT.element('option', { value : 'rectangle'}, cTF.inputTileMode, 'Rectangles');
   LT.element('option', { value : 'isometric'}, cTF.inputTileMode, 'Isometric');
   LT.element('option', { value : 'hex rows'}, cTF.inputTileMode, 'Hex rows');
