@@ -52,7 +52,7 @@ LT.login = function (loginAjax) {
 	LT.userPanel.buttonCaption.removeChild(LT.userPanel.buttonCaption.firstChild);
 	LT.userPanel.buttonCaption.appendChild(newUsername);
     LT.pageBar.appendChild(LT.userButton);
-	LT.createUserList();
+	LT.refreshUsersList();
     if (LT.tableListDiv){ LT.refreshTableList(); }
 	LT.element('div', {'class' : 'chat_alert'}, LT.chatOutput, "You are logged in.");
     LT.chatOutput.removeChild(LT.chatBottom);

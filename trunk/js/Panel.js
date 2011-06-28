@@ -128,6 +128,7 @@ LT.Panel.prototype = {
     var tabNumber = this.tabs.length - 1;
     tabLabel.onclick = function () {
       self.selectTab(tabNumber);
+      LT.Panel.saveCookie();
       return false;
     }
   },
@@ -147,7 +148,7 @@ LT.Panel.prototype = {
       if (tab.action) {
         tab.action();
       }
-    }  
+    }
   },
 
   // Hide tab
