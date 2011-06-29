@@ -60,7 +60,7 @@ LT.loadSwatches = function (){
 	newImage.file = imagesArray[i].file;
 	newImage.onclick = function() {
 	  LT.selectedImageID = this.id;
-	  bringForward(LT.clickTileLayer);
+	  LT.bringForward(LT.clickTileLayer);
       LT.brush = "tile";
 	}
   }
@@ -357,10 +357,12 @@ LT.getEditPiece = function (piece) {
   LT.selectedEditPiece = piece;
   for ( i = 0; i < LT.ePForm.userSelect.childNodes.length; i++) {
     var option = LT.ePForm.userSelect.childNodes[i];
+	option.removeAttribute('selected');
+  }
+  for ( i = 0; i < LT.ePForm.userSelect.childNodes.length; i++) {
+    var option = LT.ePForm.userSelect.childNodes[i];
     if (LT.users[option.value].id == piece.user_id) {
 	  option.setAttribute('selected', 'select');
-	} else {
-	  option.removeAttribute('selected');
 	}
   }
   LT.ePForm.pName.value = piece.name;
