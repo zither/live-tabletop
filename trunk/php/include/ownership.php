@@ -61,10 +61,11 @@ function LT_can_modify_piece($piece_id) {
   // admins may update other user's pieces
   if (strcmp($_SESSION['permissions'], 'administrator') == 0) return TRUE;
 
-  // users can only update pieces belonging to tables they own
+  // users can update pieces they own and pieces belonging to tables they own
   if ($rows = LT_call_silent('read_piece', $piece_id)) {
-    $table_id = $rows[0]['table_id'];
     $user_id = $LT_SQL->real_escape_string($_SESSION['user_id']);
+    if ($rows[0]['user_id'] == $user_id) return TRUE;
+    $table_id = $rows[0]['table_id'];
     if ($rows = LT_call_silent('read_table', $table_id)) {
       return $user_id == $rows[0]['user_id'];
     }
