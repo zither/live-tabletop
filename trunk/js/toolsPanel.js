@@ -1,27 +1,3 @@
-LT.readTileImages = function () {
-  var readTileImages = LT.ajaxRequest("POST", "php/read_images.php", {'type' : 'tile'});
-  if (readTileImages.responseXML) {
-    var imageElements = readTileImages.responseXML.getElementsByTagName('image');
-    LT.tileImages = {};
-    for (var i = 0 ; i < imageElements.length; i++) {
-      var image = new LT.Image(imageElements[i]);
-      LT.tileImages[image.id] = image;
-    }
-  }
-};
-
-LT.readPieceImages = function () {
-  var readPieceImages = LT.ajaxRequest("POST", "php/read_images.php", {'type' : 'piece'});
-  if (readPieceImages.responseXML) {
-    var imageElements = readPieceImages.responseXML.getElementsByTagName('image');
-    LT.pieceImages = {};
-    for (var i = 0 ; i < imageElements.length; i++) {
-      var image = new LT.Image(imageElements[i]);
-      LT.pieceImages[image.id] = image;
-    }
-  }
-};
-
 LT.loadSwatches = function () {
   LT.selectedImageID = -1;
   LT.selectedImage = '';
@@ -60,7 +36,7 @@ LT.loadSwatches = function () {
   
   LT.element('div', { 'class' : 'clearBoth' }, LT.toolsTab.header);
   
-  var imagesArray = LT.sortObject(LT.tileImages, 'file');
+  var imagesArray = LT.sortObject(LT.Tile.images, 'file');
   for (var i = 0 ; i < imagesArray.length; i++) {
     var newImage = LT.element('img', { title : imagesArray[i].file, 
       'class' : 'swatch', 
@@ -78,7 +54,7 @@ LT.loadSwatches = function () {
 LT.loadPieceImages = function () {
   LT.fill(LT.editPieceImageDiv);
   LT.fill(LT.createPieceImageDiv);
-  var imagesArray = LT.sortObject(LT.pieceImages, 'file');
+  var imagesArray = LT.sortObject(LT.Piece.images, 'file');
   for (var i = 0 ; i < imagesArray.length; i++) {
     var cImage = LT.element('img', { title : imagesArray[i].file, 
       style : 'border: 1px solid black; margin: 1px 1px 1px 1px', 
@@ -86,17 +62,17 @@ LT.loadPieceImages = function () {
     cImage.onclick = (function (image) {return function () {
       var imageName = image.file.substr(0, image.file.length - 4);
       LT.selectedPieceImage = image.id;
-      LT.cPForm.yOff.setAttribute('value', (image.height - parseInt(LT.cPForm.hInput.value)) * -1);
-      LT.cPForm.xOff.setAttribute('value', (image.width - parseInt(LT.cPForm.wInput.value)) / -2);
-      LT.cPForm.pName.setAttribute('value', imageName);
+      LT.Piece.creator.yOff.setAttribute('value', (image.height - parseInt(LT.Piece.creator.hInput.value)) * -1);
+      LT.Piece.creator.xOff.setAttribute('value', (image.width - parseInt(LT.Piece.creator.wInput.value)) / -2);
+      LT.Piece.creator.pName.setAttribute('value', imageName);
     };})(imagesArray[i]);
     var eImage = LT.element('img', { title : imagesArray[i].file, 
       style : 'border: 1px solid black; margin: 1px 1px 1px 1px', 
       src : 'images/upload/piece/' + imagesArray[i].file}, LT.editPieceImageDiv);
     eImage.onclick = (function (obj) {return function () {
       LT.selectedEditPiece.image_id = obj.id;
-      LT.ePForm.xOff.value = (obj.width - LT.selectedEditPiece.width) / -2;
-      LT.ePForm.yOff.value = 0 - (obj.height - LT.selectedEditPiece.height);
+      LT.Piece.editor.xOff.value = (obj.width - LT.selectedEditPiece.width) / -2;
+      LT.Piece.editor.yOff.value = 0 - (obj.height - LT.selectedEditPiece.height);
     };})(imagesArray[i]);
   }
 };
@@ -119,45 +95,45 @@ LT.createPiece = function () {
   LT.ajaxRequest("POST", "php/create_piece.php", {
     table_id : LT.currentTable.id, 
     image_id : LT.selectedPieceImage,
-    user_id : LT.users[LT.cPForm.userSelect.value].id,
-    name : LT.cPForm.pName.value,
-    x : LT.cPForm.x.value,
-    y : LT.cPForm.y.value, 
-    x_offset : LT.cPForm.xOff.value,
-    y_offset : LT.cPForm.yOff.value,
-    height : LT.cPForm.hInput.value,
-    width : LT.cPForm.wInput.value,
+    user_id : LT.users[LT.Piece.creator.userSelect.value].id,
+    name : LT.Piece.creator.pName.value,
+    x : LT.Piece.creator.x.value,
+    y : LT.Piece.creator.y.value, 
+    x_offset : LT.Piece.creator.xOff.value,
+    y_offset : LT.Piece.creator.yOff.value,
+    height : LT.Piece.creator.hInput.value,
+    width : LT.Piece.creator.wInput.value,
   });
   LT.loadPieces();
 }
 
 LT.populateEditPiecesTab = function () {
-  LT.ePForm = LT.element('form', { }, LT.editPiecesTab.header);
-  var userDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.ePForm, 'Owner: ');
-  LT.ePForm.userSelect = LT.element('select', { size : 1, name : 'userSelect', 
-    style : 'width: 90px;' }, userDiv);
-  var nameDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.ePForm, 'Name: ');
-  LT.ePForm.pName = LT.element('input', { size : 10, type: 'text',
-     }, nameDiv, 'Piece Name', 1);
-  var hDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.ePForm, 'Height: ');
-  LT.ePForm.hInput = LT.element('input', { size : 1 }, hDiv, '0', 1);  
-  var wDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.ePForm, 'Width: ');
-  LT.ePForm.wInput = LT.element('input', { size : 1 }, wDiv, '0', 1);
-  var yDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.ePForm, 'Y Pos: ');
-  LT.ePForm.y = LT.element('input', { size : 1 }, yDiv, '0', 1);
-  var xDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.ePForm, 'X Pos: ');
-  LT.ePForm.x = LT.element('input', { size : 1 }, xDiv, '0', 1);
-  var hOffDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.ePForm, 'Height Offset: ');
-  LT.ePForm.yOff = LT.element('input', { size : 1 }, hOffDiv, '0', 1);  
-  var wOffDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.ePForm, 'Width Offset: ');
-  LT.ePForm.xOff = LT.element('input', { size : 1 }, wOffDiv, '0', 1);
+  var form = LT.element('form', { }, LT.editPiecesTab.header);
+  LT.Piece.editor = {
+    userSelect: LT.element('select', { size : 1, name : 'userSelect', style : 'width: 90px;' },
+      LT.element('div', { 'class' : 'inputDiv' }, form, 'Owner: ')),
+    pName: LT.element('input', { size : 10, type: 'text'},
+      LT.element('div', { 'class' : 'inputDiv' }, form, 'Name: '), 'Piece Name', true), 
+    hInput: LT.element('input', { size : 1 },
+      LT.element('div', { 'class' : 'inputDiv' }, form, 'Height: '), '0', true), 
+    wInput: LT.element('input', { size : 1 },
+      LT.element('div', { 'class' : 'inputDiv' }, form, 'Width: '), '0', true), 
+    y: LT.element('input', { size : 1 },
+      LT.element('div', { 'class' : 'inputDiv' }, form, 'Y Pos: '), '0', true), 
+    x: LT.element('input', { size : 1 },
+      LT.element('div', { 'class' : 'inputDiv' }, form, 'X Pos: '), '0', true), 
+    yOff: LT.element('input', { size : 1 },
+      LT.element('div', { 'class' : 'inputDiv' }, form, 'Height Offset: '), '0', true), 
+    xOff: LT.element('input', { size : 1 },
+      LT.element('div', { 'class' : 'inputDiv' }, form, 'Width Offset: '), '0', true), 
+  }
   pSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
-        id : 'chatSubmit', size : 8, value : 'Apply Changes' }, LT.ePForm);
+        id : 'chatSubmit', size : 8, value : 'Apply Changes' }, form);
   pSubmit.onclick = function () {
     LT.selectedEditPiece.edit();
   };
   pRemove = LT.element('input', { type : 'button', style : 'cursor: pointer', 
-        id : 'chatSubmit', size : 8, value : 'Delete Piece' }, LT.ePForm);
+        id : 'chatSubmit', size : 8, value : 'Delete Piece' }, form);
   pRemove.onclick = function () {
     var confirmDel =  confirm('Are you sure you want to delete '
       + LT.selectedEditPiece.name + '?');
@@ -169,27 +145,27 @@ LT.populateEditPiecesTab = function () {
 }
 
 LT.populateCreatePiecesTab = function () {
-  LT.cPForm = LT.element('form', { }, LT.createPiecesTab.header);
-  var userDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.cPForm, 'Owner: ');
-  LT.cPForm.userSelect = LT.element('select', { size : 1, name : 'userSelect', 
-    style : 'width: 90px;' }, userDiv);
-  var nameDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.cPForm, 'Name: ');
-  LT.cPForm.pName = LT.element('input', { size : 10, type: 'text',
-     }, nameDiv, 'Piece Name', 1);
-  var hDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.cPForm, 'Height: ');
-  LT.cPForm.hInput = LT.element('input', { size : 1 }, hDiv, '0', 1);  
-  var wDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.cPForm, 'Width: ');
-  LT.cPForm.wInput = LT.element('input', { size : 1 }, wDiv, '0', 1);
-  var yDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.cPForm, 'Y Pos: ');
-  LT.cPForm.y = LT.element('input', { size : 1 }, yDiv, '0', 1);
-  var xDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.cPForm, 'X Pos: ');
-  LT.cPForm.x = LT.element('input', { size : 1 }, xDiv, '0', 1);
-  var hOffDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.cPForm, 'Height Offset: ');
-  LT.cPForm.yOff = LT.element('input', { size : 1 }, hOffDiv, '0', 1);  
-  var wOffDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.cPForm, 'Width Offset: ');
-  LT.cPForm.xOff = LT.element('input', { size : 1 }, wOffDiv, '0', 1);
+  var form = LT.element('form', { }, LT.createPiecesTab.header);
+  LT.Piece.creator = {
+    userSelect: LT.element('select', { size : 1, name : 'userSelect',  style : 'width: 90px;' },
+      LT.element('div', { 'class' : 'inputDiv' }, form, 'Owner: ')),
+    pName: LT.element('input', { size : 10, type: 'text'},
+      LT.element('div', { 'class' : 'inputDiv' }, form, 'Name: '), 'Piece Name', true), 
+    hInput: LT.element('input', { size : 1 }, 
+      LT.element('div', { 'class' : 'inputDiv' }, form, 'Height: '), '0', true), 
+    wInput: LT.element('input', { size : 1 },
+      LT.element('div', { 'class' : 'inputDiv' }, form, 'Width: '), '0', true), 
+    y: LT.element('input', { size : 1 },
+      LT.element('div', { 'class' : 'inputDiv' }, form, 'Y Pos: '), '0', true), 
+    x: LT.element('input', { size : 1 },
+      LT.element('div', { 'class' : 'inputDiv' }, form, 'X Pos: '), '0', true), 
+    yOff: LT.element('input', { size : 1 },
+      LT.element('div', { 'class' : 'inputDiv' }, form, 'Height Offset: '), '0', true), 
+    xOff: LT.element('input', { size : 1 },
+      LT.element('div', { 'class' : 'inputDiv' }, form, 'Width Offset: '), '0', true), 
+  }
   pSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
-        id : 'chatSubmit', size : 8, value : 'Create' }, LT.cPForm);
+        id : 'chatSubmit', size : 8, value : 'Create' }, form);
   pSubmit.onclick = function () { LT.createPiece(); };
   LT.element('div', { 'class' : 'clearBoth' }, LT.createPiecesTab.header);
   LT.createPieceImageDiv = LT.element('div', { 'style' : 'clear: both; overflow: none;' },

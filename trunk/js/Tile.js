@@ -14,6 +14,20 @@ LT.Tile = function (tableID, x, y, tileCode) {
 LT.Tile.PROPERTIES = ["fog", "image_id", "x", "y", "table_id"];
 LT.Tile.dragging = 0;
 LT.Tile.toggleFogValue = 1;
+LT.Tile.images
+
+// STATIC FUNCTIONS
+LT.Tile.readImages = function () {
+  var request = LT.ajaxRequest("POST", "php/read_images.php", {'type' : 'tile'});
+  if (request.responseXML) {
+    var imageElements = request.responseXML.getElementsByTagName('image');
+    LT.Tile.images = {};
+    for (var i = 0 ; i < imageElements.length; i++) {
+      var image = new LT.Image(imageElements[i]);
+      LT.Tile.images[image.id] = image;
+    }
+  }
+};
 
 // METHODS OF TILE OBJECTS
 LT.Tile.prototype = {
@@ -59,7 +73,7 @@ LT.Tile.prototype = {
     }
     // if the tile is not empty, create a new image
     if (this.image_id != -1) {
-      var image = LT.tileImages[this.image_id];
+      var image = LT.Tile.images[this.image_id];
       var table = LT.currentTable;
       // scaling factors = current table scale / original image scale
       var xScale = table.tile_width /  image.tile_width;
