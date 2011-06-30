@@ -16,11 +16,74 @@ LT.Piece = function (element) {
     var statValue = decodeURIComponent(statNodes[j].textContent);
     this.stats[statName] = statValue;
   }
+  this.element = LT.element('div', {style : 'position: absolute; '
+    + 'height: ' + this.height + 'px; ' + 'width: ' + this.width + 'px; '
+    + 'left: ' + this.x + 'px; ' + 'top: ' + this.y + 'px; '}, LT.pieceLayer);
+  var imageSource = LT.pieceImages[this.image_id];
+  this.image = LT.element('img', {style:
+    'margin-top: ' + this.y_offset + 'px; margin-left: ' + this.x_offset + 'px;',
+    src : 'images/upload/piece/' + imageSource.file}, this.element);
+  this.mover = LT.element('div', {
+    title : this.name,
+    style : 'position: absolute; opacity: 0.8; '
+    + 'height: ' + imageSource.height + 'px; width: ' + imageSource.width + 'px; '
+    + 'left: ' + this.x + 'px; top: ' + this.y + 'px; '
+    + 'margin-left: ' + this.x_offset + 'px; margin-top: ' + this.y_offset + 'px; '
+    }, LT.clickPieceLayer);
+  if (LT.Piece.selected && this.id == LT.Piece.selected.id) {
+    this.mover.style.border = '1px dashed black';
+    this.mover.style.margin = (this.y_offset -1) + 'px 0px 0px '
+      + (this.x_offset -1) + 'px';
+  }
+  if (LT.currentUser.id == LT.currentTable.user_id
+   || LT.currentUser.id == this.user_id
+   || LT.currentUser.permissions == 'administrator') {
+    var self = this;
+    this.mover.onmousedown = function () {
+      LT.Piece.selected = self;
+      for (i = 0; i < LT.pieces.length; i++) {
+        LT.pieces[i].mover.style.border = '0px';
+        LT.pieces[i].mover.style.margin =  LT.pieces[i].y_offset + 'px 0px 0px '
+          + LT.pieces[i].x_offset + 'px';
+      }
+      self.element.style.background = '#FFF';
+      self.mover.style.border = '1px dashed black';
+      self.mover.style.margin = (self.y_offset -1) + 'px 0px 0px '
+        + (self.x_offset -1) + 'px';
+      LT.Piece.moving = true;
+      return false; 
+    };
+    this.mover.onmouseover = function () { 
+      self.element.style.background = '#FFF';
+      return false;
+    };
+    this.mover.onmouseout = function () { 
+      self.element.style.background = '';
+      return false;
+    };
+  }
+
 };
 
 // GLOBAL VARIABLES
 LT.Piece.PROPERTIES = ["id", "user_id", "image_id", "table_id", "name", 
   "x", "y", "x_offset", "y_offset", "height", "width", "color"];
+LT.Piece.placing = false;
+LT.Piece.moving = false;
+LT.Piece.selected = null;
+
+// STATIC FUNCTIONS
+LT.Piece.stopDragging = function () {
+  if (LT.Piece.moving) {
+    LT.Piece.selected.place();
+    LT.Piece.moving = false;
+  }
+};
+LT.Piece.drag = function () {
+  if (LT.Piece.moving) {
+    LT.Piece.selected.move();
+  }
+};
 
 // METHODS OF PIECE OBJECTS
 LT.Piece.prototype = {
@@ -133,6 +196,77 @@ LT.Piece.prototype = {
     return document.createTextNode(this.name);
   },
 
-}
+
+  place: function () {
+    // was LT.getEditPiece()
+    LT.selectedEditPiece = this;
+    for (i = 0; i < LT.ePForm.userSelect.childNodes.length; i++) {
+      var option = LT.ePForm.userSelect.childNodes[i];
+      option.removeAttribute('selected');
+    }
+    for (i = 0; i < LT.ePForm.userSelect.childNodes.length; i++) {
+      var option = LT.ePForm.userSelect.childNodes[i];
+      if (LT.users[option.value].id == this.user_id) {
+        option.setAttribute('selected', 'select');
+      }
+    }
+    LT.ePForm.pName.value = this.name;
+    LT.ePForm.x.value = this.x;
+    LT.ePForm.y.value = this.y;
+    LT.ePForm.xOff.value = this.x_offset;
+    LT.ePForm.yOff.value = this.y_offset;
+    LT.ePForm.wInput.value = this.width;
+    LT.ePForm.hInput.value = this.height;
+
+    // was LT.placePiece()
+    this.x = parseInt(this.element.style.left);
+    this.y = parseInt(this.element.style.top);
+    this.update({});
+  },
+
+  move: function () {
+    // was LT.movePiece()
+    var w = parseInt(this.element.style.width);
+    var h = parseInt(this.element.style.height);
+    if (LT.clickDragGap == 0) {
+      LT.clickX = LT.dragX - parseInt(this.element.style.left);
+      LT.clickY = LT.dragY - parseInt(this.element.style.top);
+      LT.clickDragGap = 1;
+    }
+    var tableHeight = parseInt(LT.tableTop.style.height);
+    var tableWidth = parseInt(LT.tableTop.style.width);
+    LT.dragX = Math.min(LT.dragX - LT.clickX, tableWidth - w);
+    LT.dragY = Math.min(LT.dragY - LT.clickY, tableHeight - h);
+    LT.dragX = Math.max(LT.dragX, 0);
+    LT.dragY = Math.max(LT.dragY, 0);
+    if (LT.currentTable.tile_height) {
+      var tileH = LT.currentTable.tile_height;
+      var tileW = LT.currentTable.tile_width;
+      LT.dragY = LT.dragY - (LT.dragY % tileH);
+      LT.dragX = LT.dragX - (LT.dragX % tileW);
+    }
+    this.element.style.top  = LT.dragY + "px";
+    this.element.style.left = LT.dragX + "px";
+//    this.image.style.top  = LT.dragY + "px";
+//    this.image.style.left = LT.dragX + "px";
+    this.mover.style.top  = LT.dragY + "px";
+    this.mover.style.left = LT.dragX + "px";
+  },
+
+  edit: function () {
+    // was LT.editPieceHandler()
+    this.user_id = LT.users[LT.ePForm.userSelect.value].id;
+    this.image_id = LT.selectedEditPiece.image_id;
+    this.name = LT.ePForm.pName.value;
+    this.x = LT.ePForm.x.value;
+    this.y = LT.ePForm.y.value
+    this.x_offset = LT.ePForm.xOff.value;
+    this.y_offset = LT.ePForm.yOff.value;
+    this.width = LT.ePForm.wInput.value;
+    this.height = LT.ePForm.hInput.value;
+    this.update({});
+  },
+
+};
 
 

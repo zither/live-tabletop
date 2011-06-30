@@ -58,8 +58,8 @@ LT.element = function(elementType, attributes, parentElement, text, clears) {
   }
   if(clears) { 
     item.onfocus = function(){ 
-	  if( item.value == text ){ this.value = ""; }
-	}
+      if( item.value == text ){ this.value = ""; }
+    }
   }
   return item
 }
@@ -69,7 +69,7 @@ LT.textInput = function(attributes, parentElement, text){
   //if(text){attributes.type = 'text';}
   
   item.onfocus = function(){ 
-	if( item.value == text ){ this.value = ""; }
+    if( item.value == text ){ this.value = ""; }
   }
 
 }
@@ -122,16 +122,16 @@ LT.ajaxRequest = function(method, url, args, callback) {
 LT.sortObject = function (map, sortBy){
   sortedArray = [];
   for(id in map){
-	sortedArray.push(map[id]);
+    sortedArray.push(map[id]);
   }
   sortedArray.sort( function (a,b){ 
     if( a[sortBy] > b[sortBy] ){
-	  return 1;
+      return 1;
     }else if( a[sortBy] == b[sortBy] ){
-	  return 0;
-	}else{
+      return 0;
+    }else{
       return -1;
-	}
+    }
   } );
   return sortedArray;
 }
@@ -154,11 +154,7 @@ document.onmouseup = function () {
   LT.Panel.stopDragging();
   LT.clickDragGap = 0;
   LT.Tile.dragging = 0;
-  if (LT.placingPiece) {
-	LT.getEditPiece(LT.selectedPiece);
-    LT.placePiece(LT.selectedPiece);
-	LT.placingPiece = 0;
-  }
+  LT.Piece.stopDragging();
   LT.Panel.saveCookie();
 }
 document.onmousedown = function () {
@@ -176,9 +172,7 @@ document.onmousemove = function (e) {
     LT.dragX = e.pageX;
     LT.dragY = e.pageY;
   }
-  if (LT.isPieceMoving) {
-    LT.movePiece();
-  }
+  LT.Piece.drag();
   LT.Panel.drag();
   e.preventDefault();
   return false;
@@ -191,18 +185,18 @@ LT.checkTimestamps = function () {
     LT.ajaxRequest("POST", "php/read_table.php", args, function (ajax) {
       var tableResponse = ajax.responseXML.getElementsByTagName("table");
       var table = new LT.Table(tableResponse[0]);
-	  if (cT.piece_stamp < table.piece_stamp) {
-	    cT.piece_stamp = table.piece_stamp;
-		LT.loadPieces();
-	  }
-	  if (cT.tile_stamp < table.tile_stamp) {
-	    cT.tile_stamp = table.tile_stamp;
-		LT.readTiles();
-	  }
-	  if (cT.message_stamp < table.message_stamp) {
-	    cT.message_stamp = table.message_stamp;
-		LT.refreshMessageList();
-	  }
+      if (cT.piece_stamp < table.piece_stamp) {
+        cT.piece_stamp = table.piece_stamp;
+        LT.loadPieces();
+      }
+      if (cT.tile_stamp < table.tile_stamp) {
+        cT.tile_stamp = table.tile_stamp;
+        LT.readTiles();
+      }
+      if (cT.message_stamp < table.message_stamp) {
+        cT.message_stamp = table.message_stamp;
+        LT.refreshMessageList();
+      }
     });
   }
 }

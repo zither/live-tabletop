@@ -108,7 +108,6 @@ LT.Panel.prototype = {
 
   // Create a tab
   makeTab: function (name, tabAction) {
-    // FIXME: magic number (color)
     var isActive = 'activeTab';
     if (this.tabs.length > 0){
       isActive = 'inactiveTab';
@@ -131,6 +130,7 @@ LT.Panel.prototype = {
       LT.Panel.saveCookie();
       return false;
     }
+    return this.tabs[tabNumber];
   },
 
   // Select a tab
