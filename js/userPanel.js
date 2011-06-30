@@ -55,18 +55,18 @@ populateUserEditTab = function () {
 
 LT.refreshUsersList = function () {
   LT.fill(LT.uL.userSelect)
-  LT.fill(LT.cPForm.userSelect)
-  LT.fill(LT.ePForm.userSelect)
+  LT.fill(LT.Piece.creator.userSelect)
+  LT.fill(LT.Piece.editor.userSelect)
   for ( i = 0; i < LT.users.length; i++) {
     var option = LT.element('option', {value : i}, LT.uL.userSelect,
       LT.users[i].name);
 	option.onclick = function() {selectOption(LT.uL.userSelect.value);};
-    var cPOption = LT.element('option', {value : i}, LT.cPForm.userSelect,
+    var cPOption = LT.element('option', {value : i}, LT.Piece.creator.userSelect,
       LT.users[i].name);
 	if ( LT.users[i].id == LT.currentUser.id ) {
 	    cPOption.setAttribute('selected', 'select');
 	}
-    LT.element('option', {value : i}, LT.ePForm.userSelect,
+    LT.element('option', {value : i}, LT.Piece.editor.userSelect,
       LT.users[i].name);
   }
   LT.uL.nameInput.value = LT.users[LT.uL.userSelect.value].name;

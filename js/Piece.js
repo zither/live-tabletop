@@ -19,7 +19,7 @@ LT.Piece = function (element) {
   this.element = LT.element('div', {style : 'position: absolute; '
     + 'height: ' + this.height + 'px; ' + 'width: ' + this.width + 'px; '
     + 'left: ' + this.x + 'px; ' + 'top: ' + this.y + 'px; '}, LT.pieceLayer);
-  var imageSource = LT.pieceImages[this.image_id];
+  var imageSource = LT.Piece.images[this.image_id];
   this.image = LT.element('img', {style:
     'margin-top: ' + this.y_offset + 'px; margin-left: ' + this.x_offset + 'px;',
     src : 'images/upload/piece/' + imageSource.file}, this.element);
@@ -71,6 +71,10 @@ LT.Piece.PROPERTIES = ["id", "user_id", "image_id", "table_id", "name",
 LT.Piece.placing = false;
 LT.Piece.moving = false;
 LT.Piece.selected = null;
+LT.Piece.images = {};
+LT.Piece.editor = {};
+LT.Piece.creator = {};
+
 
 // STATIC FUNCTIONS
 LT.Piece.stopDragging = function () {
@@ -82,6 +86,17 @@ LT.Piece.stopDragging = function () {
 LT.Piece.drag = function () {
   if (LT.Piece.moving) {
     LT.Piece.selected.move();
+  }
+};
+LT.Piece.readImages = function () {
+  var request = LT.ajaxRequest("POST", "php/read_images.php", {'type' : 'piece'});
+  if (request.responseXML) {
+    var imageElements = request.responseXML.getElementsByTagName('image');
+    LT.Piece.images = {};
+    for (var i = 0 ; i < imageElements.length; i++) {
+      var image = new LT.Image(imageElements[i]);
+      LT.Piece.images[image.id] = image;
+    }
   }
 };
 
@@ -200,23 +215,23 @@ LT.Piece.prototype = {
   place: function () {
     // was LT.getEditPiece()
     LT.selectedEditPiece = this;
-    for (i = 0; i < LT.ePForm.userSelect.childNodes.length; i++) {
-      var option = LT.ePForm.userSelect.childNodes[i];
+    for (i = 0; i < LT.Piece.editor.userSelect.childNodes.length; i++) {
+      var option = LT.Piece.editor.userSelect.childNodes[i];
       option.removeAttribute('selected');
     }
-    for (i = 0; i < LT.ePForm.userSelect.childNodes.length; i++) {
-      var option = LT.ePForm.userSelect.childNodes[i];
+    for (i = 0; i < LT.Piece.editor.userSelect.childNodes.length; i++) {
+      var option = LT.Piece.editor.userSelect.childNodes[i];
       if (LT.users[option.value].id == this.user_id) {
         option.setAttribute('selected', 'select');
       }
     }
-    LT.ePForm.pName.value = this.name;
-    LT.ePForm.x.value = this.x;
-    LT.ePForm.y.value = this.y;
-    LT.ePForm.xOff.value = this.x_offset;
-    LT.ePForm.yOff.value = this.y_offset;
-    LT.ePForm.wInput.value = this.width;
-    LT.ePForm.hInput.value = this.height;
+    LT.Piece.editor.pName.value = this.name;
+    LT.Piece.editor.x.value = this.x;
+    LT.Piece.editor.y.value = this.y;
+    LT.Piece.editor.xOff.value = this.x_offset;
+    LT.Piece.editor.yOff.value = this.y_offset;
+    LT.Piece.editor.wInput.value = this.width;
+    LT.Piece.editor.hInput.value = this.height;
 
     // was LT.placePiece()
     this.x = parseInt(this.element.style.left);
@@ -255,15 +270,15 @@ LT.Piece.prototype = {
 
   edit: function () {
     // was LT.editPieceHandler()
-    this.user_id = LT.users[LT.ePForm.userSelect.value].id;
+    this.user_id = LT.users[LT.Piece.editor.userSelect.value].id;
     this.image_id = LT.selectedEditPiece.image_id;
-    this.name = LT.ePForm.pName.value;
-    this.x = LT.ePForm.x.value;
-    this.y = LT.ePForm.y.value
-    this.x_offset = LT.ePForm.xOff.value;
-    this.y_offset = LT.ePForm.yOff.value;
-    this.width = LT.ePForm.wInput.value;
-    this.height = LT.ePForm.hInput.value;
+    this.name = LT.Piece.editor.pName.value;
+    this.x = LT.Piece.editor.x.value;
+    this.y = LT.Piece.editor.y.value
+    this.x_offset = LT.Piece.editor.xOff.value;
+    this.y_offset = LT.Piece.editor.yOff.value;
+    this.width = LT.Piece.editor.wInput.value;
+    this.height = LT.Piece.editor.hInput.value;
     this.update({});
   },
 

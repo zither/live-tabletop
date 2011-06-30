@@ -45,36 +45,27 @@ but no parentElement, you must create and insert the text node yourself.
 If you want the element inserted at the end of the page, use document.body
 as the parentElement.
 */
-LT.element = function(elementType, attributes, parentElement, text, clears) {
+LT.element = function (elementType, attributes, parentElement, text, clears) {
   var item = document.createElement(elementType);
-  for(var attributeName in attributes){
+  for (var attributeName in attributes) {
     item.setAttribute(attributeName, attributes[attributeName]);
   }
-  if(parentElement){ parentElement.appendChild(item); }
-  if( elementType == 'input' ){
-    if(text){ item.setAttribute('value', text); }  
-  }else{
-    if(text){ item.appendChild(document.createTextNode(text)); }
+  if (parentElement) parentElement.appendChild(item);
+  if (text) {
+    if (elementType == 'input') item.setAttribute('value', text);
+    else item.appendChild(document.createTextNode(text));
   }
-  if(clears) { 
-    item.onfocus = function(){ 
-      if( item.value == text ){ this.value = ""; }
-    }
+  if (clears) item.onfocus = function () {
+    if (item.value == text) this.value = "";
   }
   return item
 }
 
-LT.textInput = function(attributes, parentElement, text){
-  var item = LT.element('input', attributes, parentElement, text);
-  //if(text){attributes.type = 'text';}
-  
-  item.onfocus = function(){ 
-    if( item.value == text ){ this.value = ""; }
-  }
-
+LT.textInput = function (attributes, parentElement, text) {
+  var item = LT.element('input', attributes, parentElement, text, true);
 }
 
-LT.ajaxRequest = function(method, url, args, callback) {
+LT.ajaxRequest = function (method, url, args, callback) {
 
   var ajax = new XMLHttpRequest();
 
@@ -119,29 +110,29 @@ LT.ajaxRequest = function(method, url, args, callback) {
 }
 
 // Creates an array from an object
-LT.sortObject = function (map, sortBy){
+LT.sortObject = function (map, sortBy) {
   sortedArray = [];
-  for(id in map){
+  for (id in map) {
     sortedArray.push(map[id]);
   }
-  sortedArray.sort( function (a,b){ 
-    if( a[sortBy] > b[sortBy] ){
+  sortedArray.sort(function (a,b) { 
+    if (a[sortBy] > b[sortBy]) {
       return 1;
-    }else if( a[sortBy] == b[sortBy] ){
+    }else if (a[sortBy] == b[sortBy]) {
       return 0;
-    }else{
+    } else {
       return -1;
     }
-  } );
+  });
   return sortedArray;
 }
 
 // Clears parent element and adds child
-LT.fill = function (pObject, cObject){
-  while(pObject.firstChild){
+LT.fill = function (pObject, cObject) {
+  while(pObject.firstChild) {
     pObject.removeChild(pObject.firstChild);
   }
-  if (cObject){
+  if (cObject) {
     pObject.appendChild(cObject);
   }
 }

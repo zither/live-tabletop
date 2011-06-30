@@ -83,8 +83,8 @@ LT.loadTable = function (table) {
       LT.readTiles();
       LT.loadPieces();
       document.cookie = 'table=' + LT.currentTable.id + ';';
-      LT.cPForm.wInput.setAttribute('value', LT.currentTable.tile_width);
-      LT.cPForm.hInput.setAttribute('value', LT.currentTable.tile_height);
+      LT.Piece.creator.wInput.setAttribute('value', LT.currentTable.tile_width);
+      LT.Piece.creator.hInput.setAttribute('value', LT.currentTable.tile_height);
 	
       var eTF = LT.editTablesForm
       var cT = LT.currentTable
@@ -116,8 +116,8 @@ LT.loadTable = function (table) {
 }
 LT.refreshTables = function () {
   LT.readTables();
-  LT.readTileImages();
-  LT.readPieceImages();
+  LT.Tile.readImages();
+  LT.Piece.readImages();
   LT.fill(LT.tablesDiv);
   for( var i = 0 ; i < LT.tables.length; i++ ){	
     tableEntry = LT.element('div', { 'style' : 'clear: both;' }, LT.tablesDiv, ' ')
