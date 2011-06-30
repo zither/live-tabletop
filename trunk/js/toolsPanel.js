@@ -25,37 +25,46 @@ LT.readPieceImages = function(){
 LT.loadSwatches = function (){
   LT.selectedImageID = -1;
   LT.selectedImage = '';
-  LT.fill(LT.tilesTab.content);
+  LT.fill(LT.toolsTab.header);
+  LT.fill(LT.toolsTab.content);
   var eraser = LT.element('div', { style :
-    'float : left; border : 1px solid black; margin : 1px 1px 1px 1px; height : 40px; width: 40px;',},
-     LT.tilesTab.header, 'erase');
+    'float : left; border : 1px solid black; margin : 1px 1px 1px 1px; height : 30px; width: 38px;',},
+     LT.toolsTab.header, 'erase');
   eraser.onclick = function() {
 	LT.selectedImageID = -1;
     LT.brush = "tile";
 	LT.selectedImage = '';
 	LT.bringForward(LT.clickTileLayer);
   }
-  var eraser = LT.element('div', { style :
-    'float : left; border : 1px solid black; margin : 1px 1px 1px 1px; height : 40px; width: 40px;',},
-     LT.tilesTab.header, 'fog');
-  eraser.onclick = function() {
+  var fogTool = LT.element('div', { style :
+    'float : left; border : 1px solid black; margin : 1px 1px 1px 1px; height : 30px; width: 25px;',},
+     LT.toolsTab.header, 'fog');
+  fogTool.onclick = function() {
     LT.brush = "fog";
 	LT.bringForward(LT.clickTileLayer);
   }
-  var eraser = LT.element('div', { style :
-    'float : left; border : 1px solid black; margin : 1px 1px 1px 1px; height : 40px; width: 40px;',},
-     LT.tilesTab.header, 'wall');
-  eraser.onclick = function() {
+  var wallTool = LT.element('div', { style :
+    'float : left; border : 1px solid black; margin : 1px 1px 1px 1px; height : 30px; width: 25px;',},
+     LT.toolsTab.header, 'wall');
+  wallTool.onclick = function() {
     LT.brush = "wall";
 	LT.bringForward(LT.clickWallLayer);
   }
-  LT.element('div', { 'class' : 'clearBoth' }, LT.tilesTab.header);
+  var pieceTool = LT.element('div', { style :
+    'float : left; border : 1px solid black; margin : 1px 1px 1px 1px; height : 30px; width: 35px;',},
+     LT.toolsTab.header, 'piece');
+  pieceTool.onclick = function() {
+    LT.brush = "piece";
+	LT.bringForward(LT.clickPieceLayer);
+  }
+  
+  LT.element('div', { 'class' : 'clearBoth' }, LT.toolsTab.header);
   
   var imagesArray = LT.sortObject(LT.tileImages, 'file');
   for( var i = 0 ; i < imagesArray.length; i++ ){
     var newImage = LT.element('img', { title : imagesArray[i].file, 
 	  'class' : 'swatch', 
-	  src : 'images/upload/tile/' + imagesArray[i].file}, LT.tilesTab.content);
+	  src : 'images/upload/tile/' + imagesArray[i].file}, LT.toolsTab.content);
 	newImage.id = imagesArray[i].id;
 	newImage.file = imagesArray[i].file;
 	newImage.onclick = function() {
@@ -297,20 +306,13 @@ LT.bringForward = function (cObject) {
   LT.clickLayers.appendChild(cObject);
 }
 LT.createToolsPanel = function () {
-  LT.toolsPanel = new LT.Panel( 'Tools', 'Tools', 6, 49, 140, 180);
-  LT.toolsPanel.makeTab('Add Piece', function () {
-    LT.bringForward(LT.clickPieceLayer);
-  });
-  LT.toolsPanel.makeTab('Edit Piece', function () {
-    LT.bringForward(LT.clickPieceLayer);
-  });
-  LT.toolsPanel.makeTab('Tiles', function () {
-    LT.bringForward(LT.clickTileLayer);
-    LT.brush = "tile";
-  });
-  LT.editPiecesTab = LT.toolsPanel.tabs[1];
+  LT.toolsPanel = new LT.Panel( 'Pieces', 'Pieces', 6, 49, 140, 180);
+  LT.toolsPanel.makeTab('Create');
   LT.createPiecesTab = LT.toolsPanel.tabs[0];
-  LT.tilesTab = LT.toolsPanel.tabs[2];
+  LT.toolsPanel.makeTab('Settings');
+  LT.editPiecesTab = LT.toolsPanel.tabs[1];
+  LT.toolsPanel.makeTab('Stats');
+  LT.statsPiecesTab = LT.toolsPanel.tabs[2];
   populateEditPiecesTab();
   populateCreatePiecesTab();
   LT.loadPieceImages();
