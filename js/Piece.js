@@ -41,6 +41,7 @@ LT.Piece = function (element) {
     var self = this;
     this.mover.onmousedown = function () {
       LT.Piece.selected = self;
+      LT.Piece.editor.selected = self.image_id;
       for (i = 0; i < LT.pieces.length; i++) {
         LT.pieces[i].mover.style.border = '0px';
         LT.pieces[i].mover.style.margin =  LT.pieces[i].y_offset + 'px 0px 0px '
@@ -214,7 +215,6 @@ LT.Piece.prototype = {
 
   place: function () {
     // was LT.getEditPiece()
-    LT.selectedEditPiece = this;
     for (i = 0; i < LT.Piece.editor.userSelect.childNodes.length; i++) {
       var option = LT.Piece.editor.userSelect.childNodes[i];
       option.removeAttribute('selected');
@@ -262,8 +262,6 @@ LT.Piece.prototype = {
     }
     this.element.style.top  = LT.dragY + "px";
     this.element.style.left = LT.dragX + "px";
-//    this.image.style.top  = LT.dragY + "px";
-//    this.image.style.left = LT.dragX + "px";
     this.mover.style.top  = LT.dragY + "px";
     this.mover.style.left = LT.dragX + "px";
   },
@@ -271,7 +269,7 @@ LT.Piece.prototype = {
   edit: function () {
     // was LT.editPieceHandler()
     this.user_id = LT.users[LT.Piece.editor.userSelect.value].id;
-    this.image_id = LT.selectedEditPiece.image_id;
+    this.image_id = LT.Piece.editor.selected;
     this.name = LT.Piece.editor.pName.value;
     this.x = LT.Piece.editor.x.value;
     this.y = LT.Piece.editor.y.value

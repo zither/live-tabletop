@@ -1,9 +1,9 @@
 LT.loginCheck = function () {
   LT.createLogin();
   LT.createUserPanel();
-  var checkLogin = LT.ajaxRequest("POST", "php/login_check.php",{ });
-  if (checkLogin.responseXML) {
-    LT.login(checkLogin);
+  var request = LT.ajaxRequest("POST", "php/login_check.php",{ });
+  if (request.responseXML) {
+    LT.login(request);
     LT.pageBar.appendChild(LT.userButton);
   } else {
     LT.pageBar.appendChild(LT.loginForm);
@@ -23,24 +23,27 @@ LT.createLogin = function () {
 };
 
 LT.createUser = function () {
-  var createUserAjax = LT.ajaxRequest("POST", "php/create_user.php",
-    { username : LT.inputUserName.value, permissions : 'user', 
-	 password : LT.inputPassword.value});
-}
+  LT.ajaxRequest("POST", "php/create_user.php", {
+    username : LT.inputUserName.value,
+    permissions : 'user', 
+    password : LT.inputPassword.value,
+  });
+};
 
-LT.sendLogin = function (loginName, loginPW) {
-  var loginAjax = LT.ajaxRequest("POST", "php/login.php",
-    { username : loginName, password : loginPW});
-  LT.login(loginAjax);
-}
-LT.login = function (loginAjax) {
-  var userElement = loginAjax.responseXML.getElementsByTagName('user')[0];
+LT.sendLogin = function (loginName, loginPassword) {
+  var request = LT.ajaxRequest("POST", "php/login.php",
+    { username : loginName, password : loginPassword});
+  LT.login(request);
+};
+
+LT.login = function (loginRequest) {
+  var userElement = loginRequest.responseXML.getElementsByTagName('user')[0];
   LT.currentUser = new LT.User(userElement);
-  var readUsers = LT.ajaxRequest("POST", "php/read_users.php",{});
-  if (readUsers.responseXML){
-    var userElements = readUsers.responseXML.getElementsByTagName('user');
+  var request = LT.ajaxRequest("POST", "php/read_users.php",{});
+  if (request.responseXML) {
+    var userElements = request.responseXML.getElementsByTagName('user');
     LT.users = [];
-    for( var i = 0 ; i < userElements.length; i++ ){
+    for (var i = 0 ; i < userElements.length; i++) {
       var user = new LT.User(userElements[i]);
       LT.users.push(user);
     }
@@ -49,23 +52,24 @@ LT.login = function (loginAjax) {
     LT.pageBar.removeChild(LT.loginForm);
     LT.element('div', {id: 'loggedIn'}, LT.userButton);
     var newUsername = document.createTextNode(LT.currentUser.name + "'s options");
-	LT.userPanel.buttonCaption.removeChild(LT.userPanel.buttonCaption.firstChild);
-	LT.userPanel.buttonCaption.appendChild(newUsername);
+    LT.userPanel.buttonCaption.removeChild(LT.userPanel.buttonCaption.firstChild);
+    LT.userPanel.buttonCaption.appendChild(newUsername);
     LT.pageBar.appendChild(LT.userButton);
-	LT.refreshUsersList();
-    if (LT.tableListDiv){ LT.refreshTableList(); }
-	LT.element('div', {'class' : 'chat_alert'}, LT.chatOutput, "You are logged in.");
+    LT.refreshUsersList();
+    if (LT.tableListDiv) LT.refreshTableList();
+    LT.element('div', {'class' : 'chat_alert'}, LT.chatOutput, "You are logged in.");
     LT.chatOutput.removeChild(LT.chatBottom);
     LT.chatOutput.appendChild(LT.chatBottom);
     LT.chatBottom.scrollIntoView(true);
-	LT.refreshTables();
-	LT.loadSwatches();
-	LT.Panel.loadCookie();
-	LT.loadPieceImages();
+    LT.refreshTables();
+    LT.createTools();
+    LT.createPieceImages();
+    LT.Panel.loadCookie();
   } else {
     alert('Incorrect username or password.');
   }
-}
+};
+
 LT.logout = function () {
   LT.ajaxRequest("POST", "php/logout.php", {});
   LT.userPanel.hide();
@@ -75,4 +79,4 @@ LT.logout = function () {
   LT.chatOutput.removeChild(LT.chatBottom);
   LT.chatOutput.appendChild(LT.chatBottom);
   LT.chatBottom.scrollIntoView(true);
-}
+};
