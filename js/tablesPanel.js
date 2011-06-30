@@ -53,16 +53,18 @@ LT.loadTable = function (table) {
     if (LT.currentTable) {
 	  if (LT.currentTable.user_id == LT.currentUser.id 
         || LT.currentUser.permissions == 'administrator') {
-	    LT.toolsPanel.show();
-	    LT.toolsPanel.showButton();
+	    LT.toolsPanel.showTab(0);
+	    LT.toolsPanel.showTab(1);
 	    LT.tablesPanel.showTab(2);
+	    LT.tablesPanel.showTab(3);
 	  } else {
-	    LT.toolsPanel.hide();
-	    LT.toolsPanel.hideButton();
 		if (LT.tablesPanel.currentTab == 2) {
 		  LT.tablesPanel.selectTab(0);
 		}
+	    LT.toolsPanel.hideTab(0);
+	    LT.toolsPanel.hideTab(1);
 	    LT.tablesPanel.hideTab(2);
+	    LT.tablesPanel.hideTab(3);
         LT.bringForward(LT.clickPieceLayer);
 	  }
 	  LT.refreshTables;
@@ -143,8 +145,13 @@ LT.createTablesPanel = function () {
   LT.tablesTab = LT.tablesPanel.tabs[0].content;
   LT.tablesPanel.makeTab('Create');
   LT.createTableTab = LT.tablesPanel.tabs[1].content;
-  LT.tablesPanel.makeTab('Edit');
+  LT.tablesPanel.makeTab('Settings');
   LT.editTableTab = LT.tablesPanel.tabs[2].content;
+  LT.tablesPanel.makeTab('Tools', function () {
+    LT.bringForward(LT.clickPieceLayer);
+    LT.brush = "piece";
+  });
+  LT.toolsTab = LT.tablesPanel.tabs[3];
   LT.tableRefresh = LT.element('input',{ type : 'button' }, LT.tablesTab, 'Refresh');
   LT.tableRefresh.onclick = function() { LT.refreshTables(); };
   LT.tablesDiv = LT.element('div',{}, LT.tablesTab);
@@ -200,7 +207,6 @@ LT.editTable = function () {
   cT.update({});
   LT.loadTable();
 }
-
 
 populateCreateTableTab = function () {
   LT.tableListForm = LT.element('form', { }, LT.createTableTab);

@@ -21,7 +21,7 @@ LT.loadLT = function () {
   LT.refreshMessageList();
   LT.loadTable();
   LT.holdTimestamps = 0;
-  setInterval('LT.checkTimestamps()', 2000);
+  setInterval(LT.checkTimestamps, 2000);
 }
 
 onload = function () {
