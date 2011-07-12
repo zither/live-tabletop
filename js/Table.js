@@ -21,6 +21,22 @@ LT.Table.PROPERTIES = ["id", "user_id", "image_id", "name",
   "grid_thickness", "grid_color", "wall_thickness", "wall_color",
   "piece_stamp", "tile_stamp", "message_stamp", "tile_mode"];
 
+LT.Table.presets = [];
+
+// STATIC FUNCTIONS
+LT.Table.loadPresets = function () {
+  var request = LT.ajaxRequest("GET", "../presets.xml", {});
+  var elements = request.responseXML.getElementsByTagName("preset");
+  for (var i = 0; i < elements.length; i++) {
+    LT.Table.presets.push({
+      name: elements[i].getAttribute("name"),
+      mode: elements[i].getAttribute("mode"),
+      width: parseInt(elements[i].getAttribute("width")),
+      height: parseInt(elements[i].getAttribute("height")),
+    });
+  }
+};
+
 // METHODS OF TABLE OBJECTS
 LT.Table.prototype = {
 
