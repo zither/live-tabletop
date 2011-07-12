@@ -18,6 +18,7 @@ LT.loadLT = function () {
   LT.createTurnsPanel();
   LT.createFilesPanel();
   LT.loginCheck();
+  LT.Table.loadPresets();
   LT.refreshMessageList();
   LT.loadTable();
   LT.holdTimestamps = 0;
