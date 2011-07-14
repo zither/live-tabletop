@@ -177,6 +177,20 @@ LT.Piece.prototype = {
     var args = {piece_id: this.id, name: statName};
     LT.ajaxRequest("POST", "php/delete_stat.php", args, function () {return;});
   },
+  getStatNames: function () {
+    var names = [];
+    for (var statName in this.stats) {
+      names.push(statName);
+    }
+    return names;
+  },
+  getStats: function () {
+    var statObjects = [];
+    for (var statName in this.stats) {
+      statObjects.push({name: statName, value: this.stats[statName]});
+    }
+    return statObjects;
+  },
 
   // GAME-SPECIFIC HOOKS
 
