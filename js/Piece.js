@@ -41,6 +41,7 @@ LT.Piece = function (element) {
     var self = this;
     this.mover.onmousedown = function () {
       LT.Piece.selected = self;
+      LT.Piece.readStats();
       LT.Piece.editor.selected = self.image_id;
       for (i = 0; i < LT.pieces.length; i++) {
         LT.pieces[i].mover.style.border = '0px';

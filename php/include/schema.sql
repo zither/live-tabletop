@@ -558,6 +558,9 @@ END;
 CREATE PROCEDURE set_stat (IN the_piece INT, IN the_name VARCHAR(200), IN the_value TEXT)
 BEGIN
   REPLACE INTO stats (piece_id, name, value) VALUES (the_piece, the_name, the_value);
+  UPDATE tables SET piece_stamp = NOW() WHERE id = (
+    SELECT table_id FROM pieces WHERE id = the_piece
+  );
 END; 
 
 CREATE PROCEDURE get_stats (IN the_piece INT)
