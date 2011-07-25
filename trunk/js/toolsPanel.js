@@ -120,6 +120,35 @@ LT.createPiece = function () {
   LT.loadPieces();
 }
 
+LT.Piece.readStats = function () {
+  LT.fill( LT.Piece.statList );
+  LT.Piece.stats = LT.Piece.selected.getStats();
+  for ( i = 0; i < LT.Piece.stats.length; i++ ) {
+    LT.element('span', {}, LT.Piece.statList, LT.Piece.stats[i].name + ': ');
+    LT.Piece.stats[i].valueInput = LT.element('input', { size : 1 },
+      LT.Piece.statList, LT.Piece.stats[i].value);
+    LT.element('br', {}, LT.Piece.statList);
+  }
+  LT.Piece.statList.submit = LT.element('input', { type : 'button',
+    style : 'cursor: pointer', value : 'Apply Changes' }, LT.Piece.statList);
+  LT.Piece.statList.submit.onclick = function () {
+    LT.Piece.updateStats();
+  };
+}
+
+LT.Piece.updateStats = function () {
+  for( i = 0; i < LT.Piece.stats.length; i++ ){
+    LT.Piece.selected.setStat( LT.Piece.stats[i].name, 
+      LT.Piece.stats[i].valueInput.value);
+    alert(LT.Piece.stats[i].name + ": " + LT.Piece.stats[i].valueInput.value);
+  }
+}
+
+LT.Piece.addStat = function () {
+  LT.Piece.selected.setStat( LT.Piece.statEditor.newStatName.value, 
+    LT.Piece.statEditor.newStatValue.value);
+}
+
 // Brings element to the foreground
 LT.bringForward = function (cObject) {
   LT.fill(LT.clickLayers);
@@ -197,12 +226,17 @@ LT.createToolsPanel = function () {
   LT.createPieceImageDiv = LT.element('div', { 'style' : 'clear: both; overflow: none;' },
     createPiecesTab.content, 'Columns: ');
 
-  // TODO: Populate piece stats tab
-
+  //Populate piece stats tab
+  LT.Piece.statList = LT.element('div', {}, statsPiecesTab.content);
+  
+  var newStatForm = LT.element('div', {}, statsPiecesTab.content);
+  LT.Piece.statEditor = {
+    newStatName: LT.element('input', {size : 2}, newStatForm, 'Stat', true),
+    newStatValue: LT.element('input', {size : 2}, newStatForm, 'Value', true),
+    addStat: LT.element('input', {type : 'button'}, newStatForm, 'Add')
+  }
+  LT.Piece.statEditor.addStat.onclick = function () { LT.Piece.addStat(); };
+  
   // is this redundant? See login.js
   LT.createPieceImages();
-
-  // What does this do?
-  LT.toolsPanel.selectTab(LT.toolsPanel.selectedTab);
 };
-
