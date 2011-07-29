@@ -25,7 +25,7 @@ LT.Table.presets = [];
 
 // STATIC FUNCTIONS
 LT.Table.loadPresets = function () {
-  var request = LT.ajaxRequest("GET", "../presets.xml", {});
+  var request = LT.ajaxRequest("GET", "presets.xml", {});
   var elements = request.responseXML.getElementsByTagName("preset");
   for (var i = 0; i < elements.length; i++) {
     LT.Table.presets.push({
