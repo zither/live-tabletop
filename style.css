@@ -21,6 +21,7 @@ DIV {
 }
 input {
   border: 1px solid #CCC;
+  float: left;
 }
 #pageBar {
   background: url(images/pageBar.jpg) repeat-x left top;
@@ -86,7 +87,6 @@ input {
 }
 
 .buttonEnd {
-  background-image: url(images/buttonEnd.jpg);
   width: 5px;
   height: 22px;
   float: left;
@@ -406,4 +406,11 @@ height: 1px; background: #999; width: auto; clear: both; margin: 1px 0px 4px 0px
 }
 .inputDiv input {
   float: right
+}
+.buttonDiv {
+  float: left;
+  border: 1px solid #CCC;
+}
+.buttonDiv:hover {
+  cursor: pointer;
 }
