@@ -226,20 +226,22 @@ LT.Panel.prototype = {
   // Load this panel's dimensions from a string saved in a cookie
   restoreFromCookieString: function (cookieString) {
     LT.element('div', {'class' : 'clearBoth'}, this.tabBar);
-    var panelShape = cookieString.split(' ');
-    // FIXME: magic numbers
-	if (panelShape[0]) {
-      var width = parseInt(panelShape[2]);
-      this.outside.style.left = panelShape[0] + 'px';
-      this.outside.style.top = panelShape[1] + 'px';
-	  this.setWidth(width);
-      this.content.style.height = panelShape[3] + 'px';
-      this.selectTab(parseInt(panelShape[5]));
-      if (parseInt(panelShape[4]) == 1) {
-        this.show();
-      } else {
-        this.hide();
-	  }
+    if (cookieString) {
+      var panelShape = cookieString.split(' ');
+      // FIXME: magic numbers
+	  if (panelShape[0]) {
+        var width = parseInt(panelShape[2]);
+        this.outside.style.left = panelShape[0] + 'px';
+        this.outside.style.top = panelShape[1] + 'px';
+	    this.setWidth(width);
+        this.content.style.height = panelShape[3] + 'px';
+        this.selectTab(parseInt(panelShape[5]));
+        if (parseInt(panelShape[4]) == 1) {
+          this.show();
+        } else {
+          this.hide();
+	    }
+      }
 	}
   },
 
