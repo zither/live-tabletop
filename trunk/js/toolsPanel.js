@@ -143,6 +143,7 @@ LT.Piece.readStats = function () {
 LT.Piece.deleteStatHandler = function (statName) {
   return function () {
     LT.Piece.selected.deleteStat(statName);
+    LT.Piece.readStats();
   };
 };
 LT.Piece.updateStats = function () {
@@ -150,6 +151,7 @@ LT.Piece.updateStats = function () {
     LT.Piece.selected.setStat( LT.Piece.stats[i].name, 
       LT.Piece.stats[i].valueInput.value);
   }
+  LT.Piece.readStats();
 }
 
 LT.Piece.addStat = function () {
