@@ -250,9 +250,6 @@ LT.createToolsPanel = function () {
     addStat: LT.element('div', {'class' : 'buttonDiv'}, statEditorForm, '+')
   }
   LT.Piece.statEditor.addStat.onclick = function () { LT.Piece.addStat(); };
-  LT.Piece.refreshStatsButton = LT.element('div', 
-    {'class' : 'buttonDiv', style : 'clear: left;'}, LT.Piece.statEditor.form, 'Refresh');
-  LT.Piece.refreshStatsButton.onclick = function () { LT.Piece.readStats(); }; 
   LT.element('div', {'class' : 'clearBoth'}, LT.Piece.statEditor.form); 
   // is this redundant? See login.js
   LT.createPieceImages();
