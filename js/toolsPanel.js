@@ -122,11 +122,16 @@ LT.createPiece = function () {
 
 LT.Piece.readStats = function () {
   LT.fill( LT.Piece.statList );
+  LT.element('div',{'class' : 'separator'}, LT.Piece.statList);  
   LT.Piece.stats = LT.Piece.selected.getStats();
   for ( i = 0; i < LT.Piece.stats.length; i++ ) {
     LT.element('span', {}, LT.Piece.statList, LT.Piece.stats[i].name + ': ');
     LT.Piece.stats[i].valueInput = LT.element('input', { size : 1 },
       LT.Piece.statList, LT.Piece.stats[i].value);
+    LT.Piece.stats[i].deleteButton = LT.element('input', 
+      {type : 'button', style : 'cursor: pointer', value : '-'}, LT.Piece.statList);
+    LT.Piece.stats[i].deleteButton.onclick = 
+      LT.Piece.deleteStatHandler(LT.Piece.stats[i].name);
     LT.element('br', {}, LT.Piece.statList);
   }
   LT.Piece.statList.submit = LT.element('input', { type : 'button',
@@ -135,7 +140,11 @@ LT.Piece.readStats = function () {
     LT.Piece.updateStats();
   };
 }
-
+LT.Piece.deleteStatHandler = function (statName) {
+  return function () {
+    LT.Piece.selected.deleteStat(statName);
+  };
+};
 LT.Piece.updateStats = function () {
   for( i = 0; i < LT.Piece.stats.length; i++ ){
     LT.Piece.selected.setStat( LT.Piece.stats[i].name, 
@@ -228,14 +237,17 @@ LT.createToolsPanel = function () {
   //Populate piece stats tab
   LT.Piece.statList = LT.element('div', {}, statsPiecesTab.content);
   
-  var newStatForm = LT.element('div', {}, statsPiecesTab.content);
+  var newStatForm = LT.element('div', {}, statsPiecesTab.header);
   LT.Piece.statEditor = {
     newStatName: LT.element('input', {size : 2}, newStatForm, 'Stat', true),
     newStatValue: LT.element('input', {size : 2}, newStatForm, 'Value', true),
-    addStat: LT.element('input', {type : 'button'}, newStatForm, 'Add')
+    addStat: LT.element('input', {type : 'button'}, newStatForm, '+')
   }
   LT.Piece.statEditor.addStat.onclick = function () { LT.Piece.addStat(); };
-  
+
+  LT.Piece.refreshStatsButton = LT.element('input', 
+    {type : 'button'}, newStatForm, 'Refresh');
+  LT.Piece.refreshStatsButton.onclick = function () { LT.Piece.readStats(); };
   // is this redundant? See login.js
   LT.createPieceImages();
 };
