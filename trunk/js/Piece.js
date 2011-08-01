@@ -173,10 +173,12 @@ LT.Piece.prototype = {
   setStat: function (statName, newValue) {
     var args = {piece_id: this.id, name: statName, value: newValue};
     LT.ajaxRequest("POST", "php/update_stat.php", args, function () {return;});
+    this.stats[statName] = newValue;
   },
   deleteStat: function (statName) {
     var args = {piece_id: this.id, name: statName};
     LT.ajaxRequest("POST", "php/delete_stat.php", args, function () {return;});
+    delete(this.stats[statName]);
   },
   getStatNames: function () {
     var names = [];

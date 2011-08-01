@@ -140,7 +140,6 @@ LT.Piece.updateStats = function () {
   for( i = 0; i < LT.Piece.stats.length; i++ ){
     LT.Piece.selected.setStat( LT.Piece.stats[i].name, 
       LT.Piece.stats[i].valueInput.value);
-    alert(LT.Piece.stats[i].name + ": " + LT.Piece.stats[i].valueInput.value);
   }
 }
 
