@@ -571,6 +571,9 @@ END;
 CREATE PROCEDURE delete_stat (IN the_piece INT, IN the_name VARCHAR(200))
 BEGIN
   DELETE FROM stats WHERE piece_id = the_piece AND name = the_name;
+  UPDATE tables SET piece_stamp = NOW() WHERE id = (
+    SELECT table_id FROM pieces WHERE id = the_piece
+  );
 END; 
 
 /* Walls Procedures */
