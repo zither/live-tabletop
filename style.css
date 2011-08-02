@@ -409,7 +409,11 @@ height: 1px; background: #999; width: auto; clear: both; margin: 1px 0px 4px 0px
 }
 .buttonDiv {
   float: left;
-  border: 1px solid #CCC;
+  background: #333;
+  border: 1px solid #000;
+  color: #CCC;
+  min-width: 10px;
+  text-align: center;
 }
 .buttonDiv:hover {
   cursor: pointer;

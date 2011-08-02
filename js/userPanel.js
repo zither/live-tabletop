@@ -26,7 +26,7 @@ LT.createUserPanel = function () {
     LT.tablesPanel.refreshPanel();
     LT.chatPanel.refreshPanel();
     LT.turnsPanel.refreshPanel();
-    LT.toolsPanel.refreshPanel();
+    LT.piecesPanel.refreshPanel();
     LT.filesPanel.refreshPanel();
     LT.userPanel.refreshPanel();
   }

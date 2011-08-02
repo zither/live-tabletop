@@ -13,7 +13,7 @@ LT.loadLT = function () {
   LT.buttons = LT.element('div', {id: 'buttons'}, LT.pageBar);
   LT.tables = [];
   LT.createTablesPanel();
-  LT.createToolsPanel();
+  LT.createPiecesPanel();
   LT.createChatPanel();
   LT.createTurnsPanel();
   LT.createFilesPanel();

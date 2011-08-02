@@ -168,11 +168,11 @@ LT.bringForward = function (cObject) {
   LT.clickLayers.appendChild(cObject);
 }
 
-LT.createToolsPanel = function () {
-  LT.toolsPanel = new LT.Panel('Pieces', 'Pieces', 6, 49, 140, 180);
-  var createPiecesTab = LT.toolsPanel.makeTab('Create');
-  var editPiecesTab = LT.toolsPanel.makeTab('Settings');
-  var statsPiecesTab = LT.toolsPanel.makeTab('Stats');
+LT.createPiecesPanel = function () {
+  LT.piecesPanel = new LT.Panel('Pieces', 'Pieces', 6, 49, 140, 180);
+  var createPiecesTab = LT.piecesPanel.makeTab('Create');
+  var editPiecesTab = LT.piecesPanel.makeTab('Settings');
+  var statsPiecesTab = LT.piecesPanel.makeTab('Stats');
 
   // Populate edit pieces tab
   var form = LT.element('form', { }, editPiecesTab.header);

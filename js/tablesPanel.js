@@ -53,16 +53,16 @@ LT.loadTable = function (table) {
     if (LT.currentTable) {
 	  if (LT.currentTable.user_id == LT.currentUser.id 
         || LT.currentUser.permissions == 'administrator') {
-	    LT.toolsPanel.showTab(0);
-	    LT.toolsPanel.showTab(1);
+	    LT.piecesPanel.showTab(0);
+	    LT.piecesPanel.showTab(1);
 	    LT.tablesPanel.showTab(2);
 	    LT.tablesPanel.showTab(3);
 	  } else {
 		if (LT.tablesPanel.currentTab == 2) {
 		  LT.tablesPanel.selectTab(0);
 		}
-	    LT.toolsPanel.hideTab(0);
-	    LT.toolsPanel.hideTab(1);
+	    LT.piecesPanel.hideTab(0);
+	    LT.piecesPanel.hideTab(1);
 	    LT.tablesPanel.hideTab(2);
 	    LT.tablesPanel.hideTab(3);
         LT.bringForward(LT.clickPieceLayer);
