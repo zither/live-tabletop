@@ -27,7 +27,7 @@ LT.refreshMessageList = function () {
     var now = new Date();
     // create an element to contain the timestamp
     // the element's title (mouseover text) is the full date and time
-    var time = LT.element('span', {title: then.toString()}, LT.chatOutput);
+    var time = LT.element('span', {title: then.toString()}, LT.chatPanel.output);
     if (then.toDateString() == now.toDateString()) {
       // if the message is from today, then only show hours and minutes
       time.textContent = "[" + then.getHours() + ":" + then.getMinutes() + "]";
@@ -37,30 +37,30 @@ LT.refreshMessageList = function () {
         + then.getDate() + " " + then.getHours() + ":" + then.getMinutes() + "]";
     }
     // show the user who sent the message
-    LT.element('span', {}, LT.chatOutput, " " + LT.messages[i].userName + ": ");
+    LT.element('span', {}, LT.chatPanel.output, " " + LT.messages[i].userName + ": ");
     // show the content of the message
-    LT.chatOutput.appendChild(LT.messages[i].element);
+    LT.chatPanel.output.appendChild(LT.messages[i].element);
     // start a new line after the message
-	LT.element('br', {}, LT.chatOutput);
+	LT.element('br', {}, LT.chatPanel.output);
   }
   
-  LT.chatOutput.removeChild(LT.chatBottom);
-  LT.chatOutput.appendChild(LT.chatBottom);
+  LT.chatPanel.output.removeChild(LT.chatBottom);
+  LT.chatPanel.output.appendChild(LT.chatBottom);
   LT.chatBottom.scrollIntoView(true);
 };
 
 LT.createChatPanel = function () {
   LT.chatPanel = new LT.Panel( 'Chat', 'Chat', 6, 95, 355, 130);
-  LT.chatForm = LT.element('form', { id : 'chatForm' , style : "" 
-    }, LT.chatPanel.footer);
-  LT.chatOutput = LT.element('div', { id : 'chatOutput' }, LT.chatPanel.content);
-  LT.chatBottom = LT.element('a', {}, LT.chatOutput, " ");
+  LT.chatPanel.form = LT.element('form', {id:'chatForm'}, LT.chatPanel.footer);
+  LT.chatPanel.output = LT.element('div', { id : 'chatOutput' }, LT.chatPanel.content);
+  LT.chatBottom = LT.element('a', {}, LT.chatPanel.output, " ");
   LT.chatInput = LT.element('input', { id : 'chatInput', size : 20, 
-    style : 'border: 1px solid #CCC;'}, LT.chatForm, '-- Write a message. --', 1 );
-  LT.chatSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
-    id : 'chatSubmit', size : 8 }, LT.chatForm, 'Send');
-  LT.chatSubmit.onclick = function() { LT.createMessage(); };
-  LT.chatForm.onsubmit = function() { LT.createMessage(); return false; };
+    style : 'border: 1px solid #CCC;'}, LT.chatPanel.form, '-- Write a message. --', 1 );
+  LT.chatPanel.form.chatSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
+    id : 'chatSubmit', size : 8 }, LT.chatPanel.form, 'Send');
+  LT.chatPanel.form.chatSubmit.onclick = function() { LT.createMessage(); };
+  LT.chatPanel.form.onsubmit = function() { LT.createMessage(); return false; };
+  LT.element('div', {'class':'clearBoth'}, LT.chatPanel.form);
 }
 
 LT.createMessage = function () {

@@ -57,9 +57,9 @@ LT.login = function (loginRequest) {
     LT.pageBar.appendChild(LT.userButton);
     LT.refreshUsersList();
     if (LT.tableListDiv) LT.refreshTableList();
-    LT.element('div', {'class' : 'chat_alert'}, LT.chatOutput, "You are logged in.");
-    LT.chatOutput.removeChild(LT.chatBottom);
-    LT.chatOutput.appendChild(LT.chatBottom);
+    LT.element('div', {'class' : 'chat_alert'}, LT.chatPanel.output, "You are logged in.");
+    LT.chatPanel.output.removeChild(LT.chatBottom);
+    LT.chatPanel.output.appendChild(LT.chatBottom);
     LT.chatBottom.scrollIntoView(true);
     LT.refreshTables();
     LT.createTools();
@@ -75,8 +75,8 @@ LT.logout = function () {
   LT.userPanel.hide();
   LT.pageBar.removeChild(LT.userButton);
   LT.pageBar.appendChild(LT.loginForm);
-  LT.element('div', {'class' : 'chat_alert'}, LT.chatOutput, "You have logged out.");
-  LT.chatOutput.removeChild(LT.chatBottom);
-  LT.chatOutput.appendChild(LT.chatBottom);
+  LT.element('div', {'class' : 'chat_alert'}, LT.chatPanel.output, "You have logged out.");
+  LT.chatPanel.output.removeChild(LT.chatBottom);
+  LT.chatPanel.output.appendChild(LT.chatBottom);
   LT.chatBottom.scrollIntoView(true);
 };
