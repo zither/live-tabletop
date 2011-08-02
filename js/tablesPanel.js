@@ -69,16 +69,16 @@ LT.loadTable = function (table) {
 	  }
 	  LT.refreshTables;
       LT.currentTable.createGrid();
-      LT.element('br', {}, LT.chatOutput);
-      LT.element('div', {'class' : 'chat_alert'}, LT.chatOutput, 
+      LT.element('br', {}, LT.chatPanel.output);
+      LT.element('div', {'class' : 'chat_alert'}, LT.chatPanel.output, 
         "Loading chat log for " + LT.currentTable.name + "...");
       LT.lastMessage = 0;
       LT.refreshMessageList();
-      LT.element('a', {'class' : 'chat_alert'}, LT.chatOutput, 
+      LT.element('a', {'class' : 'chat_alert'}, LT.chatPanel.output, 
         "Arriving at " + LT.currentTable.name);
-      LT.element('br', {}, LT.chatOutput);
-      LT.chatOutput.removeChild(LT.chatBottom);
-      LT.chatOutput.appendChild(LT.chatBottom);
+      LT.element('br', {}, LT.chatPanel.output);
+      LT.chatPanel.output.removeChild(LT.chatBottom);
+      LT.chatPanel.output.appendChild(LT.chatBottom);
       LT.chatBottom.scrollIntoView(true);
       LT.readTiles();
       LT.loadPieces();
