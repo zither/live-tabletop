@@ -347,7 +347,6 @@ LT.Panel.prototype = {
   },
 	
   setWidth: function (newWidth) {
-    //this.outside.style.width = newWidth + "px";
     this.content.style.width = newWidth + "px";
     this.footer.style.width = newWidth + "px";
     this.header.style.width = newWidth + "px";
