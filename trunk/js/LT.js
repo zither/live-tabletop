@@ -56,7 +56,7 @@ LT.element = function (elementType, attributes, parentElement, text, clears) {
     else item.appendChild(document.createTextNode(text));
   }
   if (clears) item.onfocus = function () {
-    if (item.value == text) this.value = "";
+    if (item.value == text) this.select();
   }
   return item
 }
