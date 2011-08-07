@@ -19,7 +19,20 @@ LT.Table = function (element) {
 LT.Table.PROPERTIES = ["id", "user_id", "image_id", "name",
   "tile_rows", "tile_columns", "tile_width", "tile_height",
   "grid_thickness", "grid_color", "wall_thickness", "wall_color",
-  "piece_stamp", "tile_stamp", "message_stamp", "tile_mode"];
+  "piece_stamp", "tile_stamp", "message_stamp", "tile_mode"
+];
+
+LT.Table.readImages = function () {
+  var request = LT.ajaxRequest("POST", "php/read_images.php", {'type' : 'background'});
+  if (request.responseXML) {
+    var bgElements = request.responseXML.getElementsByTagName('image');
+    LT.Table.images = [];
+    for (var i = 0 ; i < bgElements.length; i++) {
+      var image = new LT.Image(bgElements[i]);
+      LT.Table.images[i] = image;
+    }
+  }
+};
 
 LT.Table.presets = [];
 

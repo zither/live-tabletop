@@ -15,14 +15,13 @@ LT.createUserPanel = function () {
   LT.element('div', {'class': 'separator'}, LT.myOptionsTab.content);
   
   createImagesButton = LT.element('a', {}, LT.myOptionsTab.content, 'Process Uploaded Images');
-  createImagesButton.onclick = function(){
-    LT.ajaxRequest("POST", "php/create_images.php", {});
+  createImagesButton.onclick = function () {
+    LT.processImages();
   }
-  
   LT.element('div', {'class': 'separator'}, LT.myOptionsTab.content);
   
   defaultPanels = LT.element('a', {}, LT.myOptionsTab.content, 'Default Panels');
-  defaultPanels.onclick = function(){
+  defaultPanels.onclick = function () {
     LT.tablesPanel.refreshPanel();
     LT.chatPanel.refreshPanel();
     LT.turnsPanel.refreshPanel();
@@ -71,7 +70,7 @@ LT.refreshUsersList = function () {
   }
   LT.uL.nameInput.value = LT.users[LT.uL.userSelect.value].name;
 }
-selectOption = function(userID) {
+selectOption = function (userID) {
   var user = LT.users[userID];
   LT.uL.nameInput.value = user.name;
 }
