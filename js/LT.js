@@ -191,3 +191,6 @@ LT.checkTimestamps = function () {
     });
   }
 }
+LT.processImages = function(){
+  LT.ajaxRequest("POST", "php/create_images.php", {});
+}

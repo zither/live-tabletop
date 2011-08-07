@@ -265,8 +265,8 @@ LT.Piece.prototype = {
       LT.clickY = LT.dragY - parseInt(this.element.style.top);
       LT.clickDragGap = 1;
     }
-    var tableHeight = parseInt(LT.tableTop.style.height);
-    var tableWidth = parseInt(LT.tableTop.style.width);
+    var tableHeight = parseInt(LT.tabletop.style.height);
+    var tableWidth = parseInt(LT.tabletop.style.width);
     LT.dragX = Math.min(LT.dragX - LT.clickX, tableWidth - w);
     LT.dragY = Math.min(LT.dragY - LT.clickY, tableHeight - h);
     LT.dragX = Math.max(LT.dragX, 0);

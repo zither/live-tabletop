@@ -40,9 +40,8 @@ input {
   top: 0px;
 }
 
-#tableTop {
+#tabletop {
   position: relative;
-  background: #999 url(images/abaddon45.png) no-repeat;
   margin: 200px 200px 200px 200px;
 }
 
