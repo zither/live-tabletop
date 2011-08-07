@@ -204,6 +204,7 @@ populateEditTableTab = function () {
   eTF.isometricMode = LT.element('option', { value : 'isometric'}, eTF.tileMode, 'Isometric');
   eTF.hexRowsMode = LT.element('option', { value : 'hex rows'}, eTF.tileMode, 'Hex rows');
   eTF.hexColumnsMode = LT.element('option', { value : 'hex columns'}, eTF.tileMode, 'Hex Columns');
+  LT.element('option', { value : 0}, eTF.background, 'None');
   eTF.selectBG = []
   for ( i = 0; i < LT.Table.images.length; i++) {
     var image = LT.Table.images[i];
@@ -216,6 +217,7 @@ LT.Table.edit = function () {
   var eTF = LT.Table.editForm;
   var cT = LT.currentTable;
   cT.name = eTF.name.value;
+  cT.image_id = eTF.background.value;
   cT.rows = eTF.rows.value;
   cT.columns = eTF.cols.value;
   cT.tile_height = eTF.tileHeight.value; 
@@ -257,6 +259,7 @@ populateCreateTableTab = function () {
   LT.element('option', { value : 'hex rows'}, cTF.tileMode, 'Hex rows');
   LT.element('option', { value : 'hex columns'}, cTF.tileMode, 'Hex Columns');
   cTF.submit.onclick = LT.createTableHandler();
+  LT.element('option', { value : 0}, cTF.background, 'None');
   for ( i = 0; i < LT.Table.images.length; i++) {
     var image = LT.Table.images[i];
     var imageName = image.file.substr(0, image.file.length - 4);
