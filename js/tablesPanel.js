@@ -7,10 +7,10 @@ LT.Table.readTables = function(){
     for( var i = 0 ; i < tableElements.length; i++ ){
       var table = new LT.Table(tableElements[i]);
       LT.tables.push(table);
-	  if (!LT.currentTable && LT.tables[i].id == tableCookie){
+      if (!LT.currentTable && LT.tables[i].id == tableCookie){
          LT.currentTable = LT.tables[i];
       }
-	}
+    }
   }
 }
 
@@ -26,17 +26,17 @@ LT.Table.readTiles = function(){
     LT.fill(LT.tileLayer);
     LT.fill(LT.clickTileLayer);
     LT.fill(LT.fogLayer);
-	LT.resizeLayer(LT.tabletop);
-	LT.resizeLayer(LT.clickWallLayer);
+    LT.resizeLayer(LT.tabletop);
+    LT.resizeLayer(LT.clickWallLayer);
     LT.tiles = [];
     var tileElements = readTiles.responseXML.getElementsByTagName('tiles');
 
-	var tileText = decodeURIComponent(tileElements[0].textContent);
-	var tilesArray = new Array();
+    var tileText = decodeURIComponent(tileElements[0].textContent);
+    var tilesArray = new Array();
     tilesArray = tileText.split(' ');
     for(i = 0; i < tilesArray.length; i++){
-	  x = i % LT.currentTable.tile_columns;
-	  y = Math.floor(i / LT.currentTable.tile_columns);
+      x = i % LT.currentTable.tile_columns;
+      y = Math.floor(i / LT.currentTable.tile_columns);
       var tile = new LT.Tile(LT.currentTable.id, x, y, tilesArray[i]);
       LT.tiles.push(tile);
     }
@@ -45,29 +45,29 @@ LT.Table.readTiles = function(){
 LT.loadTableHandler = function (table) {
   return function () { LT.loadTable(table); };
 }
-LT.loadTable = function (table) {	
+LT.loadTable = function (table) {    
 
     if (table) {
       LT.currentTable = table;
     }
     if (LT.currentTable) {
-	  if (LT.currentTable.user_id == LT.currentUser.id 
+      if (LT.currentTable.user_id == LT.currentUser.id 
         || LT.currentUser.permissions == 'administrator') {
-	    LT.piecesPanel.showTab(0);
-	    LT.piecesPanel.showTab(1);
-	    LT.tablesPanel.showTab(2);
-	    LT.tablesPanel.showTab(3);
-	  } else {
-		if (LT.tablesPanel.currentTab == 2) {
-		  LT.tablesPanel.selectTab(0);
-		}
-	    LT.piecesPanel.hideTab(0);
-	    LT.piecesPanel.hideTab(1);
-	    LT.tablesPanel.hideTab(2);
-	    LT.tablesPanel.hideTab(3);
+        LT.piecesPanel.showTab(0);
+        LT.piecesPanel.showTab(1);
+        LT.tablesPanel.showTab(2);
+        LT.tablesPanel.showTab(3);
+      } else {
+        if (LT.tablesPanel.currentTab == 2) {
+          LT.tablesPanel.selectTab(0);
+        }
+        LT.piecesPanel.hideTab(0);
+        LT.piecesPanel.hideTab(1);
+        LT.tablesPanel.hideTab(2);
+        LT.tablesPanel.hideTab(3);
         LT.bringForward(LT.clickPieceLayer);
-	  }
-	  LT.refreshTables;
+      }
+      LT.refreshTables;
       LT.currentTable.createGrid();
       LT.element('br', {}, LT.chatPanel.output);
       LT.element('div', {'class' : 'chat_alert'}, LT.chatPanel.output, 
@@ -93,13 +93,13 @@ LT.loadTable = function (table) {
       }
       var eTF = LT.Table.editForm;
       var cT = LT.currentTable;
-	  eTF.name.setAttribute('value', cT.name);
-	  eTF.cols.setAttribute('value', cT.tile_columns);
-	  eTF.rows.setAttribute('value', cT.tile_rows);
-	  eTF.tileHeight.setAttribute('value', cT.tile_height);
-	  eTF.tileWidth.setAttribute('value', cT.tile_width);
-	  eTF.gridThickness.setAttribute('value', cT.grid_thickness);
-	  eTF.wallThickness.setAttribute('value', cT.wall_thickness);
+      eTF.name.setAttribute('value', cT.name);
+      eTF.cols.setAttribute('value', cT.tile_columns);
+      eTF.rows.setAttribute('value', cT.tile_rows);
+      eTF.tileHeight.setAttribute('value', cT.tile_height);
+      eTF.tileWidth.setAttribute('value', cT.tile_width);
+      eTF.gridThickness.setAttribute('value', cT.grid_thickness);
+      eTF.wallThickness.setAttribute('value', cT.wall_thickness);
       for ( i = 0; i < eTF.selectBG.length; i++) {
         if (eTF.selectBG[i].value == LT.currentTable.image_id) {
           eTF.selectBG[i].setAttribute('selected', 'select');
@@ -107,34 +107,32 @@ LT.loadTable = function (table) {
           eTF.selectBG[i].removeAttribute('selected');
         }
       }
-	  eTF.rectangleMode.removeAttribute('selected');
-	  eTF.isometricMode.removeAttribute('selected');
-	  eTF.hexColumnsMode.removeAttribute('selected');
-	  eTF.hexRowsMode.removeAttribute('selected');
-	  if (cT.tile_mode == 'rectangle') {
-	    eTF.rectangleMode.setAttribute('selected', 'select');
-	  }
-	  if (cT.tile_mode == 'isometric') {
-	    eTF.isometricMode.setAttribute('selected', 'select');
-	  }
-	  if (cT.tile_mode == 'hex columns') {
-	    eTF.hexColumnsMode.setAttribute('selected', 'select');
-	  }
+      eTF.rectangleMode.removeAttribute('selected');
+      eTF.isometricMode.removeAttribute('selected');
+      eTF.hexColumnsMode.removeAttribute('selected');
+      eTF.hexRowsMode.removeAttribute('selected');
+      if (cT.tile_mode == 'rectangle') {
+        eTF.rectangleMode.setAttribute('selected', 'select');
+      }
+      if (cT.tile_mode == 'isometric') {
+        eTF.isometricMode.setAttribute('selected', 'select');
+      }
+      if (cT.tile_mode == 'hex columns') {
+        eTF.hexColumnsMode.setAttribute('selected', 'select');
+      }
       if (cT.tile_mode == 'hex rows') {
         eTF.hexRowsMode.setAttribute('selected', 'select');
-	  }
+      }
     }
  
 }
 LT.refreshTables = function () {
   LT.Table.readTables();
-  LT.Tile.readImages();
-  LT.Piece.readImages();
   LT.fill(LT.tablesDiv);
-  for( var i = 0 ; i < LT.tables.length; i++ ){	
+  for( var i = 0 ; i < LT.tables.length; i++ ){    
     tableEntry = LT.element('div', { 'style' : 'clear: both;' }, LT.tablesDiv, ' ')
     var tableLink = LT.element('a', {'class' : 'textButton'}, tableEntry, LT.tables[i].name);
-	tableLink.onclick = LT.loadTableHandler(LT.tables[i]);
+    tableLink.onclick = LT.loadTableHandler(LT.tables[i]);
     tableDelete = LT.element('a', { 'class' : 'deleteButton' }, tableEntry, 'Delete');
     tableDelete.onclick = LT.Table.deleteTable(LT.tables[i]);
     LT.element('div',{'class' : 'separator'}, tableEntry);
@@ -152,7 +150,6 @@ LT.Table.deleteTable = function (table) {
 }
 
 LT.createTablesPanel = function () {
-  LT.Table.readImages();
   LT.tablesPanel = new LT.Panel( 'Tables', 'Tables', 6, 26, 140, 180);
   LT.tablesPanel.makeTab('List');
   LT.tablesTab = LT.tablesPanel.tabs[0].content;
@@ -271,22 +268,22 @@ LT.createTableHandler = function () {
   return function () {
     LT.Table.create();
     for( var i = 0 ; i < LT.tables.length; i++ ){
-	  if (LT.tables[i].name == LT.Table.createForm.name.value) {
+      if (LT.tables[i].name == LT.Table.createForm.name.value) {
          LT.currentTable = LT.tables[i];
       }
-	}
-	LT.loadTable();
+    }
+    LT.loadTable();
   };
 }
 LT.Table.create = function () {
   var cTF = LT.Table.createForm;
   var createTableAjax = LT.ajaxRequest("POST", "php/create_table.php",
     {
-	name : cTF.name.value,
-	image_id : cTF.background.value,
-	default_tile: -1,
+    name : cTF.name.value,
+    image_id : cTF.background.value,
+    default_tile: -1,
     rows : cTF.rows.value,
-	columns : cTF.cols.value,
+    columns : cTF.cols.value,
     tile_height : cTF.tileHeight.value, 
     tile_width : cTF.tileWidth.value,
     tile_mode : cTF.tileMode.value,
