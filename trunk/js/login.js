@@ -22,14 +22,6 @@ LT.createLogin = function () {
   loginSubmit.onclick = function () {LT.sendLogin(LT.loginUsername.value, LT.loginPassword.value)};
 };
 
-LT.createUser = function () {
-  LT.ajaxRequest("POST", "php/create_user.php", {
-    username : LT.inputUserName.value,
-    permissions : 'user', 
-    password : LT.inputPassword.value,
-  });
-};
-
 LT.sendLogin = function (loginName, loginPassword) {
   var request = LT.ajaxRequest("POST", "php/login.php",
     { username : loginName, password : loginPassword});

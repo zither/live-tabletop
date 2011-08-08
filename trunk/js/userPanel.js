@@ -1,26 +1,29 @@
-
 LT.createUserPanel = function () {  
-  LT.userButton = LT.element('div', { id : 'loginDiv' });
+  LT.userButton = LT.element({attributes: {id: 'loginDiv'}});
   LT.userPanel = new LT.Panel('User Options', "'s options", 185, 26, 210, 100, LT.userButton);
   
-  LT.userPanel.makeTab('Options');
-  LT.userPanel.makeTab('Edit User');
-  LT.userPanel.makeTab('Add User');
-  LT.myOptionsTab = LT.userPanel.tabs[0];
-  LT.userListTab = LT.userPanel.tabs[1];
-  LT.adminTab = LT.userPanel.tabs[2];
-  
-  LT.element('a', {id: 'logoutDiv'}, LT.myOptionsTab.content, 'Logout').onclick = LT.logout;
-  
-  LT.element('div', {'class': 'separator'}, LT.myOptionsTab.content);
-  
-  createImagesButton = LT.element('a', {}, LT.myOptionsTab.content, 'Process Uploaded Images');
-  createImagesButton.onclick = function () {
-    LT.processImages();
-  }
-  LT.element('div', {'class': 'separator'}, LT.myOptionsTab.content);
-  
-  defaultPanels = LT.element('a', {}, LT.myOptionsTab.content, 'Default Panels');
+  // options tab
+  var optionsTab = LT.userPanel.makeTab('Options');
+  var logout = LT.element({
+    tag: 'a',
+    attributes: {id: 'logoutDiv'},
+    parent: optionsTab.content,
+    text: 'Logout',
+  })
+  logout.onclick = LT.logout;
+  LT.element({attributes: {'class': 'separator'}, parent: optionsTab.content});
+  var createImagesButton = LT.element({
+    tag: 'a',
+    parent: optionsTab.content,
+    text:'Process Uploaded Images',
+  });
+  createImagesButton.onclick = LT.processImages;
+  LT.element({attributes: {'class': 'separator'}, parent: optionsTab.content});
+  var defaultPanels = LT.element({
+    tag: 'a',
+    parent: optionsTab.content,
+    text: 'Default Panels',
+  });
   defaultPanels.onclick = function () {
     LT.tablesPanel.refreshPanel();
     LT.chatPanel.refreshPanel();
@@ -29,48 +32,88 @@ LT.createUserPanel = function () {
     LT.filesPanel.refreshPanel();
     LT.userPanel.refreshPanel();
   }
-  populateAdminTab();
-  populateUserEditTab();
-}
 
-populateAdminTab = function () {
-  LT.userForm = LT.element('form', { }, LT.adminTab.content);
-  LT.inputUserName = LT.element('input', { size : 8, type: 'text' }, LT.userForm, 'User Name', 1);
-  LT.inputPassword = LT.element('input', { size : 8 }, LT.userForm, 'Password', 1);
-  userSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
-        id : 'chatSubmit', size : 8, value : 'Create' }, LT.userForm);
-  userSubmit.onclick = function() { LT.createUser(); };
-}
+  // edit user tab
+  var editUserTab = LT.userPanel.makeTab('Edit User');
+  LT.editUserSelect = LT.element({
+    tag: 'select',
+    attributes: {size : 1, name: 'userSelect'},
+    style: {width: '100px'},
+    parent: editUserTab.content,
+  });
+  var editUserNameDiv = LT.element({
+    attributes: {'class' : 'inputDiv'},
+    parent: editUserTab.content,
+    text: 'Name: ',
+  });
+  LT.editUserInput = LT.element({
+    tag: 'input',
+    attributes: {size: 8, type: 'text'},
+    parent: editUserNameDiv,
+  });
+  var editUserPalette = new LT.Palette(null, editUserTab.content, 5);
 
-populateUserEditTab = function () {
-  LT.uL = LT.element('form', {}, LT.userListTab.content);
-  
-  LT.uL.userSelect = LT.element('select', { size : 1, name : 'userSelect', 
-    style : 'width: 100px;' }, LT.uL);
-  LT.uL.nameDiv = LT.element('div', { 'class' : 'inputDiv' }, LT.uL, 'Name: ');
-  LT.uL.nameInput = LT.element('input', { size : 8, type: 'text',
-    }, LT.uL.nameDiv);
+  // add user tab
+  var addUserTab = LT.userPanel.makeTab('Add User');
+  var addUserName = LT.element({
+    tag: 'input',
+    attributes: {size: 8, type: 'text' },
+    parent: addUserTab.content,
+    text: 'User Name',
+    clear: true,
+  });
+  var addUserPassword = LT.element({
+    tag: 'input',
+    attributes: {size: 8},
+    parent: addUserTab.content,
+    text: 'Password',
+    clear: true,
+  });
+  var addUserPalette = new LT.Palette(null, addUserTab.content, 5);
+  var addUserSubmit = LT.element({
+    tag: 'input',
+    parent: addUserTab.content,
+    attributes: {
+      type : 'button',
+      style : 'cursor: pointer', 
+      id : 'chatSubmit',
+      size : 8,
+      value : 'Create',
+    },
+  });
+  addUserSubmit.onclick = function () {
+    LT.ajaxRequest("POST", "php/create_user.php", {
+      username : addUserName.value,
+      permissions : 'user',
+      password : addUserPassword.value,
+      color: addUserPalette.getColor(),
+    });
+  };
 }
 
 LT.refreshUsersList = function () {
-  LT.fill(LT.uL.userSelect)
+  LT.fill(LT.editUserSelect)
   LT.fill(LT.Piece.creator.userSelect)
   LT.fill(LT.Piece.editor.userSelect)
-  for ( i = 0; i < LT.users.length; i++) {
-    var option = LT.element('option', {value : i}, LT.uL.userSelect,
-      LT.users[i].name);
-	option.onclick = function() {selectOption(LT.uL.userSelect.value);};
-    var cPOption = LT.element('option', {value : i}, LT.Piece.creator.userSelect,
-      LT.users[i].name);
-	if ( LT.users[i].id == LT.currentUser.id ) {
-	    cPOption.setAttribute('selected', 'select');
-	}
-    LT.element('option', {value : i}, LT.Piece.editor.userSelect,
-      LT.users[i].name);
+  for (var i = 0; i < LT.users.length; i++) {
+    var option = function (theParent) {
+      return LT.element({
+        tag: 'option',
+        parent: theParent,
+        attributes: {value: i},
+        text: LT.users[i].name,
+      });
+    }
+    var editUserOption = option(LT.editUserSelect);
+    editUserOption.onclick = function () {
+      LT.editUserInput.value = LT.users[LT.editUserSelect.value].name;
+    };
+    var pieceCreatorOption = option(LT.Piece.creator.userSelect);
+    if (LT.users[i].id == LT.currentUser.id) {
+      pieceCreatorOption.setAttribute('selected', 'selected');
+    }
+    var pieceEditorOption = option(LT.Piece.editor.userSelect);
   }
-  LT.uL.nameInput.value = LT.users[LT.uL.userSelect.value].name;
+  LT.editUserInput.value = LT.users[LT.editUserSelect.value].name;
 }
-selectOption = function (userID) {
-  var user = LT.users[userID];
-  LT.uL.nameInput.value = user.name;
-}
+

@@ -30,20 +30,17 @@ LT.getCookie = function (cookieName) {
 
 /*
 LT.element creates a new HTML element and inserts it into the document.
+This function takes an object argument which can have the following properties:
 
-Parameters:
+  tag: html tag name, defaults to "div"
+  attributes: an object with a property for each attribute
+  parent: the parent element of the new element
+  text: text to appear inside the new element
+  children: array of elements to appent to the new element
+  clears: when you click on the element, you overwrite the default text
+  style: an object with a property for each CSS property
 
-  elementType (required) "div", "span", "input", etc.
-  attributes (required) i.e. {class: "inside-link", href: "test.html"}.
-  parentElement (optional) the parent element of the new element.
-  text (optional) text to appear inside the new element.
-
-Returns: the new element
-
-Attribute can be {} if you do not want any attributes. If you want text,
-but no parentElement, you must create and insert the text node yourself.
-If you want the element inserted at the end of the page, use document.body
-as the parentElement.
+This function returns the new element.
 */
 LT.element = function (args, attributes, parentElement, text, clears) {
   if (typeof(args) == 'string') {
@@ -58,7 +55,7 @@ LT.element = function (args, attributes, parentElement, text, clears) {
   }
   var newElement = document.createElement(args.tag || "div");
   if (args.attributes) {
-    for (attrName in args.attributes)
+    for (var attrName in args.attributes)
       newElement.setAttribute(attrName, args.attributes[attrName]);
   }
   if (args.parent) {
@@ -77,17 +74,11 @@ LT.element = function (args, attributes, parentElement, text, clears) {
     for (var i = 0; i < args.children.length; i++)
       newElement.appendChild(args.children[i]);
   }
+  if (args.style) {
+    for (var property in args.style)
+      newElement.style[property] = args.style[property];
+  }
   return newElement;
-}
-
-LT.textInput = function (theAttributes, theParent, theText) {
-  return LT.element({
-    tag: 'input',
-    attributes: theAttributes,
-    parent: theParent,
-    text: theText,
-    clears: true,
-  });
 }
 
 LT.ajaxRequest = function (method, url, args, callback) {
