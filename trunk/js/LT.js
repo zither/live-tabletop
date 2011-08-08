@@ -182,7 +182,7 @@ LT.checkTimestamps = function () {
       }
       if (cT.tile_stamp < table.tile_stamp) {
         cT.tile_stamp = table.tile_stamp;
-        LT.readTiles();
+        LT.Table.readTiles();
       }
       if (cT.message_stamp < table.message_stamp) {
         cT.message_stamp = table.message_stamp;
