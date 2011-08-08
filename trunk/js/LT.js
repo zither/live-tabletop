@@ -45,24 +45,49 @@ but no parentElement, you must create and insert the text node yourself.
 If you want the element inserted at the end of the page, use document.body
 as the parentElement.
 */
-LT.element = function (elementType, attributes, parentElement, text, clears) {
-  var item = document.createElement(elementType);
-  for (var attributeName in attributes) {
-    item.setAttribute(attributeName, attributes[attributeName]);
+LT.element = function (args, attributes, parentElement, text, clears) {
+  if (typeof(args) == 'string') {
+    // old syntax. TODO: convert all LT.element calls to new syntax
+    args = {
+      tag: args,
+      attributes: attributes,
+      parent: parentElement,
+      text: text,
+      clears: clears,
+    };
   }
-  if (parentElement) parentElement.appendChild(item);
-  if (text) {
-    if (elementType == 'input') item.setAttribute('value', text);
-    else item.appendChild(document.createTextNode(text));
+  var newElement = document.createElement(args.tag || "div");
+  if (args.attributes) {
+    for (attrName in args.attributes)
+      newElement.setAttribute(attrName, args.attributes[attrName]);
   }
-  if (clears) item.onfocus = function () {
-    if (item.value == text) this.select();
+  if (args.parent) {
+    args.parent.appendChild(newElement);
   }
-  return item
+  if (args.text) {
+    if (args.tag == 'input') newElement.value = args.text;
+    else newElement.textContent = args.text;
+  }
+  if (args.clears) {
+    newElement.onfocus = function () {
+      if (newElement.value == args.text) this.select();
+    };
+  }
+  if (args.children) {
+    for (var i = 0; i < args.children.length; i++)
+      newElement.appendChild(args.children[i]);
+  }
+  return newElement;
 }
 
-LT.textInput = function (attributes, parentElement, text) {
-  var item = LT.element('input', attributes, parentElement, text, true);
+LT.textInput = function (theAttributes, theParent, theText) {
+  return LT.element({
+    tag: 'input',
+    attributes: theAttributes,
+    parent: theParent,
+    text: theText,
+    clears: true,
+  });
 }
 
 LT.ajaxRequest = function (method, url, args, callback) {
