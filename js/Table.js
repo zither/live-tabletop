@@ -16,11 +16,18 @@ LT.Table = function (element) {
 };
 
 // GLOBAL VARIABLES
+
 LT.Table.PROPERTIES = ["id", "user_id", "image_id", "name",
   "tile_rows", "tile_columns", "tile_width", "tile_height",
   "grid_thickness", "grid_color", "wall_thickness", "wall_color",
   "piece_stamp", "tile_stamp", "message_stamp", "tile_mode"
 ];
+
+LT.Table.images = [];
+
+LT.Table.presets = [];
+
+// STATIC FUNCTIONS
 
 LT.Table.readImages = function () {
   var request = LT.ajaxRequest("POST", "php/read_images.php", {'type' : 'background'});
@@ -34,9 +41,6 @@ LT.Table.readImages = function () {
   }
 };
 
-LT.Table.presets = [];
-
-// STATIC FUNCTIONS
 LT.Table.loadPresets = function () {
   var request = LT.ajaxRequest("GET", "presets.xml", {});
   var elements = request.responseXML.getElementsByTagName("preset");

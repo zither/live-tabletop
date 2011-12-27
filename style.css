@@ -417,3 +417,12 @@ height: 1px; background: #999; width: auto; clear: both; margin: 1px 0px 4px 0px
 .buttonDiv:hover {
   cursor: pointer;
 }
+/* Install Box */
+#installBox {
+  margin: 20px auto;
+  width: 180px;
+}
+#installBox input {
+  border: 1px solid #CCC;
+}
+
