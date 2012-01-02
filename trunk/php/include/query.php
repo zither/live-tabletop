@@ -76,8 +76,8 @@ function LT_query($query, $die = TRUE) {
   }
 
   // ignore subsequent result sets
-  if ($LT_SQL->more_results()) {
-    while($LT_SQL->next_result());
+  while ($LT_SQL->more_results()) {
+    $LT_SQL->next_result();
   }
 
   // return first result set array

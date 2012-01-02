@@ -48,7 +48,10 @@ else {
 $salt = LT_random_salt();
 $hash = LT_hash_password($admin_password, $salt);
 $query = "CALL create_user('$admin_username', '$hash', '$salt', NULL, 'administrator')";
+//$query = "CALL create_user('red', 'yellow', 'blue', NULL, 'administrator')";
 $LT_SQL->query($query) or die('Query failed: ' . $LT_SQL->error);
+//echo($admin_username . " : " . $admin_password);
+
 
 
 // Create db_config.php
