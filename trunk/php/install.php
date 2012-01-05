@@ -24,6 +24,7 @@ $LT_SQL->query("CREATE DATABASE IF NOT EXISTS $database")
 $LT_SQL->query("USE $database")
   or die ("Query failed: "  . $LT_SQL->error);
 
+  
 // Create the Database Schema (tables and stored procedures)
 
 $LT_SQL->autocommit(FALSE);
@@ -48,10 +49,8 @@ else {
 $salt = LT_random_salt();
 $hash = LT_hash_password($admin_password, $salt);
 $query = "CALL create_user('$admin_username', '$hash', '$salt', NULL, 'administrator')";
-//$query = "CALL create_user('red', 'yellow', 'blue', NULL, 'administrator')";
 $LT_SQL->query($query) or die('Query failed: ' . $LT_SQL->error);
-//echo($admin_username . " : " . $admin_password);
-
+$LT_SQL->commit();
 
 
 // Create db_config.php
