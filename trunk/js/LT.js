@@ -187,7 +187,7 @@ document.onmousemove = function (e) {
 
 LT.checkTimestamps = function () {
   if (LT.currentTable && !LT.holdTimestamps) {
-    cT = LT.currentTable
+    var cT = LT.currentTable;
     var args = {table_id: LT.currentTable.id};
     LT.ajaxRequest("POST", "php/read_table.php", args, function (ajax) {
       var tableResponse = ajax.responseXML.getElementsByTagName("table");

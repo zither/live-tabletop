@@ -1,6 +1,6 @@
 LT.readChat = function(){
   var readChat = LT.ajaxRequest("POST", "php/read_messages.php",{ 
-    table_id : LT.tableID, last_message : LT.lastMessage });
+    table_id : LT.currentTable.id, last_message : LT.lastMessage });
   if (readChat.responseXML){
     var chatElements = readChat.responseXML.getElementsByTagName('message');
     LT.messages = [];
@@ -64,10 +64,9 @@ LT.createChatPanel = function () {
 }
 
 LT.createMessage = function () {
-  var tempMessage = LT.chatInput.value;
+  var args = {table_id: LT.currentTable.id, text: LT.chatInput.value};
   LT.chatInput.value = "";
-  var createMessageAjax = LT.ajaxRequest("POST", "php/create_message.php",
-    { table_id : LT.tableID, text : tempMessage });
+  LT.ajaxRequest("POST", "php/create_message.php", args);
   LT.chatInput.focus();
   LT.refreshMessageList();
 }
