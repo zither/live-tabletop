@@ -34,9 +34,10 @@ LT.Panel = function (panelName, buttonName, x, y, width, height, buttonLoc) {
 
  // Create Floating Panel ----------------------------------------------------
 
-  this.outside = LT.element('div', {'class' : 'outerPanel', 
-    'style' : 'left: ' + x + 'px; top: ' + y + 'px; visibility: hidden;'
-    }, document.body);
+  this.outside = LT.element('div', {'class' : 'outerPanel',
+  	'style' : 'left: ' + x + 'px; top: ' + y + 'px; visibility: hidden; ' + 
+		'width: ' + width + 'px;'},
+  	document.body);
   this.outside.onmousedown = function() {
     self.bringToFront();
   };
@@ -73,9 +74,8 @@ LT.Panel = function (panelName, buttonName, x, y, width, height, buttonLoc) {
   this.header = LT.element('div', {'class' : 'panelHeader'}, this.outside);
   
   // Middle: this.content contains elements specific to each panel
-  this.content = LT.element('div', {'class' : 'panelContent', 
-    'style' : 'width: ' + width + 'px; height: ' + height + 'px;' 
-    }, this.outside);
+  this.content = LT.element('div', {'class' : 'panelContent', 'style' : 
+	'height: ' + height + 'px;'}, this.outside);
 
   this.footer = LT.element('div', {'class' : 'panelFooter'}, this.outside);
   
@@ -216,7 +216,7 @@ LT.Panel.prototype = {
   getCookieString: function () {
 	var x = parseInt(this.outside.style.left);
 	var y = parseInt(this.outside.style.top);
-	var w = parseInt(this.content.style.width);
+	var w = parseInt(this.outside.style.width);
 	var h = parseInt(this.content.style.height);
     var v = this.outside.style.visibility == "visible" ? 1 : 0;
 	var t = this.selectedTab;
@@ -247,7 +247,7 @@ LT.Panel.prototype = {
 
   // Move panel.
   move: function () {
-    var w = parseInt(this.content.style.width);
+    var w = parseInt(this.outside.style.width);
     var h = parseInt(this.content.style.height);
     if (LT.clickDragGap == 0) {
       LT.clickX = LT.dragX - parseInt(this.outside.style.left);
@@ -268,7 +268,7 @@ LT.Panel.prototype = {
     var panelX = parseInt(this.outside.style.left);
     var panelY = parseInt(this.outside.style.top);
     if (LT.clickDragGap == 0) {
-      LT.clickX = LT.dragX - parseInt(this.content.style.width);
+      LT.clickX = LT.dragX - parseInt(this.outside.style.width);
       LT.clickY = LT.dragY - parseInt(this.content.style.height);
       LT.clickDragGap = 1;
     }
@@ -285,7 +285,7 @@ LT.Panel.prototype = {
     if (LT.clickDragGap == 0) {
       LT.clickX = LT.dragX - parseInt(this.outside.style.left);
       LT.clickY = LT.dragY - parseInt(this.outside.style.top);
-      LT.clickCornerX = LT.dragX + parseInt(this.content.style.width);
+      LT.clickCornerX = LT.dragX + parseInt(this.outside.style.width);
       LT.clickCornerY = LT.dragY + parseInt(this.content.style.height);
       LT.clickDragGap = 1;
     }
@@ -308,7 +308,7 @@ LT.Panel.prototype = {
       LT.clickX = LT.dragX;
       LT.clickY = LT.dragY;
       LT.clickH = parseInt(this.content.style.height);
-      LT.clickW = parseInt(this.content.style.width);
+      LT.clickW = parseInt(this.outside.style.width);
       LT.clickT = parseInt(this.outside.style.top);
       LT.clickDragGap = 1;
     }
@@ -332,7 +332,7 @@ LT.Panel.prototype = {
       LT.clickX = LT.dragX - parseInt(this.outside.style.left);
       LT.clickY = LT.dragY;
       LT.clickH = parseInt(this.content.style.height);
-      LT.clickCornerX = LT.dragX + parseInt(this.content.style.width);
+      LT.clickCornerX = LT.dragX + parseInt(this.outside.style.width);
       LT.clickDragGap = 1;
     }
     // FIXME: magic numbers
@@ -347,11 +347,8 @@ LT.Panel.prototype = {
   },
 	
   setWidth: function (newWidth) {
-    this.content.style.width = newWidth + "px";
-    this.footer.style.width = newWidth + "px";
-    this.header.style.width = newWidth + "px";
-    this.tabBar.style.width = newWidth + "px";
-    this.bar.style.width = newWidth - 42 + "px";
+	  this.outside.style.width = newWidth + "px";
+    this.bar.style.width = newWidth - 44 + "px";
   }
 };
 
