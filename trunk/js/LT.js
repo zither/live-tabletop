@@ -186,7 +186,7 @@ document.onmousemove = function (e) {
 };
 
 LT.checkTimestamps = function () {
-  if (LT.currentTable && !LT.holdTimestamps) {
+  if (LT.currentTable && !LT.holdTimestamps && LT.currentUser) {
     var cT = LT.currentTable;
     var args = {table_id: LT.currentTable.id};
     LT.ajaxRequest("POST", "php/read_table.php", args, function (ajax) {

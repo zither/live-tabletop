@@ -25,10 +25,11 @@ LT.installer = function () {
     });
     var checkInstall = LT.ajaxRequest("POST", 'php/db_config.php', {});
     if (checkInstall.status == 200) {
-      LT.ajaxRequest("POST", "php/create_images.php", {}); // <<< broken FIXME
-      document.body.removeChild(installBox);
-      LT.load();
+      //LT.ajaxRequest("POST", "php/create_images.php", {}); // <<< broken FIXME
       LT.sendLogin(DBAdminName.value, DBAdminPW.value );
+      LT.processImages;
+	  document.body.removeChild(installBox);
+      LT.load();
       LT.tablesPanel.show();
     } else {
       alert('Database was not properly installed. Try again.');
