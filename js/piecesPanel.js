@@ -233,7 +233,7 @@ LT.createPiecesPanel = function () {
     selected: null,
   }
   pSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
-        id : 'chatSubmit', size : 8, value : 'Create' }, form);
+        size : 8, value : 'Create', 'clear' : 'both' }, form);
   pSubmit.onclick = function () { LT.createPiece(); };
   LT.element('div', { 'class' : 'clearBoth' }, createPiecesTab.header);
   LT.createPieceImageDiv = LT.element('div', { 'style' : 'clear: both; overflow: none;' },

@@ -15,23 +15,29 @@ LT.load = function () {
   LT.buttons = LT.element('div', {id: 'buttons'}, LT.pageBar);
 
   LT.tables = [];
-
+/*
+  LT.processImages;
+  
   LT.Tile.readImages();
   LT.Piece.readImages();
   LT.Table.readImages();
+*/
 
+/*
   LT.createTablesPanel();
   LT.createPiecesPanel();
   LT.createChatPanel();
   LT.createTurnsPanel();
   LT.createFilesPanel();
-
+*/
   LT.loginCheck();
+/*
   LT.Table.loadPresets();
   LT.refreshMessageList();
   LT.loadTable();
   LT.holdTimestamps = 0;
   setInterval(LT.checkTimestamps, 2000);
+*/
 }
 
 onload = function () {

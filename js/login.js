@@ -47,9 +47,21 @@ LT.login = function (loginRequest) {
     LT.userPanel.buttonCaption.removeChild(LT.userPanel.buttonCaption.firstChild);
     LT.userPanel.buttonCaption.appendChild(newUsername);
     LT.pageBar.appendChild(LT.userButton);
+		
+    if (!LT.tablesPanel) {
+      LT.Tile.readImages();
+      LT.Piece.readImages();
+      LT.Table.readImages();
+	
+  	  LT.createTablesPanel();
+      LT.createPiecesPanel();
+      LT.createChatPanel();
+      LT.createTurnsPanel();
+      LT.createFilesPanel();
+	  }
     LT.refreshUsersList();
     if (LT.tableListDiv) LT.refreshTableList();
-    LT.element('div', {'class' : 'chat_alert'}, LT.chatPanel.output, "You are logged in.");
+    LT.element('div', {'class' : 'chat_alert'}, LT.chatPanel.output, "You have logged in.");
     LT.chatPanel.output.removeChild(LT.chatBottom);
     LT.chatPanel.output.appendChild(LT.chatBottom);
     LT.chatBottom.scrollIntoView(true);
@@ -57,6 +69,12 @@ LT.login = function (loginRequest) {
     LT.createTools();
     LT.createPieceImages();
     LT.Panel.loadCookie();
+		
+	  LT.Table.loadPresets();
+    LT.refreshMessageList();
+    LT.loadTable();
+    LT.holdTimestamps = 0;
+    setInterval(LT.checkTimestamps, 2000);
   } else {
     alert('Incorrect username or password.');
   }
@@ -71,4 +89,5 @@ LT.logout = function () {
   LT.chatPanel.output.removeChild(LT.chatBottom);
   LT.chatPanel.output.appendChild(LT.chatBottom);
   LT.chatBottom.scrollIntoView(true);
+	LT.currentUser = 0;
 };
