@@ -1,14 +1,15 @@
 LT.readChat = function(){
+  if (!LT.currentTable) return;
   var readChat = LT.ajaxRequest("POST", "php/read_messages.php",{ 
     table_id : LT.currentTable.id, last_message : LT.lastMessage });
-  if (readChat.responseXML){
+  if (readChat.responseXML) {
     var chatElements = readChat.responseXML.getElementsByTagName('message');
     LT.messages = [];
-    for( var i = 0 ; i < chatElements.length; i++ ){
+    for (var i = 0 ; i < chatElements.length; i++) {
       var message = new LT.Message(chatElements[i]);
       LT.messages.push(message);
-	  for( var n=0; n < LT.users.length; n++){
-        if( LT.users[n].id == LT.messages[i].user_id){
+	  for (var n = 0; n < LT.users.length; n++) {
+        if (LT.users[n].id == LT.messages[i].user_id) {
           LT.messages[i].userName = LT.users[n].name
 	    }
 	  }
