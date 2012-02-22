@@ -142,7 +142,7 @@ LT.Table.prototype = {
   createGrid: function () {
 
     // Remove any grid which is currently in the wall layer.
-	LT.fill(LT.wallLayer);
+    LT.fill(LT.wallLayer);
 
     // Add a new grid to the wall layer.
     this.grid = new LT.Grid(this.tile_columns, this.tile_rows,
