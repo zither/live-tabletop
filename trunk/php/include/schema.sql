@@ -331,12 +331,21 @@ END;
 
 CREATE PROCEDURE create_table (IN the_name VARCHAR(200), IN the_image INT,
   IN the_user INT, IN the_rows SMALLINT, IN the_columns SMALLINT,
-  IN the_width INT, IN the_height INT, IN the_tile_mode TEXT)
+  IN the_width INT, IN the_height INT,
+  IN the_grid_thickness INT, IN the_grid_color TEXT,
+  IN the_wall_thickness INT, IN the_wall_color TEXT,
+  IN the_tile_mode TEXT)
 BEGIN
   INSERT INTO tables (name, image_id, user_id, tile_rows, tile_columns,
-    tile_width, tile_height, tile_stamp, message_stamp, piece_stamp, tile_mode)
+    tile_width, tile_height,
+    grid_thickness, grid_color, wall_thickness, wall_color,
+    tile_stamp, message_stamp, piece_stamp,
+    tile_mode)
   VALUES (the_name, the_image, the_user, the_rows, the_columns,
-    the_width, the_height, NOW(), NOW(), NOW(), the_tile_mode);
+    the_width, the_height, 
+    the_grid_thickness, the_grid_color, the_wall_thickness, the_wall_color,
+    NOW(), NOW(), NOW(),
+    the_tile_mode);
 END; 
 
 CREATE PROCEDURE read_table (IN the_table INT)

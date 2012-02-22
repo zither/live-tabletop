@@ -244,7 +244,7 @@ populateCreateTableTab = function () {
     gridThickness: LT.element('input', { size:1 }, 
       LT.element('div', { 'class' : 'inputDiv' }, form, 'Grid Thickness: '), '1', 1),
     wallThickness: LT.element('input', { size:1 }, 
-      LT.element('div', { 'class' : 'inputDiv' }, form, 'Wall Thickness: '), '1', 1),
+      LT.element('div', { 'class' : 'inputDiv' }, form, 'Wall Thickness: '), '3', 1),
     tileMode: LT.element('select', { name:'cTileMode' }, 
       LT.element('div', { 'class' : 'inputDiv' }, form, 'Tile Mode: ') ),
     submit: LT.element('input', { type : 'button', style : 'cursor: pointer', 
