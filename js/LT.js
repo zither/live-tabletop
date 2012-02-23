@@ -81,6 +81,105 @@ LT.element = function (args, attributes, parentElement, text, clears) {
   return newElement;
 }
 
+LT.elementAttributes = function (element, attributes) {
+  for (var key in attributes) {
+    var value = attributes[key];
+    if (key == "style" && typeof(value) == "object") {
+      var styles = [];
+      for (var prop in value) styles.push(prop + ": " + value[prop]);
+      value = styles.join("; ");
+    }
+    element.setAttribute(key, value);
+  }
+};
+
+LT.elementChildren = function (element, children) {
+  for (var i = 0; i < children.length; i++) {
+    if (typeof(children[i]) == "string") {
+      if (element.tagName.toLowerCase() == "input") element.value = children[i];
+      else element.appendChild(document.createTextNode(children[i]));
+    }
+    else if (children[i] instanceof Element) element.appendChild(children[i]);
+    else if (children[i] instanceof Array) element.appendChild(LT.createElement(
+      children[i][0], children[i][1], children[i][2], children[i][3]));
+  }
+};
+
+/*
+Create an HTML element.
+
+This function takes 0 to 4 arguments in any order, distinguished by type.
+
+tag:         A string argument is interpreted as the new element's tagName.
+             If none of the arguments is a string, the new element is a div.
+
+parent:      An HTML element argument becomes the parent of the new element.
+
+attributes:  If an argument is an object but not an HTML element or array,
+             it's properties become the attributes of the new element.
+             If the style attribute is an object instead of a string,
+             the properties of that object are converted into CSS properties.
+
+children:    Contents of an array argument become children of the new element.
+             Strings are appended as text nodes.
+             Arrays are converted to an element as arguments to this function.
+*/
+LT.createElement = function (arg1, arg2, arg3, arg4) {
+  var tag = "div";
+  var attributes = {};
+  var children = [];
+  var parent = null;
+  var args = [arg1, arg2, arg3, arg4];
+  for (var i = 0; i < args.length; i++) {
+    if (typeof(args[i]) == "string") tag = args[i];
+    else if (args[i] instanceof Element) parent = args[i];
+    else if (args[i] instanceof Array) children = args[i];
+    else if (typeof(args[i]) == "object") attributes = args[i];
+  }
+  var newElement = document.createElement(tag);
+  if (parent) parent.appendChild(newElement);
+  LT.elementAttributes(newElement, attributes);
+  LT.elementChildren(newElement, children);
+  return newElement;
+};
+
+/*
+Create a text input field.
+
+This function takes 0 to 3 arguments in any order, distinguished by type.
+
+text:        A string argument is interpreted as the default text.
+             The default text disappears when you select the field.
+
+parent:      An HTML element argument becomes the parent of the new element.
+
+attributes:  If an argument is an object but not an HTML element,
+             it's properties become the attributes of the new element.
+             If the style attribute is an object instead of a string,
+             the properties of that object are converted into CSS properties.
+*/
+LT.textInput = function (arg1, arg2, arg3) {
+  var text = "";
+  var attributes = {};
+  var parent = null;
+  var args = [arg1, arg2, arg3];
+  for (var i = 0; i < args.length; i++) {
+    if (typeof(args[i]) == "string") text = args[i];
+    else if (args[i] instanceof Element) parent = args[i];
+    else if (typeof(args[i]) == "object") attributes = args[i];
+  }
+  var input = document.createElement("input");
+  if (parent) parent.appendChild(input);
+  attributes.type = "text";
+  LT.elementAttributes(input, attributes);
+  if (text) {
+    input.value = text;
+    input.onfocus = function () {if (input.value == text) this.select();};
+  }
+  return input;
+};
+
+
 LT.ajaxRequest = function (method, url, args, callback) {
 
   var ajax = new XMLHttpRequest();
