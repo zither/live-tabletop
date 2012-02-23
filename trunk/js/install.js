@@ -25,10 +25,13 @@ LT.installer = function () {
     });
     var checkInstall = LT.ajaxRequest("POST", 'php/db_config.php', {});
     if (checkInstall.status == 200) {
-      //LT.ajaxRequest("POST", "php/create_images.php", {}); // <<< broken FIXME
-      LT.sendLogin(DBAdminName.value, DBAdminPW.value );
-      LT.processImages;
-	  document.body.removeChild(installBox);
+      //LT.ajaxRequest("POST", "php/create_images.php", {}); // won't work, not logged in
+      //LT.sendLogin(DBAdminName.value, DBAdminPW.value ); // won't work, LT.load() has not been called
+      //LT.load(); // too soon, we haven't processed the uploaded images yet.
+      LT.ajaxRequest("POST", "php/login.php",
+        {username : DBAdminName.value, password : DBAdminPW.value});
+      LT.processImages();
+      document.body.removeChild(installBox);
       LT.load();
       LT.tablesPanel.show();
     } else {
