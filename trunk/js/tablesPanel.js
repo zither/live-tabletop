@@ -42,90 +42,79 @@ LT.Table.readTiles = function(){
     }
   }
 }
-LT.loadTableHandler = function (table) {
-  return function () { LT.loadTable(table); };
-}
-LT.loadTable = function (table) {    
 
-    if (table) {
-      LT.currentTable = table;
-    }
-    if (LT.currentTable) {
-      if (LT.currentTable.user_id == LT.currentUser.id 
-        || LT.currentUser.permissions == 'administrator') {
-        LT.piecesPanel.showTab(0);
-        LT.piecesPanel.showTab(1);
-        LT.tablesPanel.showTab(2);
-        LT.tablesPanel.showTab(3);
-      } else {
-        if (LT.tablesPanel.currentTab == 2) {
-          LT.tablesPanel.selectTab(0);
-        }
-        LT.piecesPanel.hideTab(0);
-        LT.piecesPanel.hideTab(1);
-        LT.tablesPanel.hideTab(2);
-        LT.tablesPanel.hideTab(3);
-        LT.bringForward(LT.clickPieceLayer);
-      }
-      LT.refreshTables;
-      LT.currentTable.createGrid();
-      LT.element('br', {}, LT.chatPanel.output);
-      LT.element('div', {'class' : 'chat_alert'}, LT.chatPanel.output, 
-        "Loading chat log for " + LT.currentTable.name + "...");
-      LT.lastMessage = 0;
-      LT.refreshMessageList();
-      LT.element('a', {'class' : 'chat_alert'}, LT.chatPanel.output, 
-        "Arriving at " + LT.currentTable.name);
-      LT.element('br', {}, LT.chatPanel.output);
-      LT.chatPanel.output.removeChild(LT.chatBottom);
-      LT.chatPanel.output.appendChild(LT.chatBottom);
-      LT.chatBottom.scrollIntoView(true);
-      LT.Table.readTiles();
-      LT.loadPieces();
-      document.cookie = 'table=' + LT.currentTable.id + ';';
-      LT.Piece.creator.wInput.setAttribute('value', LT.currentTable.tile_width);
-      LT.Piece.creator.hInput.setAttribute('value', LT.currentTable.tile_height);
-      for ( i = 0; i < LT.Table.images.length; i++) {
-        if (LT.Table.images[i].id == LT.currentTable.image_id) {
-          LT.tabletop.style.background = "url('images/upload/background/" + 
-            LT.Table.images[i].file + "')";
-        }
-      }
-      var eTF = LT.Table.editForm;
-      var cT = LT.currentTable;
-      eTF.name.setAttribute('value', cT.name);
-      eTF.cols.setAttribute('value', cT.tile_columns);
-      eTF.rows.setAttribute('value', cT.tile_rows);
-      eTF.tileHeight.setAttribute('value', cT.tile_height);
-      eTF.tileWidth.setAttribute('value', cT.tile_width);
-      eTF.gridThickness.setAttribute('value', cT.grid_thickness);
-      eTF.wallThickness.setAttribute('value', cT.wall_thickness);
-      for ( i = 0; i < eTF.selectBG.length; i++) {
-        if (eTF.selectBG[i].value == LT.currentTable.image_id) {
-          eTF.selectBG[i].setAttribute('selected', 'select');
-        }else{
-          eTF.selectBG[i].removeAttribute('selected');
-        }
-      }
-      eTF.rectangleMode.removeAttribute('selected');
-      eTF.isometricMode.removeAttribute('selected');
-      eTF.hexColumnsMode.removeAttribute('selected');
-      eTF.hexRowsMode.removeAttribute('selected');
-      if (cT.tile_mode == 'rectangle') {
-        eTF.rectangleMode.setAttribute('selected', 'select');
-      }
-      if (cT.tile_mode == 'isometric') {
-        eTF.isometricMode.setAttribute('selected', 'select');
-      }
-      if (cT.tile_mode == 'hex columns') {
-        eTF.hexColumnsMode.setAttribute('selected', 'select');
-      }
-      if (cT.tile_mode == 'hex rows') {
-        eTF.hexRowsMode.setAttribute('selected', 'select');
-      }
-    }
- 
+LT.loadTableHandler = function (table) {
+  return function () {LT.loadTable(table);};
 }
+
+LT.loadTable = function (table) {    
+  if (table) {
+    LT.currentTable = table;
+  }
+  if (LT.currentTable) {
+    if (LT.currentTable.user_id == LT.currentUser.id 
+      || LT.currentUser.permissions == 'administrator') {
+      LT.piecesPanel.showTab(0);
+      LT.piecesPanel.showTab(1);
+      LT.tablesPanel.showTab(2);
+      LT.tablesPanel.showTab(3);
+    } else {
+      if (LT.tablesPanel.currentTab == 2) {
+        LT.tablesPanel.selectTab(0);
+      }
+      LT.piecesPanel.hideTab(0);
+      LT.piecesPanel.hideTab(1);
+      LT.tablesPanel.hideTab(2);
+      LT.tablesPanel.hideTab(3);
+      LT.bringForward(LT.clickPieceLayer);
+    }
+    LT.refreshTables;
+    LT.currentTable.createGrid();
+
+    LT.createElement(LT.chatPanel.output, 'br');
+    LT.createElement(LT.chatPanel.output, 'div', {'class' : 'chat_alert'},
+      ["Loading chat log for " + LT.currentTable.name + "..."]);
+    LT.lastMessage = 0;
+    LT.refreshMessageList();
+    LT.createElement(LT.chatPanel.output, 'a', {'class' : 'chat_alert'}, 
+      ["Arriving at " + LT.currentTable.name]);
+    LT.createElement(LT.chatPanel.output, 'br');
+
+    LT.chatPanel.output.removeChild(LT.chatBottom);
+    LT.chatPanel.output.appendChild(LT.chatBottom);
+    LT.chatBottom.scrollIntoView(true);
+    LT.Table.readTiles();
+    LT.loadPieces();
+    document.cookie = 'table=' + LT.currentTable.id + ';';
+    LT.Piece.creator.wInput.setAttribute('value', LT.currentTable.tile_width);
+    LT.Piece.creator.hInput.setAttribute('value', LT.currentTable.tile_height);
+    for ( i = 0; i < LT.Table.images.length; i++) {
+      if (LT.Table.images[i].id == LT.currentTable.image_id) {
+        LT.tabletop.style.background = "url('images/upload/background/" + 
+          LT.Table.images[i].file + "')";
+      }
+    }
+    var eTF = LT.Table.editForm;
+    var cT = LT.currentTable;
+    eTF.name.value = cT.name;
+    eTF.cols.value = cT.tile_columns;
+    eTF.rows.value = cT.tile_rows;
+    eTF.tileHeight.value = cT.tile_height;
+    eTF.tileWidth.value = cT.tile_width;
+    eTF.gridThickness.value = cT.grid_thickness;
+    eTF.wallThickness.value = cT.wall_thickness;
+    eTF.background.selectedIndex = 0;
+    for (i = 0; i < eTF.background.options.length; i++) {
+      if (eTF.background.options[i].value == cT.image_id)
+        eTF.background.selectedIndex = i;
+    }
+    for (i = 0; i < eTF.tileMode.options.length; i++) {
+      if (eTF.tileMode.options[i].value == cT.tile_mode)
+        eTF.tileMode.selectedIndex = i;
+    }
+  }
+};
+
 LT.refreshTables = function () {
   LT.Table.readTables();
   LT.fill(LT.tablesDiv);
@@ -137,7 +126,8 @@ LT.refreshTables = function () {
     tableDelete.onclick = LT.Table.deleteTable(LT.tables[i]);
     LT.element('div',{'class' : 'separator'}, tableEntry);
   }
-}
+};
+
 LT.Table.deleteTable = function (table) {
   return function () {
     var confirmDel =  confirm('Are you sure you want to delete '
@@ -171,123 +161,83 @@ LT.createTablesPanel = function () {
 
 };
 
-populateEditTableTab = function () {
-  var form = LT.element('form', { }, LT.editTableTab);
-  LT.Table.editForm = {
-    name: LT.element('input', { size:10, type:'text' }, 
-      LT.element('div', { 'class':'inputDiv' }, form, 'Name: ') ),
-    background: LT.element('select', { 'style':'width: 135px;', name:'tableBG' }, 
-      LT.element('div', { 'class' : 'inputDiv' }, form, 'Background: ') ),
-    cols: LT.element('input', { size:1 }, 
-      LT.element('div', { 'class':'inputDiv' }, form, 'Columns: ') ),
-    rows: LT.element('input', { size:1 }, 
-      LT.element('div', { 'class':'inputDiv' }, form, 'Rows: ') ),
-    tileHeight: LT.element('input', { size:1 }, 
-      LT.element('div', { 'class':'inputDiv' }, form, 'Tile Height: ') ),
-    tileWidth: LT.element('input', { size:1 }, 
-      LT.element('div', { 'class':'inputDiv' }, form, 'Tile Width: ') ),
-    gridThickness: LT.element('input', { size:1 }, 
-      LT.element('div', { 'class':'inputDiv' }, form, 'Grid Thickness: '), '1', 1),
-    wallThickness: LT.element('input', { size:1 }, 
-      LT.element('div', { 'class':'inputDiv' }, form, 'Wall Thickness: '), '1', 1),
-    tileMode: LT.element('select', { size:1, name:'eTileMode'}, 
-      LT.element('div', { 'class':'inputDiv' }, form, 'Tile Mode: ') ),
-    submit: LT.element('input', { type:'button', style:'cursor: pointer', 
-      id:'chatSubmit', size:8, value:'Apply Changes' }, form)
-  }
-  eTF = LT.Table.editForm;
-  eTF.submit.onclick = function() { LT.Table.edit(); };
-  eTF.rectangleMode = LT.element('option', { value : 'rectangle'}, eTF.tileMode, 'Rectangles');
-  eTF.isometricMode = LT.element('option', { value : 'isometric'}, eTF.tileMode, 'Isometric');
-  eTF.hexRowsMode = LT.element('option', { value : 'hex rows'}, eTF.tileMode, 'Hex rows');
-  eTF.hexColumnsMode = LT.element('option', { value : 'hex columns'}, eTF.tileMode, 'Hex Columns');
-  LT.element('option', { value : 0}, eTF.background, 'None');
-  eTF.selectBG = []
-  for ( i = 0; i < LT.Table.images.length; i++) {
+LT.genericTableForm = function (parent, actionName, actionHandler) {
+  var form = {
+    name: LT.textInput({size: 10}, 'Table Name'),
+    cols: LT.textInput({size: 1}, '8'),
+    rows: LT.textInput({size: 1}, '8'),
+    tileWidth: LT.textInput({size: 1}, '45'),
+    tileHeight: LT.textInput({size: 1}, '45'),
+    gridThickness: LT.textInput({size: 1}, '1'),
+    wallThickness: LT.textInput({size: 1}, '3'),
+    submit: LT.createElement('input', {type: 'button', value: actionName,
+      id: 'chatSubmit', size: 8, style: {cursor: 'pointer'}}),
+    background: LT.createElement('select', {style: {width: '135px'}, name: 'background'},
+      [['option', {value: 0}, ['None']]]),
+    tileMode: LT.createElement('select', {style: {width: '135px'}, name: 'tile_mode'}, [
+      ['option', {value: 'rectangle'}, ['Rectangular Grid']],
+      ['option', {value: 'isometric'}, ['Isometric Grid']],
+      ['option', {value: 'hex rows'}, ['Hex Rows']],
+      ['option', {value: 'hex columns'}, ['Hex Columns']],
+    ]),
+  };
+  form.submit.onclick = actionHandler;
+  for (i = 0; i < LT.Table.images.length; i++) {
     var image = LT.Table.images[i];
     var imageName = image.file.substr(0, image.file.length - 4);
-    eTF.selectBG[i] = LT.element('option', { value : image.id},
-      eTF.background, imageName);
+    LT.createElement(form.background, 'option', {value: image.id}, [imageName]);
   }
-}
-LT.Table.edit = function () {
-  var eTF = LT.Table.editForm;
-  var cT = LT.currentTable;
-  cT.name = eTF.name.value;
-  cT.image_id = eTF.background.value;
-  cT.rows = eTF.rows.value;
-  cT.columns = eTF.cols.value;
-  cT.tile_height = eTF.tileHeight.value; 
-  cT.tile_width = eTF.tileWidth.value;
-  cT.tile_mode = eTF.tileMode.value;
-  cT.wall_thickness = eTF.wallThickness.value;
-  cT.grid_thickness = eTF.gridThickness.value;
-  cT.update({});
-  LT.loadTable();
-}
+  LT.createElement(parent, 'form', [
+    [{'class': 'inputDiv'}, ['Name: ', form.name]],
+    [{'class': 'inputDiv'}, ['Background: ', form.background]],
+    [{'class': 'inputDiv'}, ['Columns: ', form.cols]],
+    [{'class': 'inputDiv'}, ['Rows: ', form.rows]],
+    [{'class': 'inputDiv'}, ['Tile Height: ', form.tileWidth]],
+    [{'class': 'inputDiv'}, ['Tile Width: ', form.tileHeight]],
+    [{'class': 'inputDiv'}, ['Grid Thickness: ', form.gridThickness]],
+    [{'class': 'inputDiv'}, ['Wall Thickness: ', form.wallThickness]],
+    [{'class': 'inputDiv'}, ['Tile Mode: ', form.tileMode]],
+    form.submit,
+  ]);
+  return form;
+};
+
+populateEditTableTab = function () {
+  LT.Table.editForm = LT.genericTableForm(LT.editTableTab, 'Apply Changes', function () {
+    LT.currentTable.name = LT.Table.editForm.name.value;
+    LT.currentTable.image_id = LT.Table.editForm.background.value;
+    LT.currentTable.rows = LT.Table.editForm.rows.value;
+    LT.currentTable.columns = LT.Table.editForm.cols.value;
+    LT.currentTable.tile_height = LT.Table.editForm.tileHeight.value; 
+    LT.currentTable.tile_width = LT.Table.editForm.tileWidth.value;
+    LT.currentTable.tile_mode = LT.Table.editForm.tileMode.value;
+    LT.currentTable.wall_thickness = LT.Table.editForm.wallThickness.value;
+    LT.currentTable.grid_thickness = LT.Table.editForm.gridThickness.value;
+    LT.currentTable.update({});
+    LT.loadTable();
+  });
+};
 
 populateCreateTableTab = function () {
-  form = LT.element('form', { }, LT.createTableTab);
-  LT.Table.createForm = {
-    name: LT.element('input', { size:10, type:'text'}, 
-      LT.element('div', { 'class' : 'inputDiv' }, form, 'Name: '), 'Table Name', 1),
-    background: LT.element('select', { 'style':'width: 135px;', name:'tableBG' }, 
-      LT.element('div', { 'class' : 'inputDiv' }, form, 'Background: ') ),
-    cols: LT.element('input', { size:1 },
-      LT.element('div', { 'class' : 'inputDiv' }, form, 'Columns: '), '8', 1),
-    rows: LT.element('input', { size:1 },
-      LT.element('div', { 'class' : 'inputDiv' }, form, 'Rows: '), '8', 1),
-    tileHeight: LT.element('input', { size:1 },
-      LT.element('div', { 'class' : 'inputDiv' }, form, 'Tile Height: '), '45', 1),
-    tileWidth: LT.element('input', { size:1 },
-      LT.element('div', { 'class' : 'inputDiv' }, form, 'Tile Width: '), '45', 1),
-    gridThickness: LT.element('input', { size:1 }, 
-      LT.element('div', { 'class' : 'inputDiv' }, form, 'Grid Thickness: '), '1', 1),
-    wallThickness: LT.element('input', { size:1 }, 
-      LT.element('div', { 'class' : 'inputDiv' }, form, 'Wall Thickness: '), '3', 1),
-    tileMode: LT.element('select', { name:'cTileMode' }, 
-      LT.element('div', { 'class' : 'inputDiv' }, form, 'Tile Mode: ') ),
-    submit: LT.element('input', { type : 'button', style : 'cursor: pointer', 
-      id : 'chatSubmit', size : 8, value : 'Create' }, form)
-  }
-  cTF = LT.Table.createForm
-  LT.element('option', { value : 'rectangle'}, cTF.tileMode, 'Rectangles');
-  LT.element('option', { value : 'isometric'}, cTF.tileMode, 'Isometric');
-  LT.element('option', { value : 'hex rows'}, cTF.tileMode, 'Hex rows');
-  LT.element('option', { value : 'hex columns'}, cTF.tileMode, 'Hex Columns');
-  cTF.submit.onclick = LT.createTableHandler();
-  LT.element('option', { value : 0}, cTF.background, 'None');
-  for ( i = 0; i < LT.Table.images.length; i++) {
-    var image = LT.Table.images[i];
-    var imageName = image.file.substr(0, image.file.length - 4);
-    LT.element('option', { value : image.id}, cTF.background, imageName);
-  }
-}
-
-LT.createTableHandler = function () {
-  return function () {
-    LT.Table.create();
-    for( var i = 0 ; i < LT.tables.length; i++ ){
-      if (LT.tables[i].name == LT.Table.createForm.name.value) {
-         LT.currentTable = LT.tables[i];
-      }
+  var createForm = LT.genericTableForm(LT.createTableTab, 'Create Table', function () {
+    LT.ajaxRequest("POST", "php/create_table.php", {
+      default_tile: -1,
+      name: createForm.name.value,
+      image_id: createForm.background.value,
+      rows: createForm.rows.value,
+      columns: createForm.cols.value,
+      tile_height: createForm.tileHeight.value, 
+      tile_width: createForm.tileWidth.value,
+      tile_mode: createForm.tileMode.value,
+      wall_thickness: createForm.wallThickness.value,
+      grid_thickness: createForm.gridThickness.value,
+    });
+    LT.refreshTables();
+    for (var i = 0; i < LT.tables.length; i++) {
+      if (LT.tables[i].name == createForm.name.value)
+        LT.currentTable = LT.tables[i];
     }
     LT.loadTable();
-  };
-}
-LT.Table.create = function () {
-  var cTF = LT.Table.createForm;
-  var createTableAjax = LT.ajaxRequest("POST", "php/create_table.php",
-    {
-    name : cTF.name.value,
-    image_id : cTF.background.value,
-    default_tile: -1,
-    rows : cTF.rows.value,
-    columns : cTF.cols.value,
-    tile_height : cTF.tileHeight.value, 
-    tile_width : cTF.tileWidth.value,
-    tile_mode : cTF.tileMode.value,
-    wall_thickness : cTF.wallThickness.value,
-    grid_thickness : cTF.gridThickness.value });
-  LT.refreshTables();
-}
+  });
+};
+

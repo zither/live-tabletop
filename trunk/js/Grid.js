@@ -45,7 +45,7 @@ LT.Grid.prototype = {
   // METHODS OF GRID OBJECTS
 
   repaint: function () {
-    if (this._thickness == 0) return;
+//    if (this._thickness == 0) return;
 
     var context = this.canvas.getContext("2d");
     var margins = this.SHAPES[this._mode].margins;
