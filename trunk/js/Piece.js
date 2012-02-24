@@ -16,7 +16,7 @@ LT.Piece = function (element) {
     var statValue = decodeURIComponent(statNodes[j].textContent);
     this.stats[statName] = statValue;
   }
-  this.element = LT.createElement(LT.pieceLayer, {style: {
+  this.element = LT.element(LT.pieceLayer, {style: {
     position: 'absolute',
     height: this.height + 'px',
     width: this.width + 'px',
@@ -24,14 +24,14 @@ LT.Piece = function (element) {
     top: this.y + 'px',
   }});
   var imageSource = LT.Piece.images[this.image_id];
-  this.image = LT.createElement(this.element, 'img', {
+  this.image = LT.element(this.element, 'img', {
     style: {
       'margin-top': this.y_offset + 'px',
       'margin-left': this.x_offset + 'px',
     },
     src : 'images/upload/piece/' + imageSource.file,
   });
-  this.mover = LT.createElement(LT.clickPieceLayer, {
+  this.mover = LT.element(LT.clickPieceLayer, {
     title: this.name,
     style: {
       position: 'absolute',
@@ -223,12 +223,12 @@ LT.Piece.prototype = {
   The default character sheet script simply lists the stats as a 2 column table.
   */
   characterSheet: function () {
-    var table = LT.createElement("table");
-    var tbody = LT.createElement(table, "tbody");
+    var table = LT.element("table");
+    var tbody = LT.element(table, "tbody");
     for (var statName in this.stats) {
-      var row = LT.createElement(tbody, "tr");
-      LT.createElement(row, "td", [statName]);
-      LT.createElement(row, "td", [this.stats[statName]]);
+      var row = LT.element(tbody, "tr");
+      LT.element(row, "td", [statName]);
+      LT.element(row, "td", [this.stats[statName]]);
     }
     return table;
   },

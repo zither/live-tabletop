@@ -11,14 +11,15 @@ LT.loginCheck = function () {
 };
 
 LT.createLogin = function () {
-  var username = LT.createElement('input', {type: 'text',     id: 'username', size: 10}, ['username']);
-  var password = LT.createElement('input', {type: 'password', id: 'password', size: 10}, ['password']);
-  var submit = LT.createElement('input', {type: 'button', style: 'cursor: pointer', id: 'loginSubmit', size: 8 }, ['Login']);
-  submit.onclick = function () {
-    var request = LT.ajaxRequest("POST", "php/login.php", {username: username.value, password: password.value});
+  var username = LT.text('username', {id: 'username', size: 10});
+  var password = LT.password('password', {id: 'password', size: 10});
+  var submit = LT.button('Login', function () {
+    var request = LT.ajaxRequest("POST", "php/login.php",
+      {username: username.value, password: password.value});
     LT.login(request);
-  };
-  LT.loginForm = LT.createElement(LT.pageBar, 'form', {id: 'loginForm'}, [username, password, submit]);
+  });
+  LT.loginForm = LT.element(LT.pageBar, 'form', {id: 'loginForm'},
+    [username, password, submit]);
 };
 
 LT.login = function (loginRequest) {
@@ -35,7 +36,7 @@ LT.login = function (loginRequest) {
   }
   if (LT.currentUser.id) {
     LT.pageBar.removeChild(LT.loginForm);
-    LT.createElement(LT.userButton, {id: 'loggedIn'});
+    LT.element(LT.userButton, {id: 'loggedIn'});
     var newUsername = document.createTextNode(LT.currentUser.name + "'s options");
     LT.userPanel.buttonCaption.removeChild(LT.userPanel.buttonCaption.firstChild);
     LT.userPanel.buttonCaption.appendChild(newUsername);

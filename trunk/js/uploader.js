@@ -7,10 +7,10 @@ EXAMPLE USAGE (CLIENT SIDE):
 onload = function () {
   var my_uploader = new LT.Uploader("create_image.php", document.body);
   my_uploader.form.onsubmit = function () {
-    LT.createElement(document.body, ["STARTING ..."]);
+    LT.element(document.body, ["STARTING ..."]);
   }
   my_uploader.onload = function (result) {
-    LT.createElement(document.body, ["... FINISHED"]);
+    LT.element(document.body, ["... FINISHED"]);
   }
   my_uploader.form.submit();
 }
@@ -49,7 +49,7 @@ LT.Uploader = function (url, container) {
   var target_name = "uploader_target_" + this.index;
 
   // you can add elements to the form if you want
-  this.form = LT.createElement("form", {
+  this.form = LT.element("form", {
       action: url,
       method: "POST",
       enctype: "multipart/form-data",
@@ -57,20 +57,20 @@ LT.Uploader = function (url, container) {
     }, container);
 
   // file selection widget
-  this.fileInput = LT.createElement("input", {
+  this.fileInput = LT.element("input", {
       type: "file",
       name: "file"
     }, this.form);
 
   // hidden input with uploader id
-  LT.createElement("input", {
+  LT.element("input", {
       type: "hidden",
       name: "uploader",
       value: this.index
     }, this.form);
 
   // hidden iframe that recieves the result of the upload action
-  this.iframe = LT.createElement("iframe", {
+  this.iframe = LT.element("iframe", {
       name: target_name,
       src: "about:blank",
     }, this.form);
@@ -112,7 +112,7 @@ LT.Uploader.prototype = {
     this.temp_args = [];
     for (var arg_name in args) {
       this.temp_args.push(
-        LT.createElement("input", {
+        LT.element("input", {
             type: "hidden",
             name: arg_name,
             value: args[arg_name]
@@ -133,7 +133,7 @@ LT.Uploader.prototype = {
     if (this.perm_args[arg_name]) {
       this.form.removeChild(this.perm_args[arg_name]);
     }
-    this.perm_args[arg_name] = LT.createElement("input", {
+    this.perm_args[arg_name] = LT.element("input", {
         type: "hidden",
         name: arg_name,
         value: arg_value

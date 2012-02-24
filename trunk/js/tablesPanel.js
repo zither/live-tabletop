@@ -110,11 +110,11 @@ LT.refreshTables = function () {
   LT.Table.readTables();
   LT.fill(LT.tablesDiv);
   for (var i = 0 ; i < LT.tables.length; i++) {
-    var tableLink = LT.createElement('a', {'class' : 'textButton'}, [LT.tables[i].name]);
-    var tableDelete = LT.createElement('a', { 'class' : 'deleteButton' }, ['Delete']);
+    var tableLink = LT.element('a', {'class' : 'textButton'}, [LT.tables[i].name]);
+    var tableDelete = LT.element('a', { 'class' : 'deleteButton' }, ['Delete']);
     tableLink.onclick = LT.loadTableHandler(LT.tables[i]);
     tableDelete.onclick = LT.deleteTableHandler(LT.tables[i]);
-    LT.createElement(LT.tablesDiv, { 'style' : 'clear: both;' },
+    LT.element(LT.tablesDiv, { 'style' : 'clear: both;' },
       [tableLink, tableDelete, [{'class': 'separator'}]]);
   }
 };
@@ -135,52 +135,46 @@ LT.deleteTableHandler = function (table) {
 LT.createTablesPanel = function () {
   LT.tablesPanel = new LT.Panel( 'Tables', 'Tables', 6, 26, 140, 180);
   LT.tablesPanel.makeTab('List');
-  LT.tablesTab = LT.tablesPanel.tabs[0].content;
   LT.tablesPanel.makeTab('Create');
-  LT.createTableTab = LT.tablesPanel.tabs[1].content;
   LT.tablesPanel.makeTab('Settings');
-  LT.editTableTab = LT.tablesPanel.tabs[2].content;
   LT.tablesPanel.makeTab('Tools', function () {
     LT.bringForward(LT.clickPieceLayer);
     LT.brush = "piece";
   });
+  LT.button(LT.tablesPanel.tabs[0].content, 'Refresh',
+    function() {LT.refreshTables();});
+  LT.tablesDiv = LT.element(LT.tablesPanel.tabs[0].content);
+  LT.refreshTables();
+  populateCreateTableTab(LT.tablesPanel.tabs[1].content);
+  populateEditTableTab(LT.tablesPanel.tabs[2].content);
   LT.toolsTab = LT.tablesPanel.tabs[3];
-  LT.tableRefresh = LT.createElement(LT.tablesTab, 'input', {type: 'button'}, ['Refresh']);
-  LT.tableRefresh.onclick = function() {LT.refreshTables();};
-  LT.tablesDiv = LT.createElement(LT.tablesTab);
-  LT.refreshTables();  
-  populateCreateTableTab();
-  populateEditTableTab();
-
 };
 
 LT.genericTableForm = function (parent, actionName, actionHandler) {
   var form = {
-    name: LT.textInput({size: 10}, 'Table Name'),
-    cols: LT.textInput({size: 1}, '8'),
-    rows: LT.textInput({size: 1}, '8'),
-    tileWidth: LT.textInput({size: 1}, '45'),
-    tileHeight: LT.textInput({size: 1}, '45'),
-    gridThickness: LT.textInput({size: 1}, '1'),
-    wallThickness: LT.textInput({size: 1}, '3'),
-    submit: LT.createElement('input', {type: 'button', value: actionName,
-      id: 'chatSubmit', size: 8, style: {cursor: 'pointer'}}),
-    background: LT.createElement('select', {style: {width: '135px'}, name: 'background'},
+    name: LT.text({size: 10}, 'Table Name'),
+    cols: LT.text({size: 1}, '8'),
+    rows: LT.text({size: 1}, '8'),
+    tileWidth: LT.text({size: 1}, '45'),
+    tileHeight: LT.text({size: 1}, '45'),
+    gridThickness: LT.text({size: 1}, '1'),
+    wallThickness: LT.text({size: 1}, '3'),
+    submit: LT.button(actionName, actionHandler),
+    background: LT.element('select', {style: {width: '135px'}, name: 'background'},
       [['option', {value: 0}, ['None']]]),
-    tileMode: LT.createElement('select', {style: {width: '135px'}, name: 'tile_mode'}, [
+    tileMode: LT.element('select', {style: {width: '135px'}, name: 'tile_mode'}, [
       ['option', {value: 'rectangle'}, ['Rectangular Grid']],
       ['option', {value: 'isometric'}, ['Isometric Grid']],
       ['option', {value: 'hex rows'}, ['Hex Rows']],
       ['option', {value: 'hex columns'}, ['Hex Columns']],
     ]),
   };
-  form.submit.onclick = actionHandler;
   for (i = 0; i < LT.Table.images.length; i++) {
     var image = LT.Table.images[i];
     var imageName = image.file.substr(0, image.file.length - 4);
-    LT.createElement(form.background, 'option', {value: image.id}, [imageName]);
+    LT.element(form.background, 'option', {value: image.id}, [imageName]);
   }
-  LT.createElement(parent, 'form', [
+  LT.element(parent, 'form', [
     [{'class': 'inputDiv'}, ['Name: ', form.name]],
     [{'class': 'inputDiv'}, ['Background: ', form.background]],
     [{'class': 'inputDiv'}, ['Columns: ', form.cols]],
@@ -195,8 +189,8 @@ LT.genericTableForm = function (parent, actionName, actionHandler) {
   return form;
 };
 
-populateEditTableTab = function () {
-  LT.Table.editForm = LT.genericTableForm(LT.editTableTab, 'Apply Changes', function () {
+populateEditTableTab = function (tab) {
+  LT.Table.editForm = LT.genericTableForm(tab, 'Apply Changes', function () {
     LT.currentTable.name = LT.Table.editForm.name.value;
     LT.currentTable.image_id = LT.Table.editForm.background.value;
     LT.currentTable.rows = LT.Table.editForm.rows.value;
@@ -211,23 +205,23 @@ populateEditTableTab = function () {
   });
 };
 
-populateCreateTableTab = function () {
-  var createForm = LT.genericTableForm(LT.createTableTab, 'Create Table', function () {
+populateCreateTableTab = function (tab) {
+  var form = LT.genericTableForm(tab, 'Create Table', function () {
     LT.ajaxRequest("POST", "php/create_table.php", {
       default_tile: -1,
-      name: createForm.name.value,
-      image_id: createForm.background.value,
-      rows: createForm.rows.value,
-      columns: createForm.cols.value,
-      tile_height: createForm.tileHeight.value, 
-      tile_width: createForm.tileWidth.value,
-      tile_mode: createForm.tileMode.value,
-      wall_thickness: createForm.wallThickness.value,
-      grid_thickness: createForm.gridThickness.value,
+      name: form.name.value,
+      image_id: form.background.value,
+      rows: form.rows.value,
+      columns: form.cols.value,
+      tile_height: form.tileHeight.value, 
+      tile_width: form.tileWidth.value,
+      tile_mode: form.tileMode.value,
+      wall_thickness: form.wallThickness.value,
+      grid_thickness: form.gridThickness.value,
     });
     LT.refreshTables();
     for (var i = 0; i < LT.tables.length; i++) {
-      if (LT.tables[i].name == createForm.name.value)
+      if (LT.tables[i].name == form.name.value)
         LT.currentTable = LT.tables[i];
     }
     LT.loadTable();

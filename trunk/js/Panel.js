@@ -35,37 +35,37 @@ LT.Panel = function (panelName, buttonName, x, y, width, height, buttonLoc) {
   // Create Floating Panel ----------------------------------------------------
 
   // corner resize handles
-  var resizeTL = LT.createElement({'class': 'resizeTL'});
-  var resizeTR = LT.createElement({'class': 'resizeTR'})
-  var resizeBL = LT.createElement({'class': 'resizeBL'});
-  var resizeBR = LT.createElement({'class': 'resizeBR'});
+  var resizeTL = LT.element({'class': 'resizeTL'});
+  var resizeTR = LT.element({'class': 'resizeTR'})
+  var resizeBL = LT.element({'class': 'resizeBL'});
+  var resizeBR = LT.element({'class': 'resizeBR'});
   resizeTL.onmousedown = function() {LT.Panel.selectedTL = self; return false;};
   resizeTR.onmousedown = function() {LT.Panel.selectedTR = self; return false;};
   resizeBL.onmousedown = function() {LT.Panel.selectedBL = self; return false;};
   resizeBR.onmousedown = function() {LT.Panel.selectedBR = self; return false;};
 
   // title bar for dragging the panel around
-  this.bar = LT.createElement({'class': 'panelBar', style: {width: (width - 42) + 'px'}}, [' ']);
+  this.bar = LT.element({'class': 'panelBar', style: {width: (width - 42) + 'px'}}, [' ']);
   this.bar.onmousedown = function () {
     LT.Panel.selected = self;
     return false;
   };
 
   // close button
-  var close = LT.createElement({'class': 'close'});
+  var close = LT.element({'class': 'close'});
   close.onclick = function () {
     self.hide();
     LT.Panel.saveCookie();
     return false;
   };
 
-  this.tabBar = LT.createElement({'class': 'tabBar'})
-  this.header = LT.createElement({'class': 'panelHeader'});
-  this.content = LT.createElement({'class': 'panelContent', style: {height: height + 'px'}});
-  this.footer = LT.createElement({'class': 'panelFooter'});
+  this.tabBar = LT.element({'class': 'tabBar'})
+  this.header = LT.element({'class': 'panelHeader'});
+  this.content = LT.element({'class': 'panelContent', style: {height: height + 'px'}});
+  this.footer = LT.element({'class': 'panelFooter'});
 
   // panel structure
-  this.outside = LT.createElement(document.body, {'class': 'outerPanel', 
+  this.outside = LT.element(document.body, {'class': 'outerPanel', 
     style: {left: x + 'px', top: y + 'px', visibility: 'hidden', width: width + 'px'}}, [
     [{'class': 'title'}, [
       resizeTL,
@@ -90,9 +90,9 @@ LT.Panel = function (panelName, buttonName, x, y, width, height, buttonLoc) {
 
   // Create Menu Button ------------------------------------------------------
 
-  this.buttonCaption = LT.createElement({'class': 'buttonCaption'}, [buttonName]);
+  this.buttonCaption = LT.element({'class': 'buttonCaption'}, [buttonName]);
   var menu = buttonLoc ? buttonLoc : LT.buttons;
-  this.button = LT.createElement(menu, {'class': 'buttonUnchecked'}, 
+  this.button = LT.element(menu, {'class': 'buttonUnchecked'}, 
     [[{'class': 'buttonStart'}], this.buttonCaption, [{'class': 'buttonEnd'}]]);
   this.button.onclick = function () {
     if (self.outside.style.visibility == "hidden") self.show();
@@ -167,13 +167,13 @@ LT.Panel.prototype = {
   makeTab: function (name, tabAction) {
     var isActive = 'activeTab';
     if (this.tabs.length > 0) isActive = 'inactiveTab';
-    tabLabel = LT.createElement(this.tabBar, {'class' : isActive}, [
+    tabLabel = LT.element(this.tabBar, {'class' : isActive}, [
       [{'class' : 'tabStart'}],
       [{'class' : 'tabContent'}, [name]],
       [{'class' : 'tabEnd'}],
     ]);
-    var tabContent = LT.createElement();
-    var tabHeader = LT.createElement();
+    var tabContent = LT.element();
+    var tabHeader = LT.element();
     this.tabs.push({label: tabLabel, content: tabContent, header: tabHeader, action: tabAction});
     if (this.tabs.length == 1) {
       this.content.appendChild(tabContent);
@@ -281,7 +281,7 @@ LT.Panel.prototype = {
 
   // Load this panel's dimensions from a string saved in a cookie
   restoreFromCookieString: function (cookieString) {
-    LT.createElement(this.tabBar, {'class' : 'clearBoth'});
+    LT.element(this.tabBar, {'class' : 'clearBoth'});
     if (cookieString) {
       var panelShape = cookieString.split(' ');
       // FIXME: magic numbers

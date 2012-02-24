@@ -227,7 +227,7 @@ LT.Table.prototype = {
   },
 
   createGridClickDetector: function (column, row, direction, left, top, width, height) {
-    var clickDiv = LT.createElement(LT.clickWallLayer, {style: {
+    var clickDiv = LT.element(LT.clickWallLayer, {style: {
       position: "absolute",
       left: (this.tile_width  * (column + left)) + "px",
       top: (this.tile_height * (row + top)) + "px",

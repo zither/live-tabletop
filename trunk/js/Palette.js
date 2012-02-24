@@ -2,7 +2,7 @@ LT.Palette = function (theHandler, theParent, theBrightness) {
   this.brightness = theBrightness || 6;
   this.handler = theHandler;
   this.selected = null;
-  this.element = LT.createElement(theParent, {style: {
+  this.element = LT.element(theParent, {style: {
     clear: 'left',
     height: theBrightness * this.SWATCH_HEIGHT + 'px',
     position: 'relative',
@@ -55,7 +55,7 @@ LT.Palette.prototype = {
     var red = r * 51;
     var green = g * 51;
     var blue = b * 51;
-    var swatch = LT.createElement(this.element, {style: {
+    var swatch = LT.element(this.element, {style: {
       position: 'absolute',
       left: x * this.SWATCH_WIDTH + 'px',
       top: y * this.SWATCH_HEIGHT + 'px',
