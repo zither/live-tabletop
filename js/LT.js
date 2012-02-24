@@ -150,6 +150,8 @@ This function takes 0 to 3 arguments in any order, distinguished by type.
 
 text:        A string argument is interpreted as the default text.
              The default text disappears when you select the field.
+             TODO: the default text doesn't disappear, it is just selected
+             TODO: it is immediately unselected in chrome browser
 
 parent:      An HTML element argument becomes the parent of the new element.
 
