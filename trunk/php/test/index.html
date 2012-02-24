@@ -2,7 +2,7 @@
   <head>
     <title>Live Tabletop Automated Test</title>
     <link rel="stylesheet" href="test.css"/>
-    <script type="text/javascript" src="../../js/liveTabletop.js"></script>
+    <script type="text/javascript" src="../../js/LT.js"></script>
     <script type="text/javascript" src="../../js/uploader.js"></script>
     <script type="text/javascript" src="test.js"></script>
     <script type="text/javascript">
@@ -12,17 +12,23 @@ TEST.ADMIN_USERNAME = "foo";
 TEST.ADMIN_PASSWORD = "bar";
 TEST.WRONG_PASSWORD = "baz";
 TEST.TABLE_ARGS = {
-  name: "My Table",
+  'name': "My Table",
   image_id: 1,
   default_tile: 2,
   rows: 100,
   columns: 50,
   tile_width: 45,
   tile_height: 30,
-  tile_mode: "rectangle"};
+  tile_mode: "rectangle",
+  grid_thickness: 1,
+  grid_color: "gray",
+  wall_thickness: 3,
+  wall_color: "black",
+};
 TEST.INSTALL_ARGS = {
   admin_username : TEST.ADMIN_USERNAME,
-  admin_password : TEST.ADMIN_PASSWORD},
+  admin_password : TEST.ADMIN_PASSWORD,
+},
 
 // special result tests
 TEST.one_table = function (ajax) {return TEST.count(ajax, "table", 1);};
@@ -76,7 +82,7 @@ TEST.tests = [
     result: function (ajax) {
       var roll = ajax.responseXML.getElementsByTagName("message")[0];
       var text = decodeURIComponent(roll.textContent.replace(/^\s+|\s+$/g, ''));
-      return (text == 'From 1975 - 2010, <span title="0 + 2010 - 1975">'
+      return (text == 'From 1975 - 2010, <span class="roll">0 + 2010 - 1975 = '
         + '35</span> years passed.') ? "PASS" : "FAIL [" + text + "]";}},
 
   // U S E R
@@ -150,7 +156,12 @@ TEST.tests = [
       columns: 25,
       tile_width: 32,
       tile_height: 40,
-      tile_mode: "rectangle"},
+      grid_thickness: 7,
+      grid_color: "red",
+      wall_thickness: 3,
+      wall_color: "green",
+      tile_mode: "rectangle",
+    },
     result: TEST.one_table},
 
   {group: "READ TABLE",
@@ -171,11 +182,12 @@ TEST.tests = [
       image_id: 3,
       tile_width: 30,
       tile_height: 20,
-      grid_width: 15,
-      grid_height: 10,
       grid_thickness: 2,
       grid_color: "brown",
-      tile_mode: 'isometric'},
+      wall_thickness: 1,
+      wall_color: "blue",
+      tile_mode: 'isometric',
+    },
     result: TEST.blank},
   {action: "../read_table.php",
     args: {table_id: 1},
@@ -187,10 +199,10 @@ TEST.tests = [
           && tables[i].getAttribute("image_id") == "3"
           && tables[i].getAttribute("tile_width") == "30"
           && tables[i].getAttribute("tile_height") == "20"
-          && tables[i].getAttribute("grid_width") == "15"
-          && tables[i].getAttribute("grid_height") == "10"
           && tables[i].getAttribute("grid_thickness") == "2"
           && decodeURIComponent(tables[i].getAttribute("grid_color")) == "brown"
+          && tables[i].getAttribute("wall_thickness") == "1"
+          && decodeURIComponent(tables[i].getAttribute("wall_color")) == "blue"
           && decodeURIComponent(tables[i].getAttribute("tile_mode")) == "isometric"
         ) return "PASS";
       }
@@ -376,12 +388,14 @@ TEST.tests = [
     args: {
       image_id: 1,
       user_id: 2,
-      public: 1,
+      'public': 1,
       tile_width: 123456,
       tile_height: 234567,
       center_x: 345678,
       center_y: 456789,
-      tile_mode: "isometric"},
+      tile_mode: "isometric",
+      layer: 3,
+    },
     result: TEST.blank},
   {action: "../read_images.php",
     args: {type: "background"},
@@ -395,8 +409,9 @@ TEST.tests = [
         && image.getAttribute("center_x") == "345678"
         && image.getAttribute("center_y") == "456789"
         && decodeURIComponent(image.getAttribute("tile_mode")) == "isometric"
+        && image.getAttribute("layer") == "3"
         ) return "PASS";
-      return "FAIL [" + ajax.responseText + "]";}},
+      else return "FAIL [" + ajax.responseText + "]";}},
 
   {group: "DELETE IMAGE",
     action: "../delete_image.php",
@@ -430,6 +445,7 @@ TEST.tests = [
     args: {table_id: 1, x: 2, y: 3, direction: "sw"},
     result: TEST.blank},
   {action: "../read_walls.php",
+    args: {table_id: 1},
     result: function (ajax) {return TEST.count(ajax, "wall", 0);}},
 ];
 
@@ -439,22 +455,22 @@ onload = function () {
     location: "URL of database server",
     database: "database name",
     username: "database user name",
-    password: "database password"};
+    password: "database password",
+  };
   var inputs = {};
   for (var field in descriptions) {
-    var div = LT.element("div", {}, document.body);
-    inputs[field] = LT.element("input", {type: "text", name: field}, div);
-    div.appendChild(document.createTextNode(descriptions[field]));
+    inputs[field] = LT.textInput(field);
+    LT.createElement(document.body, [inputs[field], descriptions[field]]);
   }
 
   // image selection
-  LT.element("div", {}, document.body, "select an image file:");
+  LT.createElement(document.body, ["select an image file:"]);
   document.body.appendChild(TEST.uploader.form);
   TEST.uploader.form.onsubmit = function () {
-    LT.element("div", {}, document.body, "STARTING UPLOAD...");
+    LT.createElement(document.body, ["STARTING UPLOAD..."]);
   }
   TEST.uploader.onload = function (result) {    
-    LT.element("div", {}, document.body, "... FINISHED UPLOAD");
+    LT.createElement(document.body, ["... FINISHED UPLOAD"]);
     TEST.finish(result);
   }
   TEST.uploader.iframe.style.removeProperty("border");
@@ -463,8 +479,7 @@ onload = function () {
   TEST.uploader.iframe.style.display = "block";
 
   // submit button
-  var begin = LT.element("input", {type: "submit", value: "Begin Test"},
-    document.body);
+  var begin = LT.createElement(document.body, "input", {type: "submit"}, ["Begin Test"]);
   begin.onclick = function (e) {
     if (!e) var e = window.event;
     TEST.INSTALL_ARGS.location = inputs.location.value;

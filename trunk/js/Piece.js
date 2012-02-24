@@ -16,20 +16,34 @@ LT.Piece = function (element) {
     var statValue = decodeURIComponent(statNodes[j].textContent);
     this.stats[statName] = statValue;
   }
-  this.element = LT.element('div', {style : 'position: absolute; '
-    + 'height: ' + this.height + 'px; ' + 'width: ' + this.width + 'px; '
-    + 'left: ' + this.x + 'px; ' + 'top: ' + this.y + 'px; '}, LT.pieceLayer);
+  this.element = LT.createElement(LT.pieceLayer, {style: {
+    position: 'absolute',
+    height: this.height + 'px',
+    width: this.width + 'px',
+    left: this.x + 'px',
+    top: this.y + 'px',
+  }});
   var imageSource = LT.Piece.images[this.image_id];
-  this.image = LT.element('img', {style:
-    'margin-top: ' + this.y_offset + 'px; margin-left: ' + this.x_offset + 'px;',
-    src : 'images/upload/piece/' + imageSource.file}, this.element);
-  this.mover = LT.element('div', {
-    title : this.name,
-    style : 'position: absolute; opacity: 0.8; '
-    + 'height: ' + imageSource.height + 'px; width: ' + imageSource.width + 'px; '
-    + 'left: ' + this.x + 'px; top: ' + this.y + 'px; '
-    + 'margin-left: ' + this.x_offset + 'px; margin-top: ' + this.y_offset + 'px; '
-    }, LT.clickPieceLayer);
+  this.image = LT.createElement(this.element, 'img', {
+    style: {
+      'margin-top': this.y_offset + 'px',
+      'margin-left': this.x_offset + 'px',
+    },
+    src : 'images/upload/piece/' + imageSource.file,
+  });
+  this.mover = LT.createElement(LT.clickPieceLayer, {
+    title: this.name,
+    style: {
+      position: 'absolute',
+      opacity: '0.8',
+      height: imageSource.height + 'px',
+      width: imageSource.width + 'px',
+      left: this.x + 'px',
+      top: this.y + 'px',
+      'margin-left': + this.x_offset + 'px',
+      'margin-top': + this.y_offset + 'px',
+    },
+  });
   if (LT.Piece.selected && this.id == LT.Piece.selected.id) {
     this.mover.style.border = '1px dashed black';
     this.mover.style.margin = (this.y_offset -1) + 'px 0px 0px '
@@ -79,17 +93,19 @@ LT.Piece.creator = {};
 
 
 // STATIC FUNCTIONS
-LT.Piece.stopDragging = function () {
+LT.dropHandlers.push(function () {
   if (LT.Piece.moving) {
     LT.Piece.selected.place();
     LT.Piece.moving = false;
   }
-};
-LT.Piece.drag = function () {
+});
+
+LT.dragHandlers.push(function () {
   if (LT.Piece.moving) {
     LT.Piece.selected.move();
   }
-};
+});
+
 LT.Piece.readImages = function () {
   var request = LT.ajaxRequest("POST", "php/read_images.php", {'type' : 'piece'});
   if (request.responseXML) {
@@ -207,12 +223,12 @@ LT.Piece.prototype = {
   The default character sheet script simply lists the stats as a 2 column table.
   */
   characterSheet: function () {
-    var table = LT.element("table", {});
-    var tbody = LT.element("tbody", {}, table);
+    var table = LT.createElement("table");
+    var tbody = LT.createElement(table, "tbody");
     for (var statName in this.stats) {
-      var row = LT.element("tr", {}, tbody);
-      LT.element("td", {}, row, statName);
-      LT.element("td", {}, row, this.stats[statName]);
+      var row = LT.createElement(tbody, "tr");
+      LT.createElement(row, "td", [statName]);
+      LT.createElement(row, "td", [this.stats[statName]]);
     }
     return table;
   },

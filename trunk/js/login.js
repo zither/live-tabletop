@@ -11,19 +11,14 @@ LT.loginCheck = function () {
 };
 
 LT.createLogin = function () {
-  LT.loginForm = LT.element('form', { id : 'loginForm', 
-    style : 'float: right;'}, LT.pageBar);
-  LT.loginUsername = LT.element('input', { style : 'border: 1px solid #CCC;',
-    id : 'username', size : 10 }, LT.loginForm, 'username', 1);
-  LT.loginPassword = LT.element('input', { style : 'border: 1px solid #CCC;',
-    id : 'password', size : 10, type : 'password' }, LT.loginForm, 'password', 1);
-  var loginSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
-    id : 'loginSubmit', size : 8 }, LT.loginForm, 'Login');
-  loginSubmit.onclick = function () {
-    var request = LT.ajaxRequest("POST", "php/login.php",
-      {username: LT.loginUsername.value, password: LT.loginPassword.value});
+  var username = LT.createElement('input', {type: 'text',     id: 'username', size: 10}, ['username']);
+  var password = LT.createElement('input', {type: 'password', id: 'password', size: 10}, ['password']);
+  var submit = LT.createElement('input', {type: 'button', style: 'cursor: pointer', id: 'loginSubmit', size: 8 }, ['Login']);
+  submit.onclick = function () {
+    var request = LT.ajaxRequest("POST", "php/login.php", {username: username.value, password: password.value});
     LT.login(request);
   };
+  LT.loginForm = LT.createElement(LT.pageBar, 'form', {id: 'loginForm'}, [username, password, submit]);
 };
 
 LT.login = function (loginRequest) {
@@ -40,7 +35,7 @@ LT.login = function (loginRequest) {
   }
   if (LT.currentUser.id) {
     LT.pageBar.removeChild(LT.loginForm);
-    LT.element('div', {id: 'loggedIn'}, LT.userButton);
+    LT.createElement(LT.userButton, {id: 'loggedIn'});
     var newUsername = document.createTextNode(LT.currentUser.name + "'s options");
     LT.userPanel.buttonCaption.removeChild(LT.userPanel.buttonCaption.firstChild);
     LT.userPanel.buttonCaption.appendChild(newUsername);
@@ -59,10 +54,7 @@ LT.login = function (loginRequest) {
 	  }
     LT.refreshUsersList();
     if (LT.tableListDiv) LT.refreshTableList();
-    LT.element('div', {'class' : 'chat_alert'}, LT.chatPanel.output, "You have logged in.");
-    LT.chatPanel.output.removeChild(LT.chatBottom);
-    LT.chatPanel.output.appendChild(LT.chatBottom);
-    LT.chatBottom.scrollIntoView(true);
+    LT.chatAlert("You have logged in.");
     LT.refreshTables();
     LT.createTools();
     LT.createPieceImages();
@@ -83,9 +75,6 @@ LT.logout = function () {
   LT.userPanel.hide();
   LT.pageBar.removeChild(LT.userButton);
   LT.pageBar.appendChild(LT.loginForm);
-  LT.element('div', {'class' : 'chat_alert'}, LT.chatPanel.output, "You have logged out.");
-  LT.chatPanel.output.removeChild(LT.chatBottom);
-  LT.chatPanel.output.appendChild(LT.chatBottom);
-  LT.chatBottom.scrollIntoView(true);
+  LT.chatAlert("You have logged out.");
 	LT.currentUser = 0;
 };

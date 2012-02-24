@@ -227,16 +227,15 @@ LT.Table.prototype = {
   },
 
   createGridClickDetector: function (column, row, direction, left, top, width, height) {
-    var clickDiv = LT.element("div", {style: "position: absolute;"
-      + "left: " + (this.tile_width  * (column + left)) + "px;"
-      + "top: " + (this.tile_height * (row + top)) + "px;"
-      + "width: " + (this.tile_width  * width) + "px;"
-      + "height: " + (this.tile_height * height) + "px;"
-      }, LT.clickWallLayer);
+    var clickDiv = LT.createElement(LT.clickWallLayer, {style: {
+      position: "absolute",
+      left: (this.tile_width  * (column + left)) + "px",
+      top: (this.tile_height * (row + top)) + "px",
+      width: (this.tile_width  * width) + "px",
+      height: (this.tile_height * height) + "px",
+    }});
     var self = this;
-    clickDiv.onclick = function () {
-      self.click(column, row, direction);
-    }
+    clickDiv.onclick = function () {self.click(column, row, direction);};
   },
 
   click: function (column, row, direction) {

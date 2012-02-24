@@ -43,10 +43,6 @@ LT.Table.readTiles = function(){
   }
 }
 
-LT.loadTableHandler = function (table) {
-  return function () {LT.loadTable(table);};
-}
-
 LT.loadTable = function (table) {    
   if (table) {
     LT.currentTable = table;
@@ -71,18 +67,13 @@ LT.loadTable = function (table) {
     LT.refreshTables;
     LT.currentTable.createGrid();
 
-    LT.createElement(LT.chatPanel.output, 'br');
-    LT.createElement(LT.chatPanel.output, 'div', {'class' : 'chat_alert'},
-      ["Loading chat log for " + LT.currentTable.name + "..."]);
+    LT.chatAlert();
+    LT.chatAlert("Loading chat log for " + LT.currentTable.name + "...");
     LT.lastMessage = 0;
     LT.refreshMessageList();
-    LT.createElement(LT.chatPanel.output, 'a', {'class' : 'chat_alert'}, 
-      ["Arriving at " + LT.currentTable.name]);
-    LT.createElement(LT.chatPanel.output, 'br');
+    LT.chatAlert("Arriving at " + LT.currentTable.name);
+    LT.chatAlert();
 
-    LT.chatPanel.output.removeChild(LT.chatBottom);
-    LT.chatPanel.output.appendChild(LT.chatBottom);
-    LT.chatBottom.scrollIntoView(true);
     LT.Table.readTiles();
     LT.loadPieces();
     document.cookie = 'table=' + LT.currentTable.id + ';';
@@ -118,22 +109,24 @@ LT.loadTable = function (table) {
 LT.refreshTables = function () {
   LT.Table.readTables();
   LT.fill(LT.tablesDiv);
-  for( var i = 0 ; i < LT.tables.length; i++ ){    
-    tableEntry = LT.element('div', { 'style' : 'clear: both;' }, LT.tablesDiv, ' ')
-    var tableLink = LT.element('a', {'class' : 'textButton'}, tableEntry, LT.tables[i].name);
+  for (var i = 0 ; i < LT.tables.length; i++) {
+    var tableLink = LT.createElement('a', {'class' : 'textButton'}, [LT.tables[i].name]);
+    var tableDelete = LT.createElement('a', { 'class' : 'deleteButton' }, ['Delete']);
     tableLink.onclick = LT.loadTableHandler(LT.tables[i]);
-    tableDelete = LT.element('a', { 'class' : 'deleteButton' }, tableEntry, 'Delete');
-    tableDelete.onclick = LT.Table.deleteTable(LT.tables[i]);
-    LT.element('div',{'class' : 'separator'}, tableEntry);
+    tableDelete.onclick = LT.deleteTableHandler(LT.tables[i]);
+    LT.createElement(LT.tablesDiv, { 'style' : 'clear: both;' },
+      [tableLink, tableDelete, [{'class': 'separator'}]]);
   }
 };
 
-LT.Table.deleteTable = function (table) {
+LT.loadTableHandler = function (table) {
+  return function () {LT.loadTable(table);};
+}
+
+LT.deleteTableHandler = function (table) {
   return function () {
-    var confirmDel =  confirm('Are you sure you want to delete '
-      + table.name + '?');
-    if (confirmDel) {
-      LT.ajaxRequest("POST", "php/delete_table.php",{ 'table_id' : table.id });
+    if (confirm('Are you sure you want to delete ' + table.name + '?')) {
+      LT.ajaxRequest("POST", "php/delete_table.php", {'table_id': table.id });
       LT.refreshTables();
     }
   }
@@ -152,9 +145,9 @@ LT.createTablesPanel = function () {
     LT.brush = "piece";
   });
   LT.toolsTab = LT.tablesPanel.tabs[3];
-  LT.tableRefresh = LT.element('input',{ type : 'button' }, LT.tablesTab, 'Refresh');
-  LT.tableRefresh.onclick = function() { LT.refreshTables(); };
-  LT.tablesDiv = LT.element('div',{}, LT.tablesTab);
+  LT.tableRefresh = LT.createElement(LT.tablesTab, 'input', {type: 'button'}, ['Refresh']);
+  LT.tableRefresh.onclick = function() {LT.refreshTables();};
+  LT.tablesDiv = LT.createElement(LT.tablesTab);
   LT.refreshTables();  
   populateCreateTableTab();
   populateEditTableTab();

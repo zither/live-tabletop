@@ -2,16 +2,12 @@ LT.Palette = function (theHandler, theParent, theBrightness) {
   this.brightness = theBrightness || 6;
   this.handler = theHandler;
   this.selected = null;
-  this.element = LT.element({
-    parent: theParent,
-    style: {
-      clear: 'left',
-//      height: 6 * this.SWATCH_HEIGHT + 'px',
-      height: theBrightness * this.SWATCH_HEIGHT + 'px',
-      position: 'relative',
-      border: '2px solid transparent',
-    },
-  });
+  this.element = LT.createElement(theParent, {style: {
+    clear: 'left',
+    height: theBrightness * this.SWATCH_HEIGHT + 'px',
+    position: 'relative',
+    border: '2px solid transparent',
+  }});
   for (var r = 0; r < theBrightness; r++) {
     for (var g = 0; g < theBrightness; g++) {
       for (var b = 0; b < theBrightness; b++) {
@@ -51,6 +47,7 @@ LT.Palette = function (theHandler, theParent, theBrightness) {
   }
 */
 };
+
 LT.Palette.prototype = {
   SWATCH_WIDTH: 5,
   SWATCH_HEIGHT: 5,
@@ -58,17 +55,14 @@ LT.Palette.prototype = {
     var red = r * 51;
     var green = g * 51;
     var blue = b * 51;
-    var swatch = LT.element({
-      parent: this.element,
-      style: {
-        position: 'absolute',
-        left: x * this.SWATCH_WIDTH + 'px',
-        top: y * this.SWATCH_HEIGHT + 'px',
-        width: this.SWATCH_WIDTH + 'px',
-        height: this.SWATCH_HEIGHT + 'px',
-        backgroundColor: 'rgb(' + [red, green, blue].join(',') + ')',
-      },
-    });
+    var swatch = LT.createElement(this.element, {style: {
+      position: 'absolute',
+      left: x * this.SWATCH_WIDTH + 'px',
+      top: y * this.SWATCH_HEIGHT + 'px',
+      width: this.SWATCH_WIDTH + 'px',
+      height: this.SWATCH_HEIGHT + 'px',
+      'background-color': 'rgb(' + [red, green, blue].join(',') + ')',
+    }});
     var self = this;
     swatch.onclick = function () {
       if (self.selected) {

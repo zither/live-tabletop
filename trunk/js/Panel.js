@@ -32,75 +32,132 @@ LT.Panel = function (panelName, buttonName, x, y, width, height, buttonLoc) {
   // Remember the current 'this' during event handlers.
   var self = this;
 
- // Create Floating Panel ----------------------------------------------------
+  // Create Floating Panel ----------------------------------------------------
 
-  this.outside = LT.element('div', {'class' : 'outerPanel',
-  	'style' : 'left: ' + x + 'px; top: ' + y + 'px; visibility: hidden; ' + 
-		'width: ' + width + 'px;'},
-  	document.body);
-  this.outside.onmousedown = function() {
-    self.bringToFront();
-  };
-  this.outside.style.zIndex = "" + LT.Panel.order.length;
+  // corner resize handles
+  var resizeTL = LT.createElement({'class': 'resizeTL'});
+  var resizeTR = LT.createElement({'class': 'resizeTR'})
+  var resizeBL = LT.createElement({'class': 'resizeBL'});
+  var resizeBR = LT.createElement({'class': 'resizeBR'});
+  resizeTL.onmousedown = function() {LT.Panel.selectedTL = self; return false;};
+  resizeTR.onmousedown = function() {LT.Panel.selectedTR = self; return false;};
+  resizeBL.onmousedown = function() {LT.Panel.selectedBL = self; return false;};
+  resizeBR.onmousedown = function() {LT.Panel.selectedBR = self; return false;};
 
-  // Top: includes top-left resize button, title, close button
-  var title = LT.element('div', {'class' : 'title'}, this.outside);
-  var resizeTL = LT.element('div', {'class' : 'resizeTL'}, title)
-  resizeTL.onmousedown = function() {
-    LT.Panel.selectedTL = self;
-    return false;
-  };
-  LT.element('div', {'class' : 'titleStart'}, title);
-  LT.element('div', {'class' : 'titleCaption'}, title, panelName);
-  LT.element('div', {'class' : 'titleEnd'}, title);
-  this.bar = LT.element('div', {'class' : 'panelBar', 
-    'style' : 'width: ' + (width - 42) + 'px;'}, title, ' ');
+  // title bar for dragging the panel around
+  this.bar = LT.createElement({'class': 'panelBar', style: {width: (width - 42) + 'px'}}, [' ']);
   this.bar.onmousedown = function () {
     LT.Panel.selected = self;
     return false;
   };
-  var resizeTR = LT.element('div', {'class' : 'resizeTR'}, title)
-  resizeTR.onmousedown = function() {
-    LT.Panel.selectedTR = self;
-    return false;
-  };
-  var close = LT.element('div', {'class' : 'close'}, title);
+
+  // close button
+  var close = LT.createElement({'class': 'close'});
   close.onclick = function () {
-	self.hide();
+    self.hide();
     LT.Panel.saveCookie();
     return false;
   };
-  this.tabBar = LT.element('div', {'class' : 'tabBar'}, this.outside)
-  this.header = LT.element('div', {'class' : 'panelHeader'}, this.outside);
-  
-  // Middle: this.content contains elements specific to each panel
-  this.content = LT.element('div', {'class' : 'panelContent', 'style' : 
-	'height: ' + height + 'px;'}, this.outside);
 
-  this.footer = LT.element('div', {'class' : 'panelFooter'}, this.outside);
-  
-  // Bottom: includes bottom-right resize button
-  var bottom = LT.element('div', {'class' : 'panelBottom'}, this.outside);
-  LT.element('div', {'class' : 'resizeBL'}, bottom)
-    .onmousedown = function() {LT.Panel.selectedBL = self; return false;};
-  LT.element('div', {'class' : 'resizeBR'}, bottom)
-    .onmousedown = function() {LT.Panel.selectedBR = self; return false;};
+  this.tabBar = LT.createElement({'class': 'tabBar'})
+  this.header = LT.createElement({'class': 'panelHeader'});
+  this.content = LT.createElement({'class': 'panelContent', style: {height: height + 'px'}});
+  this.footer = LT.createElement({'class': 'panelFooter'});
+
+  // panel structure
+  this.outside = LT.createElement(document.body, {'class': 'outerPanel', 
+    style: {left: x + 'px', top: y + 'px', visibility: 'hidden', width: width + 'px'}}, [
+    [{'class': 'title'}, [
+      resizeTL,
+      [{'class': 'titleStart'}],
+      [{'class': 'titleCaption'}, [panelName]],
+      [{'class': 'titleEnd'}],
+      this.bar,
+      resizeTR,
+      close,
+    ]],
+    this.tabBar,
+    this.header,
+    this.content,
+    this.footer, 
+    [{'class': 'panelBottom'}, [
+      resizeBL,
+      resizeBR,
+    ]],
+  ]);
+  this.outside.onmousedown = function() {self.bringToFront();};
+  this.outside.style.zIndex = "" + LT.Panel.order.length;
 
   // Create Menu Button ------------------------------------------------------
 
+  this.buttonCaption = LT.createElement({'class': 'buttonCaption'}, [buttonName]);
   var menu = buttonLoc ? buttonLoc : LT.buttons;
-  this.button = LT.element('div', {'class' : 'buttonUnchecked'}, menu);
+  this.button = LT.createElement(menu, {'class': 'buttonUnchecked'}, 
+    [[{'class': 'buttonStart'}], this.buttonCaption, [{'class': 'buttonEnd'}]]);
   this.button.onclick = function () {
     if (self.outside.style.visibility == "hidden") self.show();
     else self.hide();
     LT.Panel.saveCookie();
     return false;
   };
-  LT.element('div', {'class' : 'buttonStart'}, this.button);
-  this.buttonCaption = LT.element('div', {'class' : 'buttonCaption'}, this.button, buttonName);
-  LT.element('div', {'class' : 'buttonEnd'}, this.button);
 
 }
+
+
+// GLOBAL VARIABLES
+
+LT.Panel.order = []; // panels in back-to-front order
+LT.Panel.list = []; // panels in the order they were created
+
+LT.Panel.selected = null; // panel being moved, null if no panel is being moved
+LT.Panel.selectedBR = null; // panel being resized with the bottom right handle
+LT.Panel.selectedTL = null; // panel being resized with the top left handle
+
+LT.clickCornerX = 0; // horizontal position of corner being resized
+LT.clickCornerY = 0; // vertical position of corner being resized
+
+
+// STATIC FUNCTIONS
+
+// Save panel Positions
+LT.Panel.saveCookie = function(){
+  var cookieString = '';
+  for (i = 0; i < LT.Panel.list.length; i++) {
+	cookieString += LT.Panel.list[i].getCookieString();
+  }
+  document.cookie = 'panels=' + cookieString + ';';
+}
+
+// Load Panel positions
+LT.Panel.loadCookie = function (){
+  var cookieArray = LT.getCookie('panels');
+  if (cookieArray) {
+    var panelsCookie = cookieArray.split('_');
+    for(i = 0; i < LT.Panel.list.length; i++){
+      LT.Panel.list[i].restoreFromCookieString(panelsCookie[i]);
+    }
+  }
+}
+
+// If a panel is being moved or resized, update it's dimensions.
+LT.dragHandlers.push(function () {
+  if (LT.Panel.selected) LT.Panel.selected.move();
+  if (LT.Panel.selectedBL) LT.Panel.selectedBL.resizeBL();
+  if (LT.Panel.selectedBR) LT.Panel.selectedBR.resizeBR();
+  if (LT.Panel.selectedTR) LT.Panel.selectedTR.resizeTR();
+  if (LT.Panel.selectedTL) LT.Panel.selectedTL.resizeTL();
+});
+
+// Stop moving or resizing panels.
+LT.dropHandlers.push(function () {
+  LT.Panel.selected = null;
+  LT.Panel.selectedTR = null;
+  LT.Panel.selectedTL = null;
+  LT.Panel.selectedBR = null;
+  LT.Panel.selectedBL = null;
+  LT.Panel.saveCookie();
+});
+
 
 // METHODS OF PANEL OBJECTS
 
@@ -109,17 +166,16 @@ LT.Panel.prototype = {
   // Create a tab
   makeTab: function (name, tabAction) {
     var isActive = 'activeTab';
-    if (this.tabs.length > 0){
-      isActive = 'inactiveTab';
-    }
-    tabLabel = LT.element('div', {'class' : isActive}, this.tabBar);
-    LT.element('div', {'class' : 'tabStart'}, tabLabel);
-    LT.element('div', {'class' : 'tabContent'}, tabLabel, name);
-    LT.element('div', {'class' : 'tabEnd'}, tabLabel);
-    var tabContent = LT.element('div', {});
-    var tabHeader = LT.element('div', {});
-    this.tabs.push({label : tabLabel, content : tabContent, header : tabHeader, action : tabAction});
-    if (this.tabs.length == 1){
+    if (this.tabs.length > 0) isActive = 'inactiveTab';
+    tabLabel = LT.createElement(this.tabBar, {'class' : isActive}, [
+      [{'class' : 'tabStart'}],
+      [{'class' : 'tabContent'}, [name]],
+      [{'class' : 'tabEnd'}],
+    ]);
+    var tabContent = LT.createElement();
+    var tabHeader = LT.createElement();
+    this.tabs.push({label: tabLabel, content: tabContent, header: tabHeader, action: tabAction});
+    if (this.tabs.length == 1) {
       this.content.appendChild(tabContent);
       this.header.appendChild(tabHeader);
     }
@@ -225,7 +281,7 @@ LT.Panel.prototype = {
 
   // Load this panel's dimensions from a string saved in a cookie
   restoreFromCookieString: function (cookieString) {
-    LT.element('div', {'class' : 'clearBoth'}, this.tabBar);
+    LT.createElement(this.tabBar, {'class' : 'clearBoth'});
     if (cookieString) {
       var panelShape = cookieString.split(' ');
       // FIXME: magic numbers
@@ -351,68 +407,4 @@ LT.Panel.prototype = {
     this.bar.style.width = newWidth - 44 + "px";
   }
 };
-
-// GLOBAL VARIABLES
-
-LT.Panel.order = []; // panels in back-to-front order
-LT.Panel.list = []; // panels in the order they were created
-
-LT.Panel.selected = null; // panel being moved, null if no panel is being moved
-LT.Panel.selectedBR = null; // panel being resized with the bottom right handle
-LT.Panel.selectedTL = null; // panel being resized with the top left handle
-
-LT.clickCornerX = 0; // horizontal position of corner being resized
-LT.clickCornerY = 0; // vertical position of corner being resized
-
-
-// STATIC FUNCTIONS
-
-// Save panel Positions
-LT.Panel.saveCookie = function(){
-  var cookieString = '';
-  for (i = 0; i < LT.Panel.list.length; i++) {
-	cookieString += LT.Panel.list[i].getCookieString();
-  }
-  document.cookie = 'panels=' + cookieString + ';';
-}
-
-// Load Panel positions
-LT.Panel.loadCookie = function (){
-  var cookieArray = LT.getCookie('panels');
-  if (cookieArray) {
-    var panelsCookie = cookieArray.split('_');
-    for(i = 0; i < LT.Panel.list.length; i++){
-      LT.Panel.list[i].restoreFromCookieString(panelsCookie[i]);
-    }
-  }
-}
-
-// If a panel is being moved or resized, update it's dimensions.
-LT.Panel.drag = function () {
-  if (LT.Panel.selected) {
-    LT.Panel.selected.move();
-  }
-  if (LT.Panel.selectedBL) {
-    LT.Panel.selectedBL.resizeBL();
-  }
-  if (LT.Panel.selectedBR) {
-    LT.Panel.selectedBR.resizeBR();
-  }
-  if (LT.Panel.selectedTR) {
-    LT.Panel.selectedTR.resizeTR();
-  }
-  if (LT.Panel.selectedTL) {
-    LT.Panel.selectedTL.resizeTL();
-  }
-}
-
-// Stop moving or resizing panels.
-LT.Panel.stopDragging = function () {
-  LT.Panel.selected = null;
-  LT.Panel.selectedTR = null;
-  LT.Panel.selectedTL = null;
-  LT.Panel.selectedBR = null;
-  LT.Panel.selectedBL = null;
-}
-
 

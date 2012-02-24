@@ -28,59 +28,6 @@ LT.getCookie = function (cookieName) {
   }
 };
 
-/*
-LT.element creates a new HTML element and inserts it into the document.
-This function takes an object argument which can have the following properties:
-
-  tag: html tag name, defaults to "div"
-  attributes: an object with a property for each attribute
-  parent: the parent element of the new element
-  text: text to appear inside the new element
-  children: array of elements to appent to the new element
-  clears: when you click on the element, you overwrite the default text
-  style: an object with a property for each CSS property
-
-This function returns the new element.
-*/
-LT.element = function (args, attributes, parentElement, text, clears) {
-  if (typeof(args) == 'string') {
-    // old syntax. TODO: convert all LT.element calls to new syntax
-    args = {
-      tag: args,
-      attributes: attributes,
-      parent: parentElement,
-      text: text,
-      clears: clears,
-    };
-  }
-  var newElement = document.createElement(args.tag || "div");
-  if (args.attributes) {
-    for (var attrName in args.attributes)
-      newElement.setAttribute(attrName, args.attributes[attrName]);
-  }
-  if (args.parent) {
-    args.parent.appendChild(newElement);
-  }
-  if (args.text) {
-    if (args.tag == 'input') newElement.value = args.text;
-    else newElement.textContent = args.text;
-  }
-  if (args.clears) {
-    newElement.onfocus = function () {
-      if (newElement.value == args.text) this.select();
-    };
-  }
-  if (args.children) {
-    for (var i = 0; i < args.children.length; i++)
-      newElement.appendChild(args.children[i]);
-  }
-  if (args.style) {
-    for (var property in args.style)
-      newElement.style[property] = args.style[property];
-  }
-  return newElement;
-}
-
 LT.elementAttributes = function (element, attributes) {
   for (var key in attributes) {
     var value = attributes[key];
@@ -106,6 +53,25 @@ LT.elementChildren = function (element, children) {
 };
 
 /*
+Associate the items in an array by their type and class.
+Used in functions that take arguments in any order, distinguished by type.
+*/
+LT.associateByType = function (items) {
+  var results = {};
+  for (var i = 0; i < items.length; i++) {
+    var item = items[i];
+    var type = typeof(item);
+    if (type == "object") {
+      if (item instanceof Element) results.element = item;
+      else if (item instanceof Array) results.array = item;
+      else results.object = item;
+    }
+    else results[type] = item;
+  }
+  return results;
+};
+
+/*
 Create an HTML element.
 
 This function takes 0 to 4 arguments in any order, distinguished by type.
@@ -125,21 +91,11 @@ children:    Contents of an array argument become children of the new element.
              Arrays are converted to an element as arguments to this function.
 */
 LT.createElement = function (arg1, arg2, arg3, arg4) {
-  var tag = "div";
-  var attributes = {};
-  var children = [];
-  var parent = null;
-  var args = [arg1, arg2, arg3, arg4];
-  for (var i = 0; i < args.length; i++) {
-    if (typeof(args[i]) == "string") tag = args[i];
-    else if (args[i] instanceof Element) parent = args[i];
-    else if (args[i] instanceof Array) children = args[i];
-    else if (typeof(args[i]) == "object") attributes = args[i];
-  }
-  var newElement = document.createElement(tag);
-  if (parent) parent.appendChild(newElement);
-  LT.elementAttributes(newElement, attributes);
-  LT.elementChildren(newElement, children);
+  var args = LT.associateByType([arg1, arg2, arg3, arg4]);
+  var newElement = document.createElement(args.string || 'div');
+  if (args.element) args.element.appendChild(newElement);
+  LT.elementAttributes(newElement, args.object || {});
+  LT.elementChildren(newElement, args.array || []);
   return newElement;
 };
 
@@ -149,9 +105,8 @@ Create a text input field.
 This function takes 0 to 3 arguments in any order, distinguished by type.
 
 text:        A string argument is interpreted as the default text.
-             The default text disappears when you select the field.
-             TODO: the default text doesn't disappear, it is just selected
-             TODO: it is immediately unselected in chrome browser
+             The default text is selected when you select the field.
+             TODO: it is immediately unselected when you click on the field in chrome browser
 
 parent:      An HTML element argument becomes the parent of the new element.
 
@@ -161,26 +116,20 @@ attributes:  If an argument is an object but not an HTML element,
              the properties of that object are converted into CSS properties.
 */
 LT.textInput = function (arg1, arg2, arg3) {
-  var text = "";
-  var attributes = {};
-  var parent = null;
-  var args = [arg1, arg2, arg3];
-  for (var i = 0; i < args.length; i++) {
-    if (typeof(args[i]) == "string") text = args[i];
-    else if (args[i] instanceof Element) parent = args[i];
-    else if (typeof(args[i]) == "object") attributes = args[i];
-  }
+  var args = LT.associateByType([arg1, arg2, arg3]);
   var input = document.createElement("input");
-  if (parent) parent.appendChild(input);
-  attributes.type = "text";
-  LT.elementAttributes(input, attributes);
-  if (text) {
-    input.value = text;
-    input.onfocus = function () {if (input.value == text) this.select();};
+  input.type = "text";
+  if (args.element) args.element.appendChild(input);
+  LT.elementAttributes(input, args.object);
+  if (args.string) {
+    input.value = args.string;
+    input.onfocus = function () {
+      if (input.value == args.string)
+        this.select();
+    };
   }
   return input;
 };
-
 
 LT.ajaxRequest = function (method, url, args, callback) {
 
@@ -254,16 +203,18 @@ LT.fill = function (pObject, cObject) {
   }
 }
 
+LT.dragHandlers = [];
+LT.dropHandlers = [];
+
 document.onselectstart = function () {return false;}
 
 // Stop dragging when the mouse button is released.
-document.onmouseup = function () {
+document.onmouseup = function (e) {
+  if (!e) var e = window.event;
   LT.holdTimestamps = 0;
-  LT.Panel.stopDragging();
+  for (var i = 0; i < LT.dropHandlers.length; i++)
+    LT.dropHandlers[i](e);
   LT.clickDragGap = 0;
-  LT.Tile.dragging = 0;
-  LT.Piece.stopDragging();
-  LT.Panel.saveCookie();
 }
 document.onmousedown = function () {
   LT.holdTimestamps = 1;
@@ -280,8 +231,8 @@ document.onmousemove = function (e) {
     LT.dragX = e.pageX;
     LT.dragY = e.pageY;
   }
-  LT.Piece.drag();
-  LT.Panel.drag();
+  for (var i = 0; i < LT.dragHandlers.length; i++)
+    LT.dragHandlers[i](e);
   e.preventDefault();
   return false;
 };

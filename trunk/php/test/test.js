@@ -13,7 +13,7 @@ var TEST = {
   // TEST.start() starts the tests. It should not be called
   // until the document is loaded (i.e. "onload = TEST.start;".)
   start: function () {
-    LT.element("div", {}, document.body, "STARTING TESTS ...");
+    LT.createElement(document.body, ["STARTING TESTS ..."]);
     TEST.request();
   },
 
@@ -96,20 +96,20 @@ var TEST = {
   finish: function (ajax) {
     var old_test = TEST.tests[TEST.index];
     var result = old_test.result(ajax);
-    LT.element("div", {class: result.slice(0,4)}, document.body,
-      old_test.action + ": " + result);
+    LT.createElement(document.body, [old_test.action + ": " + result],
+      {'class': result.slice(0,4)});
     if (old_test.abort && result != "PASS") {
-      LT.element("div", {}, document.body, "... STOPPING TESTS!");
+      LT.createElement(document.body, ["... STOPPING TESTS!"]);
       return;
     }
     TEST.index++;
     if (TEST.index == TEST.tests.length) {
-      LT.element("div", {}, document.body, "... FINISHED!");
+      LT.createElement(document.body, ["... FINISHED!"]);
       return;
     }
     var new_test = TEST.tests[TEST.index];
     if (new_test.group) {
-      LT.element("div", {}, document.body, new_test.group);
+      LT.createElement(document.body, [new_test.group]);
     }
     TEST.request();
   }

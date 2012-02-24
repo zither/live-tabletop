@@ -28,7 +28,7 @@ LT.refreshMessageList = function () {
     var now = new Date();
     // create an element to contain the timestamp
     // the element's title (mouseover text) is the full date and time
-    var time = LT.element('span', {title: then.toString()}, LT.chatPanel.output);
+    var time = LT.createElement(LT.chatOutput, 'span', {title: then.toString()});
     if (then.toDateString() == now.toDateString()) {
       // if the message is from today, then only show hours and minutes
       time.textContent = "[" + then.getHours() + ":" + then.getMinutes() + "]";
@@ -38,36 +38,47 @@ LT.refreshMessageList = function () {
         + then.getDate() + " " + then.getHours() + ":" + then.getMinutes() + "]";
     }
     // show the user who sent the message
-    LT.element('span', {}, LT.chatPanel.output, " " + LT.messages[i].userName + ": ");
+    LT.createElement(LT.chatOutput, 'span', [" " + LT.messages[i].userName + ": "]);
     // show the content of the message
-    LT.chatPanel.output.appendChild(LT.messages[i].element);
+    LT.chatOutput.appendChild(LT.messages[i].element);
     // start a new line after the message
-	LT.element('br', {}, LT.chatPanel.output);
+    LT.createElement(LT.chatOutput, 'br');
   }
   
-  LT.chatPanel.output.removeChild(LT.chatBottom);
-  LT.chatPanel.output.appendChild(LT.chatBottom);
+  LT.chatOutput.removeChild(LT.chatBottom);
+  LT.chatOutput.appendChild(LT.chatBottom);
   LT.chatBottom.scrollIntoView(true);
 };
 
 LT.createChatPanel = function () {
-  LT.chatPanel = new LT.Panel( 'Chat', 'Chat', 6, 95, 355, 130);
-  LT.chatPanel.form = LT.element('form', {id:'chatForm'}, LT.chatPanel.footer);
-  LT.chatPanel.output = LT.element('div', { id : 'chatOutput' }, LT.chatPanel.content);
-  LT.chatBottom = LT.element('a', {}, LT.chatPanel.output, " ");
-  LT.chatInput = LT.element('input', { id : 'chatInput', size : 20, 
-    style : 'border: 1px solid #CCC;'}, LT.chatPanel.form, '-- Write a message. --', 1 );
-  LT.chatPanel.form.chatSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
-    id : 'chatSubmit', size : 8 }, LT.chatPanel.form, 'Send');
-  LT.chatPanel.form.chatSubmit.onclick = function() { LT.createMessage(); };
-  LT.chatPanel.form.onsubmit = function() { LT.createMessage(); return false; };
-  LT.element('div', {'class':'clearBoth'}, LT.chatPanel.form);
-}
+  LT.chatPanel = new LT.Panel('Chat', 'Chat', 6, 95, 355, 130);
+  var form = LT.createElement(LT.chatPanel.footer, 'form', {id:'chatForm'});
+  LT.chatOutput = LT.createElement(LT.chatPanel.content, {id: 'chatOutput'});
+  LT.chatBottom = LT.createElement(LT.chatOutput, 'a', [" "]);
+  var chatInput = LT.textInput(form, '-- Write a message. --',
+    {id: 'chatInput', size: 20, style: {border: '1px solid #CCC'}});
+  var chatSubmit = LT.createElement(form, 'input', ['Send'],
+    {type: 'button', style: 'cursor: pointer', id: 'chatSubmit', size: 8 });
+  LT.createElement(form, {'class': 'clearBoth'});
 
-LT.createMessage = function () {
-  var args = {table_id: LT.currentTable.id, text: LT.chatInput.value};
-  LT.chatInput.value = "";
-  LT.ajaxRequest("POST", "php/create_message.php", args);
-  LT.chatInput.focus();
-  LT.refreshMessageList();
-}
+  var createMessage = function () {
+    chatInput.value = "";
+    LT.ajaxRequest("POST", "php/create_message.php", 
+      {table_id: LT.currentTable.id, text: chatInput.value});
+    chatInput.focus();
+    LT.refreshMessageList();
+  }
+  chatSubmit.onclick = function() {createMessage();};
+  form.onsubmit = function() {createMessage(); return false;};
+};
+
+LT.chatAlert = function (text) {
+  if (text) 
+    LT.createElement(LT.chatOutput, {'class' : 'chat_alert'}, [text]);
+  else
+    LT.createElement(LT.chatOutput, 'br');
+  LT.chatOutput.removeChild(LT.chatBottom);
+  LT.chatOutput.appendChild(LT.chatBottom);
+  LT.chatBottom.scrollIntoView(true);
+};
+
