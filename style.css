@@ -436,9 +436,13 @@ height: 1px; background: #999; width: auto; clear: both; margin: 1px 0px 4px 0px
 /* Install Box */
 #installBox {
   margin: 20px auto;
-  width: 180px;
+  width: 250px;
+}
+#installBox div {
+  clear: right;
 }
 #installBox input {
   border: 1px solid #CCC;
+  float: right;
 }
 

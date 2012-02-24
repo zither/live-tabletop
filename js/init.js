@@ -1,17 +1,17 @@
 LT.load = function () {
-  LT.clickTileLayer = LT.createElement({'class': 'clickLayer'});
-  LT.clickWallLayer = LT.createElement({'class': 'clickLayer'});
-  LT.clickPieceLayer = LT.createElement({'class': 'clickLayer'});
-  LT.clickLayers = LT.createElement([LT.clickTileLayer, LT.clickWallLayer, LT.clickPieceLayer]);
-  LT.tileLayer = LT.createElement();
-  LT.wallLayer = LT.createElement();
-  LT.pieceLayer = LT.createElement();
-  LT.fogLayer = LT.createElement();
-  LT.tabletop = LT.createElement(document.body, {id: 'tabletop'},
+  LT.clickTileLayer = LT.element({'class': 'clickLayer'});
+  LT.clickWallLayer = LT.element({'class': 'clickLayer'});
+  LT.clickPieceLayer = LT.element({'class': 'clickLayer'});
+  LT.clickLayers = LT.element([LT.clickTileLayer, LT.clickWallLayer, LT.clickPieceLayer]);
+  LT.tileLayer = LT.element();
+  LT.wallLayer = LT.element();
+  LT.pieceLayer = LT.element();
+  LT.fogLayer = LT.element();
+  LT.tabletop = LT.element(document.body, {id: 'tabletop'},
     [LT.tileLayer, LT.wallLayer, LT.pieceLayer, LT.fogLayer, LT.clickLayers]);
 
-  LT.buttons = LT.createElement({id: 'buttons'});
-  LT.pageBar = LT.createElement(document.body, {id: 'pageBar'}, [[{id: 'logo'}], LT.buttons]);
+  LT.buttons = LT.element({id: 'buttons'});
+  LT.pageBar = LT.element(document.body, {id: 'pageBar'}, [[{id: 'logo'}], LT.buttons]);
 
   LT.tables = [];
 

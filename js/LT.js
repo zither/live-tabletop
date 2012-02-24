@@ -28,6 +28,7 @@ LT.getCookie = function (cookieName) {
   }
 };
 
+// Assign each property of an object as an element's attributes.
 LT.elementAttributes = function (element, attributes) {
   for (var key in attributes) {
     var value = attributes[key];
@@ -40,6 +41,7 @@ LT.elementAttributes = function (element, attributes) {
   }
 };
 
+// Insert text and elements inside an element.
 LT.elementChildren = function (element, children) {
   for (var i = 0; i < children.length; i++) {
     if (typeof(children[i]) == "string") {
@@ -47,7 +49,7 @@ LT.elementChildren = function (element, children) {
       else element.appendChild(document.createTextNode(children[i]));
     }
     else if (children[i] instanceof Element) element.appendChild(children[i]);
-    else if (children[i] instanceof Array) element.appendChild(LT.createElement(
+    else if (children[i] instanceof Array) element.appendChild(LT.element(
       children[i][0], children[i][1], children[i][2], children[i][3]));
   }
 };
@@ -90,12 +92,12 @@ children:    Contents of an array argument become children of the new element.
              Strings are appended as text nodes.
              Arrays are converted to an element as arguments to this function.
 */
-LT.createElement = function (arg1, arg2, arg3, arg4) {
+LT.element = function (arg1, arg2, arg3, arg4) {
   var args = LT.associateByType([arg1, arg2, arg3, arg4]);
   var newElement = document.createElement(args.string || 'div');
   if (args.element) args.element.appendChild(newElement);
-  LT.elementAttributes(newElement, args.object || {});
-  LT.elementChildren(newElement, args.array || []);
+  if (args.object) LT.elementAttributes(newElement, args.object);
+  if (args.array) LT.elementChildren(newElement, args.array);
   return newElement;
 };
 
@@ -110,17 +112,17 @@ text:        A string argument is interpreted as the default text.
 
 parent:      An HTML element argument becomes the parent of the new element.
 
-attributes:  If an argument is an object but not an HTML element,
+attributes:  If an argument is an object but not an HTML element or array,
              it's properties become the attributes of the new element.
              If the style attribute is an object instead of a string,
              the properties of that object are converted into CSS properties.
 */
-LT.textInput = function (arg1, arg2, arg3) {
+LT.text = function (arg1, arg2, arg3) {
   var args = LT.associateByType([arg1, arg2, arg3]);
   var input = document.createElement("input");
   input.type = "text";
   if (args.element) args.element.appendChild(input);
-  LT.elementAttributes(input, args.object);
+  if (args.object) LT.elementAttributes(input, args.object);
   if (args.string) {
     input.value = args.string;
     input.onfocus = function () {
@@ -131,6 +133,44 @@ LT.textInput = function (arg1, arg2, arg3) {
   return input;
 };
 
+/*
+Create a password input field.
+The arguments are the same as LT.text() 
+*/
+LT.password = function (arg1, arg2, arg3) {
+  var input = LT.text(arg1, arg2, arg3);
+  input.type = "password";
+  return input;
+};
+
+/*
+Create a button.
+
+This function takes 0 to 3 arguments in any order, distinguished by type.
+
+text:        A string argument is interpreted as the text on the button.
+
+parent:      An HTML element argument becomes the parent of the new element.
+
+attributes:  If an argument is an object but not an HTML element or array,
+             it's properties become the attributes of the new element.
+             If the style attribute is an object instead of a string,
+             the properties of that object are converted into CSS properties.
+*/
+LT.button = function (arg1, arg2, arg3) {
+  var args = LT.associateByType([arg1, arg2, arg3]);
+  var input = document.createElement("input");
+  input.type = "button";
+  input.value = args.string;
+  if (args.element) args.element.appendChild(input);
+  if (args.object) LT.elementAttributes(input, args.object);
+  if (args['function']) input.onclick = args['function'];
+  return input;
+};
+
+/*
+Send an HTTP request.
+*/
 LT.ajaxRequest = function (method, url, args, callback) {
 
   var ajax = new XMLHttpRequest();

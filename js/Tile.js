@@ -99,7 +99,7 @@ LT.Tile.prototype = {
         top += Math.round(0.5 * table.tile_height * (this.x % 2));
       }
       // create the new image element
-      this.image = LT.createElement('img', {'src' : image.getURL(), style: {
+      this.image = LT.element('img', {'src' : image.getURL(), style: {
         position: 'absolute',
         left: left + 'px',
         top: top + 'px',
@@ -110,7 +110,7 @@ LT.Tile.prototype = {
       }});
       // create as many new sub-layers as needed
       for (var i = LT.tileLayer.childNodes.length; i < image.layer + 1; i++) {
-        LT.createElement(LT.tileLayer);
+        LT.element(LT.tileLayer);
       }
       // add the new image to the appropriate sub-layer
       var layer = LT.tileLayer.childNodes.item(image.layer);
@@ -144,7 +144,7 @@ LT.Tile.prototype = {
       top += Math.round(0.5 * table.tile_height * (this.x % 2));
     }
     // create the new clickable element
-    this.clickDiv = LT.createElement(LT.clickTileLayer, {style: {
+    this.clickDiv = LT.element(LT.clickTileLayer, {style: {
       position: 'absolute',
       left: left + 'px',
       top: top + 'px',
@@ -193,7 +193,7 @@ LT.Tile.prototype = {
         top += Math.round(0.5 * table.tile_height * (this.x % 2));
       }
       // create the new fog element
-      this.fogElement = LT.createElement(LT.fogLayer, 'img', 
+      this.fogElement = LT.element(LT.fogLayer, 'img', 
         {'src': 'images/fog.png', style: {
           position: 'absolute',
           left: left + 'px',

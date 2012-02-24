@@ -459,18 +459,18 @@ onload = function () {
   };
   var inputs = {};
   for (var field in descriptions) {
-    inputs[field] = LT.textInput(field);
-    LT.createElement(document.body, [inputs[field], descriptions[field]]);
+    inputs[field] = LT.text(field);
+    LT.element(document.body, [inputs[field], descriptions[field]]);
   }
 
   // image selection
-  LT.createElement(document.body, ["select an image file:"]);
+  LT.element(document.body, ["select an image file:"]);
   document.body.appendChild(TEST.uploader.form);
   TEST.uploader.form.onsubmit = function () {
-    LT.createElement(document.body, ["STARTING UPLOAD..."]);
+    LT.element(document.body, ["STARTING UPLOAD..."]);
   }
   TEST.uploader.onload = function (result) {    
-    LT.createElement(document.body, ["... FINISHED UPLOAD"]);
+    LT.element(document.body, ["... FINISHED UPLOAD"]);
     TEST.finish(result);
   }
   TEST.uploader.iframe.style.removeProperty("border");
@@ -479,7 +479,7 @@ onload = function () {
   TEST.uploader.iframe.style.display = "block";
 
   // submit button
-  var begin = LT.createElement(document.body, "input", {type: "submit"}, ["Begin Test"]);
+  var begin = LT.element(document.body, "input", {type: "submit"}, ["Begin Test"]);
   begin.onclick = function (e) {
     if (!e) var e = window.event;
     TEST.INSTALL_ARGS.location = inputs.location.value;
