@@ -19,13 +19,11 @@ LT.createLogin = function () {
     id : 'password', size : 10, type : 'password' }, LT.loginForm, 'password', 1);
   var loginSubmit = LT.element('input', { type : 'button', style : 'cursor: pointer', 
     id : 'loginSubmit', size : 8 }, LT.loginForm, 'Login');
-  loginSubmit.onclick = function () {LT.sendLogin(LT.loginUsername.value, LT.loginPassword.value)};
-};
-
-LT.sendLogin = function (loginName, loginPassword) {
-  var request = LT.ajaxRequest("POST", "php/login.php",
-    { username : loginName, password : loginPassword});
-  LT.login(request);
+  loginSubmit.onclick = function () {
+    var request = LT.ajaxRequest("POST", "php/login.php",
+      {username: LT.loginUsername.value, password: LT.loginPassword.value});
+    LT.login(request);
+  };
 };
 
 LT.login = function (loginRequest) {
@@ -69,7 +67,7 @@ LT.login = function (loginRequest) {
     LT.createTools();
     LT.createPieceImages();
     LT.Panel.loadCookie();
-		
+
 	  LT.Table.loadPresets();
     LT.refreshMessageList();
     LT.loadTable();
