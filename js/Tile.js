@@ -29,6 +29,10 @@ LT.Tile.readImages = function () {
   }
 };
 
+LT.dropHandlers.push(function () {
+  LT.Tile.dragging = 0;
+});
+
 // METHODS OF TILE OBJECTS
 LT.Tile.prototype = {
 
@@ -95,13 +99,18 @@ LT.Tile.prototype = {
         top += Math.round(0.5 * table.tile_height * (this.x % 2));
       }
       // create the new image element
-      this.image = LT.element('img', {'src' : image.getURL(),
-        'style': 'position: absolute; left: ' + left + 'px; top: ' + top + 'px; '
-        + 'width: ' + image_width + 'px; height: ' + image_height + 'px; '
-        + 'margin-left: ' + margin_left + 'px; margin-top: ' + margin_top + 'px; '});
+      this.image = LT.createElement('img', {'src' : image.getURL(), style: {
+        position: 'absolute',
+        left: left + 'px',
+        top: top + 'px',
+        width: image_width + 'px',
+        height: image_height + 'px',
+        'margin-left': margin_left + 'px',
+        'margin-top': margin_top + 'px',
+      }});
       // create as many new sub-layers as needed
       for (var i = LT.tileLayer.childNodes.length; i < image.layer + 1; i++) {
-        LT.element('div', {}, LT.tileLayer);
+        LT.createElement(LT.tileLayer);
       }
       // add the new image to the appropriate sub-layer
       var layer = LT.tileLayer.childNodes.item(image.layer);
@@ -135,9 +144,13 @@ LT.Tile.prototype = {
       top += Math.round(0.5 * table.tile_height * (this.x % 2));
     }
     // create the new clickable element
-    this.clickDiv = LT.element('div', {'style': 'position: absolute; '
-      + 'left: ' + left + 'px; top: ' + top + 'px; width: ' + table.tile_width
-      + 'px; height: ' + table.tile_height + 'px; '}, LT.clickTileLayer);
+    this.clickDiv = LT.createElement(LT.clickTileLayer, {style: {
+      position: 'absolute',
+      left: left + 'px',
+      top: top + 'px',
+      width: table.tile_width + 'px',
+      height: table.tile_height + 'px',
+    }});
     // create event handlers for painting the tile
     var self = this;
     this.clickDiv.onmousedown = function() {
@@ -180,10 +193,14 @@ LT.Tile.prototype = {
         top += Math.round(0.5 * table.tile_height * (this.x % 2));
       }
       // create the new fog element
-      this.fogElement = LT.element('img', {'src': 'images/fog.png',
-        'style': 'position: absolute; left: ' + left + 'px; top:' + top + 'px; '
-        + 'width: ' + table.tile_width * 2 + 'px; height: ' + table.tile_height * 2
-        + 'px; '}, LT.fogLayer);
+      this.fogElement = LT.createElement(LT.fogLayer, 'img', 
+        {'src': 'images/fog.png', style: {
+          position: 'absolute',
+          left: left + 'px',
+          top: top + 'px', 
+          width: table.tile_width * 2 + 'px',
+          height: table.tile_height * 2 + 'px',
+        }});
     }
   },
 

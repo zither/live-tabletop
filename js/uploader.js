@@ -7,10 +7,10 @@ EXAMPLE USAGE (CLIENT SIDE):
 onload = function () {
   var my_uploader = new LT.Uploader("create_image.php", document.body);
   my_uploader.form.onsubmit = function () {
-    LT.element("div", {}, document.body, "STARTING ...");
+    LT.createElement(document.body, ["STARTING ..."]);
   }
   my_uploader.onload = function (result) {
-    LT.element("div", {}, document.body, "... FINISHED");
+    LT.createElement(document.body, ["... FINISHED"]);
   }
   my_uploader.form.submit();
 }
@@ -49,7 +49,7 @@ LT.Uploader = function (url, container) {
   var target_name = "uploader_target_" + this.index;
 
   // you can add elements to the form if you want
-  this.form = LT.element("form", {
+  this.form = LT.createElement("form", {
       action: url,
       method: "POST",
       enctype: "multipart/form-data",
@@ -57,20 +57,20 @@ LT.Uploader = function (url, container) {
     }, container);
 
   // file selection widget
-  this.fileInput = LT.element("input", {
+  this.fileInput = LT.createElement("input", {
       type: "file",
       name: "file"
     }, this.form);
 
   // hidden input with uploader id
-  LT.element("input", {
+  LT.createElement("input", {
       type: "hidden",
       name: "uploader",
       value: this.index
     }, this.form);
 
   // hidden iframe that recieves the result of the upload action
-  this.iframe = LT.element("iframe", {
+  this.iframe = LT.createElement("iframe", {
       name: target_name,
       src: "about:blank",
     }, this.form);
@@ -112,7 +112,7 @@ LT.Uploader.prototype = {
     this.temp_args = [];
     for (var arg_name in args) {
       this.temp_args.push(
-        LT.element("input", {
+        LT.createElement("input", {
             type: "hidden",
             name: arg_name,
             value: args[arg_name]
@@ -133,7 +133,7 @@ LT.Uploader.prototype = {
     if (this.perm_args[arg_name]) {
       this.form.removeChild(this.perm_args[arg_name]);
     }
-    this.perm_args[arg_name] = LT.element("input", {
+    this.perm_args[arg_name] = LT.createElement("input", {
         type: "hidden",
         name: arg_name,
         value: arg_value

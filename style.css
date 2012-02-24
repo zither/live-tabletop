@@ -45,6 +45,14 @@ input {
   margin: 200px 200px 200px 200px;
 }
 
+#loginForm {
+  float: right;
+}
+
+#username, #password {
+  border: 1px solid #CCC;
+}
+
 /* SHOW/HIDE PANEL BUTTONS AT THE TOP OF THE PAGE */
 
 #buttons {
@@ -366,6 +374,14 @@ height: 1px; background: #999; width: auto; clear: both; margin: 1px 0px 4px 0px
   margin: 1px 1px 1px 1px
 }
 
+#eraser, #fogTool, #wallTool, #pieceTool {
+  float: left;
+  border: 1px solid black;
+  margin: 1px 1px 1px 1px;
+  height: 30px;
+  width: 40px;
+  text-align: center;
+}
 
 .roll {
   font-style: italic;
