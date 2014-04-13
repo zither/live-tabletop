@@ -8,7 +8,7 @@ include('include/ownership.php');
 
 // Interpret the Request
 
-$piece_id = $LT_SQL->real_escape_string($_REQUEST['piece_id']);
+$piece_id = $LT_SQL->real_escape_string($_REQUEST['id']);
 $image_id = $LT_SQL->real_escape_string($_REQUEST['image_id']);
 $user_id = $LT_SQL->real_escape_string($_REQUEST['user_id']);
 $name = $LT_SQL->real_escape_string($_REQUEST['name']);

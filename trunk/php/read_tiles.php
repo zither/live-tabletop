@@ -16,14 +16,13 @@ $rows = LT_call('read_tiles', $table_id);
 
 // Generate Output
 
-include('include/xml_headers.php');
-echo "<tiles>";
-for ($i = 0; $i < count($rows); $i++) {
-  $t = $rows[$i];
-  echo "{$t['fog']}{$t['image_id']}";
-  if ($i != count($rows) - 1) {
-    echo " ";
-  }
+$images = array();
+$fog = "";
+foreach ($rows as $tile) {
+	$images[] = intval($tile['image_id']);
+	$fog .= $tile['fog'];
 }
-echo "</tiles>\n";
+include('include/json_headers.php');
+echo json_encode(array('fog' => $fog, 'images' => $images));
+
 ?>

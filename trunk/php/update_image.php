@@ -8,7 +8,7 @@ include('include/ownership.php');
 
 // Interpret the Request
 
-$image_id = $LT_SQL->real_escape_string($_REQUEST['image_id']);
+$image_id = $LT_SQL->real_escape_string($_REQUEST['id']);
 $user_id = $LT_SQL->real_escape_string($_REQUEST['user_id']);
 $public = $LT_SQL->real_escape_string($_REQUEST['public']);
 $tile_width = $LT_SQL->real_escape_string($_REQUEST['tile_width']);

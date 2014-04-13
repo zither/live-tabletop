@@ -17,28 +17,15 @@ $rows = LT_call('read_images', $type);
 
 // Generate Output
 
-include('include/xml_headers.php');
-echo "<images>\n";
-for ($i = 0; $i < count($rows); $i++) {
-  echo "  <image"
-    // Encode integers as strings.
-    . " id=\"{$rows[$i]['id']}\""
-    . " user_id=\"{$rows[$i]['user_id']}\""
-    . " public=\"{$rows[$i]['public']}\""
-    . " time=\"{$rows[$i]['time']}\""
-    . " width=\"{$rows[$i]['width']}\""
-    . " height=\"{$rows[$i]['height']}\""
-    . " tile_width=\"{$rows[$i]['tile_width']}\""
-    . " tile_height=\"{$rows[$i]['tile_height']}\""
-    . " center_x=\"{$rows[$i]['center_x']}\""
-    . " center_y=\"{$rows[$i]['center_y']}\""
-    . " layer=\"{$rows[$i]['layer']}\""
-    // URL-encode strings to be decoded by javascript's decodeURIComponent.
-    . " file=\"" . rawurlencode($rows[$i]['file']) . "\""
-    . " type=\"" . rawurlencode($rows[$i]['type']) . "\""
-    . " tile_mode=\"" . rawurlencode($rows[$i]['tile_mode']) . "\""
-    . "/>\n";
-}
-echo "</images>\n";
+// convert number strings to integers
+$string_fields = array('file', 'type', 'tile_mode');
+foreach ($rows as $i => $fields)
+	foreach ($fields as $key => $value)
+		if (!in_array($key, $string_fields))
+			$rows[$i][$key] = intval($value);
+
+// output json
+include('include/json_headers.php');
+echo json_encode($rows);
 
 ?>

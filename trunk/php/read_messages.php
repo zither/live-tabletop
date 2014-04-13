@@ -17,16 +17,12 @@ $rows = LT_call('read_messages', $table_id, $last_message);
 
 // Generate Output
 
-include('include/xml_headers.php');
-echo "<messages>\n";
-for ($i = 0; $i < count($rows); $i++) {
-  echo "  <message"
-    . " id=\"{$rows[$i]['id']}\""
-    . " user_id=\"{$rows[$i]['user_id']}\""
-    . " time=\"{$rows[$i]['time']}\">"
-    . rawurlencode($rows[$i]['text'])
-    . "</message>\n";
+foreach ($rows as $message) {
+	$message['id']      = intval($message['id']);
+	$message['user_id'] = intval($message['user_id']);
+	$message['time']    = intval($message['time']);
 }
-echo "</messages>\n";
+include('include/json_headers.php');
+echo json_encode($rows);
 
 ?>

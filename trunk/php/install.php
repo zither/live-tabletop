@@ -54,12 +54,10 @@ $LT_SQL->commit();
 
 
 // Create db_config.php
-
 file_put_contents('db_config.php',
   "<?php\n"
-  . "  \$LT_SQL = new mysqli('$location', '$username', '$password', '$database');\n"
+  . "\t\$LT_SQL = new mysqli('$location', '$username', '$password', '$database');\n"
   . "?>\n");
-
 
 ?>
 

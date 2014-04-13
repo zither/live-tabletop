@@ -13,11 +13,6 @@ $rows = LT_call('read_users');
 // Generate Output
 
 include('include/users.php');
-include('include/xml_headers.php');
-echo "<users>\n";
-for ($i = 0; $i < count($rows); $i++) {
-  LT_write_user_row($rows[$i]);
-}
-echo "</users>\n";
+LT_write_users($rows);
 
 ?>

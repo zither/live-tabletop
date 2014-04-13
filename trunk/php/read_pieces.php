@@ -12,43 +12,21 @@ $table_id = $LT_SQL->real_escape_string($_REQUEST['table_id']);
 
 // Query the Database
 
+$string_fields = array('name', 'color');
 $piece_rows = LT_call('read_pieces', $table_id);
-$pieces = array();
-for ($i = 0; $i < count($piece_rows); $i++) {
-  $pieces[] = array('stats' => array(), 'attributes' => $piece_rows[$i]);
-  $piece_id = $piece_rows[$i]['id'];
-  $stat_rows = LT_call('get_stats', $piece_id);
-  for ($j = 0; $j < count($stat_rows); $j++) {
-    $name = $stat_rows[$j]['name'];
-    $value = $stat_rows[$j]['value'];
-    $pieces[$i]['stats'][$name] = $value;
-  }
+foreach ($piece_rows as $i => $peice) {
+	foreach ($piece as $key => $value)
+		if (!in_array($key, $string_fields))
+			$piece_rows[$i][$key] = intval($value);
+	$stat_rows = LT_call('get_stats', $piece['id']);
+	$piece_rows[$i]['stats'] = array();
+	foreach ($stat_rows as $stat)
+		$piece_rows[$i]['stats'][$stat['name']] = $stat['value'];
 }
 
 // Generate Output
 
-include('include/xml_headers.php');
-echo "<pieces>\n";
-for ($i = 0; $i < count($pieces); $i++) {
-  echo "  <piece";
-  foreach ($pieces[$i]['attributes'] as $key => $value) {
-    if ($key == 'name' or $key == 'color') {
-      // URL-encode strings to be decoded by javascript's decodeURIComponent.
-      echo " $key=\"" . rawurlencode($value) . "\"";
-    }
-    else {
-      // Encode integers as strings.
-      echo " $key=\"$value\"";
-    }
-  }
-  echo ">\n";
-  foreach ($pieces[$i]['stats'] as $key => $value) {
-    // URL-encode strings to be decoded by javascript's decodeURIComponent.
-    echo "    <stat name=\"" . rawurlencode($key) . "\">"
-      . rawurlencode($value) . "</stat>\n";
-  }
-  echo "  </piece>\n";
-}
-echo "</pieces>\n";
+include('include/json_headers.php');
+echo json_encode($piece_rows);
 
 ?>

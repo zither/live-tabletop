@@ -1,4 +1,4 @@
-LT.createTurnsPanel = function () {
-  LT.turnsPanel = new LT.Panel( 'Turns', 'Turns', 6, 72, 175, 300);
-};
+$(function () { // This anonymous function runs after the page loads.
+	LT.turnsPanel = new LT.Panel("turnsPanel");
+});
 

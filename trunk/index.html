@@ -1,37 +1,453 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<link rel="shortcut icon" href="icon.gif" />
-<link href="style.css" rel="stylesheet" type="text/css" />
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<title> Live Tabletop </title>
-<!-- main Live Tabletop object: global LT variable -->
-<script type="text/javascript" src="js/LT.js"></script>
-<!-- classes: LT.Panel, LT.Table, LT.User, LT.Tile, etc. -->
-<script type="text/javascript" src="js/Palette.js"></script>
-<script type="text/javascript" src="js/Panel.js"></script>
-<script type="text/javascript" src="js/Grid.js"></script>
-<script type="text/javascript" src="js/Table.js"></script>
-<script type="text/javascript" src="js/Image.js"></script>
-<script type="text/javascript" src="js/User.js"></script>
-<script type="text/javascript" src="js/Tile.js"></script>
-<script type="text/javascript" src="js/Piece.js"></script>
-<script type="text/javascript" src="js/Message.js"></script>
-<!-- panels: LT.chatPanel, LT.userPanel, etc. -->
-<script type="text/javascript" src="js/userPanel.js"></script>
-<script type="text/javascript" src="js/chatPanel.js"></script>
-<script type="text/javascript" src="js/tablesPanel.js"></script>
-<script type="text/javascript" src="js/piecesPanel.js"></script>
-<script type="text/javascript" src="js/turnsPanel.js"></script>
-<script type="text/javascript" src="js/filesPanel.js"></script>
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="shortcut icon" href="icon.gif" />
+		<link href="style.css" rel="stylesheet" type="text/css" />
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+		<title>Live Tabletop</title>
+		<!-- JQuery framework for DOM manipulation and Ajax -->
+		<script type="text/javascript" src="jquery-1.9.1.min.js"></script>
+		<!-- main Live Tabletop object: global LT variable -->
+		<script type="text/javascript" src="js/LT.js"></script>
+		<!-- classes: LT.Panel, LT.Table, LT.User, LT.Tile, etc. -->
+		<script type="text/javascript" src="js/Grid.js"></script>
+		<script type="text/javascript" src="js/Image.js"></script>
+		<script type="text/javascript" src="js/Message.js"></script>
+		<script type="text/javascript" src="js/Palette.js"></script>
+		<script type="text/javascript" src="js/Panel.js"></script>
+		<script type="text/javascript" src="js/Piece.js"></script>
+		<script type="text/javascript" src="js/Table.js"></script>
+		<script type="text/javascript" src="js/Tile.js"></script>
+		<script type="text/javascript" src="js/User.js"></script>
+		<!-- panels: LT.chatPanel, LT.userPanel, etc. -->
+		<script type="text/javascript" src="js/chatPanel.js"></script>
+		<script type="text/javascript" src="js/filesPanel.js"></script>
+		<script type="text/javascript" src="js/piecesPanel.js"></script>
+		<script type="text/javascript" src="js/tablesPanel.js"></script>
+		<script type="text/javascript" src="js/turnsPanel.js"></script>
+		<script type="text/javascript" src="js/userPanel.js"></script>
+		<!-- utility functions -->
+		<script type="text/javascript" src="js/init.js"></script>
+		<script type="text/javascript" src="js/install.js"></script>
+		<script type="text/javascript" src="js/login.js"></script>
+		<script type="text/javascript" src="js/uploader.js"></script>
+	</head>
+	<body>
 
-<script type="text/javascript" src="js/uploader.js"></script>
-<script type="text/javascript" src="js/install.js"></script>
-<!-- createLogin function -->
-<script type="text/javascript" src="js/login.js"></script>
-<!-- install and set window.onload handler to create the GUI -->
-<script type="text/javascript" src="js/init.js"></script>
-</head>
-<body>
-</body>
+		<!-- installer, should be hidden when Live Tabletop is installed -->
+		<form id="installBox">
+			<p>
+				Live Tabletop needs to be configured to complete installation.
+				Before configuring Live Tabletop, create a database to store Live Tabletop's data.
+				(The database server URL, the name of the database, and the username and password
+				required to access the database will vary from site to site.)
+				Then choose a username and password for a new Live Tabletop administrator account.
+			</p>
+			<table>
+				<tr><td>Database Server (URL): </td><td><input type="text" size="12" name="location"/></td></tr>
+				<tr><td>Database Name: </td><td><input type="text" size="12" name="database"/></td></tr>
+				<tr><td>Database Username: </td><td><input type="text" size="12" name="username"/></td></tr>
+				<tr><td>Database Password: </td><td><input type="password" size="12" name="password"/></td></tr>
+				<tr><td>Administrator Username: </td><td><input type="text" size="12" name="admin_username"/></td></tr>
+				<tr><td>Administrator Password: </td><td><input type="password" size="12" name="admin_password"/></td></tr>
+				<tr><td>Re-type Password: </td><td><input type="password" size="12" name="retype_password"/></td></tr>
+			</table>
+			<input type="button" value="Configure Live Tabletop"/>
+		</form>
+
+		<!-- displays the table's current map -->
+		<div id="map">
+			<div id="tileLayer"></div>
+			<div id="wallLayer"></div>
+			<div id="pieceLayer"></div>
+			<div id="fogLayer"></div>
+			<div id="clickLayers">
+				<div class="clickLayer" id="clickTileLayer"></div>
+				<div class="clickLayer" id="clickWallLayer"></div>
+				<div class="clickLayer" id="clickPieceLayer"></div>
+			</div>
+		</div>
+
+		<!-- panels -->
+		<div class="panel chatPanel">
+			<div class="title">
+				<div class="resizeTL"></div>
+				<div class="titleStart"></div>
+				<div class="titleCaption">Chat</div>
+				<div class="titleEnd"></div>
+				<div class="panelBar"> </div>
+				<div class="resizeTR"></div>
+				<div class="close"></div>
+			</div>
+			<div class="tabBar"></div>
+			<div class="panelHeader"></div>
+			<div class="panelContent">
+				<div id="chatOutput">
+					<a id="chatBottom"> </a>
+				</div>
+			</div>
+			<div class="panelFooter">
+				<form id="chatForm">
+					<input type="text" size="20", id="chatInput" value="-- Write a message. --"/>
+					<input type="submit" value="Send"/>
+					<div class="clearBoth"></div>
+				</form>
+			</div>
+			<div class="panelBottom">
+				<div class="resizeBL"></div>
+				<div class="resizeBR"></div>
+			</div>
+		</div>
+
+		<div class="panel filesPanel">
+			<div class="title">
+				<div class="resizeTL"></div>
+				<div class="titleStart"></div>
+				<div class="titleCaption">Files</div>
+				<div class="titleEnd"></div>
+				<div class="panelBar"> </div>
+				<div class="resizeTR"></div>
+				<div class="close"></div>
+			</div>
+			<div class="tabBar"></div>
+			<div class="panelHeader"></div>
+			<div class="panelContent">
+				<form id="uploadImage">
+					<div><input type="radio" name="type" value="piece" checked="checked"/> Piece</div>
+					<div><input type="radio" name="type" value="tile"/> Tile</div>
+					<div><input type="radio" name="type" value="background"/> Background</div>
+					<input type="submit" value="upload"/>
+				</form>
+			</div>
+			<div class="panelFooter"></div>
+			<div class="panelBottom">
+				<div class="resizeBL"></div>
+				<div class="resizeBR"></div>
+			</div>
+		</div>
+
+		<div class="panel piecesPanel">
+			<div class="title">
+				<div class="resizeTL"></div>
+				<div class="titleStart"></div>
+				<div class="titleCaption">Pieces</div>
+				<div class="titleEnd"></div>
+				<div class="panelBar"> </div>
+				<div class="resizeTR"></div>
+				<div class="close"></div>
+			</div>
+			<div class="tabBar">
+				<div class="tab active" id="pieceCreationTab">
+					<div class="tabStart"></div>
+					<div class="tabContent">Create</div>
+					<div class="tabEnd"></div>
+				</div>
+				<div class="tab" id="pieceSettingsTab">
+					<div class="tabStart"></div>
+					<div class="tabContent">Settings</div>
+					<div class="tabEnd"></div>
+				</div>
+				<div class="tab" id="pieceStatsTab">
+					<div class="tabStart"></div>
+					<div class="tabContent">Stats</div>
+					<div class="tabEnd"></div>
+				</div>
+			</div>
+			<div class="panelHeader">
+				<div class="pieceCreationTab">
+					<form id="pieceCreator">
+						<!-- was userSelect, pname/pieceNae, hInput, wInput, y, x, yOff, xOff, selected -->
+						<!-- TODO: move select style to style.css -->
+						<div class="inputDiv">Owner: <select name="user_id" size="1" style="width: 90px;"></select></div>
+						<div class="inputDiv">Name: <input name="name" type="text" size="10" value="Piece Name"/></div>
+						<div class="inputDiv">Height: <input name="height" type="text" size="1" value="0"/></div>
+						<div class="inputDiv">Width: <input name="width" type="text" size="1" value="0"/></div>
+						<div class="inputDiv">Y Pos: <input name="y" type="text" size="1" value="0"/></div>
+						<div class="inputDiv">X Pos: <input name="x" type="text" size="1" value="0"/></div>
+						<div class="inputDiv">Y Off: <input name="y_offset" type="text" size="1" value="0"/></div>
+						<div class="inputDiv">X Off: <input name="x_offset" type="text" size="1" value="0"/></div>
+						<input name="image_id" type="hidden" value=""/>
+						<input type="button" value="create" id="createPiece"/>
+						<div class="clearBoth"></div>
+					</form>
+				</div>
+				<div class="pieceSettingsTab">
+					<form id="pieceEditor">
+						<!-- was userSelect, pname/pieceNae, hInput, wInput, y, x, yOff, xOff, selected -->
+						<!-- TODO: move select style to style.css -->
+						<div class="inputDiv">Owner: <select name="user_id" size="1" style="width: 90px;"></select></div>
+						<div class="inputDiv">Name: <input name="name" type="text" size="10" value="Piece Name"/></div>
+						<div class="inputDiv">Height: <input name="height" type="text" size="1" value="0"/></div>
+						<div class="inputDiv">Width: <input name="width" type="text" size="1" value="0"/></div>
+						<div class="inputDiv">Y Pos: <input name="y" type="text" size="1" value="0"/></div>
+						<div class="inputDiv">X Pos: <input name="x" type="text" size="1" value="0"/></div>
+						<div class="inputDiv">Y Off: <input name="y_offset" type="text" size="1" value="0"/></div>
+						<div class="inputDiv">X Off: <input name="x_offset" type="text" size="1" value="0"/></div>
+						<input name="image_id" type="hidden" value=""/>
+						<input type="button" value="Apply Changes" id="applyPieceChanges"/>
+						<input type="button" value="Delete Piece" id="deletePiece"/>
+						<div class="clearBoth"></div>
+					</form>
+				</div>
+				<div class="pieceStatsTab"></div>
+			</div>
+			<div class="panelContent">
+				<div class="pieceCreationTab" id="pieceCreatorImages"></div>
+				<div class="pieceSettingsTab" id="pieceEditorImages"></div>
+				<div class="pieceStatsTab" id="statList">
+					<form id="statCreator" style="display: none;">
+						<input name="name" type="text" value="Stat"/>
+						<input name="value" type="text" value="Value"/>
+						<div class="buttonDiv" id="addStat"><div>+</div></div>
+						<div class="clearBoth"></div>
+					</form>
+					<div class="separator"></div>
+					<input type="button" value="Apply Changes" id="submitStats"/>
+				</div>
+			</div>
+			<div class="panelFooter"></div>
+			<div class="panelBottom">
+				<div class="resizeBL"></div>
+				<div class="resizeBR"></div>
+			</div>
+		</div>
+
+		<div class="panel tablesPanel">
+			<div class="title">
+				<div class="resizeTL"></div>
+				<div class="titleStart"></div>
+				<div class="titleCaption">Tables</div>
+				<div class="titleEnd"></div>
+				<div class="panelBar"> </div>
+				<div class="resizeTR"></div>
+				<div class="close"></div>
+			</div>
+			<div class="tabBar">
+				<div class="tab" id="tableListTab">
+					<div class="tabStart"></div>
+					<div class="tabContent">List</div>
+					<div class="tabEnd"></div>
+				</div>
+				<div class="tab" id="tableCreationTab">
+					<div class="tabStart"></div>
+					<div class="tabContent">Create</div>
+					<div class="tabEnd"></div>
+				</div>
+				<div class="tab" id="tableSettingsTab">
+					<div class="tabStart"></div>
+					<div class="tabContent">Settings</div>
+					<div class="tabEnd"></div>
+				</div>
+				<div class="tab active" id="toolsTab">
+					<div class="tabStart"></div>
+					<div class="tabContent">Tools</div>
+					<div class="tabEnd"></div>
+				</div>
+			</div>
+			<div class="panelHeader">
+				<div class="toolsTab">
+					<div class="swatch" id="eraser">erase</div>
+					<div class="swatch" id="fogTool">fog</div>
+					<div class="swatch" id="wallTool">wall</div>
+					<div class="swatch" id="pieceTool">piece</div>
+					<div class="clearBoth"></div>
+				</div>
+			</div>
+			<div class="panelContent">
+				<div class="tableListTab">
+					<input type="button" value="refresh" id="refreshTables"/>
+					<div id="tableList"></div>
+				</div>
+				<div class="tableCreationTab">
+					<form id="tableCreator">
+						<div class="inputDiv">Name: <input name="name" type="text" size="10" value="Table Name"/></div>
+						<div class="inputDiv">Background:
+							<select name="image_id" style="width: 135px">
+								<option value="-1">None</option>
+							</select>
+						</div>
+						<div class="inputDiv">Columns: <input name="columns" type="text" size="1" value="8"/></div>
+						<div class="inputDiv">Rows: <input name="rows" type="text" size="1" value="8"/></div>
+						<div class="inputDiv">Tile Height: <input name="tile_width" type="text" size="1" value="45"/></div>
+						<div class="inputDiv">Tile Width: <input name="tile_height" type="text" size="1" value="45"/></div>
+						<div class="inputDiv">Grid Thickness: <input name="grid_thickness" type="text" size="1" value="1"/></div>
+						<div class="inputDiv">Wall Thickness: <input name="wall_thickness" type="text" size="1" value="3"/></div>
+						<!-- TODO: move style to style.css -->
+						<div class="inputDiv">Tile Mode:
+							<select name="tile_mode" style="width: 135px">
+								<option value="rectangle">Rectangular Grid</option>
+								<option value="isometric">Isometric Grid</option>
+								<option value="hex rows">Hex Rows</option>
+								<option value="hex columns">Hex Columns</option>
+							</select>
+						</div>
+						<input type="hidden" name="default_tile" value="-1"/>
+						<input type="button" value="Create Table" id="createTable"/>
+					</form>
+				</div>
+				<div class="tableSettingsTab">
+					<form id="tableEditor">
+						<div class="inputDiv">Name: <input name="name" type="text" size="10" value="Table Name"/></div>
+						<div class="inputDiv">Background:
+							<select name="image_id" style="width: 135px">
+								<option value="-1">None</option>
+							</select>
+						</div>
+						<div class="inputDiv">Columns: <input name="columns" type="text" size="1" value="8"/></div>
+						<div class="inputDiv">Rows: <input name="rows" type="text" size="1" value="8"/></div>
+						<div class="inputDiv">Tile Height: <input name="tile_width" type="text" size="1" value="45"/></div>
+						<div class="inputDiv">Tile Width: <input name="tile_height" type="text" size="1" value="45"/></div>
+						<div class="inputDiv">Grid Thickness: <input name="grid_thickness" type="text" size="1" value="1"/></div>
+						<div class="inputDiv">Wall Thickness: <input name="wall_thickness" type="text" size="1" value="3"/></div>
+						<!-- TODO: move style to style.css -->
+						<div class="inputDiv">Tile Mode:
+							<select name="tile_mode" style="width: 135px">
+								<option value="rectangle">Rectangular Grid</option>
+								<option value="isometric">Isometric Grid</option>
+								<option value="hex rows">Hex Rows</option>
+								<option value="hex columns">Hex Columns</option>
+							</select>
+						</div>
+						<input type="button" value="Apply Changes" id="applyTableChanges"/>
+					</form>
+				</div>
+				<div class="toolsTab">
+				</div>
+			</div>
+			<div class="panelFooter"></div>
+			<div class="panelBottom">
+				<div class="resizeBL"></div>
+				<div class="resizeBR"></div>
+			</div>
+		</div>
+
+		<div class="panel turnsPanel">
+			<div class="title">
+				<div class="resizeTL"></div>
+				<div class="titleStart"></div>
+				<div class="titleCaption">Turns</div>
+				<div class="titleEnd"></div>
+				<div class="panelBar"> </div>
+				<div class="resizeTR"></div>
+				<div class="close"></div>
+			</div>
+			<div class="tabBar"></div>
+			<div class="panelHeader"></div>
+			<div class="panelContent"></div>
+			<div class="panelFooter"></div>
+			<div class="panelBottom">
+				<div class="resizeBL"></div>
+				<div class="resizeBR"></div>
+			</div>
+		</div>
+
+		<div class="panel userPanel">
+			<div class="title">
+				<div class="resizeTL"></div>
+				<div class="titleStart"></div>
+				<div class="titleCaption">User Options</div>
+				<div class="titleEnd"></div>
+				<div class="panelBar"> </div>
+				<div class="resizeTR"></div>
+				<div class="close"></div>
+			</div>
+			<div class="tabBar">
+				<div class="tab active" id="userOptionsTab">
+					<div class="tabStart"></div>
+					<div class="tabContent">Options</div>
+					<div class="tabEnd"></div>
+				</div>
+				<div class="tab active" id="userSettingsTab">
+					<div class="tabStart"></div>
+					<div class="tabContent">Edit User</div>
+					<div class="tabEnd"></div>
+				</div>
+				<div class="tab active" id="userCreationTab">
+					<div class="tabStart"></div>
+					<div class="tabContent">Add User</div>
+					<div class="tabEnd"></div>
+				</div>
+			</div>
+			<div class="panelHeader"></div>
+			<div class="panelContent">
+				<div class="userOptionsTab">
+					<a id="logout">Logout</a>
+					<div class="separator"></div>
+					<a id="createImages">Process Uploaded Images</a>
+					<div class="separator"></div>
+					<a id="defaultPanels">Default Panels</a>
+					<div class="separator"></div>
+				</div>
+				<div class="userSettingsTab">
+					<form id="userEditor">
+						<!-- TODO: move style to style.css? -->
+						<select size="1" name="user_id" style="width: 100px;"></select>
+						<div class="inputDiv">Name: <input name="name" type="text" size="8"/></div>
+					</form>
+				</div>
+				<div class="userCreationTab">
+					<form id="userCreator">
+						<input type="text" size="8" name="username" value="User Name"/>
+						<input type="password" size="8" name="password" value="Password"/>
+						<input type="password" size="8" name="retype_password" value="Re-type Password"/>
+						<input type="hidden" name="permissions" value="user"/>
+						<input type="button" id="createUser" value="Create"/>
+					</form>
+				</div>
+			</div>
+			<div class="panelFooter"></div>
+			<div class="panelBottom">
+				<div class="resizeBL"></div>
+				<div class="resizeBR"></div>
+			</div>
+		</div>
+
+		<!-- permanent controls at the top of the page -->
+		<div id="pageBar">
+			<div id="logo"></div>
+			<div id="panelButtons">
+				<div class="panelButton chatPanel">
+					<div class="panelButtonStart"></div>
+					<div class="panelButtonCaption">Chat</div>
+					<div class="panelButtonEnd"></div>
+				</div>
+				<div class="panelButton filesPanel">
+					<div class="panelButtonStart"></div>
+					<div class="panelButtonCaption">Files</div>
+					<div class="panelButtonEnd"></div>
+				</div>
+				<div class="panelButton piecesPanel">
+					<div class="panelButtonStart"></div>
+					<div class="panelButtonCaption">Pieces</div>
+					<div class="panelButtonEnd"></div>
+				</div>
+				<div class="panelButton tablesPanel">
+					<div class="panelButtonStart"></div>
+					<div class="panelButtonCaption">Tables</div>
+					<div class="panelButtonEnd"></div>
+				</div>
+				<div class="panelButton turnsPanel">
+					<div class="panelButtonStart"></div>
+					<div class="panelButtonCaption">Turns</div>
+					<div class="panelButtonEnd"></div>
+				</div>
+			</div>
+			<!-- use form "name" instead of "id"? -->
+			<!-- old LT.text and LT.password added some unorthodox text field functionality, like selecting the text when you click on the element. -->
+			<form id="loginForm">
+				<input type="text" size="10" name="username" value="username"/>
+				<input type="text" size="10" name="password" value="password"/>
+				<input type="button" value="Login">
+			</form>
+			<div id="userButton">
+				<div id="loggedIn"></div>
+				<div class="panelButton userPanel">
+					<div class="panelButtonStart"></div>
+					<div class="panelButtonCaption"><span id="userButtonCaption"></span>'s options</div>
+					<div class="panelButtonEnd"></div>
+				</div>
+			</div>
+		</div>
+
+	</body>
 </html>

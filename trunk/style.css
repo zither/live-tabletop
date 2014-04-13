@@ -1,448 +1,523 @@
+/*
+Table of Contents:
+
+	ELEMENTS
+	PAGE BAR
+		Panel Buttons
+		Login Form
+	PANELS
+		Default Panel Sizes
+		Panel Sections
+		Panel Resize Handles
+		Panel Titles
+		Panel Tabs
+		Panel Contents
+		Links on Panels
+		Forms on Panels
+		Brushes
+		Chat
+		Piece and Tile Images
+		Stats
+	MAP
+		Layers
+		Pieces
+	INSTALL BOX
+	MISCELLANEOUS
+
+*/
+
+/* ELEMENTS */
+
+/* applying style to all elements looks inefficient and dangerous */
 * {
-  margin: 0px;
-  padding: 0px;
-  border: 0px;
-  background: no-repeat;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: no-repeat;
 }
 
-BODY {
-  scrollbar-face-color:#8080FF;
-  scrollbar-arrow-color:#FFFFFF;
-  scrollbar-track-color:#DDDDFF;
-  scrollbar-shadow-color:'';
-  scrollbar-highlight-color:'';
-  scrollbar-3dlight-color:'';
-  scrollbar-darkshadow-Color:'';
-  background: #999;
+body {
+	scrollbar-face-color:#8080FF;
+	scrollbar-arrow-color:#FFFFFF;
+	scrollbar-track-color:#DDDDFF;
+	scrollbar-shadow-color:'';
+	scrollbar-highlight-color:'';
+	scrollbar-3dlight-color:'';
+	scrollbar-darkshadow-Color:'';
+	background: #999;
 }
-DIV {
-  font-family: Arial,Helvetica,sans-serif;
-  font-size: 14px;
+div {
+	font-family: Arial,Helvetica,sans-serif;
+	font-size: 14px;
 }
 input {
-  border: 1px solid #CCC;
-  float: left;
+	border: 1px solid #CCC;
+/*	float: left; */
 }
+
+/* PAGE BAR */
+
 #pageBar {
-  background: url(images/pageBar.jpg) repeat-x left top;
-  height: 26px;
-  width: 100%;
-  position: fixed;
-  top: 0px;
+	background: url(images/pageBar.jpg) repeat-x left top;
+	height: 26px;
+	width: 100%;
+	position: fixed;
+	top: 0px;
 }
 
 #logo {
-  background-image: url(images/logo.png);
-  width: 170px;
-  height: 33px;
-  position: fixed;
-  left: 10px;
-  top: 0px;
+	background-image: url(images/logo.png);
+	width: 170px;
+	height: 33px;
+	position: fixed;
+	left: 10px;
+	top: 0px;
 }
 
-#tabletop {
-  position: relative;
-  margin: 200px 200px 200px 200px;
+/* Panel Buttons: these buttons show and hide panels */
+
+#panelButtons {
+	margin-left: 155px;
+	position: relative;
 }
+
+.panelButton {
+	height: 22px;
+	float: left;
+	margin: 0px 0px 0px 12px;
+	color: #CCC;
+}
+
+.panelButton:hover {
+	cursor: pointer;
+	color: #EEE;
+}
+
+.panelButtonStart {
+	background-image: url(images/buttonUncheck.png);
+	width: 19px;
+	height: 19px;
+	float: left;
+	margin-top: 4px;
+}
+
+.panelButtonCaption {
+	background: url(images/pageBar.jpg) repeat-x left top;
+	height: 22px;
+	float: left;
+	font-size: 16px;
+	text-decoration: none;
+	padding: 2px 1px 0px 2px;
+}
+
+.panelButtonEnd {
+	width: 5px;
+	height: 22px;
+	float: left;
+}
+
+.panelButton.checked .panelButtonStart {background-image: url(images/buttonCheck.png);}
+
+.panelButton.checked .panelButtonEnd {background-image: url();} /* FIXME: what? */
+
+/* Login Form */
 
 #loginForm {
-  float: right;
+	float: right;
+	background: #000;
+	margin-top: 3px;
+	color: #999;
+	padding: 1px 1px 1px 1px;;
 }
 
-#username, #password {
-  border: 1px solid #CCC;
+#LoginForm input[type=text] {
+	border: 1px solid #CCC;
 }
-
-/* SHOW/HIDE PANEL BUTTONS AT THE TOP OF THE PAGE */
-
-#buttons {
-  margin-left: 155px;
-  position: relative;
-  
-}
-
-.buttonUnchecked, .buttonChecked {
-  height: 22px;
-  float: left;
-  margin: 0px 0px 0px 12px;
-  color: #CCC;
-}
-
-.buttonUnchecked:hover, .buttonChecked:hover {
-  cursor: pointer;
-}
-
-.buttonStart {
-  background-image: url(images/buttonUncheck.png);
-  width: 19px;
-  height: 19px;
-  float: left;
-  margin-top: 4px;
-}
-
-.buttonCaption {
-  background: url(images/pageBar.jpg) repeat-x left top;
-  height: 22px;
-  float: left;
-  font-size: 16px;
-  text-decoration: none;
-  padding: 2px 1px 0px 2px;
-}
-
-.buttonChecked:hover , .buttonUnchecked:hover {
-  color: #EEE;
-}
-
-.buttonEnd {
-  width: 5px;
-  height: 22px;
-  float: left;
-}
-
-.buttonChecked .buttonStart {
-  background-image: url(images/buttonCheck.png);
-}
-
-.buttonChecked .buttonEnd {
-  background-image: url();
-}
-
-/* MOVEABLE, RESIZEABLE PANELS */
-
-
-.panelHeader, .panelFooter {
-  background: #FFF;
-  clear: both;
-  border-left: 1px solid #333;
-  border-right: 1px solid #333;
-  margin: 0px -5px 0px -5px;
-  padding: 0px 5px 0px 5px;
-}
-.resizeTL {
-  background: url(images/resizeTL.png);
-  width: 15px;
-  height: 23px;
-  float: left;
-  cursor: nw-resize;
-  margin-left: -5px;
-}
-.resizeTR {
-  background: url(images/resizeTR.png);
-  width: 10px;
-  height: 23px;
-  float: right;
-  cursor: ne-resize;
-  margin-right: -5px;
-}
-.panelContent {
-  clear: both;
-  background: #FFF;
-  border-left: 1px solid #333;
-  border-right: 1px solid #333;
-  color: #333;
-  overflow: auto;
-  margin: 0px -5px 0px -5px;
-  padding: 0px 5px 0px 5px;
-}
-
-.panelContent  a {
-  cursor: pointer;
-  text-decoration: none;
-}
-
-.panelContent a:hover {
-  text-decoration: underline;
-}
-
-.panelContent input, .panelFooter input {
-  background: #FFF;
-  color: #333;
-  margin-right: 4px;
-}
-
-.panelBar {
-  position: absolute;
-  height: 23px;
-  margin-left: 17px;
-  cursor: pointer;
-  left: 0px;
-  top: 0px;
-}
-.tabBar {
-  background: url(images/tabBar.jpg) repeat top left;
-  min-height: 1px;
-  max-height: 42px;
-  clear: both;
-  border-left: 1px solid #333;
-  border-right: 1px solid #333;
-  margin: 0px -5px 0px -5px;
-  padding: 0px 5px 0px 5px;
-}
-
-.panelBottom {
-  background: #FFF;
-  width: auto;
-  height:12px;
-  border-bottom: 1px solid #333;
-}
-
-.resizeBL {
-  background: url(images/resizeBL.png);
-  height: 13px;
-  width: 13px;
-  float: left;
-  cursor: sw-resize;
-  margin-left: -5px;
-}
-
-.resizeBR {
-  background: url(images/resizeBR.png);
-  height: 13px;
-  width: 13px;
-  float: right;
-  cursor: se-resize;
-  margin-right: -5px;
-}
-
-.outerPanel {
-  position: fixed;
-  visibility: hidden;
-  z-index: 0;
-  margin: 0px -5px 0px -5px;
-  padding: 0px 5px 0px 5px;
-}
-
-/* PANEL TITLES */
-
-.title {
-  position: relative;
-  background: url(images/panelBar.jpg) repeat-x top left;
-  height: 23px;
-}
-
-.titleCaption {
-  background: url(images/titleBG.jpg) repeat-x top left;
-  height: 21px;
-  float: left;
-  color: #333;
-  font-size: 16px;
-  text-decoration: none;
-  padding: 2px 2px 0px 0px;
-}
-
-.titleEnd {
-  background-image: url(images/titleEnd.jpg);
-  width: 5px;
-  height: 23px;
-  float: left;
-  margin-right: 1px;
-}
-
-.close {
-  background-image: url(images/close.png);
-  width: 22px;
-  height: 23px;
-  float: right;
-  cursor: pointer;
-}
-
-.close:hover {
-  background-image: url(images/closeHover.png);
-}
-
-/* PANEL TABS */
-
-.activeTab, .inactiveTab, .tabStart, .tabEnd {
-  height: 21px;
-  float: left;
-}
-
-.activeTab:hover, .inactiveTab:hover {
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-.activeTab, .inactiveTab {
-  margin: 0px 0px 0px 1px;
-}
-
-.activeTab {
-  background:  url(images/activeTabBG.jpg) repeat-x top left;
-}
-
-.inactiveTab {
-  background:  url(images/inactiveTabBG.jpg) repeat-x top left;
-}
-
-.tabStart, .tabEnd {
-  width: 2px;
-}
-
-.activeTab .tabStart {
-  background:  url(images/activeTabStart.jpg) repeat-x top left;
-}
-
-.activeTab .tabEnd {
-  background:  url(images/activeTabEnd.jpg) repeat-x top left;
-}
-
-.inactiveTab .tabStart {
-  background:  url(images/inactiveTabStart.jpg) repeat-x top left;
-}
-
-.inactiveTab .tabEnd {
-  background:  url(images/inactiveTabEnd.jpg) repeat-x top left;
-}
-
-.tabContent:hover {
-  text-decoration: underline;
-}
-
-.tabContent {
-  float: left;
-  padding: 2px 3px 0px 3px;
-  color: #333;
-  font-size: 13px;
-}
-
-/* LOGIN FORM */
 
 .login {
-  color: #CCC;
-  float: right;
-  text-decoration: none;
-  margin-right: 8px;
-  cursor: pointer;
-  position: relative
+	color: #CCC;
+	float: right;
+	text-decoration: none;
+	margin-right: 8px;
+	cursor: pointer;
+	position: relative
 }
 
 .login:hover {
-  text-decoration: underline;
+	text-decoration: underline;
 }
 
-#loginDiv {
-  float: right;
-}
-
-#loginForm {
-  background: #000;
-  margin-top: 3px;
-  color: #999;
-  padding: 1px 1px 1px 1px;;
+#userButton {
+	display: none;
+	float: right;
 }
 
 #loginForm input {
-  background: #CCC;
-  color: #333;
-  margin-right: 4px;
+	background: #CCC;
+	color: #333;
+	margin-right: 4px;
 }
 
-/* ??? */
+/* PANELS: moveable, resizeable windows overlaying the map */
 
-.deleteButton {
-  float: right;
+/* main panel container */
+.panel {
+	position: fixed;
+	display: none;
+	z-index: 0;
+	margin: 0px -5px 0px -5px;
+	padding: 0px 5px 0px 5px;
 }
 
-.altList {
+/* Default Panel Sizes */
+
+.panel.chatPanel {
+	left: 6px;
+	top: 95px;
+	width: 355px;
+}
+.panel.chatPanel .panelContent {height: 130px;}
+
+.panel.filesPanel {
+	left: 6px;
+	top: 118px;
+	width: 250px;
+}
+.panel.filesPanel .panelContent {height: 150px;}
+
+.panel.piecesPanel {
+	left: 6px;
+	top: 49px;
+	width: 140px;
+}
+.panel.piecesPanel .panelContent {height: 180px;}
+
+.panel.tablesPanel {
+	left: 6px;
+	top: 26px;
+	width: 140px;
+}
+.panel.tablesPanel .panelContent {height: 180px;}
+
+.panel.turnsPanel {
+	left: 6px;
+	top: 72px;
+	width: 175px;
+}
+.panel.turnsPanel .panelContent {height: 300px;}
+
+
+.panel.userPanel {
+	left: 185px;
+	top: 26px;
+	width: 210px;
+}
+.panel.userPanel .panelContent {height: 100px;}
+
+
+/* Panel Sections */
+
+.panelBar {
+	position: absolute;
+	height: 23px;
+	margin-left: 17px;
+	cursor: pointer;
+	left: 0px;
+	top: 0px;
+}
+.tabBar {
+	background: url(images/tabBar.jpg) repeat top left;
+	min-height: 1px;
+	max-height: 42px;
+	clear: both;
+	border-left: 1px solid #333;
+	border-right: 1px solid #333;
+	margin: 0px -5px 0px -5px;
+	padding: 0px 5px 0px 5px;
+	overflow: auto;
+}
+.panelHeader, .panelFooter {
+	background: #FFF;
+	clear: both;
+	border-left: 1px solid #333;
+	border-right: 1px solid #333;
+	margin: 0px -5px 0px -5px;
+	padding: 0px 5px 0px 5px;
+}
+.panelContent {
+	clear: both;
+	background: #FFF;
+	border-left: 1px solid #333;
+	border-right: 1px solid #333;
+	color: #333;
+	overflow: auto;
+	margin: 0px -5px 0px -5px;
+	padding: 0px 5px 0px 5px;
 }
 
-.separator {
-height: 1px; background: #999; width: auto; clear: both; margin: 1px 0px 4px 0px;
+.panelBottom {
+	background: #FFF;
+	width: auto;
+	height:12px;
+	border-bottom: 1px solid #333;
 }
 
-.chat_alert {
-  color: #039;
+/* Panel Resize Handles */
+
+.resizeTL {
+	background: url(images/resizeTL.png);
+	width: 15px;
+	height: 23px;
+	float: left;
+	cursor: nw-resize;
+	margin-left: -5px;
+}
+.resizeTR {
+	background: url(images/resizeTR.png);
+	width: 10px;
+	height: 23px;
+	float: right;
+	cursor: ne-resize;
+	margin-right: -5px;
+}
+.resizeBL {
+	background: url(images/resizeBL.png);
+	height: 13px;
+	width: 13px;
+	float: left;
+	cursor: sw-resize;
+	margin-left: -5px;
+}
+.resizeBR {
+	background: url(images/resizeBR.png);
+	height: 13px;
+	width: 13px;
+	float: right;
+	cursor: se-resize;
+	margin-right: -5px;
 }
 
-.fInput {
-  border: 1px solid #CCC;
+/* Panel Titles */
+
+.title {
+	position: relative;
+	background: url(images/panelBar.jpg) repeat-x top left;
+	height: 23px;
 }
 
-.fLabel {
-  color: #000; width: 200px;
-  float: left;
+.titleCaption {
+	background: url(images/titleBG.jpg) repeat-x top left;
+	height: 21px;
+	float: left;
+	color: #333;
+	font-size: 16px;
+	text-decoration: none;
+	padding: 2px 2px 0px 0px;
 }
 
-.swatch {
-  border: 1px solid black;
-  margin: 1px 1px 1px 1px;
-  max-width: 50px;
+.titleEnd {
+	background-image: url(images/titleEnd.jpg);
+	width: 5px;
+	height: 23px;
+	float: left;
+	margin-right: 1px;
 }
 
-.selected_swatch {
-  border: 1px solid #F00;
-  margin: 1px 1px 1px 1px
+.close {
+	background-image: url(images/close.png);
+	width: 22px;
+	height: 23px;
+	float: right;
+	cursor: pointer;
 }
+.close:hover {background-image: url(images/closeHover.png);}
 
-#eraser, #fogTool, #wallTool, #pieceTool {
-  float: left;
-  border: 1px solid black;
-  margin: 1px 1px 1px 1px;
-  height: 30px;
-  width: 40px;
-  text-align: center;
+/* Panel Tabs */
+
+.tab, .tabStart, .tabEnd {
+	height: 21px;
+	float: left;
 }
-
-.roll {
-  font-style: italic;
-  color: #900;
+.tab {
+	margin: 0px 0px 0px 1px;
+	background: url(images/inactiveTabBG.jpg) repeat-x top left;
 }
-
-.clearBoth {
-  height: 0px;
-  width: 1px;
-  margin-top: -1px;
-  clear: both;
+.tab:hover {
+	text-decoration: underline;
+	cursor: pointer;
 }
-
-/* LAYERS */
-
-.clickLayer {
-  position: absolute;
-  top: 0px;
-  left: 0px;
+.tab.active {background-image: url(images/activeTabBG.jpg);}
+.tabStart, .tabEnd {width: 2px;}
+.tabStart {background: url(images/inactiveTabStart.jpg) repeat-x top left;}
+.tabEnd {background: url(images/inactiveTabEnd.jpg) repeat-x top left;}
+.tab.active .tabStart {background-image: url(images/activeTabStart.jpg);}
+.tab.active .tabEnd {background-image: url(images/activeTabEnd.jpg);}
+.tabContent {
+	float: left;
+	padding: 2px 3px 0px 3px;
+	color: #333;
+	font-size: 13px;
 }
+.tabContent:hover {text-decoration: underline;} /* FIXME: redundant with .tab:hover rule? */
 
-.grid {
-  position: absolute;
-  left: 0;
-  top: 0;
+/* Links on Panels */
+
+.panelContent a {
+	cursor: pointer;
+	text-decoration: none;
 }
+.panelContent a:hover {text-decoration: underline;}
 
-.fog {
-  position: absolute;
-  background: black;
+/* Forms on Panels */
+
+.panelContent input, .panelFooter input {
+	background: #FFF;
+	color: #333;
+	margin-right: 4px;
 }
 
 .inputDiv {
-  color: #000;
-  width: 140px;
-  float: left;
+	color: #000;
+	width: 140px;
+	float: left;
 }
 .inputDiv input {
-  float: right
+	float: right
 }
 .buttonDiv {
-  float: left;
-  background: #333;
-  border: 1px solid #000;
-  color: #CCC;
-  min-width: 10px;
-  text-align: center;
+	float: left;
+	background: #333;
+	border: 1px solid #000;
+	color: #CCC;
+	min-width: 10px;
+	text-align: center;
 }
 .buttonDiv:hover {
-  cursor: pointer;
+	cursor: pointer;
 }
-/* Install Box */
+
+/* Brushes: map painting tools (tables panel?) */
+#eraser, #fogTool, #wallTool, #pieceTool {
+	float: left;
+/* handled by swatch class now
+	border: 1px solid black;
+	margin: 1px 1px 1px 1px;
+*/
+	height: 30px;
+	width: 40px;
+	text-align: center;
+}
+
+/* Chat */
+
+#chatInput {border: 1px solid #CCC;}
+.alert {color: #039;}
+.roll {
+	font-style: italic;
+	color: #900;
+}
+
+/* Color Palette */
+.colorPalette {
+	clear: left,
+	position: relative,
+	border: 2px solid transparent,
+}
+.colorSwatch {position: absolute;}
+.colorSwatch.selected {
+	border: 1px solid black;
+	margin: -1px;
+	z-index: 1;
+}
+
+/* Piece and Tile Images */
+.swatch {
+	border: 1px solid black;
+	margin: 1px 1px 1px 1px;
+	max-width: 50px;
+}
+.swatch.selected {border: 1px solid #F00;}
+#pieceCreatorImages img, #pieceEditorImages img {max-width: 200px;}
+#pieceCreatorImages, #pieceEditorImages {
+	clear: both;
+	overflow: none;
+}
+
+/* Stats */
+.statRow {clear: both;}
+.statName {float: left;}
+
+/* MAP */
+
+#map {
+	position: relative;
+	margin: 200px 200px 200px 200px;
+}
+
+/* Layers */
+
+.clickLayer {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+.clickLayer > div {position: absolute;}
+
+#fogLayer > img {position: absolute;}
+
+.grid {
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+
+/* Pieces */
+
+.piece {position: absolute;}
+.piece.selected {background: #FFF}
+.pieceMover {
+	position: absolute;
+	border: 1px dashed transparent;
+	opacity: 0.8;
+}
+.pieceMover.selected {border: black;}
+
+/* INSTALL BOX */
+
 #installBox {
-  margin: 20px auto;
-  width: 250px;
+/*	margin: 0 auto; */
+	display: none;
+	text-align: center;
 }
-#installBox div {
-  clear: right;
+#installBox p {
+	margin: 20px auto;
+	width: 400px;
+	text-align: justify;
 }
-#installBox input {
-  border: 1px solid #CCC;
-  float: right;
+#installBox table {
+	border-collapse: collapse;
+	margin: 20px auto;
+	min-width: 400px;
+	text-align: left;
+}
+#installBox td:first {padding-right: 0.5em;}
+#installBox td:last-child {text-align: right;}
+#installBox input {border: 1px solid #CCC;}
+
+/* MISCELLANEOUS */
+
+.deleteButton {float: right;}
+.clearBoth {
+	height: 0px;
+	width: 1px;
+	margin-top: -1px;
+	clear: both;
+}
+.separator {
+	height: 1px;
+	width: auto;
+	margin: 1px 0px 4px 0px;
+	clear: both;
+	background: #999;
 }
 

@@ -1,6 +1,0 @@
-<presets>
-  <preset name="squares (72✕72)" mode="rectangle" width="72" height="72"/>
-  <preset name="isometric (72✕36)" mode="isometric" width="72" height="18"/>
-  <preset name="hex rows (72✕54)" mode="hex rows" width="72" height="54"/>
-  <preset name="hex columns (54✕72)" mode="hex columns" width="54" height="72"/>
-</presets>

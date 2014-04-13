@@ -1,34 +1,44 @@
 // USER CONSTRUCTOR
-LT.User = function (element) {
-  this.id = parseInt(element.getAttribute("id"));
-  for (var i = 0; i < LT.User.PROPERTIES.length; i++) {
-    var property = LT.User.PROPERTIES[i];
-    this[property] = decodeURIComponent(element.getAttribute(property));
-  }
+LT.User = function (data) {
+	for (var i = 0; i < LT.User.PROPERTIES.length; i++)
+		this[LT.User.PROPERTIES[i]] = data[LT.User.PROPERTIES[i]];
 }
 
 // GLOBAL VARIABLES
 LT.User.PROPERTIES = ["color", "name", "permissions"];
+LT.User.STRINGS = ["color", "name", "permissions"];
+
+// STATIC FUNCTIONS
+LT.User.populateSelectors = function () {
+	$("#userEditor [name=user_id]").empty();
+	$("#pieceEditor [name=user_id]").empty();
+	$("#pieceCreator [name=user_id]").empty();
+	var sortedArray = LT.sortObject(LT.users, "name");
+	for (var i = 0; i < sortedArray.length; i++)
+		$("<option>")
+			.attr({value: sortedArray[i].id})
+			.text(sortedArray[i].name)
+			.appendTo("#userEditor [name=user_id]")
+			.clone().appendTo("#pieceEditor [name=user_id]")
+			.clone().appendTo("#pieceCreator [name=user_id]");
+	$("#pieceCreator [name=user_id]").val(LT.currentUser.id);
+	$("#userEditor [name=user_id]").change(function () {
+		$("#userEditor [name=username]")
+			.val(LT.users[parseInt($(this).val())].name);
+	});
+};
 
 // METHODS OF USER OBJECTS
 LT.User.prototype = {
 
-  update: function (mods) {
-    var args = {user_id: this.id};
-    for (var i = 0; i < LT.User.PROPERTIES.length; i++) {
-      var property = LT.User.PROPERTIES[i];
-      if (typeof(mods[property]) != "undefined") {
-        this[property] = mods[property];
-      }
-      args[property] = this[property];
-    }
-    LT.ajaxRequest("POST", "update_user.php", args, function () {return;});
-  },
-
-  remove: function () {
-    var args = {user_id: this.id};
-    LT.ajaxRequest("POST", "delete_user.php", args, function () {return;});
-  },
+	// CLIENT-SERVER COMMUNICATION
+	update: function (mods) {
+		var args = LT.applyChanges(this, mods, LT.User.PROPERTIES, LT.User.STRINGS);
+		return $.post("php/update_user.php", args);
+	},
+	remove: function () {
+		return $.post("php/delete_user.php", {user_id: this.id});
+	},
 
 }
 
