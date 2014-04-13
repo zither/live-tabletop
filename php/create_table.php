@@ -28,6 +28,7 @@ $wall_color = $LT_SQL->real_escape_string($_REQUEST['wall_color']);
 LT_call('create_table', $name, $image_id, $user_id, $tile_rows, $tile_columns,
   $tile_width, $tile_height, $grid_thickness, $grid_color, $wall_thickness,
   $wall_color, $tile_mode);
+// FIXME: are we relying on table names as a unique ID?
 $rows = LT_call('read_table_by_name', $name);
 $table_id = $rows[0]['id'];
 LT_call('create_tiles', $table_id, $default_tile, $tile_columns, $tile_rows);
@@ -35,9 +36,6 @@ LT_call('create_tiles', $table_id, $default_tile, $tile_columns, $tile_rows);
 // Generate Output
 
 include('include/tables.php');
-include('include/xml_headers.php');
-echo "<tables>\n";
-LT_write_table_row($rows[0]);
-echo "</tables>\n";
+LT_write_tables($rows);
 
 ?>

@@ -10,7 +10,7 @@ include('include/query.php');
 
 // Interpret the Request
 
-$user_id = $LT_SQL->real_escape_string($_REQUEST['user_id']);
+$user_id = $LT_SQL->real_escape_string($_REQUEST['id']);
 $username = $LT_SQL->real_escape_string($_REQUEST['username']);
 $color = $LT_SQL->real_escape_string($_REQUEST['color']);
 $permissions = $LT_SQL->real_escape_string($_REQUEST['permissions']);

@@ -13,19 +13,15 @@ $table_id = $LT_SQL->real_escape_string($_REQUEST['table_id']);
 // Query the Database
 
 $rows = LT_call('read_walls', $table_id);
+foreach ($rows as $i => $wall) {
+	// convert numbers from strings to integers
+	$rows[$i]['x'] = intval($wall['x']);
+	$rows[$i]['y'] = intval($wall['y']);
+}
 
 // Generate Output
 
-include('include/xml_headers.php');
-echo "<walls>\n ";
-for ($i = 0; $i < count($rows); $i++) {
-  // URL-encode strings to be decoded by javascript's decodeURIComponent.
-  echo "  <wall"
-    . ' x="' . $rows[$i]['x'] . '"'
-    . ' y="' . $rows[$i]['y'] . '"'
-    . ' direction="' . rawurlencode($rows[$i]['direction']) . '"'
-    . ' contents="' . rawurlencode($rows[$i]['contents']) . '"'
-    . "/>\n";
-}
-echo "\n</walls>\n";
+include('include/json_headers.php');
+echo json_encode($rows);
+
 ?>

@@ -10,7 +10,7 @@ include('include/ownership.php');
 
 $user_id = $LT_SQL->real_escape_string($_SESSION['user_id']);
 
-$table_id = $LT_SQL->real_escape_string($_REQUEST['table_id']);
+$table_id = $LT_SQL->real_escape_string($_REQUEST['id']);
 $name = $LT_SQL->real_escape_string($_REQUEST['name']);
 $image_id = $LT_SQL->real_escape_string($_REQUEST['image_id']);
 $tile_width = $LT_SQL->real_escape_string($_REQUEST['tile_width']);

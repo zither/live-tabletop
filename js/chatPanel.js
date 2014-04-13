@@ -1,83 +1,54 @@
-LT.readChat = function(){
-  if (!LT.currentTable) return;
-  var readChat = LT.ajaxRequest("POST", "php/read_messages.php",{ 
-    table_id : LT.currentTable.id, last_message : LT.lastMessage });
-  if (readChat.responseXML) {
-    var chatElements = readChat.responseXML.getElementsByTagName('message');
-    LT.messages = [];
-    for (var i = 0 ; i < chatElements.length; i++) {
-      var message = new LT.Message(chatElements[i]);
-      LT.messages.push(message);
-	  for (var n = 0; n < LT.users.length; n++) {
-        if (LT.users[n].id == LT.messages[i].user_id) {
-          LT.messages[i].userName = LT.users[n].name
-	    }
-	  }
-      LT.lastMessage = LT.messages[i].id;
-    }
-  }
-}
+$(function () { // This anonymous function runs after the page loads.
+	LT.chatPanel = new LT.Panel("chatPanel");
 
-LT.refreshMessageList = function () {
-  LT.readChat();
-  //var messagesArray = LT.sortObject(LT.messages, 'time');
-  for (var i = 0; i < LT.messages.length; i++) {
-    // convert the time in seconds to a javascript date object
-    var then = new Date(LT.messages[i].time * 1000);
-    // get a javascript date object for the current date and time
-    var now = new Date();
-    // create an element to contain the timestamp
-    // the element's title (mouseover text) is the full date and time
-    var time = LT.element(LT.chatOutput, 'span', {title: then.toString()});
-    if (then.toDateString() == now.toDateString()) {
-      // if the message is from today, then only show hours and minutes
-      time.textContent = "[" + then.getHours() + ":" + then.getMinutes() + "]";
-    } else {
-      // if the message is not from today, show year, month, day, hours and minutes
-      time.textContent = "[" + then.getFullYear() + "." + (then.getMonth() + 1) + "."
-        + then.getDate() + " " + then.getHours() + ":" + then.getMinutes() + "]";
-    }
-    // show the user who sent the message
-    LT.element(LT.chatOutput, 'span', [" " + LT.messages[i].userName + ": "]);
-    // show the content of the message
-    LT.chatOutput.appendChild(LT.messages[i].element);
-    // start a new line after the message
-    LT.element(LT.chatOutput, 'br');
-  }
-  
-  LT.chatOutput.removeChild(LT.chatBottom);
-  LT.chatOutput.appendChild(LT.chatBottom);
-  LT.chatBottom.scrollIntoView(true);
+	$("#chatForm").submit(function () {
+		if (!LT.currentTable) return false;
+		var args = {table_id: LT.currentTable.id, text: $("#chatInput").val()};
+		$.post("php/create_message.php", args, function () {
+			$("#chatInput").val("").focus();
+			LT.refreshChatPanel();
+		});
+		return false;
+	});
+});
+
+// Reload chat messages.
+LT.refreshChatPanel = function () {
+	if (!LT.currentTable) return;
+	var args = {table_id: LT.currentTable.id, last_message: LT.lastMessageID};
+	$.post("php/read_messages.php", args, function (data) {
+//		$("#chatOutput .message").remove();
+		for (var i = 0; i < data.length; i++) {
+			// TODO: generate from an HTML template?
+			$("<div>").insertBefore("#chatBottom").addClass("message").append([
+				$("<span>").text("[" + LT.formatTime(data[i].time) + "]"),
+				$("<span>").text(" " + LT.users[data[i].user_id].name + ": "),
+				$("<span>").html(data[i].text),
+			]);
+			LT.lastMessageID = data[i].id;
+		}
+		$("#chatBottom")[0].scrollIntoView(true);
+	});
 };
 
-LT.createChatPanel = function () {
-  LT.chatPanel = new LT.Panel('Chat', 'Chat', 6, 95, 355, 130);
-  LT.chatOutput = LT.element(LT.chatPanel.content, {id: 'chatOutput'});
-  LT.chatBottom = LT.element(LT.chatOutput, 'a', [" "]);
-  var chatInput = LT.text('-- Write a message. --',
-    {id: 'chatInput', size: 20, style: {border: '1px solid #CCC'}});
-  var createMessage = function () {
-    chatInput.value = "";
-    LT.ajaxRequest("POST", "php/create_message.php", 
-      {table_id: LT.currentTable.id, text: chatInput.value});
-    chatInput.focus();
-    LT.refreshMessageList();
-  }
-  var form = LT.element(LT.chatPanel.footer, 'form', {id:'chatForm'}, [
-    chatInput,
-    LT.button('Send', function () {createMessage();}),
-    [{'class': 'clearBoth'}],
-  ]);
-  form.onsubmit = function() {createMessage(); return false;};
+// Format time as year.month.day hour:minute (or just hour:minute if today.)
+LT.formatTime = function (seconds) {
+	var time = new Date(seconds * 1000);
+	var minutes = ("00" + time.getMinutes()).slice(-2); // zero-padding
+	if (time.toDateString() == (new Date()).toDateString())
+		// if the message is from today, then only show hours and minutes
+		return time.getHours() + ":" + minutes;
+	else
+		// if it is not from today, show year, month, day, hours and minutes
+		return time.getFullYear() + "." + (time.getMonth() + 1) + "."
+			+ time.getDate() + " " + time.getHours() + ":" + minutes;
 };
 
-LT.chatAlert = function (text) {
-  if (text) 
-    LT.element(LT.chatOutput, {'class' : 'chat_alert'}, [text]);
-  else
-    LT.element(LT.chatOutput, 'br');
-  LT.chatOutput.removeChild(LT.chatBottom);
-  LT.chatOutput.appendChild(LT.chatBottom);
-  LT.chatBottom.scrollIntoView(true);
+// Add a client-side message to the chat window.
+// TODO: not bound to tables, separate from chat? new notification system?
+LT.alert = function (text) {
+	$("#chatBottom").before(
+		text ? $("<div>").addClass("alert").text(text) : $("<br>")
+	)[0].scrollIntoView(true)
 };
 

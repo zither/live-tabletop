@@ -1,7 +1,10 @@
 <?php
 
 session_start();
-if (!isset($_SESSION['user_id'])) die ('You are not logged in.');
+if (!isset($_SESSION['user_id'])) {
+	header('HTTP/1.1 401 Unauthorized', true, 401);
+	die ('You are not logged in.');
+}
 
 include('db_config.php');
 include('include/query.php');
@@ -14,15 +17,16 @@ $user_id = $LT_SQL->real_escape_string($_SESSION['user_id']);
 
 $rows = LT_call('read_user', $user_id);
 
-if (count($rows) == 0) die ("Invalid user ID.");
+// only a DB failure or deleted account will cause this?
+if (count($rows) == 0) {
+	header('HTTP/1.1 404 Not Found', true, 404);
+	die ("User not found.");
+}
 
 // Generate Output
 
 include('include/users.php');
-include('include/xml_headers.php');
-echo "<users>\n";
-LT_write_user_row($rows[0]);
-echo "</users>\n";
+LT_write_users($rows);
 
 ?>
 
