@@ -19,7 +19,7 @@ $(function () { // This anonymous function runs after the page loads.
 		});
 	});
 
-	// TODO: UI for choosng presets
+	// TODO: UI for choosing presets
 	$.get("presets.json", function (data) {LT.Table.presets = data;});
 
 	// tools tab
@@ -101,7 +101,6 @@ LT.loadTable = function (table) {
 			+ LT.Table.images[table.image_id].file + "')"});
 
 	// populate table settings form
-	// TODO: function to automatically populate a table from an object?
 	$("#tableEditor [name=name]").val(table.name);
 	$("#tableEditor [name=tile_columns]").val(table.tile_columns);
 	$("#tableEditor [name=tile_rows]").val(table.tile_rows);
@@ -109,19 +108,8 @@ LT.loadTable = function (table) {
 	$("#tableEditor [name=tile_width]").val(table.tile_width);
 	$("#tableEditor [name=grid_thickness]").val(table.grid_thickness);
 	$("#tableEditor [name=wall_thickness]").val(table.wall_thickness);
-	// background image selector
-	$("#tableEditor [name=image_id]").prop("selectedIndex", 0);
-	$("#tableEditor [name=image_id] option").each(function () {
-		if ($(this).attr("value") == table.image_id)
-			$(this).prop("selected", true);
-			// TODO: will this remove selected state from other options?
-	});
-	// tile mode selector
-	$("#tableEditor [name=tile_mode] option").each(function () {
-		if ($(this).attr("value") == table.tile_mode)
-			$(this).prop("selected", true);
-			// TODO: will this remove selected state from other options?
-	});
+	$("#tableEditor [name=image_id]").val(table.image_id);
+	$("#tableEditor [name=tile_mode]").val(table.tile_mode);
 };
 
 LT.refreshTables = function () {
