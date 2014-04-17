@@ -1,0 +1,7 @@
+.PASS {
+  color: green;
+}
+.FAIL {
+  color: red;
+}
+
