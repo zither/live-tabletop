@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS admins, users, friends, tables, table_users, messages,
-	tables, map_owners, pieces, tiles, walls;
+	tables, map_owners, pieces, tiles, walls, characters, character_owners;
 
 /* TODO update this after the procedures are done */
 DROP PROCEDURE IF EXISTS create_user;
@@ -103,7 +103,7 @@ CREATE TABLE users (
 	color TEXT,
 	avatar INT,
 	email TEXT,
-	subscribed TINIINT NOT NULL DEFAULT 0
+	subscribed TINYINT NOT NULL DEFAULT 0
 );
 
 /* FRIENDS TABLE
@@ -116,6 +116,8 @@ CREATE TABLE friends (
 	sender INT NOT NULL,
 	recipient INT NOT NULL,
 	time TIMESTAMP, /* TODO: do we need this? */
+	FOREIGN KEY (sender) REFERENCES users(id) ON DELETE CASCADE,
+	FOREIGN KEY (recipient) REFERENCES users(id) ON DELETE CASCADE,
 	PRIMARY KEY (sender, recipient)
 }
 
@@ -127,14 +129,16 @@ CREATE TABLE friends (
 	group of players. The state of the table is saved between games.
 
 	map: each table shows one map at a time
-	public: a setting allowing anyone with the table’s permalink URL to join
+	private: anyone with the table’s permalink URL can join if this is 0
+	turns: JSON array of turns (character ids?) in a sequence
 */
 
 CREATE TABLE tables (
 	id INT AUTO_INCREMENT PRIMARY KEY,
 	name TEXT,
 	map INT,
-	public TINYINT NOT NULL DEFAULT 0, /* FIXME: reserved keyword */
+	private TINYINT NOT NULL DEFAULT 1,
+	turns TEXT,
 	message_stamp DATETIME
 );
 
@@ -158,6 +162,8 @@ CREATE TABLE table_users (
 	table_id INT NOT NULL,
 	permission TEXT,
 	viewing TINYINT NOT NULL DEFAULT 0,
+	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+	FOREIGN KEY (table_id) REFERENCES tables(id) ON DELETE CASCADE,
 	PRIMARY KEY (user_id, table_id)
 );
 
@@ -175,7 +181,9 @@ CREATE TABLE messages (
 	user_id INT NOT NULL,
 	avatar INT,
 	text TEXT,
-	time_stamp TIMESTAMP
+	time_stamp TIMESTAMP,
+	FOREIGN KEY (table_id) REFERENCES tables(id) ON DELETE CASCADE,
+	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 
@@ -186,7 +194,7 @@ CREATE TABLE messages (
 	grid_style: width, color...?
 	wall_style: width, color...? (TODO: also door style?)
 	type: “hex” or “square”
-	min/max zoom (18/288), rotate (0/359.999) and tilt (0/90)
+	min/max zoom, rotate and tilt
 	background: image id or URL (TODO: and settings?)
 */
 
@@ -198,8 +206,8 @@ CREATE TABLE tables (
 	tile_columns SMALLINT NOT NULL,
 	background_id INT,
 	background_url TEXT,
-	min_zoom SMALLINT NOT NULL DEFAULT 18, /* TODO: pixels or percentages? */
-	max_zoom SMALLINT NOT NULL DEFAULT 288,
+	min_zoom FLOAT NOT NULL DEFAULT 0.25,
+	max_zoom FLOAT NOT NULL DEFAULT 4.0,
 	min_rotate SMALLINT NOT NULL DEFAULT -180,
 	max_rotate SMALLINT NOT NULL DEFAULT 180,
 	min_tilt SMALLINT NOT NULL DEFAULT 0,
@@ -223,6 +231,8 @@ CREATE TABLE tables (
 CREATE TABLE map_owners (
 	user_id INT NOT NULL,
 	map_id INT NOT NULL,
+	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+	FOREIGN KEY (map_id) REFERENCES maps(id) ON DELETE CASCADE,
 	PRIMARY KEY (user_id, map_id)
 );
 
@@ -251,16 +261,17 @@ CREATE TABLE pieces (
 	image_id INT,
 	image_url TEXT,
 	name TEXT,
-	x INT NOT NULL DEFAULT 0, /* TODO: float */
-	y INT NOT NULL DEFAULT 0, /* TODO: float */
+	x FLOAT NOT NULL DEFAULT 0,
+	y FLOAT NOT NULL DEFAULT 0,
 	x_center INT NOT NULL DEFAULT 0,
 	y_center INT NOT NULL DEFAULT 0,
-	x_tiles SMALLINT NOT NULL DEFAULT 1, /* TODO: float? */
-	y_tiles SMALLINT NOT NULL DEFAULT 1, /* TODO: float? */
-	scale SMALLINT NOT NULL DEFAULT 100, /* TODO: float? */
+	x_tiles FLOAT NOT NULL DEFAULT 1,
+	y_tiles FLOAT NOT NULL DEFAULT 1,
+	scale FLOAT NOT NULL DEFAULT 1,
 	character_id INT,
 	markers TEXT, /* TODO: make this a table? */
-	color TEXT /* TODO: do we need this? */
+	color TEXT, /* TODO: do we need this? */
+	FOREIGN KEY (map_id) REFERENCES maps(id) ON DELETE CASCADE
 );
 
 /* TILES TABLE
@@ -272,12 +283,13 @@ CREATE TABLE pieces (
 */
 
 CREATE TABLE tiles (
-	table_id INT NOT NULL,
+	map_id INT NOT NULL,
 	x SMALLINT NOT NULL,
 	y SMALLINT NOT NULL,
-	ddddimage_id INT,
+	image_id INT,
 	fog TINYINT NOT NULL DEFAULT 0,
-	PRIMARY KEY (table_id, x, y)
+	FOREIGN KEY (map_id) REFERENCES maps(id) ON DELETE CASCADE,
+	PRIMARY KEY (map_id, x, y)
 );
 
 
@@ -296,6 +308,7 @@ CREATE TABLE walls (
 	y SMALLINT NOT NULL,
 	direction VARCHAR(2) NOT NULL,
 	contents TEXT NOT NULL,
+	FOREIGN KEY (map_id) REFERENCES maps(id) ON DELETE CASCADE,
 	PRIMARY KEY (map_id, x, y, direction)
 );
 
@@ -336,24 +349,9 @@ CREATE TABLE characters (
 CREATE TABLE character_owners (
 	user_id INT,
 	character_id INT,
+	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+	FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
 	PRIMARY_KEY (user_id, character_id)
-);
-
-
-/* TURNS TABLE
-
-	An appearance of a character in a table’s initiative list.
-	TODO: Reordering turns means changing a couple or all of the order fields
-		of the turns on a table (half on average, every one to rotate them.) 
-		So maybe turns should be a field containing a JSON array of character
-		ids in the Tables table instead of having their own database table.
-*/
-
-CREATE TABLE turns (
-	id INT AUTO_INCREMENT PRIMARY KEY,
-	character_id INT,
-	table_id INT,
-	order INT /* FIXME: reserved keyword */
 );
 
 
@@ -369,6 +367,7 @@ BEGIN
 	INSERT INTO admins (name, password_hash, password_salt)
 		VALUES (the_name, the_hash, the_salt);
 END;
+
 
 /* USERS PROCEDURES */
 
@@ -442,27 +441,44 @@ END;
 CREATE PROCEDURE delete_user (IN the_user INT)
 BEGIN
 	START TRANSACTION;
-	DELETE FROM messages WHERE user_id = the_user;
-	DELETE FROM messages WHERE table_id IN (
-		SELECT id FROM tables WHERE user_id = the_user);
-	DELETE FROM stats WHERE piece_id IN (
-		SELECT id FROM pieces WHERE table_id IN (
-			SELECT id FROM tables WHERE user_id = the_user));
-	DELETE FROM pieces WHERE table_id IN (
-		SELECT id FROM tables WHERE user_id = the_user);
-	DELETE FROM tiles WHERE table_id IN (
-		SELECT id FROM tables WHERE user_id = the_user);
-	DELETE FROM walls WHERE table_id IN (
-		SELECT id FROM tables WHERE user_id = the_user);
-	DELETE FROM tables WHERE user_id = the_user;
-	DELETE FROM images WHERE user_id = the_user;
 	DELETE FROM users WHERE id = the_user;
+	DELETE FROM tables WHERE table_id NOT IN (
+		SELECT table_id FROM table_users WHERE permission = "owner");
+	DELETE FROM maps WHERE map_id NOT IN (
+		SELECT map_id FROM map_owners);
+	DELETE FROM characters WHERE character_id NOT IN (
+		SELECT character_id FROM character_owners);
+/*
+handled by ON DELETE CASCADE when you delete the user:
+	DELETE FROM friends WHERE sender = the_user OR recipient = the_user;
+	DELETE FROM table_users WHERE user_id = the_user;
+	DELETE FROM messages WHERE user_id = the_user;
+	DELETE FROM map_owners WHERE user_id = the_user;
+handled by ON DELETE CASCADE when you delete the table:
+	DELETE FROM messages WHERE table_id NOT IN (SELECT id FROM tables);
+handled by ON DELETE CASCADE when you delete the map:
+	DELETE FROM pieces WHERE map_id NOT IN (SELECT id FROM maps);
+	DELETE FROM tiles WHERE map_id NOT IN (SELECT id FROM maps);
+	DELETE FROM walls WHERE table_id NOT IN (SELECT id FROM maps);
+*/
 	COMMIT;
 END;
 
 
+/* FRIENDS PROCEDURES */
 
-/* Tiles Procedures */
+CREATE PROCEDURE create_friend (IN the_sender INT, IN the_recipient INT)
+BEGIN
+	INSERT INTO friends (sender, recipient) VALUES (the_sender, the_recipient);
+END;
+
+CREATE PROCEDURE delete_friend (IN the_sender INT, IN the_recipient INT)
+BEGIN
+	DELETE FROM friends WHERE sender = the_sender AND recipient = the_recipient;
+END;
+
+
+/* TILES PROCEDURES */
 
 CREATE PROCEDURE create_tiles (IN the_table INT, IN the_image INT,
 	IN the_width SMALLINT, IN the_height SMALLINT)
@@ -517,7 +533,7 @@ END;
 
 
 
-/* Tables Procedures */
+/* TABLES PROCEDURES */
 
 CREATE PROCEDURE create_table (IN the_name VARCHAR(200), IN the_image INT,
 	IN the_user INT, IN the_rows SMALLINT, IN the_columns SMALLINT,
@@ -623,7 +639,7 @@ END;
 
 
 
-/* Piece Procedures */
+/* PIECE PROCEDURES */
 
 CREATE PROCEDURE create_piece (IN the_table INT, IN the_image INT,
 	IN the_user INT, IN the_name TEXT, IN the_x INT, IN the_y INT,
@@ -674,8 +690,7 @@ BEGIN
 END;
 
 
-
-/* Messages Procedures */
+/* MESSAGES PROCEDURES */
 
 CREATE PROCEDURE create_message (IN the_table INT, IN the_user INT, IN the_text TEXT)
 BEGIN
@@ -697,7 +712,7 @@ BEGIN
 END;
 
 
-/* Images Procedures */
+/* IMAGES PROCEDURES */
 
 CREATE PROCEDURE create_image (IN the_user INT, IN the_file TEXT,
 	IN the_type TEXT, IN the_public TINYINT,
@@ -752,7 +767,7 @@ BEGIN
 END;
 
 
-/* Stats Procedures */
+/* STATS PROCEDURES */
 
 CREATE PROCEDURE set_stat (IN the_piece INT, IN the_name VARCHAR(200), IN the_value TEXT)
 BEGIN
@@ -775,7 +790,7 @@ BEGIN
 	);
 END;
 
-/* Walls Procedures */
+/* WALLS PROCEDURES */
 
 CREATE PROCEDURE create_wall (IN the_table INT, IN the_x SMALLINT,
 	IN the_y SMALLINT, IN the_direction VARCHAR(2), IN the_contents TEXT)
