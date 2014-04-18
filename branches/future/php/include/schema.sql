@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS admins, users, friends, tables, table_users, messages,
-	tables, map_owners, pieces, tiles, walls, characters, character_owners;
+	maps, map_owners, pieces, tiles, walls, characters, character_owners;
 
 /* TODO update this after the procedures are done */
 DROP PROCEDURE IF EXISTS create_user;
@@ -131,6 +131,8 @@ CREATE TABLE friends (
 	map: each table shows one map at a time
 	private: anyone with the table’s permalink URL can join if this is 0
 	turns: JSON array of turns (character ids?) in a sequence
+	last_message: id of last new message
+	users modified: time of last change to this table's list of users
 */
 
 CREATE TABLE tables (
@@ -138,8 +140,9 @@ CREATE TABLE tables (
 	name TEXT,
 	map INT,
 	private TINYINT NOT NULL DEFAULT 1,
-	turns TEXT,
-	message_stamp DATETIME
+	turns TEXT NOT NULL DEFAULT '[]',
+	last_message INT,
+	users_modified DATETIME
 );
 
 
@@ -148,6 +151,8 @@ CREATE TABLE tables (
 	unique relationships between tables and users.
 
 	viewing: 1 if the user is currently online and viewing this table
+	name: the name of the table, duplicated here so we only need this table
+		to populate and frequently refresh the user's Tables list
 	permission: one of four mutually exclusive states
 		“owner”: can invite people to join the table, change the public/private
 		   setting, invite members, change the map, edit the map and move any
@@ -160,6 +165,7 @@ CREATE TABLE tables (
 CREATE TABLE table_users (
 	user_id INT NOT NULL,
 	table_id INT NOT NULL,
+	name TEXT,
 	permission TEXT,
 	viewing TINYINT NOT NULL DEFAULT 0,
 	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -198,7 +204,7 @@ CREATE TABLE messages (
 	background: image id or URL (TODO: and settings?)
 */
 
-CREATE TABLE tables (
+CREATE TABLE maps (
 	id INT AUTO_INCREMENT PRIMARY KEY,
 	name TEXT,
 	type TEXT NOT NULL,
@@ -269,7 +275,7 @@ CREATE TABLE pieces (
 	y_tiles FLOAT NOT NULL DEFAULT 1,
 	scale FLOAT NOT NULL DEFAULT 1,
 	character_id INT,
-	markers TEXT, /* TODO: make this a table? */
+	markers TEXT NOT NULL DEFAULT '[]', /* TODO: make this a table? */
 	color TEXT, /* TODO: do we need this? */
 	FOREIGN KEY (map_id) REFERENCES maps(id) ON DELETE CASCADE
 );
@@ -359,7 +365,7 @@ CREATE TABLE character_owners (
  /*************************** P R O C E D U R E S ***************************/
 /***************************************************************************/
 
-/* ADMINS PROCEDRUES */
+/*** ADMINS PROCEDURES ***/
 
 CREATE PROCEDURE create_admin
 	(IN the_name VARCHAR(200), IN the_hash TEXT, IN the_salt TEXT)
@@ -369,7 +375,7 @@ BEGIN
 END;
 
 
-/* USERS PROCEDURES */
+/*** USERS PROCEDURES ***/
 
 /* User creates his own account. */
 CREATE PROCEDURE create_user (IN the_login_name VARCHAR(200), IN the_hash TEXT,
@@ -379,7 +385,7 @@ BEGIN
 		VALUES (the_login_name, the_hash, the_salt, NOW(), the_email, the_subscribed);
 END;
 
-/* Admin views all of the users */
+/* Admin views all users */
 CREATE PROCEDURE read_users ()
 BEGIN
 	SELECT id, login_name, password_hash, password_salt,
@@ -413,16 +419,16 @@ BEGIN
 END;
 */
 
-/* The user changes his password */
+/* User changes his password or Admin resets his password */
 CREATE PROCEDURE update_user_password
 	(IN the_user INT, IN the_hash TEXT, IN the_salt TEXT)
 BEGIN
 	UPDATE users SET password_hash = the_hash, password_salt = the_salt,
 		last_action = NOW()
-		WHERE id = the_user;
+	WHERE id = the_user;
 END;
 
-/* The user updates his account information */
+/* User updates his account information */
 CREATE PROCEDURE update_user (IN the_user INT, IN the_name VARCHAR(200),
 	IN the_color TEXT, IN the_avatar INT, IN the_email TEXT,
 	IN the_subscribed TINYINT)
@@ -432,12 +438,13 @@ BEGIN
 		WHERE id = the_user;
 END;
 
-/* The user sent a message or changed something */
+/* User sent a message or changed something */
 CREATE PROCEDURE update_user_timestamp (IN the_user INT)
 BEGIN
 	UPDATE users SET last_action = NOW() WHERE id = the_user;
 END;
 
+/* User? or Admin deletes a user account */
 CREATE PROCEDURE delete_user (IN the_user INT)
 BEGIN
 	START TRANSACTION;
@@ -465,20 +472,258 @@ handled by ON DELETE CASCADE when you delete the map:
 END;
 
 
-/* FRIENDS PROCEDURES */
+/*** FRIENDS PROCEDURES ***/
 
+/* User sends or confirms a friend request */
 CREATE PROCEDURE create_friend (IN the_sender INT, IN the_recipient INT)
 BEGIN
 	INSERT INTO friends (sender, recipient) VALUES (the_sender, the_recipient);
 END;
 
+/* Admin views all friend requests sent and received by the user */
+CREATE PROCEDURE read_friends (IN the_user)
+BEGIN
+	SELECT sender, recipient, UNIX_TIMESTAMP(time) AS time
+	FROM friends WHERE sender = the_user OR recipient = the_user;
+END;
+
+/* User sees the friend requests he has recieved */
+CREATE PROCEDURE read_friends_recieved (IN the_user)
+BEGIN
+	SELECT sender FROM friends WHERE recipient = the_user ORDER BY time;
+END;
+
+/* TODO: Is this used by anything? */
+CREATE PROCEDURE read_friends_sent (IN the_user)
+BEGIN
+	SELECT recipient FROM friends WHERE sender = the_user ORDER BY time;
+END;
+
+/* User views his list of confirmed friends */
+CREATE PROCEDURE read_friends_confirmed (IN the_user)
+BEGIN
+	SELECT a.recipient AS user_id FROM friends a, friends b
+		WHERE a.sender = the_user
+		AND a.sender = b.recipient AND b.sender = a.recipient;
+END;
+
+/* User stops being friends with the recipient or cancels friend request */
 CREATE PROCEDURE delete_friend (IN the_sender INT, IN the_recipient INT)
 BEGIN
 	DELETE FROM friends WHERE sender = the_sender AND recipient = the_recipient;
 END;
 
 
-/* TILES PROCEDURES */
+/*** TABLES PROCEDURES ***/
+
+/* User creates a new table. */
+CREATE PROCEDURE create_table (IN the_name VARCHAR(200), IN the_map INT)
+BEGIN
+	INSERT INTO tables (name, map, users_modified)
+		VALUES (the_name, the_map, NOW());
+END;
+
+/* User loads a table or polls for new messages or users list changes */
+CREATE PROCEDURE read_table (IN the_table INT)
+BEGIN
+	SELECT id, name, map, private, turns, last_message,
+		UNIX_TIMESTAMP(users_modified) AS users_modified
+		FROM tables WHERE id = the_table;
+END;
+
+/* FIXME: do not need?
+CREATE PROCEDURE read_table_by_name (IN the_name VARCHAR(200))
+BEGIN
+	SELECT id, name, map, private, turns, last_message,
+		UNIX_TIMESTAMP(users_modified) AS users_modified
+		FROM tables WHERE name = the_name;
+END;
+*/
+
+/* Admin views all the tables. */
+CREATE PROCEDURE read_tables ()
+BEGIN
+	SELECT id, name, map, private, turns, last_message,
+		UNIX_TIMESTAMP(users_modified) AS users_modified
+		FROM tables ORDER BY name, id;
+END;
+
+/* User renamed the table, toggled the private setting or edited the turns */
+CREATE PROCEDURE update_table (IN the_table INT, IN the_name VARCHAR(200),
+	IN the_private TINYINT, IN the_turns TEXT)
+BEGIN
+	UPDATE tables SET name = the_name, private = the_private, turns = the_turns
+		WHERE id = the_table;
+END;
+
+/*** TABLE_USERS PROCEDURES ***/
+/*	user_id INT NOT NULL,
+	table_id INT NOT NULL,
+	permission TEXT,
+	viewing TINYINT NOT NULL DEFAULT 0, */
+
+/* User creates a table, shares it with, invites or bans a user */
+CREATE PROCEDURE create_table_users (IN the_user INT, IN the_table INT, IN the permission INT)
+BEGIN
+	INSERT INTO table_users (user_id, table_id, permission)
+		VALUES (the_user, the_table, the_permission);
+END;
+
+/* User views the owners, members, viewers and blacklist of this table */
+CREATE PROCEDURE read_table_users (IN the_table INT)
+BEGIN
+	SELECT user_id, permission, viewing, login_name, users.name AS name
+		FROM table_users, users WHERE id = user_id AND table_id = the_table;
+END;
+
+/* User views tables he owns and tables he has been invited to */
+CREATE PROCEDURE read_table_user_tables (IN the_user INT)
+BEGIN
+	SELECT table_id, name, permission FROM table_users
+		WHERE user_id = the_user AND permission IN ('owner', 'member')
+		ORDER BY name, id;
+END;
+
+
+/*** MESSAGES PROCEDURES ***/
+/* messages (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	table_id INT NOT NULL,
+	user_id INT NOT NULL,
+	avatar INT,
+	text TEXT,
+	time_stamp TIMESTAMP,
+	FOREIGN KEY (table_id) REFERENCES tables(id) ON DELETE CASCADE,
+	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE */
+
+CREATE PROCEDURE create_message (IN the_table INT, IN the_user INT, IN the_text TEXT)
+BEGIN
+	START TRANSACTION;
+	INSERT INTO messages (table_id, user_id, text) VALUES (the_table, the_user, the_text);
+	UPDATE tables SET message_stamp = NOW() WHERE id = the_table;
+	COMMIT;
+END;
+
+CREATE PROCEDURE read_messages (IN the_table INT, IN the_id INT)
+BEGIN
+	SELECT id, table_id, user_id, text, UNIX_TIMESTAMP(time_stamp) AS time
+		FROM messages WHERE table_id = the_table AND id > the_id ORDER BY id ASC;
+END;
+
+CREATE PROCEDURE expire_messages ()
+BEGIN
+	DELETE FROM messages WHERE time_stamp < DATE_SUB(NOW(), INTERVAL 6 HOUR);
+END;
+
+/*** MAPS PROCEDURES ***/
+/* maps (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	name TEXT,
+	type TEXT NOT NULL,
+	tile_rows SMALLINT NOT NULL,
+	tile_columns SMALLINT NOT NULL,
+	background_id INT,
+	background_url TEXT,
+	min_zoom FLOAT NOT NULL DEFAULT 0.25,
+	max_zoom FLOAT NOT NULL DEFAULT 4.0,
+	min_rotate SMALLINT NOT NULL DEFAULT -180,
+	max_rotate SMALLINT NOT NULL DEFAULT 180,
+	min_tilt SMALLINT NOT NULL DEFAULT 0,
+	max_tilt SMALLINT NOT NULL DEFAULT 90,
+	grid_thickness TINYINT NOT NULL DEFAULT 1,
+	wall_thickness TINYINT NOT NULL DEFAULT 3,
+	door_thickness TINYINT NOT NULL DEFAULT 3, /* TODO: Is this needed? 
+	grid_color: TEXT,
+	wall_color: TEXT,
+	door_color: TEXT,
+	piece_stamp DATETIME,
+	tile_stamp DATETIME */
+
+
+/*** MAP_OWNERS PROCEDURES ***/
+/*	user_id INT NOT NULL,
+	map_id INT NOT NULL,
+	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+	FOREIGN KEY (map_id) REFERENCES maps(id) ON DELETE CASCADE,
+	PRIMARY KEY (user_id, map_id) */
+
+
+/*** PIECE PROCEDURES ***/
+/* 	id INT AUTO_INCREMENT PRIMARY KEY,
+	map_id INT NOT NULL,
+	image_id INT,
+	image_url TEXT,
+	name TEXT,
+	x FLOAT NOT NULL DEFAULT 0,
+	y FLOAT NOT NULL DEFAULT 0,
+	x_center INT NOT NULL DEFAULT 0,
+	y_center INT NOT NULL DEFAULT 0,
+	x_tiles FLOAT NOT NULL DEFAULT 1,
+	y_tiles FLOAT NOT NULL DEFAULT 1,
+	scale FLOAT NOT NULL DEFAULT 1,
+	character_id INT,
+	markers TEXT, /* TODO: make this a table? 
+	color TEXT, /* TODO: do we need this? 
+	FOREIGN KEY (map_id) REFERENCES maps(id) ON DELETE CASCADE */
+
+CREATE PROCEDURE create_piece (IN the_table INT, IN the_image INT,
+	IN the_user INT, IN the_name TEXT, IN the_x INT, IN the_y INT,
+	IN the_x_offset INT, IN the_y_offset INT, IN the_width SMALLINT,
+	IN the_height SMALLINT)
+BEGIN
+	START TRANSACTION;
+	INSERT INTO pieces (table_id, image_id, user_id, name, x, y,
+			x_offset, y_offset, width, height)
+		VALUES (the_table, the_image, the_user, the_name, the_x, the_y,
+			the_x_offset, the_y_offset, the_width, the_height);
+	UPDATE tables SET piece_stamp = NOW() WHERE id = the_table;
+	COMMIT;
+END;
+
+CREATE PROCEDURE read_piece (IN the_piece INT)
+BEGIN
+	SELECT * FROM pieces WHERE id = the_piece;
+END;
+
+CREATE PROCEDURE read_pieces (IN the_table INT)
+BEGIN
+	SELECT * FROM pieces WHERE table_id = the_table ORDER BY name, user_id;
+END;
+
+CREATE PROCEDURE update_piece (IN the_piece INT, IN the_image INT,
+	IN the_user INT, IN the_name TEXT, IN the_x INT, IN the_y INT,
+	IN the_x_offset INT, IN the_y_offset INT,
+	IN the_width SMALLINT, IN the_height SMALLINT, IN the_color TEXT)
+BEGIN
+	START TRANSACTION;
+	UPDATE pieces SET image_id = the_image, user_id = the_user, name = the_name,
+			x = the_x, y = the_y, x_offset = the_x_offset, y_offset = the_y_offset,
+			width = the_width, height = the_height, color = the_color
+		WHERE id = the_piece;
+	UPDATE tables SET piece_stamp = NOW() WHERE id = (
+		SELECT table_id FROM pieces WHERE id = the_piece);
+	COMMIT;
+END;
+
+CREATE PROCEDURE delete_piece (IN the_piece INT)
+BEGIN
+	START TRANSACTION;
+	UPDATE tables SET piece_stamp = NOW() WHERE id = (
+		SELECT table_id FROM pieces WHERE id = the_piece);
+	DELETE FROM pieces WHERE id = the_piece;
+	COMMIT;
+END;
+
+/*** TILES PROCEDURES ***/
+/* tiles (
+	map_id INT NOT NULL,
+	x SMALLINT NOT NULL,
+	y SMALLINT NOT NULL,
+	image_id INT,
+	fog TINYINT NOT NULL DEFAULT 0,
+	FOREIGN KEY (map_id) REFERENCES maps(id) ON DELETE CASCADE,
+	PRIMARY KEY (map_id, x, y)
+*/
 
 CREATE PROCEDURE create_tiles (IN the_table INT, IN the_image INT,
 	IN the_width SMALLINT, IN the_height SMALLINT)
@@ -532,265 +777,16 @@ BEGIN
 END;
 
 
-
-/* TABLES PROCEDURES */
-
-CREATE PROCEDURE create_table (IN the_name VARCHAR(200), IN the_image INT,
-	IN the_user INT, IN the_rows SMALLINT, IN the_columns SMALLINT,
-	IN the_width INT, IN the_height INT,
-	IN the_grid_thickness INT, IN the_grid_color TEXT,
-	IN the_wall_thickness INT, IN the_wall_color TEXT,
-	IN the_tile_mode TEXT)
-BEGIN
-	INSERT INTO tables (name, image_id, user_id, tile_rows, tile_columns,
-		tile_width, tile_height,
-		grid_thickness, grid_color, wall_thickness, wall_color,
-		tile_stamp, message_stamp, piece_stamp,
-		tile_mode)
-	VALUES (the_name, the_image, the_user, the_rows, the_columns,
-		the_width, the_height,
-		the_grid_thickness, the_grid_color, the_wall_thickness, the_wall_color,
-		NOW(), NOW(), NOW(),
-		the_tile_mode);
-END;
-
-CREATE PROCEDURE read_table (IN the_table INT)
-BEGIN
-	SELECT id, user_id, image_id, name,
-		tile_rows, tile_columns, tile_width, tile_height,
-		grid_thickness, grid_color, wall_thickness, wall_color,
-		UNIX_TIMESTAMP(piece_stamp) AS piece_stamp,
-		UNIX_TIMESTAMP(tile_stamp) AS tile_stamp,
-		UNIX_TIMESTAMP(message_stamp) AS message_stamp,
-		tile_mode
- FROM tables WHERE id = the_table;
-END;
-
-CREATE PROCEDURE read_table_by_name (IN the_name VARCHAR(200))
-BEGIN
-	SELECT id, user_id, image_id, name,
-		tile_rows, tile_columns, tile_width, tile_height,
-		grid_thickness, grid_color, wall_thickness, wall_color,
-		UNIX_TIMESTAMP(piece_stamp) AS piece_stamp,
-		UNIX_TIMESTAMP(tile_stamp) AS tile_stamp,
-		UNIX_TIMESTAMP(message_stamp) AS message_stamp,
-		tile_mode
-	FROM tables WHERE name = the_name;
-END;
-
-CREATE PROCEDURE read_tables ()
-BEGIN
-	SELECT id, user_id, image_id, name,
-		tile_rows, tile_columns, tile_width, tile_height,
-		grid_thickness, grid_color, wall_thickness, wall_color,
-		UNIX_TIMESTAMP(piece_stamp) AS piece_stamp,
-		UNIX_TIMESTAMP(tile_stamp) AS tile_stamp,
-		UNIX_TIMESTAMP(message_stamp) AS message_stamp,
-		tile_mode
-	FROM tables ORDER BY name;
-END;
-
-CREATE PROCEDURE read_tables_by_user_id (IN the_user INT)
-BEGIN
-	SELECT id, user_id, image_id, name,
-		tile_rows, tile_columns, tile_width, tile_height,
-		grid_thickness, grid_color, wall_thickness, wall_color,
-		UNIX_TIMESTAMP(piece_stamp) AS piece_stamp,
-		UNIX_TIMESTAMP(tile_stamp) AS tile_stamp,
-		UNIX_TIMESTAMP(message_stamp) AS message_stamp,
-		tile_mode
-	FROM tables WHERE user_id = the_user ORDER BY name;
-END;
-
-CREATE PROCEDURE read_table_timestamps (IN the_table INT)
-BEGIN
-	SELECT UNIX_TIMESTAMP(piece_stamp) AS piece_stamp,
-			   UNIX_TIMESTAMP(tile_stamp) AS tile_stamp,
-			   UNIX_TIMESTAMP(message_stamp) AS message_stamp
-	FROM tables WHERE table_id = the_table;
-END;
-
-CREATE PROCEDURE update_table (IN the_table INT, IN the_name VARCHAR(200),
-	IN the_user INT, IN the_image INT,
-	IN the_tile_width INT, IN the_tile_height INT,
-	IN the_grid_thickness INT, IN the_grid_color TEXT,
-	IN the_wall_thickness INT, IN the_wall_color TEXT,
-	IN the_tile_mode TEXT)
-BEGIN
-	UPDATE tables SET name = the_name, user_id = the_user, image_id = the_image,
-		tile_width = the_tile_width, tile_height = the_tile_height,
-		grid_thickness = the_grid_thickness, grid_color = the_grid_color,
-		wall_thickness = the_wall_thickness, wall_color = the_wall_color,
-		tile_mode = the_tile_mode
-	WHERE id = the_table;
-END;
-
-CREATE PROCEDURE delete_table (IN the_table INT)
-BEGIN
-	START TRANSACTION;
-	DELETE FROM stats WHERE piece_id IN (
-		SELECT id FROM pieces WHERE table_id = the_table);
-	DELETE FROM pieces WHERE table_id = the_table;
-	DELETE FROM walls WHERE table_id = the_table;
-	DELETE FROM messages WHERE table_id = the_table;
-	DELETE FROM tables WHERE id = the_table;
-	COMMIT;
-END;
-
-
-
-/* PIECE PROCEDURES */
-
-CREATE PROCEDURE create_piece (IN the_table INT, IN the_image INT,
-	IN the_user INT, IN the_name TEXT, IN the_x INT, IN the_y INT,
-	IN the_x_offset INT, IN the_y_offset INT, IN the_width SMALLINT,
-	IN the_height SMALLINT)
-BEGIN
-	START TRANSACTION;
-	INSERT INTO pieces (table_id, image_id, user_id, name, x, y,
-			x_offset, y_offset, width, height)
-		VALUES (the_table, the_image, the_user, the_name, the_x, the_y,
-			the_x_offset, the_y_offset, the_width, the_height);
-	UPDATE tables SET piece_stamp = NOW() WHERE id = the_table;
-	COMMIT;
-END;
-
-CREATE PROCEDURE read_piece (IN the_piece INT)
-BEGIN
-	SELECT * FROM pieces WHERE id = the_piece;
-END;
-
-CREATE PROCEDURE read_pieces (IN the_table INT)
-BEGIN
-	SELECT * FROM pieces WHERE table_id = the_table ORDER BY name, user_id;
-END;
-
-CREATE PROCEDURE update_piece (IN the_piece INT, IN the_image INT,
-	IN the_user INT, IN the_name TEXT, IN the_x INT, IN the_y INT,
-	IN the_x_offset INT, IN the_y_offset INT,
-	IN the_width SMALLINT, IN the_height SMALLINT, IN the_color TEXT)
-BEGIN
-	START TRANSACTION;
-	UPDATE pieces SET image_id = the_image, user_id = the_user, name = the_name,
-			x = the_x, y = the_y, x_offset = the_x_offset, y_offset = the_y_offset,
-			width = the_width, height = the_height, color = the_color
-		WHERE id = the_piece;
-	UPDATE tables SET piece_stamp = NOW() WHERE id = (
-		SELECT table_id FROM pieces WHERE id = the_piece);
-	COMMIT;
-END;
-
-CREATE PROCEDURE delete_piece (IN the_piece INT)
-BEGIN
-	START TRANSACTION;
-	UPDATE tables SET piece_stamp = NOW() WHERE id = (
-		SELECT table_id FROM pieces WHERE id = the_piece);
-	DELETE FROM pieces WHERE id = the_piece;
-	COMMIT;
-END;
-
-
-/* MESSAGES PROCEDURES */
-
-CREATE PROCEDURE create_message (IN the_table INT, IN the_user INT, IN the_text TEXT)
-BEGIN
-	START TRANSACTION;
-	INSERT INTO messages (table_id, user_id, text) VALUES (the_table, the_user, the_text);
-	UPDATE tables SET message_stamp = NOW() WHERE id = the_table;
-	COMMIT;
-END;
-
-CREATE PROCEDURE read_messages (IN the_table INT, IN the_id INT)
-BEGIN
-	SELECT id, table_id, user_id, text, UNIX_TIMESTAMP(time_stamp) AS time
-		FROM messages WHERE table_id = the_table AND id > the_id ORDER BY id ASC;
-END;
-
-CREATE PROCEDURE expire_messages ()
-BEGIN
-	DELETE FROM messages WHERE time_stamp < DATE_SUB(NOW(), INTERVAL 6 HOUR);
-END;
-
-
-/* IMAGES PROCEDURES */
-
-CREATE PROCEDURE create_image (IN the_user INT, IN the_file TEXT,
-	IN the_type TEXT, IN the_public TINYINT,
-	IN the_width INT, IN the_height INT,
-	IN the_tile_width INT, IN the_tile_height INT,
-	IN the_center_x INT, IN the_center_y INT,
-	IN the_tile_mode TEXT, IN the_layer INT)
-BEGIN
-	INSERT INTO images (user_id, file, type, public, width, height,
-		tile_width, tile_height, center_x, center_y, tile_mode, layer)
-	VALUES (the_user, the_file, the_type, the_public, the_width, the_height,
-		the_tile_width, the_tile_height, the_center_x, the_center_y,
-		the_tile_mode, the_layer);
-END;
-
-CREATE PROCEDURE read_image (IN the_image INT)
-BEGIN
-	SELECT id, user_id, file, type, public, UNIX_TIMESTAMP(time_stamp) AS time,
-		width, height, tile_width, tile_height, center_x, center_y, tile_mode, layer
-	FROM images WHERE id = the_image;
-END;
-
-CREATE PROCEDURE read_images (IN the_type TEXT)
-BEGIN
-	SELECT id, user_id, file, type, public, UNIX_TIMESTAMP(time_stamp) AS time,
-		width, height, tile_width, tile_height, center_x, center_y, tile_mode, layer
-	FROM images WHERE type = the_type;
-END;
-
-CREATE PROCEDURE read_images_useable (IN the_user INT, IN the_type TEXT)
-BEGIN
-	SELECT id, user_id, file, type, public, UNIX_TIMESTAMP(time_stamp) AS time,
-		width, height, tile_width, tile_height, center_x, center_y, tile_mode, layer
-	FROM images WHERE type = the_type AND (user_id = the_user OR public = 1);
-END;
-
-CREATE PROCEDURE update_image (IN the_image INT, IN the_user INT,
-	IN the_public INT, IN the_tile_width INT, IN the_tile_height INT,
-	IN the_center_x INT, IN the_center_y INT, IN the_tile_mode TEXT,
-	IN the_layer INT)
-BEGIN
-	UPDATE images SET user_id = the_user, public = the_public,
-		tile_width = the_tile_width, tile_height = the_tile_height,
-		center_x = the_center_x, center_y = the_center_y,
-		tile_mode = the_tile_mode, layer = the_layer
-	WHERE id = the_image;
-END;
-
-CREATE PROCEDURE delete_image (IN the_image INT)
-BEGIN
-	DELETE FROM images WHERE id = the_image;
-END;
-
-
-/* STATS PROCEDURES */
-
-CREATE PROCEDURE set_stat (IN the_piece INT, IN the_name VARCHAR(200), IN the_value TEXT)
-BEGIN
-	REPLACE INTO stats (piece_id, name, value) VALUES (the_piece, the_name, the_value);
-	UPDATE tables SET piece_stamp = NOW() WHERE id = (
-		SELECT table_id FROM pieces WHERE id = the_piece
-	);
-END;
-
-CREATE PROCEDURE get_stats (IN the_piece INT)
-BEGIN
-	SELECT * FROM stats WHERE piece_id = the_piece;
-END;
-
-CREATE PROCEDURE delete_stat (IN the_piece INT, IN the_name VARCHAR(200))
-BEGIN
-	DELETE FROM stats WHERE piece_id = the_piece AND name = the_name;
-	UPDATE tables SET piece_stamp = NOW() WHERE id = (
-		SELECT table_id FROM pieces WHERE id = the_piece
-	);
-END;
-
-/* WALLS PROCEDURES */
+/*** WALLS PROCEDURES ***/
+/* walls (
+	map_id INT NOT NULL,
+	x SMALLINT NOT NULL,
+	y SMALLINT NOT NULL,
+	direction VARCHAR(2) NOT NULL,
+	contents TEXT NOT NULL,
+	FOREIGN KEY (map_id) REFERENCES maps(id) ON DELETE CASCADE,
+	PRIMARY KEY (map_id, x, y, direction)
+*/
 
 CREATE PROCEDURE create_wall (IN the_table INT, IN the_x SMALLINT,
 	IN the_y SMALLINT, IN the_direction VARCHAR(2), IN the_contents TEXT)
@@ -811,4 +807,28 @@ BEGIN
 		AND y = the_y AND direction = the_direction;
 END;
 
+
+/*** CHARACTERS PROCEDURES ***/
+/* characters (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	name TEXT,
+	system TEXT,
+	stats TEXT,
+	notes TEXT,
+	portrait_id INT,
+	portrait_url TEXT,
+	piece_image_id INT,
+	piece_image_url TEXT,
+	color TEXT
+*/
+
+
+/*** CHARACTER_OWNERS PROCEDURES ***/
+/* character_owners (
+	user_id INT,
+	character_id INT,
+	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+	FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
+	PRIMARY_KEY (user_id, character_id)
+*/
 
