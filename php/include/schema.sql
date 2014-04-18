@@ -60,48 +60,52 @@ DROP PROCEDURE IF EXISTS delete_wall;
 	Admin name must be unique to identify the admin when logging in. The name
 	field is VARCHAR(200) because MYSQL can only index finite length strings.
 	TODO: do admins need an id or can we use their name as the primary key?
+
+	login: admin login name, must be unique
+	hash: hashed password, visible to PHP logic but not HTTP requests
+	salt: random password salt, visible to PHP logic but not HTTP requests
 */
 
 CREATE TABLE admins (
 	id INT AUTO_INCREMENT PRIMARY KEY,
-	name VARCHAR(200) NOT NULL UNIQUE,
-	password_hash TEXT NOT NULL,
-	password_salt TEXT NOT NULL,
+	login VARCHAR(200) NOT NULL UNIQUE,
+	hash TEXT NOT NULL,
+	salt TEXT NOT NULL,
 );
 
 
 /* USERS TABLE
 
-	Passwords are hashed so evildoers who gain access to the database cannot see
+	Passwords are hashed so evildoers who gain access to the database can't see
 	your password (finding another password with the same hash is very hard.)
 	The random salt is combined with your password before hashing, so two users
-	with the same password will not have the same password hash. This also makes
-	dictionary attacks harder: the attacker has to guess passwords for each user
-	separately because the users have different salts.
+	with the same password will not have the same password hash. This also 
+	makes dictionary attacks harder: the attacker has to guess passwords
+	for each user separately because the users have different salts.
 
-	Users.login_name must be unique to identify the user when logging in.
-	It is VARCHAR(200) because MYSQL can only index finite length strings.
-	Other references to the user (like cross-references between tables)
-	use the auto-incrementing id.
-
-	Users.name is the name displayed to other users. Unlike login_name it can
-	be changed after creating the account and it does not have to be unique.
-
-	The last action timestamp records the last time the user was actively using
-	Live Tabletop, so it needs to be updated frequently. It allows us to remove
-	inactive users and content created by inactive users.
+	login: user login name, must be unique, visible to everyone, unchangeable
+		It is VARCHAR(200) because MYSQL can only index finite length strings.
+		Other references to the user (like cross-references between tables)
+		use the auto-incrementing id.
+	hash: hashed password, visible to PHP logic but not HTTP requests
+	salt: random password salt, visible to PHP logic but not HTTP requests
+	last_action: indicates whether the user has been active recently
+	logged_in: 0 if the user has logged out since his last login
+	name: preferred form of address, not unique, can be changed at any time
+	color: ???
+	email: the user's e-mail address for contact and password reset
+	subscribed: 1 if the user wants to receive Live Tabletop announcements
 */
 
 CREATE TABLE users (
 	id INT AUTO_INCREMENT PRIMARY KEY,
-	login_name VARCHAR(200) NOT NULL UNIQUE,
-	password_hash TEXT NOT NULL,
-	password_salt TEXT NOT NULL,
+	login VARCHAR(200) NOT NULL UNIQUE,
+	hash TEXT NOT NULL,
+	salt TEXT NOT NULL,
 	last_action TIMESTAMP,
 	logged_in TINYINT NOT NULL DEFAULT 0,
 	name TEXT,
 	color TEXT,
-	avatar INT,
 	email TEXT,
 	subscribed TINYINT NOT NULL DEFAULT 0
 );
@@ -150,7 +154,6 @@ CREATE TABLE tables (
 
 	unique relationships between tables and users.
 
-	viewing: 1 if the user is currently online and viewing this table
 	name: the name of the table, duplicated here so we only need this table
 		to populate and frequently refresh the user's Tables list
 	permission: one of four mutually exclusive states
@@ -159,7 +162,9 @@ CREATE TABLE tables (
 		   piece the map.
 		“member”: can join the table when it is not public
 		“banned” (blacklisted): cannot see the table even if it is public
-		null (guest): can only join the table when it is public
+		NULL (guest): can only join the table when it is public
+	viewing: 1 if the user is currently online and viewing this table
+	avatar: the user is speaking as this character at this table
 */
 
 CREATE TABLE table_users (
@@ -168,6 +173,7 @@ CREATE TABLE table_users (
 	name TEXT,
 	permission TEXT,
 	viewing TINYINT NOT NULL DEFAULT 0,
+	avatar INT,
 	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
 	FOREIGN KEY (table_id) REFERENCES tables(id) ON DELETE CASCADE,
 	PRIMARY KEY (user_id, table_id)
@@ -219,10 +225,10 @@ CREATE TABLE maps (
 	min_tilt SMALLINT NOT NULL DEFAULT 0,
 	max_tilt SMALLINT NOT NULL DEFAULT 90,
 	grid_thickness TINYINT NOT NULL DEFAULT 1,
-	wall_thickness TINYINT NOT NULL DEFAULT 3,
-	door_thickness TINYINT NOT NULL DEFAULT 3, /* TODO: Is this needed? */
 	grid_color: TEXT,
+	wall_thickness TINYINT NOT NULL DEFAULT 3,
 	wall_color: TEXT,
+	door_thickness TINYINT NOT NULL DEFAULT 3, /* TODO: Is this needed? */
 	door_color: TEXT,
 	piece_stamp DATETIME,
 	tile_stamp DATETIME
@@ -367,75 +373,86 @@ CREATE TABLE character_owners (
 
 /*** ADMINS PROCEDURES ***/
 
+/* Admin creates an account while installing Live Tabletop
+or Admin creates an account for another admin. */ 
 CREATE PROCEDURE create_admin
-	(IN the_name VARCHAR(200), IN the_hash TEXT, IN the_salt TEXT)
+	(IN the_login VARCHAR(200), IN the_hash TEXT, IN the_salt TEXT)
 BEGIN
-	INSERT INTO admins (name, password_hash, password_salt)
-		VALUES (the_name, the_hash, the_salt);
+	START TRANSACTION;
+	INSERT INTO admins (login, hash, salt)
+		VALUES (the_login, the_hash, the_salt);
+	SELECT LAST_INSERT_ID() as id;
+	COMMIT;
+END;
+
+/* Admin logs in and PHP logic validates his password  */
+CREATE PROCEDURE read_admin (IN the_login VARCHAR(200))
+BEGIN
+	SELECT id, hash, salt FROM admins WHERE login = the_login;
+END;
+
+/* Admin changes his password
+or Admin changes another admin's password? */
+CREATE PROCEDURE update_admin_password
+	(IN the_admin INT, IN the_hash TEXT, IN the_salt TEXT)
+BEGIN
+	UPDATE admins SET hash = the_hash, salt = the_salt WHERE id = the_admin;
 END;
 
 
 /*** USERS PROCEDURES ***/
 
 /* User creates his own account. */
-CREATE PROCEDURE create_user (IN the_login_name VARCHAR(200), IN the_hash TEXT,
+CREATE PROCEDURE create_user (IN the_login VARCHAR(200), IN the_hash TEXT,
 	IN the_salt TEXT, IN the_email TEXT, IN the_subscribed TINYINT)
 BEGIN
-	INSERT INTO users (login_name, password_hash, password_salt, last_action, email, subscribed)
-		VALUES (the_login_name, the_hash, the_salt, NOW(), the_email, the_subscribed);
+	START TRANSACTION;
+	INSERT INTO users (login, hash, salt, last_action, email, subscribed)
+		VALUES 
+			(the_login, the_hash, the_salt, NOW(), the_email, the_subscribed);
+	SELECT LAST_INSERT_ID() as id;
+	COMMIT;
+END;
+
+/* User logs in and PHP logic validates his password */
+CREATE PROCEDURE read_user_login (IN the_login VARCHAR(200))
+BEGIN
+	SELECT id, login, hash, salt, UNIX_TIMESTAMP(last_action) AS last_action,
+		logged_in, name, color, e-mail, subscribed
+		FROM users WHERE login = the_login;
+END;
+
+/* User views his own account info
+or User views another user's id, login, logged_in, name and color */
+CREATE PROCEDURE read_user (IN the_user INT)
+BEGIN
+	SELECT id, login, logged_in, name, color, e-mail, subscribed
+		FROM users WHERE id = the_user;
 END;
 
 /* Admin views all users */
 CREATE PROCEDURE read_users ()
 BEGIN
-	SELECT id, login_name, password_hash, password_salt,
-		UNIX_TIMESTAMP(last_action) AS last_action,
-		logged_in, name, color, avatar, e-mail, subscribed
-		FROM users ORDER BY name, login_name, id;
+	SELECT id, login, hash, salt, UNIX_TIMESTAMP(last_action) AS last_action,
+		logged_in, name, color, e-mail, subscribed
+		FROM users ORDER BY name, login, id;
 END;
 
-/* Business Logic tier needs user info to
-	 - check the user's password
-	 - show the user his own account info
-	 - show the user info about other users
-	Hide last action and password hash/salt from all users
-	Hide e-mail and subscribed from other users
-*/
-CREATE PROCEDURE read_user (IN the_user INT)
-BEGIN
-	SELECT id, login_name, password_hash, password_salt,
-		UNIX_TIMESTAMP(last_action) AS last_action,
-		logged_in, name, color, avatar, email, subscribed    
-		FROM users WHERE id = the_user;
-END;
-
-/* FIXME: do not need?
-CREATE PROCEDURE read_user_by_name (IN the_name VARCHAR(200))
-BEGIN
-	SELECT id, login_name, password_hash, password_salt,
-		UNIX_TIMESTAMP(last_action) AS last_action,
-		logged_in, name, color, avatar, email, subscribed    
-		FROM users WHERE LOWER(name) = LOWER(the_name);
-END;
-*/
-
-/* User changes his password or Admin resets his password */
+/* User changes his password
+or Admin resets his password */
 CREATE PROCEDURE update_user_password
 	(IN the_user INT, IN the_hash TEXT, IN the_salt TEXT)
 BEGIN
-	UPDATE users SET password_hash = the_hash, password_salt = the_salt,
-		last_action = NOW()
+	UPDATE users SET hash = the_hash, salt = the_salt, last_action = NOW()
 	WHERE id = the_user;
 END;
 
 /* User updates his account information */
 CREATE PROCEDURE update_user (IN the_user INT, IN the_name VARCHAR(200),
-	IN the_color TEXT, IN the_avatar INT, IN the_email TEXT,
-	IN the_subscribed TINYINT)
+	IN the_color TEXT, IN the_email TEXT, IN the_subscribed TINYINT)
 BEGIN
-	UPDATE users SET name = the_name, color = the_color, avatar = the_avatar,
-		email = the_email, subscribed = the_subscribed, last_action = NOW()
-		WHERE id = the_user;
+	UPDATE users SET name = the_name, color = the_color, last_action = NOW(),
+		email = the_email, subscribed = the_subscribed WHERE id = the_user;
 END;
 
 /* User sent a message or changed something */
@@ -444,17 +461,22 @@ BEGIN
 	UPDATE users SET last_action = NOW() WHERE id = the_user;
 END;
 
-/* User? or Admin deletes a user account */
+/* User deletes his own account?
+or Admin deletes a user account */
 CREATE PROCEDURE delete_user (IN the_user INT)
 BEGIN
 	START TRANSACTION;
+/* delete the user */
 	DELETE FROM users WHERE id = the_user;
-	DELETE FROM tables WHERE table_id NOT IN (
-		SELECT table_id FROM table_users WHERE permission = "owner");
-	DELETE FROM maps WHERE map_id NOT IN (
-		SELECT map_id FROM map_owners);
-	DELETE FROM characters WHERE character_id NOT IN (
-		SELECT character_id FROM character_owners);
+/* delete tables without owners */
+	DELETE FROM tables WHERE id NOT IN 
+		(SELECT table_id FROM table_users WHERE permission = "owner");
+/* delete maps without owners */
+	DELETE FROM maps WHERE id NOT IN
+		(SELECT map_id FROM map_owners);
+/* delete maps without owners */
+	DELETE FROM characters WHERE id NOT IN
+		(SELECT character_id FROM character_owners);
 /*
 handled by ON DELETE CASCADE when you delete the user:
 	DELETE FROM friends WHERE sender = the_user OR recipient = the_user;
@@ -474,10 +496,12 @@ END;
 
 /*** FRIENDS PROCEDURES ***/
 
-/* User sends or confirms a friend request */
+/* User sends a friend request
+or User confirms a friend request */
 CREATE PROCEDURE create_friend (IN the_sender INT, IN the_recipient INT)
 BEGIN
-	INSERT INTO friends (sender, recipient) VALUES (the_sender, the_recipient);
+	REPLACE INTO friends (sender, recipient)
+		VALUES (the_sender, the_recipient);
 END;
 
 /* Admin views all friend requests sent and received by the user */
@@ -493,8 +517,8 @@ BEGIN
 	SELECT sender FROM friends WHERE recipient = the_user ORDER BY time;
 END;
 
-/* TODO: Is this used by anything? */
-CREATE PROCEDURE read_friends_sent (IN the_user)
+/* User sees the friend requests he has sent */
+CREATE PROCEDURE read_friends_requested (IN the_user)
 BEGIN
 	SELECT recipient FROM friends WHERE sender = the_user ORDER BY time;
 END;
@@ -507,7 +531,8 @@ BEGIN
 		AND a.sender = b.recipient AND b.sender = a.recipient;
 END;
 
-/* User stops being friends with the recipient or cancels friend request */
+/* User stops being friends with the recipient
+or User cancels a friend request */
 CREATE PROCEDURE delete_friend (IN the_sender INT, IN the_recipient INT)
 BEGIN
 	DELETE FROM friends WHERE sender = the_sender AND recipient = the_recipient;
@@ -517,28 +542,31 @@ END;
 /*** TABLES PROCEDURES ***/
 
 /* User creates a new table. */
-CREATE PROCEDURE create_table (IN the_name VARCHAR(200), IN the_map INT)
+CREATE PROCEDURE create_table
+	(IN the_user INT, IN the_name VARCHAR(200), IN the_map INT)
 BEGIN
+	DECLARE new_table_id INT;
+	START TRANSACTION;
+/* create the table */
 	INSERT INTO tables (name, map, users_modified)
 		VALUES (the_name, the_map, NOW());
+	SET new_table_id = LAST_INSERT_ID();
+/* make the user an owner */
+	INSERT INTO table_users (user_id, table_id, permission)
+		VALUES (the_user, new_table_id, 'owner');
+/* return the new table's id */
+	SELECT new_table_id AS id;
+	COMMIT;
 END;
 
-/* User loads a table or polls for new messages or users list changes */
+/* User loads a table
+or User polls for new messages and changes to the users list */
 CREATE PROCEDURE read_table (IN the_table INT)
 BEGIN
 	SELECT id, name, map, private, turns, last_message,
 		UNIX_TIMESTAMP(users_modified) AS users_modified
 		FROM tables WHERE id = the_table;
 END;
-
-/* FIXME: do not need?
-CREATE PROCEDURE read_table_by_name (IN the_name VARCHAR(200))
-BEGIN
-	SELECT id, name, map, private, turns, last_message,
-		UNIX_TIMESTAMP(users_modified) AS users_modified
-		FROM tables WHERE name = the_name;
-END;
-*/
 
 /* Admin views all the tables. */
 CREATE PROCEDURE read_tables ()
@@ -548,7 +576,9 @@ BEGIN
 		FROM tables ORDER BY name, id;
 END;
 
-/* User renamed the table, toggled the private setting or edited the turns */
+/* User renames the table
+or User toggles the table's private/public setting
+or User changes the initiative list (turns) */
 CREATE PROCEDURE update_table (IN the_table INT, IN the_name VARCHAR(200),
 	IN the_private TINYINT, IN the_turns TEXT)
 BEGIN
@@ -556,23 +586,19 @@ BEGIN
 		WHERE id = the_table;
 END;
 
-/*** TABLE_USERS PROCEDURES ***/
-/*	user_id INT NOT NULL,
-	table_id INT NOT NULL,
-	permission TEXT,
-	viewing TINYINT NOT NULL DEFAULT 0, */
-
-/* User creates a table, shares it with, invites or bans a user */
-CREATE PROCEDURE create_table_users (IN the_user INT, IN the_table INT, IN the permission INT)
+/* Admin deletes the table */
+CREATE PROCEDURE delete_table (IN the_table INT)
 BEGIN
-	INSERT INTO table_users (user_id, table_id, permission)
-		VALUES (the_user, the_table, the_permission);
+	DELETE FROM tables WHERE id = the_table;
 END;
+
+
+/*** TABLE_USERS PROCEDURES ***/
 
 /* User views the owners, members, viewers and blacklist of this table */
 CREATE PROCEDURE read_table_users (IN the_table INT)
 BEGIN
-	SELECT user_id, permission, viewing, login_name, users.name AS name
+	SELECT user_id, permission, viewing, avatar, login, users.name AS name
 		FROM table_users, users WHERE id = user_id AND table_id = the_table;
 END;
 
@@ -584,60 +610,205 @@ BEGIN
 		ORDER BY name, id;
 END;
 
-
-/*** MESSAGES PROCEDURES ***/
-/* messages (
-	id INT AUTO_INCREMENT PRIMARY KEY,
-	table_id INT NOT NULL,
-	user_id INT NOT NULL,
-	avatar INT,
-	text TEXT,
-	time_stamp TIMESTAMP,
-	FOREIGN KEY (table_id) REFERENCES tables(id) ON DELETE CASCADE,
-	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE */
-
-CREATE PROCEDURE create_message (IN the_table INT, IN the_user INT, IN the_text TEXT)
+/* User invites another user to play at the table (who becomes a member)
+or User shares the table with another user (who becomes an owner)
+or User changes an owner or blacklisted user's permission to member
+or User changes a member or blacklisted user's permission to owner
+or User adds a user to the table's blacklist
+or User removes a user from the table's blacklist (NULL permission)
+or User revokes a user's ownership or membership (NULL permission)
+or User disowns the table (NULL permission) */
+CREATE PROCEDURE update_table_users_permission
+	(IN the_user INT, IN the_table INT, IN the permission INT)
 BEGIN
 	START TRANSACTION;
-	INSERT INTO messages (table_id, user_id, text) VALUES (the_table, the_user, the_text);
-	UPDATE tables SET message_stamp = NOW() WHERE id = the_table;
+/* create or update the table user's permission */
+	REPLACE INTO table_users (user_id, table_id, permission)
+		VALUES (the_user, the_table, the_permission);
+/* delete guests (NULL permission) who are not viewing the table */
+	DELETE FROM table_users WHERE user_id = the_user AND table_id = the_table
+		AND permission = NULL AND viewing = 0;
+/* delete tables without owners */
+	IF COUNT(SELECT * FROM table_users WHERE user_id = the_user
+		AND table_id = the_table AND permission = 'owner') = 0
+	THEN
+		DELETE FROM tables WHERE id = the_table;
+	END IF;
 	COMMIT;
 END;
 
-CREATE PROCEDURE read_messages (IN the_table INT, IN the_id INT)
+/* User joins a table */
+CREATE PROCEDURE update_table_users_arrive (IN the_user INT, IN the_table INT)
 BEGIN
-	SELECT id, table_id, user_id, text, UNIX_TIMESTAMP(time_stamp) AS time
-		FROM messages WHERE table_id = the_table AND id > the_id ORDER BY id ASC;
+	REPLACE INTO table_users (user_id, table_id, viewing)
+		VALUES (the_user, the_table, 1);
 END;
 
-CREATE PROCEDURE expire_messages ()
+/* User leaves a table */
+CREATE PROCEDURE update_table_users_leave (IN the_user INT, IN the_table INT)
+BEGIN
+	START TRANSACTION;
+/* delete this table user if it was just a guest (NULL permission) */
+	DELETE FROM table_users 
+		WHERE user_id = the_user AND table_id = the_table 
+		AND permission = NULL;
+/* set this table user's viewing to 0 if the user is a member or owner */
+	UPDATE table_users SET viewing = 0
+		WHERE user_id = the_user AND table_id = the_table;
+	COMMIT;
+END;
+
+/* User joins a table */
+CREATE PROCEDURE update_table_users_avatar
+	(IN the_user INT, IN the_table INT, IN the_avatar INT)
+BEGIN
+	UPDATE table_users SET avatar = the_avatar
+		WHERE user_id = the_user AND table_id = the_table;
+END;
+
+
+/*** MESSAGES PROCEDURES ***/
+
+/* User posts a message at a table */
+CREATE PROCEDURE create_message
+	(IN the_table INT, IN the_user INT, IN the_avatar INT, IN the_text TEXT)
+BEGIN
+	START TRANSACTION;
+	INSERT INTO messages (table_id, user_id, avatar, text)
+		VALUES (the_table, the_user, the_avatar, the_text);
+	UPDATE tables SET last_message = LAST_INSERT_ID() WHERE id = the_table;
+	COMMIT;
+END;
+
+/* User joins a table (the_last_message = 0)
+or User looks for new messages
+	(the_last_message = id of the most recent message already seen by user)
+or Admin views all messages at a table (the_last_message = 0) */
+CREATE PROCEDURE read_messages (IN the_table INT, IN the_last_message INT)
+BEGIN
+	DELETE FROM messages WHERE time_stamp < DATE_SUB(NOW(), INTERVAL 6 HOUR);
+	SELECT id, table_id, user_id, avatar, text, UNIX_TIMESTAMP(time) AS time 
+		FROM messages WHERE table_id = the_table AND id > the_last_message
+		ORDER BY id ASC;
+END;
+
+/* Admin deletes old messages because no users have viewed tables recently */
+/* TODO: how can we call this at some regular interval? */
+CREATE PROCEDURE delete_messages_expired ()
 BEGIN
 	DELETE FROM messages WHERE time_stamp < DATE_SUB(NOW(), INTERVAL 6 HOUR);
 END;
 
+
 /*** MAPS PROCEDURES ***/
-/* maps (
-	id INT AUTO_INCREMENT PRIMARY KEY,
-	name TEXT,
-	type TEXT NOT NULL,
-	tile_rows SMALLINT NOT NULL,
-	tile_columns SMALLINT NOT NULL,
-	background_id INT,
-	background_url TEXT,
-	min_zoom FLOAT NOT NULL DEFAULT 0.25,
-	max_zoom FLOAT NOT NULL DEFAULT 4.0,
-	min_rotate SMALLINT NOT NULL DEFAULT -180,
-	max_rotate SMALLINT NOT NULL DEFAULT 180,
-	min_tilt SMALLINT NOT NULL DEFAULT 0,
-	max_tilt SMALLINT NOT NULL DEFAULT 90,
-	grid_thickness TINYINT NOT NULL DEFAULT 1,
-	wall_thickness TINYINT NOT NULL DEFAULT 3,
-	door_thickness TINYINT NOT NULL DEFAULT 3, /* TODO: Is this needed? 
-	grid_color: TEXT,
-	wall_color: TEXT,
-	door_color: TEXT,
-	piece_stamp DATETIME,
-	tile_stamp DATETIME */
+
+/* User creates a new map */
+CREATE PROCEDURE create_map (IN the_user INT, IN the_type TEXT,
+	IN the_rows SMALLINT, IN the_columns SMALLINT,
+	IN the_bg_id INT, IN the_bg_url TEXT, IN the_tile TEXT, IN the_name TEXT)
+BEGIN
+	DECLARE new_map_id INT;
+	DECLARE loop_row INT;
+	DECLARE loop_column INT;
+	START TRANSACTION;
+/* create the map */
+	INSERT INTO maps 
+		(type, tile_rows, tile_columns, background_id, background_url, name)
+	VALUES (the_type, the_rows, the_columns, the_bg_id, the_bg_url, the_name)
+	SET new_map_id = LAST_INSERT_ID();
+/* make the user an owner */
+	INSERT INTO map_owners (user_id, map_id) VALUES (the_user, new_map_id);
+/* create the tiles */
+	SET loop_row = 0;
+	WHILE loop_row < the_rows DO
+		SET loop_column = 0;
+		WHILE loop_column < the_columns DO
+			INSERT INTO tiles (x, y, image_id, map_id)
+				VALUES (loop_column, loop_row, the_tile, new_map_id);
+			SET loop_column = loop_column + 1;
+		END WHILE;
+		SET loop_row = loop_row + 1;
+	END WHILE;
+/* return the new map's id */
+	SELECT new_map_id AS id;
+	COMMIT;
+END;
+
+/* User views the maps he owns */
+CREATE_PROCEDURE read_maps (IN the_user INT)
+BEGIN
+	SELECT id, name, type, tile_rows, tile_columns
+		FROM maps, map_owners WHERE id = map_id and user_id = the_user;
+END;
+
+/* User loads a map
+or User polls for changes to the map, its pieces and tiles */
+CREATE PROCEDURE read_map (IN the_map INT)
+BEGIN
+	SELECT id, name, type, tile_rows, tile_columns,
+		background_id, background_url, min_zoom, max_zoom,
+		min_rotate, max_rotate, min_tilt, max_tilt,
+		grid_thickness, grid_color, wall_thickness, wall_color, 
+		door_thickness, door_color,
+		UNIX_TIMESTAMP(piece_stamp) AS piece_stamp,
+		UNIX_TIMESTAMP(tile_stamp) AS tile_stamp
+	FROM maps WHERE map_id = the_map;
+END;
+
+/* User changes map settings */
+CREATE PROCEDURE update_map (IN the_map INT, IN the_name TEXT,
+	IN the_type TEXT, IN the_left SMALLINT, IN the_top SMALLINT,
+	IN the_right SMALLINT, IN the_bottom SMALLINT,
+	IN the_background_id TEXT, IN the_background_url TEXT,
+	IN the_min_zoom FLOAT,      IN the_max_zoom FLOAT,
+	IN the_min_rotate SMALLINT, IN the_max_rotate SMALLINT,
+	IN the_min_tilt SMALLINT,   IN the_max_tilt SMALLINT,
+	IN the_grid_thickness TINYINT, IN the_grid_color: TEXT,
+	IN the_wall_thickness TINYINT, IN the_wall_color: TEXT,
+	IN the_door_thickness TINYINT, IN the_door_color: TEXT)
+BEGIN
+	DECLARE loop_row INT;
+	DECLARE loop_column INT;
+	DECLARE width SMALLINT;
+	DECLARE height SMALLINT;
+	START TRANSACTION;
+	SET width = the_right - the_left;
+	SET height = the_bottom - the_top;
+/* update map properties */
+	UPDATE maps SET name = the_name, type = the_type,
+		tile_rows = height, tile_columns = width,
+		background_id = the_background_id, background_url = the_background_url,
+		min_zoom   = the_min_zoom,   max_zoom   = the_max_zoom,
+		min_rotate = the_min_rotate, max_rotate = the_max_rotate,
+		min_tilt   = the_min_tilt,   max_tilt   = the_max_tilt,
+		grid_thickness = the_grid_thickness, grid_color = the_grid_color,
+		wall_thickness = the_wall_thickness, wall_color = the_wall_color,
+		door_thickness = the_door_thickness, door_color = the_door_color
+		WHERE id = the_map;
+/* delete tiles and walls outside the new rectangle */
+	DELETE FROM tiles WHERE map_id = the_map AND 
+		(x < the_left OR x >= the_right OR y < the_top OR y >= the_bottom);
+	DELETE FROM walls WHERE map_id = the_map AND 
+		(x < the_left OR x >= the_right OR y < the_top OR y >= the_bottom);
+/* TODO: what to do about pieces outside the rectangle? */
+/* shift coordinates to post-resize coordinate system */
+	UPDATE tiles SET x = x - the_left, y = y - the_top WHERE map_id = the_map;
+	UPDATE walls SET x = x - the_left, y = y - the_top WHERE map_id = the_map;
+	UPDATE peices SET x = x - the_left, y = y - the_top WHERE map_id = the_map;
+/* add new tile rows and columns */
+/* TODO: default tile when resizing instead of null? */
+	SET loop_row = 0;
+	WHILE loop_row < height DO
+		SET loop_column = 0;
+		WHILE loop_column < width DO
+			INSERT IGNORE INTO tiles (x, y, image_id, map_id)
+				VALUES (loop_column, loop_row, null, the_map);
+			SET loop_column = loop_column + 1;
+		END WHILE;
+		SET loop_row = loop_row + 1;
+	END WHILE;
+END;
+
 
 
 /*** MAP_OWNERS PROCEDURES ***/
@@ -715,15 +886,13 @@ BEGIN
 END;
 
 /*** TILES PROCEDURES ***/
-/* tiles (
-	map_id INT NOT NULL,
+/*	map_id INT NOT NULL,
 	x SMALLINT NOT NULL,
 	y SMALLINT NOT NULL,
 	image_id INT,
 	fog TINYINT NOT NULL DEFAULT 0,
 	FOREIGN KEY (map_id) REFERENCES maps(id) ON DELETE CASCADE,
-	PRIMARY KEY (map_id, x, y)
-*/
+	PRIMARY KEY (map_id, x, y) */
 
 CREATE PROCEDURE create_tiles (IN the_table INT, IN the_image INT,
 	IN the_width SMALLINT, IN the_height SMALLINT)
@@ -778,15 +947,11 @@ END;
 
 
 /*** WALLS PROCEDURES ***/
-/* walls (
-	map_id INT NOT NULL,
+/*	map_id INT NOT NULL,
 	x SMALLINT NOT NULL,
 	y SMALLINT NOT NULL,
 	direction VARCHAR(2) NOT NULL,
-	contents TEXT NOT NULL,
-	FOREIGN KEY (map_id) REFERENCES maps(id) ON DELETE CASCADE,
-	PRIMARY KEY (map_id, x, y, direction)
-*/
+	contents TEXT NOT NULL, */
 
 CREATE PROCEDURE create_wall (IN the_table INT, IN the_x SMALLINT,
 	IN the_y SMALLINT, IN the_direction VARCHAR(2), IN the_contents TEXT)
@@ -809,8 +974,7 @@ END;
 
 
 /*** CHARACTERS PROCEDURES ***/
-/* characters (
-	id INT AUTO_INCREMENT PRIMARY KEY,
+/*	id INT AUTO_INCREMENT PRIMARY KEY,
 	name TEXT,
 	system TEXT,
 	stats TEXT,
@@ -819,16 +983,14 @@ END;
 	portrait_url TEXT,
 	piece_image_id INT,
 	piece_image_url TEXT,
-	color TEXT
-*/
+	color TEXT */
 
 
 /*** CHARACTER_OWNERS PROCEDURES ***/
-/* character_owners (
-	user_id INT,
+/*	user_id INT,
 	character_id INT,
 	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
 	FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
-	PRIMARY_KEY (user_id, character_id)
-*/
+	PRIMARY_KEY (user_id, character_id) */
+
 
