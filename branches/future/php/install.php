@@ -48,7 +48,7 @@ else {
 
 $salt = LT_random_salt();
 $hash = LT_hash_password($admin_password, $salt);
-$query = "CALL create_user('$admin_username', '$hash', '$salt', NULL, 'administrator')";
+$query = "CALL create_admin('$admin_username', '$hash', '$salt')";
 $LT_SQL->query($query) or die('Query failed: ' . $LT_SQL->error);
 $LT_SQL->commit();
 

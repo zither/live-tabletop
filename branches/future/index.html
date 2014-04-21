@@ -37,16 +37,23 @@
 		<form id="installBox">
 			<p>
 				Live Tabletop needs to be configured to complete installation.
-				Before configuring Live Tabletop, create a database to store Live Tabletop's data.
-				(The database server URL, the name of the database, and the username and password
-				required to access the database will vary from site to site.)
-				Then choose a username and password for a new Live Tabletop administrator account.
+				The database server URL, the name of the database, and the
+				username and password required to access the database will vary
+				from site to site. (Live Tabletop will try to create the database
+				if it does not yet exist.)
+				
 			</p>
 			<table>
 				<tr><td>Database Server (URL): </td><td><input type="text" size="12" name="location"/></td></tr>
 				<tr><td>Database Name: </td><td><input type="text" size="12" name="database"/></td></tr>
 				<tr><td>Database Username: </td><td><input type="text" size="12" name="username"/></td></tr>
 				<tr><td>Database Password: </td><td><input type="password" size="12" name="password"/></td></tr>
+				<tr>
+					<td colspan="2">
+						<p>Choose a username and password for Live Tabletop
+						administration. (This is not a user account.)</p>
+					</td>
+				</tr>
 				<tr><td>Administrator Username: </td><td><input type="text" size="12" name="admin_username"/></td></tr>
 				<tr><td>Administrator Password: </td><td><input type="password" size="12" name="admin_password"/></td></tr>
 				<tr><td>Re-type Password: </td><td><input type="password" size="12" name="retype_password"/></td></tr>

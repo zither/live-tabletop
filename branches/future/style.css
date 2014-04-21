@@ -485,19 +485,18 @@ input {
 /* INSTALL BOX */
 
 #installBox {
-/*	margin: 0 auto; */
+	margin: 0 auto;
+	width: 300px;
 	display: none;
 	text-align: center;
 }
 #installBox p {
-	margin: 20px auto;
-	width: 400px;
+	margin: 10px 0;
 	text-align: justify;
 }
 #installBox table {
 	border-collapse: collapse;
-	margin: 20px auto;
-	min-width: 400px;
+	margin: 10px auto;
 	text-align: left;
 }
 #installBox td:first {padding-right: 0.5em;}
