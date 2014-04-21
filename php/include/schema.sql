@@ -393,8 +393,6 @@ CREATE TABLE character_owners (
  /*************************** P R O C E D U R E S ***************************/
 /***************************************************************************/
 
-DELIMITER //
-
 /*** ADMINS PROCEDURES ***/
 
 /* Admin creates an account while installing Live Tabletop
@@ -407,13 +405,13 @@ BEGIN
 		VALUES (the_login, the_hash, the_salt);
 	SELECT LAST_INSERT_ID() as id;
 	COMMIT;
-END//
+END;
 
 /* Admin logs in and PHP logic validates his password  */
 CREATE PROCEDURE read_admin (IN the_login VARCHAR(200))
 BEGIN
 	SELECT id, hash, salt FROM admins WHERE login = the_login;
-END//
+END;
 
 /* Admin changes his password
 or Admin changes another admin's password? */
@@ -421,7 +419,7 @@ CREATE PROCEDURE update_admin_password
 	(IN the_admin INT, IN the_hash TEXT, IN the_salt TEXT)
 BEGIN
 	UPDATE admins SET hash = the_hash, salt = the_salt WHERE id = the_admin;
-END//
+END;
 
 
 /*** USERS PROCEDURES ***/
@@ -436,7 +434,7 @@ BEGIN
 			(the_login, the_hash, the_salt, NOW(), the_email, the_subscribed);
 	SELECT LAST_INSERT_ID() as id;
 	COMMIT;
-END//
+END;
 
 /* User logs in and PHP logic validates his password */
 CREATE PROCEDURE read_user_login (IN the_login VARCHAR(200))
@@ -444,7 +442,7 @@ BEGIN
 	SELECT id, login, hash, salt, UNIX_TIMESTAMP(last_action) AS last_action,
 		logged_in, name, color, e-mail, subscribed
 		FROM users WHERE login = the_login;
-END//
+END;
 
 /* User views his own account info
 or User views another user's id, login, logged_in, name and color */
@@ -452,7 +450,7 @@ CREATE PROCEDURE read_user (IN the_user INT)
 BEGIN
 	SELECT id, login, logged_in, name, color, e-mail, subscribed
 		FROM users WHERE id = the_user;
-END//
+END;
 
 /* Admin views all users */
 CREATE PROCEDURE read_users ()
@@ -460,7 +458,7 @@ BEGIN
 	SELECT id, login, hash, salt, UNIX_TIMESTAMP(last_action) AS last_action,
 		logged_in, name, color, e-mail, subscribed
 		FROM users ORDER BY name, login, id;
-END//
+END;
 
 /* User changes his password
 or Admin resets his password */
@@ -469,7 +467,7 @@ CREATE PROCEDURE update_user_password
 BEGIN
 	UPDATE users SET hash = the_hash, salt = the_salt, last_action = NOW()
 	WHERE id = the_user;
-END//
+END;
 
 /* User updates his account information */
 CREATE PROCEDURE update_user (IN the_user INT, IN the_name VARCHAR(200),
@@ -477,13 +475,13 @@ CREATE PROCEDURE update_user (IN the_user INT, IN the_name VARCHAR(200),
 BEGIN
 	UPDATE users SET name = the_name, color = the_color, last_action = NOW(),
 		email = the_email, subscribed = the_subscribed WHERE id = the_user;
-END//
+END;
 
 /* User sent a message or changed something */
 CREATE PROCEDURE update_user_timestamp (IN the_user INT)
 BEGIN
 	UPDATE users SET last_action = NOW() WHERE id = the_user;
-END//
+END;
 
 /* User deletes his own account?
 or Admin deletes a user account */
@@ -515,7 +513,7 @@ handled by ON DELETE CASCADE when you delete the map:
 	DELETE FROM walls WHERE map_id NOT IN (SELECT id FROM maps);
 */
 	COMMIT;
-END//
+END;
 
 
 /*** FRIENDS PROCEDURES ***/
@@ -526,26 +524,26 @@ CREATE PROCEDURE create_friend (IN the_sender INT, IN the_recipient INT)
 BEGIN
 	REPLACE INTO friends (sender, recipient)
 		VALUES (the_sender, the_recipient);
-END//
+END;
 
 /* Admin views all friend requests sent and received by the user */
 CREATE PROCEDURE read_friends (IN the_user INT)
 BEGIN
 	SELECT sender, recipient, UNIX_TIMESTAMP(time) AS time
 	FROM friends WHERE sender = the_user OR recipient = the_user;
-END//
+END;
 
 /* User sees the friend requests he has recieved */
 CREATE PROCEDURE read_friends_recieved (IN the_user INT)
 BEGIN
 	SELECT sender FROM friends WHERE recipient = the_user ORDER BY time;
-END//
+END;
 
 /* User sees the friend requests he has sent */
 CREATE PROCEDURE read_friends_requested (IN the_user INT)
 BEGIN
 	SELECT recipient FROM friends WHERE sender = the_user ORDER BY time;
-END//
+END;
 
 /* User views his list of confirmed friends */
 CREATE PROCEDURE read_friends_confirmed (IN the_user INT)
@@ -553,14 +551,14 @@ BEGIN
 	SELECT a.recipient AS user_id FROM friends a, friends b
 		WHERE a.sender = the_user
 		AND a.sender = b.recipient AND b.sender = a.recipient;
-END//
+END;
 
 /* User stops being friends with the recipient
 or User cancels a friend request */
 CREATE PROCEDURE delete_friend (IN the_sender INT, IN the_recipient INT)
 BEGIN
 	DELETE FROM friends WHERE sender = the_sender AND recipient = the_recipient;
-END//
+END;
 
 
 /*** TABLES PROCEDURES ***/
@@ -581,7 +579,7 @@ BEGIN
 /* return the new table's id */
 	SELECT new_table_id AS id;
 	COMMIT;
-END//
+END;
 
 /* User loads a table
 or User polls for new messages and changes to the users list */
@@ -590,7 +588,7 @@ BEGIN
 	SELECT id, name, map, private, turns, last_message,
 		UNIX_TIMESTAMP(users_modified) AS users_modified
 		FROM tables WHERE id = the_table;
-END//
+END;
 
 /* Admin views all the tables. */
 CREATE PROCEDURE read_tables ()
@@ -598,7 +596,7 @@ BEGIN
 	SELECT id, name, map, private, turns, last_message,
 		UNIX_TIMESTAMP(users_modified) AS users_modified
 		FROM tables ORDER BY name, id;
-END//
+END;
 
 /* User renames the table
 or User toggles the table's private/public setting
@@ -608,13 +606,13 @@ CREATE PROCEDURE update_table (IN the_table INT, IN the_name VARCHAR(200),
 BEGIN
 	UPDATE tables SET name = the_name, private = the_private, turns = the_turns
 		WHERE id = the_table;
-END//
+END;
 
 /* Admin deletes the table */
 CREATE PROCEDURE delete_table (IN the_table INT)
 BEGIN
 	DELETE FROM tables WHERE id = the_table;
-END//
+END;
 
 
 /*** TABLE_USERS PROCEDURES ***/
@@ -624,7 +622,7 @@ CREATE PROCEDURE read_table_users (IN the_table INT)
 BEGIN
 	SELECT user_id, permission, viewing, avatar, login, users.name AS name
 		FROM table_users, users WHERE id = user_id AND table_id = the_table;
-END//
+END;
 
 /* User views tables he owns and tables he has been invited to */
 CREATE PROCEDURE read_table_user_tables (IN the_user INT)
@@ -632,7 +630,7 @@ BEGIN
 	SELECT table_id, name, permission FROM table_users
 		WHERE user_id = the_user AND permission IN ('owner', 'member')
 		ORDER BY name, id;
-END//
+END;
 
 /* User invites another user to play at the table (who becomes a member)
 or User shares the table with another user (who becomes an owner)
@@ -659,14 +657,14 @@ BEGIN
 		DELETE FROM tables WHERE id = the_table;
 	END IF;
 	COMMIT;
-END//
+END;
 
 /* User joins a table */
 CREATE PROCEDURE update_table_users_arrive (IN the_user INT, IN the_table INT)
 BEGIN
 	REPLACE INTO table_users (user_id, table_id, viewing)
 		VALUES (the_user, the_table, 1);
-END//
+END;
 
 /* User leaves a table */
 CREATE PROCEDURE update_table_users_leave (IN the_user INT, IN the_table INT)
@@ -680,7 +678,7 @@ BEGIN
 	UPDATE table_users SET viewing = 0
 		WHERE user_id = the_user AND table_id = the_table;
 	COMMIT;
-END//
+END;
 
 /* User joins a table */
 CREATE PROCEDURE update_table_users_avatar
@@ -688,7 +686,7 @@ CREATE PROCEDURE update_table_users_avatar
 BEGIN
 	UPDATE table_users SET avatar = the_avatar
 		WHERE user_id = the_user AND table_id = the_table;
-END//
+END;
 
 
 /*** MESSAGES PROCEDURES ***/
@@ -702,7 +700,7 @@ BEGIN
 		VALUES (the_table, the_user, the_avatar, the_text);
 	UPDATE tables SET last_message = LAST_INSERT_ID() WHERE id = the_table;
 	COMMIT;
-END//
+END;
 
 /* User joins a table (the_last_message = 0)
 or User looks for new messages
@@ -716,14 +714,14 @@ BEGIN
 		FROM messages WHERE table_id = the_table AND id > the_last_message
 		ORDER BY id ASC;
 	COMMIT;
-END//
+END;
 
 /* Admin deletes old messages because no users have viewed tables recently */
 /* TODO: how can we call this at some regular interval? */
 CREATE PROCEDURE delete_messages_expired ()
 BEGIN
 	DELETE FROM messages WHERE time_stamp < DATE_SUB(NOW(), INTERVAL 6 HOUR);
-END//
+END;
 
 
 /*** MAPS PROCEDURES ***/
@@ -758,14 +756,14 @@ BEGIN
 /* return the new map's id */
 	SELECT new_map_id AS id;
 	COMMIT;
-END//
+END;
 
 /* User views the maps he owns */
 CREATE PROCEDURE read_maps (IN the_user INT)
 BEGIN
 	SELECT id, name, type, tile_rows, tile_columns
 		FROM maps, map_owners WHERE id = map_id and user_id = the_user;
-END//
+END;
 
 /* User loads a map
 or User polls for changes to the map, its pieces and tiles */
@@ -779,7 +777,7 @@ BEGIN
 		UNIX_TIMESTAMP(piece_stamp) AS piece_stamp,
 		UNIX_TIMESTAMP(tile_stamp) AS tile_stamp
 		FROM maps WHERE map_id = the_map;
-END//
+END;
 
 /* User changes map settings */
 CREATE PROCEDURE update_map (IN the_map INT, IN the_name TEXT,
@@ -834,7 +832,7 @@ BEGIN
 		SET loop_row = loop_row + 1;
 	END WHILE;
 	COMMIT;
-END//
+END;
 
 
 /*** MAP_OWNERS PROCEDURES ***/
@@ -843,14 +841,14 @@ END//
 CREATE PROCEDURE create_map_owner (IN the_user INT, IN the_map INT)
 BEGIN
 	INSERT INTO map_owners (user_id, map_id) VALUES (the_user, the_map);
-END//
+END;
 
 /* User opens a map and sees the map's owners */
 CREATE PROCEDURE read_map_owners (IN the_map INT)
 BEGIN
 	SELECT id, login, logged_in, name, color FROM map_owners, users
 		WHERE map_id = the_map AND id = user_id;
-END//
+END;
 
 /* User disowns map
 or User removes another user from this map's owners */
@@ -866,7 +864,7 @@ BEGIN
 		DELETE FROM maps WHERE id = the_map;
 	END IF;
 	COMMIT;
-END//
+END;
 
 
 /*** PIECE PROCEDURES ***/
@@ -886,14 +884,14 @@ BEGIN
 			the_character, the_color);
 	UPDATE maps SET piece_stamp = NOW() WHERE id = the_map;
 	COMMIT;
-END//
+END;
 
 /* User loads a map
 or User refreshes an updated map */
 CREATE PROCEDURE read_pieces (IN the_map INT)
 BEGIN
 	SELECT * FROM pieces WHERE map_id = the_map ORDER BY name, user_id;
-END//
+END;
 
 /* User moves a piece
 or User modifies a piece's settings */
@@ -912,7 +910,7 @@ BEGIN
 	UPDATE maps SET piece_stamp = NOW() WHERE id = (
 		SELECT map_id FROM pieces WHERE id = the_piece);
 	COMMIT;
-END//
+END;
 
 /* User deletes a piece */
 CREATE PROCEDURE delete_piece (IN the_piece INT)
@@ -923,7 +921,7 @@ BEGIN
 	UPDATE maps SET piece_stamp = NOW() WHERE id = my_map_id;
 	DELETE FROM pieces WHERE id = the_piece;
 	COMMIT;
-END//
+END;
 
 /*** TILES PROCEDURES ***/
 
@@ -933,7 +931,7 @@ CREATE PROCEDURE read_tiles (IN the_map INT)
 BEGIN
 	SELECT image_id, fog FROM tiles WHERE map_id = the_map
 		ORDER BY y, x ASC;
-END//
+END;
 
 /* User paints or erases tiles */
 CREATE PROCEDURE update_tile (IN the_map INT, IN the_x SMALLINT,
@@ -944,7 +942,7 @@ BEGIN
 		WHERE x = the_x AND y = the_y AND map_id = the_map;
 	UPDATE maps SET tile_stamp = NOW() WHERE id = the_map;
 	COMMIT;
-END//
+END;
 
 /* User covers the map with fog */
 CREATE PROCEDURE update_tiles_fill_fog (IN the_map INT)
@@ -953,7 +951,7 @@ BEGIN
 	UPDATE tiles SET fog = 1 WHERE map_id = the_map;
 	UPDATE maps SET tile_stamp = NOW() WHERE id = the_map;
 	COMMIT;
-END//
+END;
 
 /* User removes all the fog from the map */
 CREATE PROCEDURE update_tiles_clear_fog (IN the_map INT)
@@ -962,7 +960,7 @@ BEGIN
 	UPDATE tiles SET fog = 0 WHERE map_id = the_map;
 	UPDATE maps SET tile_stamp = NOW() WHERE id = the_map;
 	COMMIT;
-END//
+END;
 
 
 /*** WALLS PROCEDURES ***/
@@ -976,14 +974,14 @@ BEGIN
 	VALUES (the_map, the_x, the_y, the_direction, the_contents);
 	UPDATE maps SET wall_stamp = NOW() WHERE id = the_map;
 	COMMIT;
-END//
+END;
 
 /* User opens a map
 or User refreshes and updated map */
 CREATE PROCEDURE read_walls (IN the_map INT)
 BEGIN
 	SELECT * FROM walls WHERE map_id = the_map;
-END//
+END;
 
 /* User erases walls and doors */
 CREATE PROCEDURE delete_wall (IN the_map INT, IN the_x SMALLINT,
@@ -994,7 +992,7 @@ BEGIN
 		AND y = the_y AND direction = the_direction;
 	UPDATE maps SET wall_stamp = NOW() WHERE id = the_map;
 	COMMIT;
-END//
+END;
 
 
 /*** CHARACTERS PROCEDURES ***/
@@ -1019,7 +1017,7 @@ BEGIN
 /* return the new character's id */
 	SELECT new_character_id;
 	COMMIT;
-END//
+END;
  
 /* User views a list of characters he owns */
 CREATE PROCEDURE read_characters (IN the_user INT)
@@ -1028,7 +1026,7 @@ BEGIN
 		piece_image_id, piece_image_url, color
 		FROM characters, character_owners
 		WHERE id = character_id AND user_id = the_user;
-END//
+END;
 
 
 /*** CHARACTER_OWNERS PROCEDURES ***/
@@ -1038,14 +1036,14 @@ CREATE PROCEDURE create_character_owner (IN the_user INT, IN the_character INT)
 BEGIN
 	INSERT INTO character_owners (user_id, character_id)
 		VALUES (the_user, the_character);
-END//
+END;
 
 /* User views a list of this character's owners */
 CREATE PROCEDURE read_character_owners (IN the_character INT)
 BEGIN
 	SELECT id, login, logged_in, name, color FROM character_owners, users
 		WHERE character_id = the_character AND id = user_id;
-END//
+END;
 
 /* User disowns a character
 or User removes another user from this character's owners */
@@ -1062,6 +1060,5 @@ BEGIN
 		DELETE FROM characters WHERE id = the_character;
 	END IF;
 	COMMIT;
-END//
+END;
 
-DELIMITER ;
