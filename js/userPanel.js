@@ -1,5 +1,5 @@
 $(function () { // This anonymous function runs after the page loads.
-	LT.userPanel = new LT.Panel("userPanel");
+	LT.userPanel = new LT.Panel("user");
 	
 	// options tab
 	$("#logout").click(LT.logout);
