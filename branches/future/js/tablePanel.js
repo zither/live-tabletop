@@ -1,5 +1,5 @@
 $(function () { // This anonymous function runs after the page loads.
-	LT.chatPanel = new LT.Panel("chatPanel");
+	LT.tablePanel = new LT.Panel("table");
 
 	$("#chatForm").submit(function () {
 		if (!LT.currentTable) return false;

@@ -58,11 +58,12 @@ input {
 /* PAGE BAR */
 
 #pageBar {
-	background: url(images/pageBar.jpg) repeat-x left top;
-	height: 26px;
+	background: black url(images/pageBar.jpg) repeat-x left top;
+	min-height: 26px;
 	width: 100%;
 	position: fixed;
 	top: 0px;
+	overflow: auto;
 }
 
 #logo {
@@ -86,6 +87,8 @@ input {
 	float: left;
 	margin: 0px 0px 0px 12px;
 	color: #CCC;
+	font-size: 16px;
+	padding: 2px 1px 0px 2px;
 }
 
 .panelButton:hover {
@@ -93,39 +96,35 @@ input {
 	color: #EEE;
 }
 
-.panelButtonStart {
-	background-image: url(images/buttonUncheck.png);
+.panelButton::before {
+	display: block;
+	content: url(images/buttonUncheck.png);
 	width: 19px;
 	height: 19px;
 	float: left;
-	margin-top: 4px;
+	margin-top: 1px;
 }
 
-.panelButtonCaption {
-	background: url(images/pageBar.jpg) repeat-x left top;
-	height: 22px;
-	float: left;
-	font-size: 16px;
-	text-decoration: none;
-	padding: 2px 1px 0px 2px;
+.panelButton.checked::before {content: url(images/buttonCheck.png);}
+
+/* View Controls */
+
+#viewControls {
+	margin: 2px 5px 2px 5px;
+	float: right;
 }
 
-.panelButtonEnd {
-	width: 5px;
-	height: 22px;
-	float: left;
+#viewControls input {
+	height: 21px;
+	width: 21px;
+	background-color: #999;
 }
-
-.panelButton.checked .panelButtonStart {background-image: url(images/buttonCheck.png);}
-
-.panelButton.checked .panelButtonEnd {background-image: url();} /* FIXME: what? */
 
 /* Login Form */
 
 #loginForm {
 	float: right;
-	background: #000;
-	margin-top: 3px;
+	margin: 2px 0 0 12px;
 	color: #999;
 	padding: 1px 1px 1px 1px;;
 }
@@ -157,6 +156,9 @@ input {
 	color: #333;
 	margin-right: 4px;
 }
+#loginForm input[type=text] {
+	width: 80px;
+}
 
 /* PANELS: moveable, resizeable windows overlaying the map */
 
@@ -165,66 +167,93 @@ input {
 	position: fixed;
 	display: none;
 	z-index: 0;
-	margin: 0px -5px 0px -5px;
-	padding: 0px 5px 0px 5px;
 }
 
 /* Default Panel Sizes */
 
-.panel.chatPanel {
-	left: 6px;
-	top: 95px;
-	width: 355px;
-}
-.panel.chatPanel .panelContent {height: 130px;}
-
-.panel.filesPanel {
-	left: 6px;
-	top: 118px;
-	width: 250px;
-}
-.panel.filesPanel .panelContent {height: 150px;}
-
-.panel.piecesPanel {
-	left: 6px;
-	top: 49px;
-	width: 140px;
-}
-.panel.piecesPanel .panelContent {height: 180px;}
-
-.panel.tablesPanel {
-	left: 6px;
-	top: 26px;
-	width: 140px;
-}
-.panel.tablesPanel .panelContent {height: 180px;}
-
-.panel.turnsPanel {
-	left: 6px;
-	top: 72px;
-	width: 175px;
-}
-.panel.turnsPanel .panelContent {height: 300px;}
+.panel.chatPanel   {left: 0px;   top: 95px;  width: 355px; height: 210px;}
+.panel.filesPanel  {left: 0px;   top: 118px; width: 250px; height: 230px;}
+.panel.piecesPanel {left: 0px;   top: 49px;  width: 140px; height: 260px;}
+.panel.tablesPanel {left: 0px;   top: 26px;  width: 140px; height: 260px;}
+.panel.turnsPanel  {left: 0px;   top: 72px;  width: 175px; height: 380px;}
+.panel.userPanel   {left: 185px; top: 26px;  width: 210px; height: 180px;}
 
 
-.panel.userPanel {
-	left: 185px;
-	top: 26px;
-	width: 210px;
-}
-.panel.userPanel .panelContent {height: 100px;}
+/* Panel Resize Handles */
 
-
-/* Panel Sections */
-
-.panelBar {
-	position: absolute;
+.resizeTL, .resizeTR, .resizeBL, .resizeBR {position: absolute;}
+.resizeTL {
+	background: url(images/resizeTL.png);
+	width: 15px;
 	height: 23px;
-	margin-left: 17px;
-	cursor: pointer;
-	left: 0px;
+	left: -5px;
 	top: 0px;
+	cursor: nw-resize;
 }
+.resizeTR {
+	background: url(images/resizeTR.png);
+	width: 10px;
+	height: 23px;
+	right: -5px;
+	top: 0px;
+	cursor: ne-resize;
+}
+.resizeBL {
+	background: url(images/resizeBL.png);
+	height: 13px;
+	width: 13px;
+	left: -5px;
+	bottom: 0px;
+	cursor: sw-resize;
+	margin-left: -5px;
+}
+.resizeBR {
+	background: url(images/resizeBR.png);
+	height: 13px;
+	width: 13px;
+	right: -5px;
+	bottom: 0px;
+	cursor: se-resize;
+}
+
+/* Panel Titles */
+
+.title {
+	cursor: pointer;
+	position: relative; /* contains absolute positioned .resizeTL/TR and .close */
+	background: url(images/panelBar.jpg) repeat-x top left;
+	height: 23px;
+}
+.title .caption {
+	background: url(images/titleBG.jpg) repeat-x top left;
+	height: 21px;
+	float: left; /* remove, change padding to margin: 2px auto 0 0; ? */
+	color: #333;
+	font-size: 16px;
+	text-decoration: none;
+	padding: 2px 7px 0px 18px;
+}
+.title .caption::after {
+	content: url(images/titleEnd.jpg);
+	width: 5px;
+	height: 23px;
+	margin: -2px -12px 0 0;
+	float: right;
+}
+.close {
+	background-image: url(images/close.png);
+	position: absolute;
+	width: 22px;
+	height: 23px;
+	right: 5px;
+	top: 0;
+	cursor: pointer;
+}
+.close:hover {background-image: url(images/closeHover.png);}
+
+
+/* Panel Tabs */
+
 .tabBar {
 	background: url(images/tabBar.jpg) repeat top left;
 	min-height: 1px;
@@ -236,110 +265,14 @@ input {
 	padding: 0px 5px 0px 5px;
 	overflow: auto;
 }
-.panelHeader, .panelFooter {
-	background: #FFF;
-	clear: both;
-	border-left: 1px solid #333;
-	border-right: 1px solid #333;
-	margin: 0px -5px 0px -5px;
-	padding: 0px 5px 0px 5px;
-}
-.panelContent {
-	clear: both;
-	background: #FFF;
-	border-left: 1px solid #333;
-	border-right: 1px solid #333;
-	color: #333;
-	overflow: auto;
-	margin: 0px -5px 0px -5px;
-	padding: 0px 5px 0px 5px;
-}
 
-.panelBottom {
-	background: #FFF;
-	width: auto;
-	height:12px;
-	border-bottom: 1px solid #333;
-}
-
-/* Panel Resize Handles */
-
-.resizeTL {
-	background: url(images/resizeTL.png);
-	width: 15px;
-	height: 23px;
-	float: left;
-	cursor: nw-resize;
-	margin-left: -5px;
-}
-.resizeTR {
-	background: url(images/resizeTR.png);
-	width: 10px;
-	height: 23px;
-	float: right;
-	cursor: ne-resize;
-	margin-right: -5px;
-}
-.resizeBL {
-	background: url(images/resizeBL.png);
-	height: 13px;
-	width: 13px;
-	float: left;
-	cursor: sw-resize;
-	margin-left: -5px;
-}
-.resizeBR {
-	background: url(images/resizeBR.png);
-	height: 13px;
-	width: 13px;
-	float: right;
-	cursor: se-resize;
-	margin-right: -5px;
-}
-
-/* Panel Titles */
-
-.title {
-	position: relative;
-	background: url(images/panelBar.jpg) repeat-x top left;
-	height: 23px;
-}
-
-.titleCaption {
-	background: url(images/titleBG.jpg) repeat-x top left;
-	height: 21px;
-	float: left;
-	color: #333;
-	font-size: 16px;
-	text-decoration: none;
-	padding: 2px 2px 0px 0px;
-}
-
-.titleEnd {
-	background-image: url(images/titleEnd.jpg);
-	width: 5px;
-	height: 23px;
-	float: left;
-	margin-right: 1px;
-}
-
-.close {
-	background-image: url(images/close.png);
-	width: 22px;
-	height: 23px;
-	float: right;
-	cursor: pointer;
-}
-.close:hover {background-image: url(images/closeHover.png);}
-
-/* Panel Tabs */
-
-.tab, .tabStart, .tabEnd {
-	height: 21px;
-	float: left;
-}
 .tab {
+	float: left;
+	height: 21px;
 	margin: 0px 0px 0px 1px;
+	padding: 2px 5px 0px 5px;
+	color: #333;
+	font-size: 13px;
 	background: url(images/inactiveTabBG.jpg) repeat-x top left;
 }
 .tab:hover {
@@ -347,30 +280,53 @@ input {
 	cursor: pointer;
 }
 .tab.active {background-image: url(images/activeTabBG.jpg);}
-.tabStart, .tabEnd {width: 2px;}
-.tabStart {background: url(images/inactiveTabStart.jpg) repeat-x top left;}
-.tabEnd {background: url(images/inactiveTabEnd.jpg) repeat-x top left;}
-.tab.active .tabStart {background-image: url(images/activeTabStart.jpg);}
-.tab.active .tabEnd {background-image: url(images/activeTabEnd.jpg);}
-.tabContent {
+.tab::before {
 	float: left;
-	padding: 2px 3px 0px 3px;
-	color: #333;
-	font-size: 13px;
+	width: 2px;
+	height: 21px;
+	margin: -2px 0 0 -5px;
+	content: url(images/inactiveTabStart.jpg);
 }
-.tabContent:hover {text-decoration: underline;} /* FIXME: redundant with .tab:hover rule? */
+.tab.active::before {content: url(images/activeTabStart.jpg);}
+.tab::after {
+	float: right;
+	width: 2px;
+	height: 21px;
+	margin: -2px -5px 0 0 ;
+	content: url(images/inactiveTabEnd.jpg);
+}
+.tab.active::after {content: url(images/activeTabEnd.jpg);}
+
+
+/* Panel Sections */
+
+.panel .content {
+	background: #FFF;
+	border-left: 1px solid #333;
+	border-right: 1px solid #333;
+	color: #333;
+	overflow: auto;
+	padding: 0px 5px 0px 5px;
+}
+
+.panel .bottom {
+	background: #FFF;
+	width: auto;
+	height:12px;
+	border-bottom: 1px solid #333;
+}
 
 /* Links on Panels */
 
-.panelContent a {
+.panel .content a {
 	cursor: pointer;
 	text-decoration: none;
 }
-.panelContent a:hover {text-decoration: underline;}
+.panel .content a:hover {text-decoration: underline;}
 
 /* Forms on Panels */
 
-.panelContent input, .panelFooter input {
+.panel .content input {
 	background: #FFF;
 	color: #333;
 	margin-right: 4px;

@@ -9,21 +9,19 @@ LT.Panel = function (name) {
 
 	this.tabs = [];
 	this.selectedTab = 0;
-	this.button = $(".panelButton." + name)[0];
-	this.outside = $(".panel." + name)[0];
+	this.button = $(".panelButton[data-panel='" + name + "']")[0];
+	this.outside = $(".panel[data-panel='" + name + "']")[0];
 
 	// Set default parameters
-	this.defaultX = parseInt($(this.outside).css("left"));
-	this.defaultY = parseInt($(this.outside).css("top"));
-	this.defaultWidth = parseInt($(this.outside).css("width"));
-	this.defaultHeight = parseInt($(this.outside).find(".panelContent").css("height"));
+	this.defaultX = this.getX();
+	this.defaultY = this.getY();
+	this.defaultWidth = this.getWidth();
+	this.defaultHeight = this.getHeight();
 
 	LT.Panel.list.push(this); // panels in the order they were created
 	LT.Panel.order.push(this); // panels in back-to-front order
 
-	// Remember the current "this" during event handlers.
-	var self = this;
-
+	var self = this; // remember the current "this" during event handlers
 	$(this.button).click(function () {
 		if ($(self.outside).css("display") == "none") self.show();
 		else self.hide();
@@ -31,7 +29,7 @@ LT.Panel = function (name) {
 		return false;
 	});
 
-	$(this.outside).css({zIndex: "" + LT.Panel.order.length})
+	$(this.outside).css({"z-index": LT.Panel.order.length})
 		.mousedown(function () {self.bringToFront();});
 
 	// corner resize handles
@@ -41,25 +39,21 @@ LT.Panel = function (name) {
 	$(this.outside).find(".resizeBR").mousedown(function () {LT.Panel.selectedBR = self; return false;});
 
 	// title bar for dragging the panel around
-	// FIXME: magic number (is 44 in setWidth, why 42 now?)
-	$(this.outside).find(".panelBar").css({width: (this.getWidth() - 42) + "px"})
-		.mousedown(function () {LT.Panel.selected = self; return false;});
+	$(this.outside).find(".title").mousedown(function () {LT.Panel.selected = self; return false;});
 
 	// close button
-	$(this.outside).find(".close").click(function () {
-		self.hide(); LT.Panel.saveCookie(); return false;});
+	$(this.outside).find(".close").click(function () {self.hide(); LT.Panel.saveCookie(); return false;});
 
 	// make tabs
-	var self = this;
 	$(this.outside).find(".tab").each(function () {
 		$(this).click(function () {
-			self.selectTab(this.id);
+			self.selectTab($(this).data("tab"));
 			LT.Panel.saveCookie();
 			return false;
 		});
 	});
 	// show contents of the initially selected tab
-	this.selectTab($(this.outside).find(".tab.active").attr("id"));
+	this.selectTab($(this.outside).find(".tab.active").data("tab"));
 }
 
 
@@ -77,10 +71,10 @@ LT.Panel.clickCornerX = 0; // horizontal position of corner being resized
 LT.Panel.clickCornerY = 0; // vertical position of corner being resized
 
 // TODO: explain each of these margins
-LT.Panel.MARGIN_LEFT = 5; // was 6 in LT.Panel.prototype.resizeTR
-LT.Panel.MARGIN_RIGHT = 7; // was 6 in LT.Panel.prototype.resizeBR
+LT.Panel.MARGIN_LEFT = 5;
+LT.Panel.MARGIN_RIGHT = 5;
 LT.Panel.MARGIN_TOP = 26;
-LT.Panel.MARGIN_BOTTOM = 61; // was 56 in LT.Panel.prototype.resizeBR
+LT.Panel.MARGIN_BOTTOM = 5;
 LT.Panel.MIN_WIDTH = 140;
 LT.Panel.MIN_HEIGHT = 50;
 
@@ -129,31 +123,24 @@ LT.Panel.prototype = {
 
 	// Select a tab
 	selectTab: function (tabName) {
-		var self = this;
-		$(this.outside).find(".tab").each(function (i, label) {
-			if (label.id == tabName) {
-				$(label).addClass("active");
-				$(self.outside).find(".panelHeader ." + label.id).show();
-				$(self.outside).find(".panelContent ." + label.id).show();				
-			} else {
-				$(label).removeClass("active");
-				$(self.outside).find(".panelHeader ." + label.id).hide();
-				$(self.outside).find(".panelContent ." + label.id).hide();
-			}
-		});
+		$(this.outside).find(".tab").removeClass("active");
+		$(this.outside).find(".content").hide();
+		$(this.outside).find(".tab[data-tab='" + tabName + "']").addClass("active");
+		$(this.outside).find(".content[data-tab='" + tabName + "']").show();
 	},
 
 	// Hide tab
 	hideTab: function (tabName) {
-		$(this.outside).find("#" + tabName + ", ." + tabName).hide();
+		$(this.outside).find(".tab[data-tab='" + tabName + "']").hide();
 	},
 	
 	// Show tab
 	showTab: function (tabName) {
-		var label = $(this.outside).find("#" + tabName);
-		label.show()
-		if (label.hasClass("active"))
-			$(this.outside).find("." + tabName).show();
+		var tab = $(this.outside).find(".tab[data-tab='" + tabName + "']");
+		tab.show();
+		// TODO: should this be able to happen?
+		if (tab.hasClass("active"))
+			$(this.outside).find(".content[data-tab='" + tabName + "']").show();
 	},
 	
 	// Restore default dimensions
@@ -190,11 +177,11 @@ LT.Panel.prototype = {
 			var panel = LT.Panel.order[i];
 			if (panel != this) {
 				newOrder.push(panel);
-				panel.outside.style.zIndex = "" + newOrder.length;
+				$(panel.outside).css("z-index", newOrder.length);
 			}
 		}
 		newOrder.push(this);
-		this.outside.style.zIndex = "" + newOrder.length;
+		$(this.outside).css("z-index", newOrder.length);
 		LT.Panel.order = newOrder;
 	},
 
@@ -206,13 +193,12 @@ LT.Panel.prototype = {
 			width: this.getWidth(),
 			height: this.getHeight(),
 			visible: $(this.outside).css("display") == "none" ? false : true,
-			tab: $(this.outside).find(".tab.active").attr("id")
+			tab: $(this.outside).find(".tab.active").data("tab")
 		};
 	},
 
 	// Load this panel's dimensions from a string saved in a cookie
 	restoreFromCookie: function (data) {
-//		LT.element(this.tabBar, {class: "clearBoth"}); // FIXME: what?
 		if (typeof(data.x) == "undefined") return;
 		this.setX(data.x);
 		this.setY(data.y);
@@ -242,7 +228,7 @@ Or maybe we should change how we do it.
 			LT.clickDragGap = 1;
 		}
 		maxX = window.innerWidth  - this.getWidth()  - LT.Panel.MARGIN_RIGHT;
-		maxY = window.innerHeight - this.getHeight() - LT.Panel.MARGIN_BOTTOM;
+		maxY = window.innerHeight - this.getHeight() - LT.Panel.MARGIN_BOTTOM - LT.Panel.MIN_HEIGHT;
 		LT.dragX = Math.min(LT.dragX - LT.clickX, maxX);
 		LT.dragY = Math.min(LT.dragY - LT.clickY, maxY);
 		LT.dragX = Math.max(LT.dragX, LT.Panel.MARGIN_LEFT);
@@ -261,7 +247,7 @@ Or maybe we should change how we do it.
 		LT.dragX = Math.max(LT.dragX - LT.clickX, LT.Panel.MIN_WIDTH);
 		LT.dragY = Math.max(LT.dragY - LT.clickY, LT.Panel.MIN_HEIGHT);
 		var maxWidth  = window.innerWidth  - this.getX() - LT.Panel.MARGIN_RIGHT;
-		var maxHeight = window.innerHeight - this.getY() - LT.Panel.MARGIN_BOTTOM;
+		var maxHeight = window.innerHeight - this.getY() - LT.Panel.MARGIN_BOTTOM - LT.Panel.MIN_HEIGHT;
 		this.setWidth(Math.min(LT.dragX, maxWidth));
 		this.setHeight(Math.min(LT.dragY, maxHeight));
 	},
@@ -321,29 +307,22 @@ Or maybe we should change how we do it.
 		this.setX(LT.dragX - LT.clickX);
 		this.setWidth(LT.Panel.clickCornerX - LT.dragX);
 
-		// FIXME: magic numbers
-		LT.dragY = Math.max(LT.dragY, panelY + 100);
-		LT.dragY = Math.min(LT.dragY, window.innerHeight - 5);
+		LT.dragY = Math.max(LT.dragY, panelY + LT.Panel.MIN_HEIGHT + LT.Panel.MARGIN_TOP);
+		LT.dragY = Math.min(LT.dragY, window.innerHeight - LT.Panel.MARGIN_BOTTOM);
 		this.setHeight(LT.clickH - LT.clickY + LT.dragY);
 	},
 	
 	// Change the position and size of the panel
 	setX: function (x) {$(this.outside).css({left: x + "px"});},
 	setY: function (y) {$(this.outside).css({top:  y + "px"});},
-	setWidth: function (w) {
-		$(this.outside).css({width: w + "px"});
-		// FIXME: magic number (was 42 in the Panel() constructor, why 44 now?)
-		$(this.outside).find(".panelBar").css({width: (w - 44) + "px"});
-	},
-	setHeight: function (h) {
-		$(this.outside).find(".panelContent").css({height: h + "px"});
-	},
+	setWidth: function (w) {$(this.outside).css({width: w + "px"});},
+	setHeight: function (h) {$(this.outside).css({height: h + "px"});},
 
 	// Find the position and size of the panel
 	getX: function () {return parseInt($(this.outside).css("left"));},
 	getY: function () {return parseInt($(this.outside).css("top"));},
 	getWidth: function () {return parseInt($(this.outside).css("width"));},
-	getHeight: function () {return parseInt($(this.outside).find(".panelContent").css("height"));},
+	getHeight: function () {return parseInt($(this.outside).css("height"));},
 
 };
 
