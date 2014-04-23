@@ -201,133 +201,89 @@
 					<!-- TODO: GUI image selector -->
 					<!-- TODO: url option -->
 					<!-- TODO: default tile option -->
-					<div class="inputDiv">Background:
-						<select name="image_id" style="width: 135px">
-							<option value="-1">None</option>
+					<div>Background: <select name="image_id"><option value="-1">None</option></select></div>
+					<div>
+						Tiles:
+						<input name="columns" type="text" size="2" value="25"/>
+						&times;
+						<input name="rows" type="text" size="2" value="25"/>
+						<select name="type">
+							<option value="square" selected="selected">square</option>
+							<option value="hex">hex</option>
 						</select>
 					</div>
-					<div class="inputDiv">
-						<input name="type" value="square" id="newMapSquare"/><label for="newMapSquare">Square</label>
-						<input name="type" value="hex" id="newMapHex"/><label for="newMapHex">Hex</label>
-					</div>
-					<div class="inputDiv">Columns: <input name="columns" type="text" size="1" value="25"/></div>
-					<div class="inputDiv">Rows: <input name="rows" type="text" size="1" value="25"/></div>
-					<input type="button" value="Create Map" id="createMap"/>
+					<div><input type="button" value="Create Map" id="createMap"/></div>
 				</form>
 			</div>
 			<div class="content" data-tab="map info">
 				<form id="mapEditor">
-					<table>
-					<div class="inputDiv">Name: <input name="name" type="text" placeholder="Map Name"/></div>
-					<div class="inputDiv">Background: <select name="image_id"><option value="-1">None</option></select></div>
-					<div class="inputDiv">
-						<input name="type" value="square" id="editMapSquare"/><label for="editMapSquare">Square</label>
-						<input name="type" value="hex" id="editMapHex"/><label for="editMapHex">Hex</label>
+					<div>Name: <input name="name" type="text" placeholder="Map Name"/></div>
+					<div>Background: <select name="image_id"><option value="-1">None</option></select></div>
+					<div>
+						Tiles:
+						<input name="columns" type="text" size="2" value="25"/>
+						&times;
+						<input name="rows" type="text" size="2" value="25"/>
+						<select name="type">
+							<option value="square" selected="selected">square</option>
+							<option value="hex">hex</option>
+						</select>
 					</div>
-					<div class="inputDiv">Columns: <input name="columns" type="text" size="1" value="25"/></div>
-					<div class="inputDiv">Rows: <input name="rows" type="text" size="1" value="25"/></div>
-					<table>
-						<tbody>
-							<tr><th></th><th>min</th><th>max</th></tr>
-							<tr>
-								<td>Zoom: </td>
-								<td>
-									<select name="min_zoom">
-										<option value="0.25" selected="selected">25%</option>
-										<option value="0.5">50%</option>
-										<option value="1">100%</option>
-									</select>
-								</td>
-								<td>
-									<select name="max_zoom">
-										<option value="1">100%</option>
-										<option value="2">200%</option>
-										<option value="4" selected="selected">400%</option>
-									</select>
-								</td>
-							</tr>
-							<tr>
-								<td>Rotate: </td>
-								<td>
-									<select name="min_rotate">
-										<option value="-180" selected="selected">180&deg; left</option>
-										<option value="-135">135&deg; left</option>
-										<option value="-90">90&deg; left</option>
-										<option value="-45">45&deg; left</option>
-										<option value="0">0&deg;</option>
-										<option value="45">45&deg; right</option>
-									</select>
-								</td>
-								<td>
-									<select name="max_rotate">
-										<option value="-45">45&deg; left</option>
-										<option value="0">0&deg;</option>
-										<option value="45">45&deg; right</option>
-										<option value="90">90&deg; right</option>
-										<option value="135">135&deg; right</option>
-										<option value="180" selected="selected">180&deg; right</option>
-									</select>
-								</td>
-							</tr>
-							<tr>
-								<td>Tilt: </td>
-								<td>
-									<select name="min_tilt">
-										<option value="0" selected="selected">0&deg;</option>
-										<option value="30">30&deg;</option>
-										<option value="60">60&deg;</option>
-										<option value="90">90&deg;</option>
-									</select>
-								</td>
-								<td>
-									<select name="max_tilt">
-										<option value="0">0&deg;</option>
-										<option value="30">30&deg;</option>
-										<option value="60">60&deg;</option>
-										<option value="90" selected="selected">90&deg;</option>
-									</select>
-								</td>
-							</tr>
-						</tbody>
-					</table>
-					<table>
-						<tbody>
-							<tr><th></th><th>thickness</th><th>color</th></tr>
-							<tr>
-								<td>Grid: </td>
-								<td>
-									<select name="grid_thickness">
-										<option value="0">none</option>
-										<option value="1">light</option>
-										<option value="2">heavy</option>
-									</select>
-								</td>
-								<td><input type="text" name="grid_color" value="black"/></td>
-							</tr>
-							<tr>
-								<td>Wall: </td>
-								<td>
-									<select name="wall_thickness">
-										<option value="2">thinner</option>
-										<option value="4">thicker</option>
-									</select>
-								</td>
-								<td><input type="text" name="wall_color" value="black"/></td>
-							</tr>
-							<tr>
-								<td>Door: </td>
-								<td>
-									<select name="door_thickness">
-										<option value="2">thinner</option>
-										<option value="4">thicker</option>
-									</select>
-								</td>
-								<td><input type="text" name="door_color" value="white"/></td>
-							</tr>
-						</tbody>
-					</table>
-					<input type="button" value="Apply Changes" id="applyMapChanges"/>
-					<input type="button" value="Delete Map" id="deleteMap"/>
+					<div>
+						Zoom:
+						<input name="min_zoom" type="text" size="2" value="25"/>%
+						-
+						<input name="max_zoom" type="text" size="2" value="400"/>%
+					</div>
+					<div>
+						Rotate:
+						<input name="min_zoom" type="text" size="3" value="-180"/>&deg;
+						-
+						<input name="max_zoom" type="text" size="3" value="180"/>&deg;
+						<select name="tilt">
+							<option value="[30,90]" selected="selected">free tilt</option>
+							<option value="[30]">side view</option>
+							<option value="[90]">top view</option>
+						</select>
+					</div>
+					<div>
+						Grid:
+						<select name="grid_thickness">
+							<option value="0">none</option>
+							<option value="1" selected="selected">thin</option>
+							<option value="2">thick</option>
+						</select>
+						<select name="grid_color">
+							<option value="#000" selected="selected">black</option>
+							<option value="#FFF">white</option>
+						</select>
+					</div>
+					<div>
+						Wall:
+						<select name="wall_thickness">
+							<option value="2" selected="selected">thin</option>
+							<option value="4">thick</option>
+						</select>
+						<select name="wall_color">
+							<option value="#000" selected="selected">black</option>
+							<option value="#FFF">white</option>
+						</select>
+					</div>
+					<div>
+						Door:
+						<select name="door_thickness">
+							<option value="2" selected="selected">thin</option>
+							<option value="4">thick</option>
+						</select>
+						<select name="door_color">
+							<option value="#000">black</option>
+							<option value="#FFF" selected="selected">white</option>
+						</select>
+					</div>
+					<div>
+						<input type="button" value="Apply Changes" id="applyMapChanges"/>
+						<input type="button" value="Delete Map" id="deleteMap"/>
+					</div>
 				</form>
 			</div>
 			<div class="content" data-tab="map tools">
@@ -371,33 +327,35 @@
 			</div>
 			<div class="content" data-tab="piece info">
 				<form id="pieceEditor">
-					<table>
-						<tbody>
-							<tr><th></th><th>X</th><th>Y</th></tr>
-							<tr>
-								<td>Position: </td>
-								<td><input name="x" type="text" size="1" value="0"/></td>
-								<td><input name="y" type="text" size="1" value="0"/></td>
-							</tr>
-							<!-- TODO: GUI for centering piece -->
-							<tr>
-								<td>Center (px): </td>
-								<td><input name="x_center" type="text" size="1" value="0"/></td>
-								<td><input name="y_center" type="text" size="1" value="0"/></td>
-							</tr>
-							<tr>
-								<td>Size (tiles): </td>
-								<td><input name="x_tiles" type="text" size="1" value="0"/></td>
-								<td><input name="y_tiles" type="text" size="1" value="0"/></td>
-							</tr>
-						</tbody>
-					</table>
-					<div class="inputDiv">Name: <input name="name" type="text" placeholder="Piece Name"/></div>
-					<div class="inputDiv">Scale: <input name="scale" type="text" value="100"/>%</div>
-					<div class="inputDiv">Character: <select name="character_id"><option value="-1">None</option></select></div>
+					<div>Name: <input name="name" type="text" placeholder="Piece Name"/></div>
+					<div>Character: <select name="character_id"><option value="-1">None</option></select></div>
+					<div>
+						Position:
+						<input name="x" type="text" size="1" value="0"/>
+						&times;
+						<input name="y" type="text" size="1" value="0"/>
+					</div>
+					<!-- TODO: GUI for centering piece -->
+					<div>
+						Center:
+						<input name="x_center" type="text" size="1" value="0"/>
+						&times;
+						<input name="y_center" type="text" size="1" value="0"/>
+						px
+					</div>
+					<div>
+						Base:
+						<input name="x_tiles" type="text" size="1" value="0"/>
+						&times;
+						<input name="y_tiles" type="text" size="1" value="0"/>
+						tiles
+					</div>
+					<div>Scale: <input name="scale" type="text" size="2" value="100"/>%</div>
 					<input name="image_id" type="hidden" value=""/>
-					<input type="button" value="Apply Changes" id="applyPieceChanges"/>
-					<input type="button" value="Delete Piece" id="deletePiece"/>
+					<div>
+						<input type="button" value="Apply Changes" id="applyPieceChanges"/>
+						<input type="button" value="Delete Piece" id="deletePiece"/>
+					</div>
 					<div class="clearBoth"></div>
 				</form>
 				<div id="pieceEditorImages"></div>
@@ -458,14 +416,6 @@
 				<input type="text" name="password" placeholder="password"/>
 				<input type="button" value="Login">
 			</form>
-			<div id="userButton">
-				<div id="loggedIn"></div>
-				<div class="panelButton userPanel">
-					<div class="panelButtonStart"></div>
-					<div class="panelButtonCaption"><span id="userButtonCaption"></span>'s options</div>
-					<div class="panelButtonEnd"></div>
-				</div>
-			</div>
 			<div id="viewControls">
 				<input type="button" value="-"/>
 				<input type="button" value="+"/>
