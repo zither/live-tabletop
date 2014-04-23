@@ -77,7 +77,7 @@ LT.Panel.clickCornerY = 0; // vertical position of corner being resized
 
 // TODO: explain each of these margins
 LT.Panel.MARGIN_TOP = 26;
-LT.Panel.MIN_WIDTH = 130;
+LT.Panel.MIN_WIDTH = 140;
 
 // STATIC FUNCTIONS
 

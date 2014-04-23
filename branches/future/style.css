@@ -28,15 +28,12 @@ Table of Contents:
 
 /* ELEMENTS */
 
-/* applying style to all elements looks inefficient and dangerous */
-* {
+body {
 	margin: 0;
 	padding: 0;
-	border: 0;
-	background: no-repeat;
-}
-
-body {
+	background: #999;
+	font-size: 14px;
+	font-family: Arial,Helvetica,sans-serif;
 	scrollbar-face-color:#8080FF;
 	scrollbar-arrow-color:#FFFFFF;
 	scrollbar-track-color:#DDDDFF;
@@ -44,16 +41,17 @@ body {
 	scrollbar-highlight-color:'';
 	scrollbar-3dlight-color:'';
 	scrollbar-darkshadow-Color:'';
-	background: #999;
 }
-div {
-	font-family: Arial,Helvetica,sans-serif;
-	font-size: 14px;
-}
-input {
+
+input, select {
+	margin: 0;
+	padding: 0;
 	border: 1px solid #CCC;
 /*	float: left; */
 }
+
+table {border-collapse: collapse;}
+th, td {padding: 0;}
 
 /* PAGE BAR */
 
@@ -62,17 +60,17 @@ input {
 	min-height: 26px;
 	width: 100%;
 	position: fixed;
-	top: 0px;
+	top: 0;
 	overflow: auto;
 }
 
 #logo {
-	background-image: url(images/logo.png);
+	background: url(images/logo.png) no-repeat;
 	width: 170px;
 	height: 33px;
 	position: fixed;
 	left: 10px;
-	top: 0px;
+	top: 0;
 }
 
 /* Panel Buttons: these buttons show and hide panels */
@@ -85,10 +83,10 @@ input {
 .panelButton {
 	height: 22px;
 	float: left;
-	margin: 0px 0px 0px 12px;
+	margin: 0 0 0 12px;
 	color: #CCC;
 	font-size: 16px;
-	padding: 2px 1px 0px 2px;
+	padding: 3px 1px 0 2px;
 }
 
 .panelButton:hover {
@@ -129,34 +127,14 @@ input {
 	padding: 1px 1px 1px 1px;;
 }
 
-#LoginForm input[type=text] {
-	border: 1px solid #CCC;
-}
-
-.login {
-	color: #CCC;
-	float: right;
-	text-decoration: none;
-	margin-right: 8px;
-	cursor: pointer;
-	position: relative
-}
-
-.login:hover {
-	text-decoration: underline;
-}
-
-#userButton {
-	display: none;
-	float: right;
-}
-
 #loginForm input {
 	background: #CCC;
 	color: #333;
 	margin-right: 4px;
 }
+
 #loginForm input[type=text] {
+	border: 1px solid #CCC;
 	width: 80px;
 }
 
@@ -171,10 +149,10 @@ input {
 
 /* Default Panel Sizes */
 
-.panel[data-panel=table]     {left: 0px;   top: 95px;  width: 355px; height: 210px;}
-.panel[data-panel=map]       {left: 0px;   top: 49px;  width: 140px; height: 260px;}
-.panel[data-panel=character] {left: 0px;   top: 72px;  width: 175px; height: 380px;}
 .panel[data-panel=user]      {left: 185px; top: 26px;  width: 210px; height: 180px;}
+.panel[data-panel=table]     {left: 0;   top: 95px;  width: 355px; height: 210px;}
+.panel[data-panel=map]       {left: 0;   top: 49px;  width: 140px; height: 260px;}
+.panel[data-panel=character] {left: 0;   top: 72px;  width: 175px; height: 380px;}
 
 
 /* Panel Resize Handles */
@@ -229,7 +207,7 @@ input {
 	color: #333;
 	font-size: 16px;
 	text-decoration: none;
-	padding: 2px 2px 0px 10px;
+	padding: 2px 2px 0 10px;
 }
 .title .caption::after {
 	content: url(images/titleEnd.jpg);
@@ -273,8 +251,8 @@ input {
 .tab {
 	float: left;
 	height: 19px;
-	margin: 0px 0px 0px 1px;
-	padding: 2px 5px 0px 5px;
+	margin: 0 0 0 1px;
+	padding: 2px 5px 0 5px;
 	color: #333;
 	font-size: 13px;
 	background: url(images/inactiveTabBG.jpg) repeat-x top left;
@@ -310,7 +288,7 @@ input {
 	border-right: 1px solid #333;
 	color: #333;
 	overflow: auto;
-	padding: 0px 5px 0px 5px;
+	padding: 0 5px 0 5px;
 }
 
 .panel .bottom {
@@ -321,30 +299,33 @@ input {
 	position: relative; /* contains absolute positioned .resizeBL/BR */
 }
 
-/* Links on Panels */
-
-.panel .content a {
-	cursor: pointer;
-	text-decoration: none;
-}
-.panel .content a:hover {text-decoration: underline;}
-
 /* Forms on Panels */
 
-.panel .content input {
+.panel .content a {cursor: pointer; text-decoration: none;}
+.panel .content a:hover {text-decoration: underline;}
+
+.panel .content input, .panel .content select {
 	background: #FFF;
 	color: #333;
-	margin-right: 4px;
+}
+.panel .content select {
+	margin-top: -1px;
+	background: #FFF;
 }
 
-.inputDiv {
-	color: #000;
-	width: 140px;
+.panel .content input[type=text] {max-width: 80px;}
+
+#mapCreator, #mapEditor, #pieceEditor {margin-right: -8px;}
+#mapCreator div, #mapEditor div, #pieceEditor div {
 	float: left;
+	margin-top: 1px;
+	margin-right: 8px;
+	min-height: 19px;
 }
-.inputDiv input {
-	float: right
-}
+
+
+#mapEditor table, #pieceEditor table {float: left;}
+
 .buttonDiv {
 	float: left;
 	background: #333;
@@ -373,10 +354,7 @@ input {
 
 #chatInput {border: 1px solid #CCC;}
 .alert {color: #039;}
-.roll {
-	font-style: italic;
-	color: #900;
-}
+.roll {font-style: italic; color: #900;}
 
 /* Color Palette */
 .colorPalette {
@@ -468,7 +446,7 @@ input {
 
 .deleteButton {float: right;}
 .clearBoth {
-	height: 0px;
+	height: 0;
 	width: 1px;
 	margin-top: -1px;
 	clear: both;
@@ -476,7 +454,7 @@ input {
 .separator {
 	height: 1px;
 	width: auto;
-	margin: 1px 0px 4px 0px;
+	margin: 1px 0 4px 0;
 	clear: both;
 	background: #999;
 }
