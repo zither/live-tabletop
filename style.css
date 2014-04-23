@@ -171,12 +171,10 @@ input {
 
 /* Default Panel Sizes */
 
-.panel.chatPanel   {left: 0px;   top: 95px;  width: 355px; height: 210px;}
-.panel.filesPanel  {left: 0px;   top: 118px; width: 250px; height: 230px;}
-.panel.piecesPanel {left: 0px;   top: 49px;  width: 140px; height: 260px;}
-.panel.tablesPanel {left: 0px;   top: 26px;  width: 140px; height: 260px;}
-.panel.turnsPanel  {left: 0px;   top: 72px;  width: 175px; height: 380px;}
-.panel.userPanel   {left: 185px; top: 26px;  width: 210px; height: 180px;}
+.panel[data-panel=table]     {left: 0px;   top: 95px;  width: 355px; height: 210px;}
+.panel[data-panel=map]       {left: 0px;   top: 49px;  width: 140px; height: 260px;}
+.panel[data-panel=character] {left: 0px;   top: 72px;  width: 175px; height: 380px;}
+.panel[data-panel=user]      {left: 185px; top: 26px;  width: 210px; height: 180px;}
 
 
 /* Panel Resize Handles */
@@ -187,7 +185,7 @@ input {
 	width: 15px;
 	height: 23px;
 	left: -5px;
-	top: 0px;
+	top: 0;
 	cursor: nw-resize;
 }
 .resizeTR {
@@ -195,7 +193,7 @@ input {
 	width: 10px;
 	height: 23px;
 	right: -5px;
-	top: 0px;
+	top: 0;
 	cursor: ne-resize;
 }
 .resizeBL {
@@ -203,16 +201,15 @@ input {
 	height: 13px;
 	width: 13px;
 	left: -5px;
-	bottom: 0px;
+	bottom: -1px;
 	cursor: sw-resize;
-	margin-left: -5px;
 }
 .resizeBR {
 	background: url(images/resizeBR.png);
 	height: 13px;
 	width: 13px;
 	right: -5px;
-	bottom: 0px;
+	bottom: -1px;
 	cursor: se-resize;
 }
 
@@ -223,6 +220,7 @@ input {
 	position: relative; /* contains absolute positioned .resizeTL/TR and .close */
 	background: url(images/panelBar.jpg) repeat-x top left;
 	height: 23px;
+	margin: 0 5px;
 }
 .title .caption {
 	background: url(images/titleBG.jpg) repeat-x top left;
@@ -231,13 +229,13 @@ input {
 	color: #333;
 	font-size: 16px;
 	text-decoration: none;
-	padding: 2px 7px 0px 18px;
+	padding: 2px 2px 0px 10px;
 }
 .title .caption::after {
 	content: url(images/titleEnd.jpg);
 	width: 5px;
 	height: 23px;
-	margin: -2px -12px 0 0;
+	margin: -2px -7px 0 0;
 	float: right;
 }
 .close {
@@ -251,24 +249,30 @@ input {
 }
 .close:hover {background-image: url(images/closeHover.png);}
 
-
 /* Panel Tabs */
 
 .tabBar {
 	background: url(images/tabBar.jpg) repeat top left;
 	min-height: 1px;
-	max-height: 42px;
-	clear: both;
+/*	max-height: 42px; */
+/*	clear: both; */
 	border-left: 1px solid #333;
 	border-right: 1px solid #333;
-	margin: 0px -5px 0px -5px;
-	padding: 0px 5px 0px 5px;
 	overflow: auto;
+}
+/* annoying hack to avoid scrollbars in .tabBar */
+.tabBar::after {
+	clear: both;
+	content: '';
+	height: 3px;
+	float: left;
+	background: white;
+	width: 100%;
 }
 
 .tab {
 	float: left;
-	height: 21px;
+	height: 19px;
 	margin: 0px 0px 0px 1px;
 	padding: 2px 5px 0px 5px;
 	color: #333;
@@ -311,9 +315,10 @@ input {
 
 .panel .bottom {
 	background: #FFF;
-	width: auto;
-	height:12px;
+	margin: 0 5px;
+	height: 12px;
 	border-bottom: 1px solid #333;
+	position: relative; /* contains absolute positioned .resizeBL/BR */
 }
 
 /* Links on Panels */
