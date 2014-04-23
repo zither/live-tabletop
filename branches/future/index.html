@@ -121,8 +121,8 @@
 			<div class="content" data-tab="table list">
 				<table>
 					<tbody>
-						<tr><th>table name (click to join)</th><th>action</th></tr>
 						<tr><td><a>My Table</a> (owned)</td><td><input type="button" value="disown"/></td></tr>
+						<tr><td><a>My Friend's Table</a></td><td></td></tr>
 					</tbody>
 				</table>
 			</div>
@@ -134,16 +134,20 @@
 				<table>
 					<tbody>
 						<tr>
-							<th>user (click for details)</th>
-							<th>owner</th>
-							<th>viewing</th>
-							<th>actions</th>
+							<td><a>Myself</a></td>
+							<td>
+								<div><input type="checkbox" value="owner"/>owner</div>
+								<div><input type="checkbox" value="viewing"/>viewing</div>
+								<div><input type="button" value="remove"/><input type="button" value="ban"/></div>
+							</td>
 						</tr>
 						<tr>
-							<td><a>Myself</a></td>
-							<td><input type="checkbox" value="owner"/></td>
-							<td><input type="checkbox" value="viewing"/></td>
-							<td><input type="button" value="remove"/><input type="button" value="ban"/></td>
+							<td><a>Someone Else</a></td>
+							<td>
+								<div><input type="checkbox" value="owner"/>owner</div>
+								<div><input type="checkbox" value="viewing"/>viewing</div>
+								<div><input type="button" value="remove"/><input type="button" value="ban"/></div>
+							</td>
 						</tr>
 					</tbody>
 				</table>
@@ -178,24 +182,14 @@
 			</div>
 			<div class="content" data-tab="map list">
 				<table>
-					<tbody>
-						<tr>
-							<th>name (click to open)</th>
-							<th>type</th>
-							<th>rows</th>
-							<th>cols</th>
-							<th>background</th><!-- TODO: thumbnail? -->
-							<th>action</th>
-						</tr>
-						<tr>
-							<td>My Map</td>
-							<td>square</td>
-							<td>25</td>
-							<td>25</td>
-							<td>none</td>
-							<td><input type="button" value="disown"/></td>
-						</tr>
-					</tbody>
+					<tr>
+						<td><a>My Map</a> (25 &times; 25 square, owned)</td>
+						<td><input type="button" value="disown"/></td>
+					</tr>
+					<tr>
+						<td><a>My Friend's Map</a> (30 &times; 50 hex)</td>
+						<td><input type="button" value="disown"/></td>
+					</tr>
 				</table>
 				<form id="mapCreator">
 					<!-- TODO: GUI image selector -->
@@ -231,9 +225,9 @@
 					</div>
 					<div>
 						Zoom:
-						<input name="min_zoom" type="text" size="2" value="25"/>%
+						<input name="min_zoom" type="text" size="3" value="25"/>%
 						-
-						<input name="max_zoom" type="text" size="2" value="400"/>%
+						<input name="max_zoom" type="text" size="3" value="400"/>%
 					</div>
 					<div>
 						Rotate:
@@ -298,26 +292,14 @@
 			</div>
 			<div class="content" data-tab="piece list">
 				<table>
-					<tbody>
-						<tr>
-							<th>image</th>
-							<th>x</th>
-							<th>y</th>
-							<th>name</th>
-							<th>character</th>
-							<th>color</th>
-							<th>action</th>
-						</tr>
-						<tr>
-							<td></td>
-							<td>0</td>
-							<td>0</td>
-							<td></td>
-							<td></td>
-							<td></td>
-							<td><input type="button" value="delete"/></td>
-						</tr>
-					</tbody>
+					<tr>
+						<td><a><img src="images/upload/piece/rogue.png"/> rogue</a> at (1,3)</td>
+						<td><input type="button" value="delete"/></td>
+					</tr>
+					<tr>
+						<td><a><img src="images/upload/piece/priest.png"/> priest</a> at (7,4)</td>
+						<td><input type="button" value="delete"/></td>
+					</tr>
 				</table>
 				<form id="pieceCreator">
 					<input name="image_id" type="hidden" value=""/>
@@ -332,15 +314,15 @@
 					<div>
 						Position:
 						<input name="x" type="text" size="1" value="0"/>
-						&times;
+						,
 						<input name="y" type="text" size="1" value="0"/>
 					</div>
 					<!-- TODO: GUI for centering piece -->
 					<div>
 						Center:
-						<input name="x_center" type="text" size="1" value="0"/>
-						&times;
-						<input name="y_center" type="text" size="1" value="0"/>
+						<input name="x_center" type="text" size="2" value="0"/>
+						px,
+						<input name="y_center" type="text" size="2" value="0"/>
 						px
 					</div>
 					<div>
@@ -350,7 +332,7 @@
 						<input name="y_tiles" type="text" size="1" value="0"/>
 						tiles
 					</div>
-					<div>Scale: <input name="scale" type="text" size="2" value="100"/>%</div>
+					<div>Scale: <input name="scale" type="text" size="3" value="100"/>%</div>
 					<input name="image_id" type="hidden" value=""/>
 					<div>
 						<input type="button" value="Apply Changes" id="applyPieceChanges"/>

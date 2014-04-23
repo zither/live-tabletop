@@ -50,6 +50,12 @@ input, select {
 /*	float: left; */
 }
 
+input[type=text] {width: 5em;}
+input[type=text][size='1'] {width: 0.7em;}
+input[type=text][size='2'] {width: 1.4em;}
+input[type=text][size='3'] {width: 2.1em;}
+input[type=text][size='4'] {width: 2.8em;}
+
 table {border-collapse: collapse;}
 th, td {padding: 0;}
 
@@ -135,7 +141,6 @@ th, td {padding: 0;}
 
 #loginForm input[type=text] {
 	border: 1px solid #CCC;
-	width: 80px;
 }
 
 /* PANELS: moveable, resizeable windows overlaying the map */
@@ -313,9 +318,9 @@ th, td {padding: 0;}
 	background: #FFF;
 }
 
-.panel .content input[type=text] {max-width: 80px;}
-
 #mapCreator, #mapEditor, #pieceEditor {margin-right: -8px;}
+
+.panel .content[data-tab='table info'] div,
 #mapCreator div, #mapEditor div, #pieceEditor div {
 	float: left;
 	margin-top: 1px;
@@ -323,8 +328,10 @@ th, td {padding: 0;}
 	min-height: 19px;
 }
 
-
-#mapEditor table, #pieceEditor table {float: left;}
+.panel .content[data-tab='piece list'] img {
+	max-height: 19px;
+	vertical-align: middle;
+}
 
 .buttonDiv {
 	float: left;
