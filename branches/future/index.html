@@ -114,9 +114,9 @@
 				<div class="close"></div>
 			</div>
 			<div class="tabBar">
-				<div class="tab active" data-tab="table list">My Tables</div>
-				<div class="tab" data-tab="table info">This Table</div>
-				<div class="tab" data-tab="chat">Rolls & Dialogue</div>
+				<div class="tab active" data-tab="table list">List</div>
+				<div class="tab" data-tab="table info">Info</div>
+				<div class="tab" data-tab="chat">Chat & Roll</div>
 			</div>
 			<div class="content" data-tab="table list">
 				<table>
@@ -170,7 +170,7 @@
 				<div class="close"></div>
 			</div>
 			<div class="tabBar">
-				<div class="tab" data-tab="map list">Maps</div>
+				<div class="tab" data-tab="map list">List</div>
 				<div class="tab" data-tab="map info">Info</div>
 				<div class="tab active" data-tab="map tools">Tools</div>
 				<div class="tab" data-tab="piece list">Pieces</div>
@@ -416,12 +416,16 @@
 				<div class="close"></div>
 			</div>
 			<div class="tabBar">
-				<div class="tab" data-tab="character list">List</div>
+				<div class="tab active" data-tab="character list">List</div>
 				<div class="tab" data-tab="character info">Info</div>
 				<div class="tab" data-tab="character stats">Stats</div>
 				<div class="tab" data-tab="character notes">Notes</div>
 			</div>
-			<div class="content">
+			<div class="content" data-tab="character list">
+			</div>
+			<div class="content" data-tab="character info">
+			</div>
+			<div class="content" data-tab="character stats">
 					<form id="statCreator" style="display: none;">
 						<input name="name" type="text" value="Stat"/>
 						<input name="value" type="text" value="Value"/>
@@ -430,6 +434,8 @@
 					</form>
 					<div class="separator"></div>
 					<input type="button" value="Apply Changes" id="submitStats"/>
+			</div>
+			<div class="content" data-tab="character notes">
 			</div>
 			<div class="bottom">
 				<div class="resizeBL"></div>

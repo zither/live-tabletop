@@ -18,6 +18,11 @@ LT.Panel = function (name) {
 	this.defaultWidth = this.getWidth();
 	this.defaultHeight = this.getHeight();
 
+	this.setX(this.getX());
+	this.setY(this.getY());
+	this.setHeight(this.getHeight());
+	this.setWidth(this.getWidth());
+
 	LT.Panel.list.push(this); // panels in the order they were created
 	LT.Panel.order.push(this); // panels in back-to-front order
 
@@ -71,12 +76,8 @@ LT.Panel.clickCornerX = 0; // horizontal position of corner being resized
 LT.Panel.clickCornerY = 0; // vertical position of corner being resized
 
 // TODO: explain each of these margins
-LT.Panel.MARGIN_LEFT = 5;
-LT.Panel.MARGIN_RIGHT = 5;
 LT.Panel.MARGIN_TOP = 26;
-LT.Panel.MARGIN_BOTTOM = 5;
-LT.Panel.MIN_WIDTH = 140;
-LT.Panel.MIN_HEIGHT = 50;
+LT.Panel.MIN_WIDTH = 130;
 
 // STATIC FUNCTIONS
 
@@ -227,11 +228,11 @@ Or maybe we should change how we do it.
 			LT.clickY = LT.dragY - this.getY();
 			LT.clickDragGap = 1;
 		}
-		maxX = window.innerWidth  - this.getWidth()  - LT.Panel.MARGIN_RIGHT;
-		maxY = window.innerHeight - this.getHeight() - LT.Panel.MARGIN_BOTTOM - LT.Panel.MIN_HEIGHT;
+		maxX = window.innerWidth  - this.getWidth();
+		maxY = window.innerHeight - this.getHeight();
 		LT.dragX = Math.min(LT.dragX - LT.clickX, maxX);
 		LT.dragY = Math.min(LT.dragY - LT.clickY, maxY);
-		LT.dragX = Math.max(LT.dragX, LT.Panel.MARGIN_LEFT);
+		LT.dragX = Math.max(LT.dragX, 0);
 		LT.dragY = Math.max(LT.dragY, LT.Panel.MARGIN_TOP);
 		this.setX(LT.dragX);
 		this.setY(LT.dragY);
@@ -245,9 +246,9 @@ Or maybe we should change how we do it.
 			LT.clickDragGap = 1;
 		}
 		LT.dragX = Math.max(LT.dragX - LT.clickX, LT.Panel.MIN_WIDTH);
-		LT.dragY = Math.max(LT.dragY - LT.clickY, LT.Panel.MIN_HEIGHT);
-		var maxWidth  = window.innerWidth  - this.getX() - LT.Panel.MARGIN_RIGHT;
-		var maxHeight = window.innerHeight - this.getY() - LT.Panel.MARGIN_BOTTOM - LT.Panel.MIN_HEIGHT;
+		LT.dragY = Math.max(LT.dragY - LT.clickY, 0);
+		var maxWidth  = window.innerWidth  - this.getX();
+		var maxHeight = window.innerHeight - this.getY();
 		this.setWidth(Math.min(LT.dragX, maxWidth));
 		this.setHeight(Math.min(LT.dragY, maxHeight));
 	},
@@ -261,10 +262,10 @@ Or maybe we should change how we do it.
 			LT.Panel.clickCornerY = LT.dragY + this.getHeight();
 			LT.clickDragGap = 1;
 		}
-		LT.dragX = Math.max(LT.dragX, LT.clickX + LT.Panel.MARGIN_LEFT);
+		LT.dragX = Math.max(LT.dragX, LT.clickX);
 		LT.dragY = Math.max(LT.dragY, LT.clickY + LT.Panel.MARGIN_TOP);
 		LT.dragX = Math.min(LT.dragX, LT.Panel.clickCornerX - LT.Panel.MIN_WIDTH);
-		LT.dragY = Math.min(LT.dragY, LT.Panel.clickCornerY - LT.Panel.MIN_HEIGHT);
+		LT.dragY = Math.min(LT.dragY, LT.Panel.clickCornerY);
 		this.setX(LT.dragX - LT.clickX);
 		this.setY(LT.dragY - LT.clickY);
 		this.setWidth(LT.Panel.clickCornerX - LT.dragX);
@@ -282,12 +283,12 @@ Or maybe we should change how we do it.
 			LT.clickDragGap = 1;
 		}
 		LT.dragY = Math.max(LT.dragY, LT.clickY - LT.clickT + LT.Panel.MARGIN_TOP);
-		LT.dragY = Math.min(LT.dragY, LT.clickY + LT.clickH - LT.Panel.MIN_HEIGHT);
+		LT.dragY = Math.min(LT.dragY, LT.clickY + LT.clickH);
 		this.setHeight(LT.clickH + LT.clickY - LT.dragY);
 		this.setY(LT.clickT - LT.clickY + LT.dragY);
 
 		var newWidth = LT.clickW + (LT.dragX - LT.clickX);
-		newWidth = Math.min(newWidth, window.innerWidth - this.getX() - LT.Panel.MARGIN_LEFT);
+		newWidth = Math.min(newWidth, window.innerWidth - this.getX());
 		newWidth = Math.max(newWidth, LT.Panel.MIN_WIDTH);
 		this.setWidth(newWidth);
 	},
@@ -302,13 +303,13 @@ Or maybe we should change how we do it.
 			LT.Panel.clickCornerX = LT.dragX + this.getWidth();
 			LT.clickDragGap = 1;
 		}
-		LT.dragX = Math.max(LT.dragX, LT.clickX + LT.Panel.MARGIN_LEFT);
+		LT.dragX = Math.max(LT.dragX, LT.clickX);
 		LT.dragX = Math.min(LT.dragX, LT.Panel.clickCornerX - LT.Panel.MIN_WIDTH);
 		this.setX(LT.dragX - LT.clickX);
 		this.setWidth(LT.Panel.clickCornerX - LT.dragX);
 
-		LT.dragY = Math.max(LT.dragY, panelY + LT.Panel.MIN_HEIGHT + LT.Panel.MARGIN_TOP);
-		LT.dragY = Math.min(LT.dragY, window.innerHeight - LT.Panel.MARGIN_BOTTOM);
+		LT.dragY = Math.max(LT.dragY, panelY + LT.Panel.MARGIN_TOP);
+		LT.dragY = Math.min(LT.dragY, window.innerHeight);
 		this.setHeight(LT.clickH - LT.clickY + LT.dragY);
 	},
 	
@@ -316,7 +317,12 @@ Or maybe we should change how we do it.
 	setX: function (x) {$(this.outside).css({left: x + "px"});},
 	setY: function (y) {$(this.outside).css({top:  y + "px"});},
 	setWidth: function (w) {$(this.outside).css({width: w + "px"});},
-	setHeight: function (h) {$(this.outside).css({height: h + "px"});},
+	setHeight: function (h) {
+		$(this.outside).css({height: h + "px"});
+		$(this.outside).find(".content").css({
+			height: (h - $(this.outside).find(".tabBar").height() - 35) + "px"
+		});
+	},
 
 	// Find the position and size of the panel
 	getX: function () {return parseInt($(this.outside).css("left"));},
