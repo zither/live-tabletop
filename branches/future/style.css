@@ -51,10 +51,10 @@ input, select {
 }
 
 input[type=text] {width: 5em;}
-input[type=text][size='1'] {width: 0.7em;}
-input[type=text][size='2'] {width: 1.4em;}
-input[type=text][size='3'] {width: 2.1em;}
-input[type=text][size='4'] {width: 2.8em;}
+input[type=text][size='1'] {width: 0.7em; text-align: right;}
+input[type=text][size='2'] {width: 1.4em; text-align: right;}
+input[type=text][size='3'] {width: 2.1em; text-align: right;}
+input[type=text][size='4'] {width: 2.8em; text-align: right;}
 
 table {border-collapse: collapse;}
 th, td {padding: 0;}
@@ -293,7 +293,7 @@ th, td {padding: 0;}
 	border-right: 1px solid #333;
 	color: #333;
 	overflow: auto;
-	padding: 0 5px 0 5px;
+/*	padding: 0 5px; */
 }
 
 .panel .bottom {
@@ -318,13 +318,9 @@ th, td {padding: 0;}
 	background: #FFF;
 }
 
-#mapCreator, #mapEditor, #pieceEditor {margin-right: -8px;}
-
-.panel .content[data-tab='table info'] div,
-#mapCreator div, #mapEditor div, #pieceEditor div {
+.panel .content div {
 	float: left;
-	margin-top: 1px;
-	margin-right: 8px;
+	margin: 1px 5px 0 5px;
 	min-height: 19px;
 }
 

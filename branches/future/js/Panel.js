@@ -44,7 +44,11 @@ LT.Panel = function (name) {
 	$(this.outside).find(".resizeBR").mousedown(function () {LT.Panel.selectedBR = self; return false;});
 
 	// title bar for dragging the panel around
-	$(this.outside).find(".title").mousedown(function () {LT.Panel.selected = self; return false;});
+	$(this.outside).find(".title").mousedown(function () {
+		self.bringToFront();
+		LT.Panel.selected = self;
+		return false;
+	});
 
 	// close button
 	$(this.outside).find(".close").click(function () {self.hide(); LT.Panel.saveCookie(); return false;});
