@@ -1,6 +1,6 @@
 /* we remove tables in bottom-up order to avoid foreign key issues */
 DROP TABLE IF EXISTS character_owners, characters, walls, tiles, pieces,
-    map_owners, maps, messages, table_users, tables, friends, users, admins;
+    map_owners, maps, messages, campaign_users, campaigns, friends, users, admins;
 
 DROP PROCEDURE IF EXISTS create_admin;
 DROP PROCEDURE IF EXISTS read_admin;
@@ -10,11 +10,11 @@ DROP PROCEDURE IF EXISTS create_user;
 DROP PROCEDURE IF EXISTS read_user_login;
 DROP PROCEDURE IF EXISTS read_user;
 DROP PROCEDURE IF EXISTS read_users;
+DROP PROCEDURE IF EXISTS update_user_logged_in;
 DROP PROCEDURE IF EXISTS update_user_password;
 DROP PROCEDURE IF EXISTS update_user;
 DROP PROCEDURE IF EXISTS update_user_timestamp;
 DROP PROCEDURE IF EXISTS delete_user;
-
 DROP PROCEDURE IF EXISTS create_friend;
 DROP PROCEDURE IF EXISTS read_friends;
 DROP PROCEDURE IF EXISTS read_friends_recieved;
@@ -22,18 +22,21 @@ DROP PROCEDURE IF EXISTS read_friends_requested;
 DROP PROCEDURE IF EXISTS read_friends_confirmed;
 DROP PROCEDURE IF EXISTS delete_friend;
 
-DROP PROCEDURE IF EXISTS create_table;
-DROP PROCEDURE IF EXISTS read_table;
-DROP PROCEDURE IF EXISTS read_tables;
-DROP PROCEDURE IF EXISTS update_table;
-DROP PROCEDURE IF EXISTS delete_table;
-DROP PROCEDURE IF EXISTS read_table_users;
-DROP PROCEDURE IF EXISTS read_table_user_tables;
-DROP PROCEDURE IF EXISTS update_table_users_permission;
-DROP PROCEDURE IF EXISTS update_table_users_arrive;
-DROP PROCEDURE IF EXISTS update_table_users_leave;
-DROP PROCEDURE IF EXISTS update_table_users_avatar;
-
+DROP PROCEDURE IF EXISTS create_campaign;
+DROP PROCEDURE IF EXISTS read_campaign;
+DROP PROCEDURE IF EXISTS read_campaigns;
+DROP PROCEDURE IF EXISTS update_campaign_map;
+DROP PROCEDURE IF EXISTS update_campaign_name;
+DROP PROCEDURE IF EXISTS update_campaign_private;
+DROP PROCEDURE IF EXISTS update_campaign_turns;
+DROP PROCEDURE IF EXISTS delete_campaign;
+DROP PROCEDURE IF EXISTS read_campaign_user_permission;
+DROP PROCEDURE IF EXISTS read_campaign_user_campaigns;
+DROP PROCEDURE IF EXISTS read_campaign_users;
+DROP PROCEDURE IF EXISTS update_campaign_users_permission;
+DROP PROCEDURE IF EXISTS update_campaign_users_arrive;
+DROP PROCEDURE IF EXISTS update_campaign_users_leave;
+DROP PROCEDURE IF EXISTS update_campaign_users_avatar;
 DROP PROCEDURE IF EXISTS create_message;
 DROP PROCEDURE IF EXISTS read_messages;
 DROP PROCEDURE IF EXISTS delete_messages_expired;
@@ -45,17 +48,15 @@ DROP PROCEDURE IF EXISTS update_map;
 DROP PROCEDURE IF EXISTS create_map_owner;
 DROP PROCEDURE IF EXISTS read_map_owners;
 DROP PROCEDURE IF EXISTS delete_map_owner;
-
 DROP PROCEDURE IF EXISTS create_piece;
 DROP PROCEDURE IF EXISTS read_pieces;
+DROP PROCEDURE IF EXISTS update_piece_position;
 DROP PROCEDURE IF EXISTS update_piece;
 DROP PROCEDURE IF EXISTS delete_piece;
-
 DROP PROCEDURE IF EXISTS read_tiles;
 DROP PROCEDURE IF EXISTS update_tile;
 DROP PROCEDURE IF EXISTS update_tiles_fill_fog;
 DROP PROCEDURE IF EXISTS update_tiles_clear_fog;
-
 DROP PROCEDURE IF EXISTS create_wall;
 DROP PROCEDURE IF EXISTS read_walls;
 DROP PROCEDURE IF EXISTS delete_wall;
@@ -148,20 +149,20 @@ CREATE TABLE friends (
 );
 
 
-/* TABLES TABLE
+/* CAMPAIGNS TABLE
 
-	Tables are virtual places where users can chat, edit tables and play games
-	together. Each table roughly corresponds to a campaign being played by a
-	group of players. The state of the table is saved between games.
+	Campaigns are virtual places where users can chat, edit campaigns and play games
+	together. Each campaign roughly corresponds to a campaign being played by a
+	group of players. The state of the campaign is saved between games.
 
-	map: each table shows one map at a time
-	private: anyone with the table’s permalink URL can join if this is 0
+	map: each campaign shows one map at a time
+	private: anyone with the campaign’s permalink URL can join if this is 0
 	turns: JSON array of turns (character ids?) in a sequence
 	last_message: id of last new message
-	users modified: time of last change to this table's list of users
+	users modified: time of last change to this campaign's list of users
 */
 
-CREATE TABLE tables (
+CREATE TABLE campaigns (
 	id INT AUTO_INCREMENT PRIMARY KEY,
 	name TEXT,
 	map INT,
@@ -172,51 +173,51 @@ CREATE TABLE tables (
 );
 
 
-/* TABLE_USERS TABLE
+/* CAMPAIGN_USERS TABLE
 
-	unique relationships between tables and users.
+	unique relationships between campaigns and users.
 
-	name: the name of the table, duplicated here so we only need this table
-		to populate and frequently refresh the user's Tables list
+	name: the name of the campaign, duplicated here so we only need this table
+		to populate and frequently refresh the user's campaign list
 	permission: one of four mutually exclusive states
-		“owner”: can invite people to join the table, change the public/private
-		   setting, invite members, change the map, edit the map and move any
-		   piece the map.
-		“member”: can join the table when it is not public
-		“banned” (blacklisted): cannot see the table even if it is public
-		NULL (guest): can only join the table when it is public
-	viewing: 1 if the user is currently online and viewing this table
-	avatar: the user is speaking as this character at this table
+		“owner”: can invite people to join the campaign, change the public/private
+			setting, invite members, change the map, edit the map and move any
+			piece on the map.
+		“member”: can join the campaign when it is not public
+		“banned” (blacklisted): cannot see the campaign even if it is public
+		NULL (guest): can only join the campaign when it is public
+	viewing: 1 if the user is currently online and viewing this campaign
+	avatar: the user is speaking as this character in this campaign
 */
 
-CREATE TABLE table_users (
+CREATE TABLE campaign_users (
 	user_id INT NOT NULL,
-	table_id INT NOT NULL,
+	campaign_id INT NOT NULL,
 	name TEXT,
 	permission TEXT,
 	viewing TINYINT NOT NULL DEFAULT 0,
 	avatar INT,
 	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-	FOREIGN KEY (table_id) REFERENCES tables(id) ON DELETE CASCADE,
-	PRIMARY KEY (user_id, table_id)
+	FOREIGN KEY (campaign_id) REFERENCES campaigns(id) ON DELETE CASCADE,
+	PRIMARY KEY (user_id, campaign_id)
 );
 
 
 /* MESSAGES TABLE
 
-	Messages from users of this table, character dialog and die rolls.
+	Messages from users of this campaign, character dialog and die rolls.
 	avatar: optional id of a character whose persona the user takes on.
 	text: can contain die rolls wrapped and styled with HTML/CSS
 */
 
 CREATE TABLE messages (
 	id INT AUTO_INCREMENT PRIMARY KEY,
-	table_id INT NOT NULL,
+	campaign_id INT NOT NULL,
 	user_id INT NOT NULL,
 	avatar INT,
 	text TEXT,
 	time_stamp TIMESTAMP,
-	FOREIGN KEY (table_id) REFERENCES tables(id) ON DELETE CASCADE,
+	FOREIGN KEY (campaign_id) REFERENCES campaigns(id) ON DELETE CASCADE,
 	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -229,7 +230,7 @@ CREATE TABLE messages (
 	wall_style: width, color...? (TODO: also door style?)
 	type: “hex” or “square”
 	min/max zoom, rotate and tilt
-	background: image id or URL (TODO: and settings?)
+	background: image JSON data. See piece.image. No base; Probably no view.
 */
 
 CREATE TABLE maps (
@@ -238,13 +239,12 @@ CREATE TABLE maps (
 	type TEXT NOT NULL,
 	tile_rows SMALLINT NOT NULL,
 	tile_columns SMALLINT NOT NULL,
-	background_id INT,
-	background_url TEXT,
+	background TEXT,
 	min_zoom FLOAT NOT NULL DEFAULT 0.25,
 	max_zoom FLOAT NOT NULL DEFAULT 4.0,
 	min_rotate SMALLINT NOT NULL DEFAULT -180,
 	max_rotate SMALLINT NOT NULL DEFAULT 180,
-	min_tilt SMALLINT NOT NULL DEFAULT 0,
+	min_tilt SMALLINT NOT NULL DEFAULT 30,
 	max_tilt SMALLINT NOT NULL DEFAULT 90,
 	grid_thickness TINYINT NOT NULL DEFAULT 1,
 	grid_color TEXT,
@@ -273,36 +273,43 @@ CREATE TABLE map_owners (
 
 /* PIECES TABLE
 
-	map_id: every peice is part of a map
+	map_id: every piece is part of a map
 	image_id: piece image/class
 	image_url: link to a piece image from another site
 	x, y: center of the piece in square map units
 	   if you use square tiles the center of tile 0, 0 is 0.5, 0.5
-	x_center, y_center: center of the piece image in pixels
-	   the middle bottom of a 100 x 100 image is 50, 100
-	   this position is based on the unscaled image
-	x_tiles, y_tiles: tile rows and columns occupied by this piece
-	scale: decrease or increase the apparent size of the piece
-	   100% scale shows the image at 1:1 image to screen pixel ratio
-	   when viewing the map at 100% zoom/default scale
+	image: JSON data {
+		"id": id of an image from our library
+		"url": web address of an image linked from another site
+		"center.x/y": center of the piece image in pixels
+			the middle bottom of a 100 x 100 image is 50, 100
+			this position is based on the unscaled image
+		"base.x/y": tile columns and rows occupied by this piece
+		"scale.x/y": decrease or increase the apparent size of the piece
+			100% scale shows the image at 1:1 image to screen pixel ratio
+			when viewing the map at 100% zoom from the top view
+		"angle": degrees to rotate the image
+		"view": how the image should look when the view rotates.
+			front: it looks the same from every angle
+			side: flips horizontally when facing left
+			top: flat and oriented, rotates and tilts with the view
+			flat: low-relief, can squish/tilt but does not rotate
+			multi: the image has been rendered from each direction
+	}
 	character_id: an optional character associated with this piece
+	locked: only campaign+map owners & character owners can move the piece if 1
 	markers: status icons with metadata attached to the piece
 */
 
 CREATE TABLE pieces (
 	id INT AUTO_INCREMENT PRIMARY KEY,
 	map_id INT NOT NULL,
-	image_id INT,
-	image_url TEXT,
+	image TEXT,
 	name TEXT,
 	x FLOAT NOT NULL DEFAULT 0,
 	y FLOAT NOT NULL DEFAULT 0,
-	x_center INT NOT NULL DEFAULT 0,
-	y_center INT NOT NULL DEFAULT 0,
-	x_tiles FLOAT NOT NULL DEFAULT 1,
-	y_tiles FLOAT NOT NULL DEFAULT 1,
-	scale FLOAT NOT NULL DEFAULT 1,
 	character_id INT,
+	locked TINYINT NOT NULL DEFAULT 1,
 	markers TEXT NOT NULL, /* DEFAULT '[]' TODO: make this a table? */
 	color TEXT, /* TODO: do we need this? */
 	FOREIGN KEY (map_id) REFERENCES maps(id) ON DELETE CASCADE
@@ -310,10 +317,11 @@ CREATE TABLE pieces (
 
 /* TILES TABLE
 
-	Fog is 0 if there is no fog of war on this tile or 1 if there is fog of war
-	on this tile. Right and bottom walls have the value 2 if there is a door on
-	that side of the tile, 1 if there is a wall on that side of the tile and 0
-	if there is neither a wall nor a door.
+	map_id: the map this tile is a part of
+	x: the column this tile appears in
+	y: the row this tile belongs to
+	image_id: the image id/class of the this tile or null if it is empty
+	fog: 1 if there is fog of war on this tile or 0 if there is not
 */
 
 CREATE TABLE tiles (
@@ -349,16 +357,18 @@ CREATE TABLE walls (
 
 /* CHARACTERS TABLE
 
-	Characters are a bridge between the social (table, users) and graphical (map, pieces.)
+	Characters are a bridge between the social (campaign, users) and graphical (map, pieces.)
 	They also contain game mechanics, which are neither entirely social nor entirely graphical,
-	but lean toward social because die rolls are already part of table chat.
+	but lean toward social because die rolls are already part of campaign chat.
 
-	name:
+	name: the character's name
 	system: game system to use if this character has stats
 	stats: system specific JSON data
 	notes: additional user-defined status effects? (like markers without icons)
-	portrait: illustration (id or URL?)
-	piece_image: default piece image/class (id or URL, what about centering, etc?)
+	portrait: JSON image data. See pieces.image.
+		No base or view; Maybe no center, scale or angle.
+	piece: JSON image data. See pieces.image.
+	color: TODO: is this needed? What is it used for?
 */
 
 CREATE TABLE characters (
@@ -367,10 +377,8 @@ CREATE TABLE characters (
 	system TEXT,
 	stats TEXT,
 	notes TEXT,
-	portrait_id INT,
-	portrait_url TEXT,
-	piece_image_id INT,
-	piece_image_url TEXT,
+	portrait TEXT,
+	piece TEXT,
 	color TEXT
 );
 
@@ -460,6 +468,13 @@ BEGIN
 		FROM users ORDER BY name, login, id;
 END;
 
+/* User has logged in or logged out */
+/* TODO: do these count as actions for the purpose of last_action? */
+CREATE PROCEDURE update_user_logged_in (IN the_user INT, IN the_status TINYINT)
+BEGIN
+	UPDATE users SET logged_in = the_status WHERE id = the_user;
+END;
+
 /* User changes his password
 or Admin resets his password */
 CREATE PROCEDURE update_user_password
@@ -478,6 +493,7 @@ BEGIN
 END;
 
 /* User sent a message or changed something */
+/* TODO: when, if ever, do we need to call this? */
 CREATE PROCEDURE update_user_timestamp (IN the_user INT)
 BEGIN
 	UPDATE users SET last_action = NOW() WHERE id = the_user;
@@ -490,9 +506,9 @@ BEGIN
 	START TRANSACTION;
 /* delete the user */
 	DELETE FROM users WHERE id = the_user;
-/* delete tables without owners */
-	DELETE FROM tables WHERE id NOT IN 
-		(SELECT table_id FROM table_users WHERE permission = "owner");
+/* delete campaigns without owners */
+	DELETE FROM campaigns WHERE id NOT IN 
+		(SELECT campaign_id FROM campaign_users WHERE permission = "owner");
 /* delete maps without owners */
 	DELETE FROM maps WHERE id NOT IN
 		(SELECT map_id FROM map_owners);
@@ -502,11 +518,11 @@ BEGIN
 /*
 handled by ON DELETE CASCADE when you delete the user:
 	DELETE FROM friends WHERE sender = the_user OR recipient = the_user;
-	DELETE FROM table_users WHERE user_id = the_user;
+	DELETE FROM campaign_users WHERE user_id = the_user;
 	DELETE FROM messages WHERE user_id = the_user;
 	DELETE FROM map_owners WHERE user_id = the_user;
-handled by ON DELETE CASCADE when you delete the table:
-	DELETE FROM messages WHERE table_id NOT IN (SELECT id FROM tables);
+handled by ON DELETE CASCADE when you delete the campaign:
+	DELETE FROM messages WHERE campaign_id NOT IN (SELECT id FROM campaigns);
 handled by ON DELETE CASCADE when you delete the map:
 	DELETE FROM pieces WHERE map_id NOT IN (SELECT id FROM maps);
 	DELETE FROM tiles WHERE map_id NOT IN (SELECT id FROM maps);
@@ -561,162 +577,181 @@ BEGIN
 END;
 
 
-/*** TABLES PROCEDURES ***/
+/*** CAMPAIGNS PROCEDURES ***/
 
-/* User creates a new table. */
-CREATE PROCEDURE create_table
-	(IN the_user INT, IN the_name VARCHAR(200), IN the_map INT)
+/* User creates a new campaign. */
+CREATE PROCEDURE create_campaign
+	(IN the_user INT, IN the_name VARCHAR(200))
 BEGIN
-	DECLARE new_table_id INT;
+	DECLARE new_campaign_id INT;
 	START TRANSACTION;
-/* create the table */
-	INSERT INTO tables (name, map, users_modified)
-		VALUES (the_name, the_map, NOW());
-	SET new_table_id = LAST_INSERT_ID();
+/* create the campaign */
+	INSERT INTO campaigns (name, users_modified) VALUES (the_name, NOW());
+	SET new_campaign_id = LAST_INSERT_ID();
 /* make the user an owner */
-	INSERT INTO table_users (user_id, table_id, permission)
-		VALUES (the_user, new_table_id, 'owner');
-/* return the new table's id */
-	SELECT new_table_id AS id;
+	INSERT INTO campaign_users (user_id, campaign_id, permission)
+		VALUES (the_user, new_campaign_id, 'owner');
+/* return the new campaign's id */
+	SELECT new_campaign_id AS id;
 	COMMIT;
 END;
 
-/* User loads a table
+/* User loads a campaign
 or User polls for new messages and changes to the users list */
-CREATE PROCEDURE read_table (IN the_table INT)
+CREATE PROCEDURE read_campaign (IN the_campaign INT)
 BEGIN
 	SELECT id, name, map, private, turns, last_message,
 		UNIX_TIMESTAMP(users_modified) AS users_modified
-		FROM tables WHERE id = the_table;
+		FROM campaigns WHERE id = the_campaign;
 END;
 
-/* Admin views all the tables. */
-CREATE PROCEDURE read_tables ()
+/* Admin views all the campaigns. */
+CREATE PROCEDURE read_campaigns ()
 BEGIN
 	SELECT id, name, map, private, turns, last_message,
 		UNIX_TIMESTAMP(users_modified) AS users_modified
-		FROM tables ORDER BY name, id;
+		FROM campaigns ORDER BY name, id;
 END;
 
-/* User renames the table
-or User toggles the table's private/public setting
-or User changes the initiative list (turns) */
-CREATE PROCEDURE update_table (IN the_table INT, IN the_name VARCHAR(200),
-	IN the_private TINYINT, IN the_turns TEXT)
+/* User changes the campaign's map */
+CREATE PROCEDURE update_campaign_map (IN the_campaign INT, IN the_map INT)
 BEGIN
-	UPDATE tables SET name = the_name, private = the_private, turns = the_turns
-		WHERE id = the_table;
+	UPDATE campaigns SET map = the_map WHERE id = the_campaign;
 END;
 
-/* Admin deletes the table */
-CREATE PROCEDURE delete_table (IN the_table INT)
+/* User renames the campaign */
+CREATE PROCEDURE update_campaign_name (IN the_campaign INT, IN the_name TEXT)
 BEGIN
-	DELETE FROM tables WHERE id = the_table;
+	UPDATE campaigns SET name = the_name WHERE id = the_campaign;
+END;
+
+/* User toggles the campaign's private/public setting */
+CREATE PROCEDURE update_campaign_private (IN the_campaign INT, IN the_private TINYINT)
+BEGIN
+	UPDATE campaigns SET private = the_private WHERE id = the_campaign;
+END;
+
+/* User changes the initiative list (turns) */
+CREATE PROCEDURE update_campaign_turns (IN the_campaign INT, IN the_turns TEXT)
+BEGIN
+	UPDATE campaigns SET turns = the_turns WHERE id = the_campaign;
+END;
+
+/* Admin deletes the campaign */
+CREATE PROCEDURE delete_campaign (IN the_campaign INT)
+BEGIN
+	DELETE FROM campaigns WHERE id = the_campaign;
 END;
 
 
-/*** TABLE_USERS PROCEDURES ***/
+/*** CAMPAIGN_USERS PROCEDURES ***/
 
-/* User views the owners, members, viewers and blacklist of this table */
-CREATE PROCEDURE read_table_users (IN the_table INT)
+/* User tries to view the campaign and PHP logic checks whether that is allowed */
+CREATE PROCEDURE read_campaign_user_permission (IN the_user INT)
 BEGIN
-	SELECT user_id, permission, viewing, avatar, login, users.name AS name
-		FROM table_users, users WHERE id = user_id AND table_id = the_table;
+	SELECT permission FROM campaign_users WHERE user_id = the_user;
 END;
 
-/* User views tables he owns and tables he has been invited to */
-CREATE PROCEDURE read_table_user_tables (IN the_user INT)
+/* User views campaigns he owns and campaigns he has been invited to */
+CREATE PROCEDURE read_campaign_user_campaigns (IN the_user INT)
 BEGIN
-	SELECT table_id, name, permission FROM table_users
+	SELECT campaign_id, name, permission FROM campaign_users
 		WHERE user_id = the_user AND permission IN ('owner', 'member')
 		ORDER BY name, id;
 END;
 
-/* User invites another user to play at the table (who becomes a member)
-or User shares the table with another user (who becomes an owner)
+/* User views the owners, members, viewers and blacklist of this campaign */
+CREATE PROCEDURE read_campaign_users (IN the_campaign INT)
+BEGIN
+	SELECT user_id, permission, viewing, avatar, login, users.name AS name
+		FROM campaign_users, users WHERE id = user_id AND campaign_id = the_campaign;
+END;
+
+/* User invites another user to play at the campaign (who becomes a member)
+or User shares the campaign with another user (who becomes an owner)
 or User changes an owner or blacklisted user's permission to member
 or User changes a member or blacklisted user's permission to owner
-or User adds a user to the table's blacklist
-or User removes a user from the table's blacklist (NULL permission)
+or User adds a user to the campaign's blacklist
+or User removes a user from the campaign's blacklist (NULL permission)
 or User revokes a user's ownership or membership (NULL permission)
-or User disowns the table (NULL permission) */
-CREATE PROCEDURE update_table_users_permission
-	(IN the_user INT, IN the_table INT, IN the_permission INT)
+or User disowns the campaign (NULL permission) */
+CREATE PROCEDURE update_campaign_users_permission
+	(IN the_user INT, IN the_campaign INT, IN the_permission INT)
 BEGIN
 	START TRANSACTION;
-/* create or update the table user's permission */
-	REPLACE INTO table_users (user_id, table_id, permission)
-		VALUES (the_user, the_table, the_permission);
-/* delete guests (NULL permission) who are not viewing the table */
-	DELETE FROM table_users WHERE user_id = the_user AND table_id = the_table
+/* create or update the campaign user's permission */
+	REPLACE INTO campaign_users (user_id, campaign_id, permission)
+		VALUES (the_user, the_campaign, the_permission);
+/* delete guests (NULL permission) who are not viewing the campaign */
+	DELETE FROM campaign_users WHERE user_id = the_user AND campaign_id = the_campaign
 		AND permission = NULL AND viewing = 0;
-/* delete tables without owners */
-	IF (SELECT COUNT(*) FROM table_users WHERE user_id = the_user
-		AND table_id = the_table AND permission = 'owner') = 0
+/* delete campaigns without owners */
+	IF (SELECT COUNT(*) FROM campaign_users WHERE user_id = the_user
+		AND campaign_id = the_campaign AND permission = 'owner') = 0
 	THEN
-		DELETE FROM tables WHERE id = the_table;
+		DELETE FROM campaigns WHERE id = the_campaign;
 	END IF;
 	COMMIT;
 END;
 
-/* User joins a table */
-CREATE PROCEDURE update_table_users_arrive (IN the_user INT, IN the_table INT)
+/* User joins a campaign */
+CREATE PROCEDURE update_campaign_users_arrive (IN the_user INT, IN the_campaign INT)
 BEGIN
-	REPLACE INTO table_users (user_id, table_id, viewing)
-		VALUES (the_user, the_table, 1);
+	REPLACE INTO campaign_users (user_id, campaign_id, viewing)
+		VALUES (the_user, the_campaign, 1);
 END;
 
-/* User leaves a table */
-CREATE PROCEDURE update_table_users_leave (IN the_user INT, IN the_table INT)
+/* User leaves a campaign */
+CREATE PROCEDURE update_campaign_users_leave (IN the_user INT, IN the_campaign INT)
 BEGIN
 	START TRANSACTION;
-/* delete this table user if it was just a guest (NULL permission) */
-	DELETE FROM table_users 
-		WHERE user_id = the_user AND table_id = the_table 
+/* delete this campaign user if it was just a guest (NULL permission) */
+	DELETE FROM campaign_users 
+		WHERE user_id = the_user AND campaign_id = the_campaign 
 		AND permission = NULL;
-/* set this table user's viewing to 0 if the user is a member or owner */
-	UPDATE table_users SET viewing = 0
-		WHERE user_id = the_user AND table_id = the_table;
+/* set this campaign user's viewing to 0 if the user is a member or owner */
+	UPDATE campaign_users SET viewing = 0
+		WHERE user_id = the_user AND campaign_id = the_campaign;
 	COMMIT;
 END;
 
-/* User joins a table */
-CREATE PROCEDURE update_table_users_avatar
-	(IN the_user INT, IN the_table INT, IN the_avatar INT)
+/* User selects his avatar for this campaign */
+CREATE PROCEDURE update_campaign_users_avatar
+	(IN the_user INT, IN the_campaign INT, IN the_avatar INT)
 BEGIN
-	UPDATE table_users SET avatar = the_avatar
-		WHERE user_id = the_user AND table_id = the_table;
+	UPDATE campaign_users SET avatar = the_avatar
+		WHERE user_id = the_user AND campaign_id = the_campaign;
 END;
 
 
 /*** MESSAGES PROCEDURES ***/
 
-/* User posts a message at a table */
+/* User posts a message in a campaign */
 CREATE PROCEDURE create_message
-	(IN the_table INT, IN the_user INT, IN the_avatar INT, IN the_text TEXT)
+	(IN the_campaign INT, IN the_user INT, IN the_avatar INT, IN the_text TEXT)
 BEGIN
 	START TRANSACTION;
-	INSERT INTO messages (table_id, user_id, avatar, text)
-		VALUES (the_table, the_user, the_avatar, the_text);
-	UPDATE tables SET last_message = LAST_INSERT_ID() WHERE id = the_table;
+	INSERT INTO messages (campaign_id, user_id, avatar, text)
+		VALUES (the_campaign, the_user, the_avatar, the_text);
+	UPDATE campaigns SET last_message = LAST_INSERT_ID() WHERE id = the_campaign;
 	COMMIT;
 END;
 
-/* User joins a table (the_last_message = 0)
+/* User joins a campaign (the_last_message = 0)
 or User looks for new messages
 	(the_last_message = id of the most recent message already seen by user)
-or Admin views all messages at a table (the_last_message = 0) */
-CREATE PROCEDURE read_messages (IN the_table INT, IN the_last_message INT)
+or Admin views all messages in a campaign (the_last_message = 0) */
+CREATE PROCEDURE read_messages (IN the_campaign INT, IN the_last_message INT)
 BEGIN
 	START TRANSACTION; /* TODO: is this needed ? */
 	DELETE FROM messages WHERE time_stamp < DATE_SUB(NOW(), INTERVAL 6 HOUR);
-	SELECT id, table_id, user_id, avatar, text, UNIX_TIMESTAMP(time) AS time 
-		FROM messages WHERE table_id = the_table AND id > the_last_message
+	SELECT id, campaign_id, user_id, avatar, text, UNIX_TIMESTAMP(time) AS time 
+		FROM messages WHERE campaign_id = the_campaign AND id > the_last_message
 		ORDER BY id ASC;
 	COMMIT;
 END;
 
-/* Admin deletes old messages because no users have viewed tables recently */
+/* Admin deletes old messages because no users have viewed campaigns recently */
 /* TODO: how can we call this at some regular interval? */
 CREATE PROCEDURE delete_messages_expired ()
 BEGIN
@@ -729,7 +764,7 @@ END;
 /* User creates a new map */
 CREATE PROCEDURE create_map (IN the_user INT, IN the_type TEXT,
 	IN the_rows SMALLINT, IN the_columns SMALLINT,
-	IN the_bg_id INT, IN the_bg_url TEXT, IN the_tile TEXT, IN the_name TEXT)
+	IN the_background TEXT, IN the_tile TEXT, IN the_name TEXT)
 BEGIN
 	DECLARE new_map_id INT;
 	DECLARE loop_row INT;
@@ -737,8 +772,8 @@ BEGIN
 	START TRANSACTION;
 /* create the map */
 	INSERT INTO maps 
-		(type, tile_rows, tile_columns, background_id, background_url, name)
-	VALUES (the_type, the_rows, the_columns, the_bg_id, the_bg_url, the_name);
+		(type, tile_rows, tile_columns, background, name)
+	VALUES (the_type, the_rows, the_columns, the_background, the_name);
 	SET new_map_id = LAST_INSERT_ID();
 /* make the user an owner */
 	INSERT INTO map_owners (user_id, map_id) VALUES (the_user, new_map_id);
@@ -769,9 +804,8 @@ END;
 or User polls for changes to the map, its pieces and tiles */
 CREATE PROCEDURE read_map (IN the_map INT)
 BEGIN
-	SELECT id, name, type, tile_rows, tile_columns,
-		background_id, background_url, min_zoom, max_zoom,
-		min_rotate, max_rotate, min_tilt, max_tilt,
+	SELECT id, name, type, tile_rows, tile_columns, background,
+		min_zoom, max_zoom, min_rotate, max_rotate, min_tilt, max_tilt,
 		grid_thickness, grid_color, wall_thickness, wall_color, 
 		door_thickness, door_color,
 		UNIX_TIMESTAMP(piece_stamp) AS piece_stamp,
@@ -782,8 +816,7 @@ END;
 /* User changes map settings */
 CREATE PROCEDURE update_map (IN the_map INT, IN the_name TEXT,
 	IN the_type TEXT, IN the_left SMALLINT, IN the_top SMALLINT,
-	IN the_right SMALLINT, IN the_bottom SMALLINT,
-	IN the_background_id TEXT, IN the_background_url TEXT,
+	IN the_right SMALLINT, IN the_bottom SMALLINT, IN the_background TEXT,
 	IN the_min_zoom FLOAT,      IN the_max_zoom FLOAT,
 	IN the_min_rotate SMALLINT, IN the_max_rotate SMALLINT,
 	IN the_min_tilt SMALLINT,   IN the_max_tilt SMALLINT,
@@ -800,8 +833,7 @@ BEGIN
 	SET height = the_bottom - the_top;
 /* update map properties */
 	UPDATE maps SET name = the_name, type = the_type,
-		tile_rows = height, tile_columns = width,
-		background_id = the_background_id, background_url = the_background_url,
+		tile_rows = height, tile_columns = width, background = the_background,
 		min_zoom   = the_min_zoom,   max_zoom   = the_max_zoom,
 		min_rotate = the_min_rotate, max_rotate = the_max_rotate,
 		min_tilt   = the_min_tilt,   max_tilt   = the_max_tilt,
@@ -818,7 +850,7 @@ BEGIN
 /* shift coordinates to post-resize coordinate system */
 	UPDATE tiles SET x = x - the_left, y = y - the_top WHERE map_id = the_map;
 	UPDATE walls SET x = x - the_left, y = y - the_top WHERE map_id = the_map;
-	UPDATE peices SET x = x - the_left, y = y - the_top WHERE map_id = the_map;
+	UPDATE pieces SET x = x - the_left, y = y - the_top WHERE map_id = the_map;
 /* add new tile rows and columns */
 /* TODO: default tile when resizing instead of null? */
 	SET loop_row = 0;
@@ -870,18 +902,13 @@ END;
 /*** PIECE PROCEDURES ***/
 
 /* User creates a new piece */
-CREATE PROCEDURE create_piece (IN the_map INT, IN the_image_id INT,
-	IN the_image_url INT, IN the_name TEXT, IN the_x FLOAT, IN the_y FLOAT,
-	IN the_x_center INT, IN the_y_center INT,
-	IN the_x_tiles FLOAT, IN the_y_tiles FLOAT, IN the_scale FLOAT,
-	IN the_character INT, IN the_color TEXT)
+CREATE PROCEDURE create_piece (IN the_map INT, IN the_image TEXT,
+	IN the_name TEXT, IN the_x FLOAT, IN the_y FLOAT, IN the_character INT,
+	IN the_color TEXT)
 BEGIN
 	START TRANSACTION;
-	INSERT INTO pieces (map_id, image_id, image_url, name, x, y, x_center, 
-			y_center, x_tiles, y_tiles, scale, character_id, markers, color)
-		VALUES (the_map, the_image_id, the_image_url, the_name, the_x, the_y,
-			the_x_center, the_y_center, the_x_tiles, the_y_tiles, the_scale,
-			the_character, the_color);
+	INSERT INTO pieces (map_id, image, name, x, y, character_id, markers, color)
+		VALUES (the_map, the_image, the_name, the_x, the_y,	the_character, the_color);
 	UPDATE maps SET piece_stamp = NOW() WHERE id = the_map;
 	COMMIT;
 END;
@@ -893,19 +920,25 @@ BEGIN
 	SELECT * FROM pieces WHERE map_id = the_map ORDER BY name, user_id;
 END;
 
-/* User moves a piece
-or User modifies a piece's settings */
-CREATE PROCEDURE update_piece (IN the_piece INT, IN the_image INT,
-	IN the_name TEXT, IN the_x FLOAT, IN the_y FLOAT,
-	IN the_x_center INT, IN the_y_center INT,
-	IN the_x_tiles FLOAT, IN the_y_tiles FLOAT, IN the_scale FLOAT,
-	IN the_character INT, IN the_color TEXT)
+/* User moves a piece */
+CREATE PROCEDURE update_piece_position
+	(IN the_piece INT, IN the_x FLOAT, IN the_y FLOAT)
 BEGIN
 	START TRANSACTION;
-	UPDATE pieces SET image_id = the_image, name = the_name,
-		x = the_x, y = the_y, x_center = the_x_center, y_center = the_y_center,
-		x_tiles = the_x_tiles, y_tiles = the_y_tiles, scale = the_scale,
-		character_id = the_character, color = the_color
+	UPDATE pieces SET x = the_x, y = the_y WHERE id = the_piece;
+	UPDATE maps SET piece_stamp = NOW() WHERE id = (
+		SELECT map_id FROM pieces WHERE id = the_piece);
+	COMMIT;
+END;
+
+/* User modifies a piece's settings */
+CREATE PROCEDURE update_piece (IN the_piece INT, IN the_image TEXT,
+	IN the_name TEXT, IN the_character INT, IN the_locked TINYINT,
+	IN the_markers TEXT, IN the_color TEXT)
+BEGIN
+	START TRANSACTION;
+	UPDATE pieces SET image = the_image, name = the_name, locked = the_locked,
+		character_id = the_character, markers = the_markers, color = the_color
 		WHERE id = the_piece;
 	UPDATE maps SET piece_stamp = NOW() WHERE id = (
 		SELECT map_id FROM pieces WHERE id = the_piece);
@@ -1000,16 +1033,14 @@ END;
 /* User creates a new character */
 CREATE PROCEDURE create_character (IN the_user INT, IN the_name TEXT,
 	IN the_system TEXT, IN the_stats TEXT, IN the_notes TEXT,
-	IN the_portrait_id INT, IN the_prortrait_url TEXT,
-	IN the_piece_image_id INT, IN the_piece_image_url TEXT, IN color TEXT)
+	IN the_portrait TEXT, IN the_piece TEXT, IN color TEXT)
 BEGIN
 	DECLARE new_character_id INT;
 	START TRANSACTION;
 /* create the character */
-	INSERT INTO characters (name, system, stats, notes, portrait_id,
-		portrait_url, piece_image_id, piece_image_url, color)
-		VALUES (the_name, the_system, the_stats, the_notes, the_portrait_id,
-		the_portrait_url, the_piece_image_id, the_piece_image_url, the_color);
+	INSERT INTO characters (name, system, stats, notes, portrait, piece, color)
+		VALUES (the_name, the_system, the_stats, the_notes, the_portrait,
+		the_piece, the_color);
 	SELECT new_character_id = LAST_INSERT_ID();
 /* make this user the character's owner */
 	INSERT INTO character_owners (user_id, character_id)
@@ -1022,8 +1053,7 @@ END;
 /* User views a list of characters he owns */
 CREATE PROCEDURE read_characters (IN the_user INT)
 BEGIN
-	SELECT id, name, system, stats, notes, portrait_id, portrait_url,
-		piece_image_id, piece_image_url, color
+	SELECT id, name, system, stats, notes, portrait, piece, color
 		FROM characters, character_owners
 		WHERE id = character_id AND user_id = the_user;
 END;
@@ -1053,7 +1083,7 @@ BEGIN
 /* remove the character owner */
 	DELETE FROM character_owners
 		WHERE user_id = the_user AND character_id = the_character;	
-/* delete characterss without owners */
+/* delete characters without owners */
 	IF (SELECT COUNT(*) FROM character_owners WHERE user_id = the_user
 		AND character_id = the_character) = 0
 	THEN
