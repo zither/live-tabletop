@@ -321,11 +321,11 @@ CREATE TABLE pieces (
 	map_id INT NOT NULL,
 	image TEXT,
 	name TEXT,
-	x FLOAT NOT NULL DEFAULT 0,
-	y FLOAT NOT NULL DEFAULT 0,
+	x FLOAT NOT NULL DEFAULT 0.5,
+	y FLOAT NOT NULL DEFAULT 0.5,
 	character_id INT,
 	locked TINYINT NOT NULL DEFAULT 1,
-	markers TEXT NOT NULL, /* DEFAULT '[]' TODO: make this a table? */
+	markers TEXT NOT NULL,
 	color TEXT, /* TODO: do we need this? */
 	FOREIGN KEY (map_id) REFERENCES maps(id) ON DELETE CASCADE
 );
@@ -876,14 +876,15 @@ END;
 /*** PIECE PROCEDURES ***/
 
 /* User creates a new piece */
-CREATE PROCEDURE create_piece (IN the_map INT, IN the_image TEXT,
-	IN the_name TEXT, IN the_x FLOAT, IN the_y FLOAT, IN the_character INT,
-	IN the_color TEXT)
+CREATE PROCEDURE create_piece (IN the_map INT, IN the_image TEXT)
 BEGIN
+	DECLARE new_id INT;
 	START TRANSACTION;
-	INSERT INTO pieces (map_id, image, name, x, y, character_id, markers, color)
-		VALUES (the_map, the_image, the_name, the_x, the_y,	the_character, the_color);
+	INSERT INTO pieces (map_id, image, markers)
+		VALUES (the_map, the_image, '[]');
+	SET new_id = LAST_INSERT_ID();
 	UPDATE maps SET piece_stamp = NOW() WHERE id = the_map;
+	SELECT new_id AS id;
 	COMMIT;
 END;
 
@@ -934,6 +935,7 @@ END;
 /*** CHARACTERS PROCEDURES ***/
 
 /* User creates a new character */
+/* TODO: do we actually need to initialize all these fields? */
 CREATE PROCEDURE create_character (IN the_user INT, IN the_name TEXT,
 	IN the_system TEXT, IN the_stats TEXT, IN the_notes TEXT,
 	IN the_portrait TEXT, IN the_piece TEXT, IN color TEXT)
