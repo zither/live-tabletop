@@ -1,6 +1,6 @@
 /* we remove tables in bottom-up order to avoid foreign key issues */
-DROP TABLE IF EXISTS character_owners, characters, walls, tiles, pieces,
-    map_owners, maps, messages, campaign_users, campaigns, friends, users, admins;
+DROP TABLE IF EXISTS character_owners, characters, pieces, map_owners,
+	maps, messages, campaign_users, campaigns, friends, users, admins;
 
 DROP PROCEDURE IF EXISTS create_admin;
 DROP PROCEDURE IF EXISTS read_admin;
@@ -43,7 +43,11 @@ DROP PROCEDURE IF EXISTS delete_messages_expired;
 
 DROP PROCEDURE IF EXISTS create_map;
 DROP PROCEDURE IF EXISTS read_maps;
+DROP PROCEDURE IF EXISTS read_map_changes;
 DROP PROCEDURE IF EXISTS read_map;
+DROP PROCEDURE IF EXISTS read_map_tiles;
+DROP PROCEDURE IF EXISTS update_map_tiles;
+DROP PROCEDURE IF EXISTS update_map_size;
 DROP PROCEDURE IF EXISTS update_map;
 DROP PROCEDURE IF EXISTS create_map_owner;
 DROP PROCEDURE IF EXISTS read_map_owners;
@@ -53,13 +57,6 @@ DROP PROCEDURE IF EXISTS read_pieces;
 DROP PROCEDURE IF EXISTS update_piece_position;
 DROP PROCEDURE IF EXISTS update_piece;
 DROP PROCEDURE IF EXISTS delete_piece;
-DROP PROCEDURE IF EXISTS read_tiles;
-DROP PROCEDURE IF EXISTS update_tile;
-DROP PROCEDURE IF EXISTS update_tiles_fill_fog;
-DROP PROCEDURE IF EXISTS update_tiles_clear_fog;
-DROP PROCEDURE IF EXISTS create_wall;
-DROP PROCEDURE IF EXISTS read_walls;
-DROP PROCEDURE IF EXISTS delete_wall;
 
 DROP PROCEDURE IF EXISTS create_character;
 DROP PROCEDURE IF EXISTS read_characters;
@@ -70,6 +67,7 @@ DROP PROCEDURE IF EXISTS delete_character_owner;
   /***************************************************************************/
  /******************************* T A B L E S *******************************/
 /***************************************************************************/
+
 
 /* ADMINS TABLE
 
@@ -132,6 +130,7 @@ CREATE TABLE users (
 	email TEXT,
 	subscribed TINYINT NOT NULL DEFAULT 0
 );
+
 
 /* FRIENDS TABLE
 
@@ -226,11 +225,25 @@ CREATE TABLE messages (
 
 	Maps are graphical things with pieces, background images and tiles.
 
-	grid_style: width, color...?
-	wall_style: width, color...? (TODO: also door style?)
-	type: “hex” or “square”
-	min/max zoom, rotate and tilt
+	name: an optional name to help identify the map
+		(only visible to map and campaign owners?)
+	type: "hex" or "square"
+	tile_rows/columns: height and width of the map, in grid units
 	background: image JSON data. See piece.image. No base; Probably no view.
+	min/max zoom, rotate and tilt: allowed viewing options
+	grid/wall/door thickness and color: style for grid and wall overlay
+	tiles: JSON array containing the image ids of each tile in the map
+	flags: string of characters representing fog, walls and doors of each tile
+		symbol  0ABCDEFGHIJKLMNOPQRSTUVWXYZ1abcdefghijklmnopqrstuvwxyz
+		fog                                ***************************
+		S wall           *********                  *********
+		S door                    *********                  *********
+		E wall     ***      ***      ***      ***      ***      ***   
+		E door        ***      ***      ***      ***      ***      ***
+		SE wall    ***      ***      ***      ***      ***      ***   
+		SE door       ***      ***      ***      ***      ***      ***
+		NE wall  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * 
+		NE door   *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
 */
 
 CREATE TABLE maps (
@@ -253,7 +266,9 @@ CREATE TABLE maps (
 	door_thickness TINYINT NOT NULL DEFAULT 3, /* TODO: Is this needed? */
 	door_color TEXT,
 	piece_stamp DATETIME,
-	tile_stamp DATETIME
+	tile_stamp DATETIME,
+	tiles TEXT,
+	flags TEXT
 );
 
 
@@ -315,45 +330,6 @@ CREATE TABLE pieces (
 	FOREIGN KEY (map_id) REFERENCES maps(id) ON DELETE CASCADE
 );
 
-/* TILES TABLE
-
-	map_id: the map this tile is a part of
-	x: the column this tile appears in
-	y: the row this tile belongs to
-	image_id: the image id/class of the this tile or null if it is empty
-	fog: 1 if there is fog of war on this tile or 0 if there is not
-*/
-
-CREATE TABLE tiles (
-	map_id INT NOT NULL,
-	x SMALLINT NOT NULL,
-	y SMALLINT NOT NULL,
-	image_id INT,
-	fog TINYINT NOT NULL DEFAULT 0,
-	FOREIGN KEY (map_id) REFERENCES maps(id) ON DELETE CASCADE,
-	PRIMARY KEY (map_id, x, y)
-);
-
-
-/* WALLS TABLE
-
-	map_id: this map
-	x: -1 .. the number of tile columns in this map
-	y: -1 .. the number of tile rows in this map
-	direction: "s" (bottom), "e" (right), "se" or "ne"
-	contents: "wall" or "door"
-*/
-
-CREATE TABLE walls (
-	map_id INT NOT NULL,
-	x SMALLINT NOT NULL,
-	y SMALLINT NOT NULL,
-	direction VARCHAR(2) NOT NULL,
-	contents TEXT NOT NULL,
-	FOREIGN KEY (map_id) REFERENCES maps(id) ON DELETE CASCADE,
-	PRIMARY KEY (map_id, x, y, direction)
-);
-
 
 /* CHARACTERS TABLE
 
@@ -382,6 +358,7 @@ CREATE TABLE characters (
 	color TEXT
 );
 
+
 /* CHARACTER_OWNERS TABLE
 
 	Users who have permission to edit this character, move pieces linked to this character,
@@ -400,6 +377,7 @@ CREATE TABLE character_owners (
   /***************************************************************************/
  /*************************** P R O C E D U R E S ***************************/
 /***************************************************************************/
+
 
 /*** ADMINS PROCEDURES ***/
 
@@ -525,8 +503,6 @@ handled by ON DELETE CASCADE when you delete the campaign:
 	DELETE FROM messages WHERE campaign_id NOT IN (SELECT id FROM campaigns);
 handled by ON DELETE CASCADE when you delete the map:
 	DELETE FROM pieces WHERE map_id NOT IN (SELECT id FROM maps);
-	DELETE FROM tiles WHERE map_id NOT IN (SELECT id FROM maps);
-	DELETE FROM walls WHERE map_id NOT IN (SELECT id FROM maps);
 */
 	COMMIT;
 END;
@@ -763,31 +739,19 @@ END;
 
 /* User creates a new map */
 CREATE PROCEDURE create_map (IN the_user INT, IN the_type TEXT,
-	IN the_rows SMALLINT, IN the_columns SMALLINT,
-	IN the_background TEXT, IN the_tile TEXT, IN the_name TEXT)
+	IN the_rows SMALLINT, IN the_columns SMALLINT, IN the_background TEXT,
+	IN the_name TEXT, IN the_tiles TEXT, IN the_flags TEXT)
 BEGIN
 	DECLARE new_map_id INT;
-	DECLARE loop_row INT;
-	DECLARE loop_column INT;
 	START TRANSACTION;
 /* create the map */
 	INSERT INTO maps 
-		(type, tile_rows, tile_columns, background, name)
-	VALUES (the_type, the_rows, the_columns, the_background, the_name);
+		(type, tile_rows, tile_columns, background, name, tiles, flags)
+	VALUES (the_type, the_rows, the_columns, the_background, the_name,
+		the_tiles, the_flags);
 	SET new_map_id = LAST_INSERT_ID();
 /* make the user an owner */
 	INSERT INTO map_owners (user_id, map_id) VALUES (the_user, new_map_id);
-/* create the tiles */
-	SET loop_row = 0;
-	WHILE loop_row < the_rows DO
-		SET loop_column = 0;
-		WHILE loop_column < the_columns DO
-			INSERT INTO tiles (x, y, image_id, map_id)
-				VALUES (loop_column, loop_row, the_tile, new_map_id);
-			SET loop_column = loop_column + 1;
-		END WHILE;
-		SET loop_row = loop_row + 1;
-	END WHILE;
 /* return the new map's id */
 	SELECT new_map_id AS id;
 	COMMIT;
@@ -800,9 +764,8 @@ BEGIN
 		FROM maps, map_owners WHERE id = map_id and user_id = the_user;
 END;
 
-/* User loads a map
-or User polls for changes to the map, its pieces and tiles */
-CREATE PROCEDURE read_map (IN the_map INT)
+/* User polls for changes to the map, its pieces and tiles */
+CREATE PROCEDURE read_map_changes (IN the_map INT)
 BEGIN
 	SELECT id, name, type, tile_rows, tile_columns, background,
 		min_zoom, max_zoom, min_rotate, max_rotate, min_tilt, max_tilt,
@@ -813,10 +776,52 @@ BEGIN
 		FROM maps WHERE map_id = the_map;
 END;
 
+/* User opens a map
+or User refreshes an updated map */
+CREATE PROCEDURE read_map (IN the_map INT)
+BEGIN
+	SELECT id, name, type, tile_rows, tile_columns, background,
+		min_zoom, max_zoom, min_rotate, max_rotate, min_tilt, max_tilt,
+		grid_thickness, grid_color, wall_thickness, wall_color, 
+		door_thickness, door_color,
+		UNIX_TIMESTAMP(piece_stamp) AS piece_stamp,
+		UNIX_TIMESTAMP(tile_stamp) AS tile_stamp, tiles, flags
+		FROM map WHERE map_id = the_map;
+END;
+
+/* User paints or erases tiles, fog or walls */
+CREATE PROCEDURE read_map_tiles (IN the_map INT)
+BEGIN
+	SELECT tile_rows, tile_columns, tiles, flags FROM map WHERE map_id = the_map
+		FOR UPDATE; /* lock row so simultaneous edits don't cancel each other */
+END;
+
+/* User paints or erases tiles, fog or walls */
+CREATE PROCEDURE update_map_tiles
+	(IN the_map INT, IN the_tiles TEXT, IN the_flags TEXT)
+BEGIN
+	UPDATE maps SET tile_stamp = NOW(), tiles = the_tiles, flags = the_flags
+		WHERE id = the_map;
+END;
+
+/* User resizes a map */
+CREATE PROCEDURE update_map_size (IN the_map INT, IN the_left SMALLINT,
+	IN the_top SMALLINT, IN the_right SMALLINT, IN the_bottom SMALLINT,
+	IN the_tiles TEXT, IN the_flags TEXT)
+BEGIN
+	START TRANSACTION;
+/* update map properties */
+	UPDATE maps SET tile_rows = the_bottom - the_top,
+		tile_columns = the_right - the_left, tiles = the_tiles, flags = the_flags
+		WHERE id = the_map;
+/* shift coordinates to post-resize coordinate system */
+	UPDATE pieces SET x = x - the_left, y = y - the_top WHERE map_id = the_map;
+	COMMIT;
+END;
+
 /* User changes map settings */
-CREATE PROCEDURE update_map (IN the_map INT, IN the_name TEXT,
-	IN the_type TEXT, IN the_left SMALLINT, IN the_top SMALLINT,
-	IN the_right SMALLINT, IN the_bottom SMALLINT, IN the_background TEXT,
+CREATE PROCEDURE update_map (IN the_map INT,
+	IN the_name TEXT, IN the_type TEXT, IN the_background TEXT,
 	IN the_min_zoom FLOAT,      IN the_max_zoom FLOAT,
 	IN the_min_rotate SMALLINT, IN the_max_rotate SMALLINT,
 	IN the_min_tilt SMALLINT,   IN the_max_tilt SMALLINT,
@@ -824,16 +829,8 @@ CREATE PROCEDURE update_map (IN the_map INT, IN the_name TEXT,
 	IN the_wall_thickness TINYINT, IN the_wall_color TEXT,
 	IN the_door_thickness TINYINT, IN the_door_color TEXT)
 BEGIN
-	DECLARE loop_row INT;
-	DECLARE loop_column INT;
-	DECLARE width SMALLINT;
-	DECLARE height SMALLINT;
-	START TRANSACTION;
-	SET width = the_right - the_left;
-	SET height = the_bottom - the_top;
-/* update map properties */
-	UPDATE maps SET name = the_name, type = the_type,
-		tile_rows = height, tile_columns = width, background = the_background,
+	UPDATE maps SET
+		name = the_name, type = the_type, background = the_background,
 		min_zoom   = the_min_zoom,   max_zoom   = the_max_zoom,
 		min_rotate = the_min_rotate, max_rotate = the_max_rotate,
 		min_tilt   = the_min_tilt,   max_tilt   = the_max_tilt,
@@ -841,29 +838,6 @@ BEGIN
 		wall_thickness = the_wall_thickness, wall_color = the_wall_color,
 		door_thickness = the_door_thickness, door_color = the_door_color
 		WHERE id = the_map;
-/* delete tiles and walls outside the new rectangle */
-	DELETE FROM tiles WHERE map_id = the_map AND 
-		(x < the_left OR x >= the_right OR y < the_top OR y >= the_bottom);
-	DELETE FROM walls WHERE map_id = the_map AND 
-		(x < the_left OR x >= the_right OR y < the_top OR y >= the_bottom);
-/* TODO: what to do about pieces outside the rectangle? */
-/* shift coordinates to post-resize coordinate system */
-	UPDATE tiles SET x = x - the_left, y = y - the_top WHERE map_id = the_map;
-	UPDATE walls SET x = x - the_left, y = y - the_top WHERE map_id = the_map;
-	UPDATE pieces SET x = x - the_left, y = y - the_top WHERE map_id = the_map;
-/* add new tile rows and columns */
-/* TODO: default tile when resizing instead of null? */
-	SET loop_row = 0;
-	WHILE loop_row < height DO
-		SET loop_column = 0;
-		WHILE loop_column < width DO
-			INSERT IGNORE INTO tiles (x, y, image_id, map_id)
-				VALUES (loop_column, loop_row, null, the_map);
-			SET loop_column = loop_column + 1;
-		END WHILE;
-		SET loop_row = loop_row + 1;
-	END WHILE;
-	COMMIT;
 END;
 
 
@@ -953,77 +927,6 @@ BEGIN
 	SELECT my_map_id = map_id FROM pieces WHERE id = the_piece;
 	UPDATE maps SET piece_stamp = NOW() WHERE id = my_map_id;
 	DELETE FROM pieces WHERE id = the_piece;
-	COMMIT;
-END;
-
-/*** TILES PROCEDURES ***/
-
-/* User opens a map
-or User refreshes and updated map */
-CREATE PROCEDURE read_tiles (IN the_map INT)
-BEGIN
-	SELECT image_id, fog FROM tiles WHERE map_id = the_map
-		ORDER BY y, x ASC;
-END;
-
-/* User paints or erases tiles */
-CREATE PROCEDURE update_tile (IN the_map INT, IN the_x SMALLINT,
-	IN the_y SMALLINT, IN the_image INT, IN the_fog TINYINT)
-BEGIN
-	START TRANSACTION;
-	UPDATE tiles SET image_id = the_image, fog = the_fog
-		WHERE x = the_x AND y = the_y AND map_id = the_map;
-	UPDATE maps SET tile_stamp = NOW() WHERE id = the_map;
-	COMMIT;
-END;
-
-/* User covers the map with fog */
-CREATE PROCEDURE update_tiles_fill_fog (IN the_map INT)
-BEGIN
-	START TRANSACTION;
-	UPDATE tiles SET fog = 1 WHERE map_id = the_map;
-	UPDATE maps SET tile_stamp = NOW() WHERE id = the_map;
-	COMMIT;
-END;
-
-/* User removes all the fog from the map */
-CREATE PROCEDURE update_tiles_clear_fog (IN the_map INT)
-BEGIN
-	START TRANSACTION;
-	UPDATE tiles SET fog = 0 WHERE map_id = the_map;
-	UPDATE maps SET tile_stamp = NOW() WHERE id = the_map;
-	COMMIT;
-END;
-
-
-/*** WALLS PROCEDURES ***/
-
-/* User paints walls and doors */
-CREATE PROCEDURE create_wall (IN the_map INT, IN the_x SMALLINT,
-	IN the_y SMALLINT, IN the_direction VARCHAR(2), IN the_contents TEXT)
-BEGIN
-	START TRANSACTION;
-	REPLACE INTO walls (map_id, x, y, direction, contents)
-	VALUES (the_map, the_x, the_y, the_direction, the_contents);
-	UPDATE maps SET wall_stamp = NOW() WHERE id = the_map;
-	COMMIT;
-END;
-
-/* User opens a map
-or User refreshes and updated map */
-CREATE PROCEDURE read_walls (IN the_map INT)
-BEGIN
-	SELECT * FROM walls WHERE map_id = the_map;
-END;
-
-/* User erases walls and doors */
-CREATE PROCEDURE delete_wall (IN the_map INT, IN the_x SMALLINT,
-	IN the_y SMALLINT, IN the_direction VARCHAR(2))
-BEGIN
-	START TRANSACTION;
-	DELETE FROM walls WHERE map_id = the_map AND x = the_x
-		AND y = the_y AND direction = the_direction;
-	UPDATE maps SET wall_stamp = NOW() WHERE id = the_map;
 	COMMIT;
 END;
 

@@ -1,22 +1,21 @@
-<?php // User joins a campaign or looks for new messages
+<?php // User disowns a map or removes another user from the map's owners
 
 session_start();
 if (!isset($_SESSION['user_id'])) die ('You are not logged in.');
 
 include('db_config.php');
 include('include/query.php');
-include('include/ownership.php');
+include('include/permissions.php');
 
 // Interpret the Request
 
-$campaign = $LT_SQL->real_escape_string($_REQUEST['campaign']);
-$last_message_id = $LT_SQL->real_escape_string($_REQUEST['last_message_id']);
+$map = intval($_REQUEST['map']);
 
 // Query the Database
 
-if (LT_can_view_campaign($campaign)) {
-	if ($rows = LT_call('read_messages', $campaign, $last_message_id)) {
-		$string_fields = array('text');
+if (LT_can_edit_map($map)) {
+	if ($rows = LT_call('read_map_owners', $map)) {
+		$string_fields = array('login', 'name', 'color');
 		foreach ($rows as $i => $fields)
 			foreach ($fields as $key => $value)
 				if (!in_array($key, $string_fields))
