@@ -1,22 +1,19 @@
-<?php
+<?php // User moves a piece
 
 session_start();
 if (!isset($_SESSION['user_id'])) die ('You are not logged in.');
 
 include('db_config.php');
 include('include/query.php');
+include('include/permissions.php');
 
 // Interpret the Request
 
-$table_id = $LT_SQL->real_escape_string($_REQUEST['table_id']);
+$piece = intval($_REQUEST['piece']);
 
 // Query the Database
 
-$rows = LT_call('read_table', $table_id);
-
-// Generate Output
-
-include('include/tables.php');
-LT_write_tables($rows);
+if (LT_can_edit_piece($peice))
+	LT_call('delete_piece', $piece);
 
 ?>
