@@ -2,7 +2,7 @@
 
 if (file_exists('db_config.php')) die ("Live Tabletop is already installed.");
 
-include('include/users.php');
+include('include/password.php');
 
 
 // Interpret the Request
@@ -15,7 +15,7 @@ $LT_SQL = new mysqli($location, $username, $password);
 if ($LT_SQL->connect_errno != 0) die('Could not connect.');
 
 $database = $LT_SQL->real_escape_string($_REQUEST['database']);
-$admin_username = $LT_SQL->real_escape_string($_REQUEST['admin_username']);
+$admin_login = $LT_SQL->real_escape_string($_REQUEST['admin_login']);
 $admin_password = $LT_SQL->real_escape_string($_REQUEST['admin_password']);
 
 $LT_SQL->query("CREATE DATABASE IF NOT EXISTS $database")
@@ -35,7 +35,7 @@ if ($LT_SQL->multi_query(file_get_contents('include/schema.sql'))) {
       $LT_SQL->rollback();
       die("Query failed: " . $LT_SQL->error);
     }
-  } while ($LT_SQL->next_result());
+  } while ($LT_SQL->more_results() && $LT_SQL->next_result());
   $LT_SQL->commit();
 }
 else {
@@ -48,7 +48,7 @@ else {
 
 $salt = LT_random_salt();
 $hash = LT_hash_password($admin_password, $salt);
-$query = "CALL create_admin('$admin_username', '$hash', '$salt')";
+$query = "CALL create_admin('$admin_login', '$hash', '$salt')";
 $LT_SQL->query($query) or die('Query failed: ' . $LT_SQL->error);
 $LT_SQL->commit();
 
