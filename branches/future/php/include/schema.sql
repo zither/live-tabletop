@@ -5,6 +5,7 @@ DROP TABLE IF EXISTS character_owners, characters, pieces, map_owners,
 DROP PROCEDURE IF EXISTS create_admin;
 DROP PROCEDURE IF EXISTS read_admin;
 DROP PROCEDURE IF EXISTS update_admin_password;
+DROP PROCEDURE IF EXISTS delete_admin;
 
 DROP PROCEDURE IF EXISTS create_user;
 DROP PROCEDURE IF EXISTS read_user_login;
@@ -215,7 +216,7 @@ CREATE TABLE messages (
 	user_id INT NOT NULL,
 	avatar INT,
 	text TEXT,
-	time_stamp TIMESTAMP,
+	time TIMESTAMP,
 	FOREIGN KEY (campaign_id) REFERENCES campaigns(id) ON DELETE CASCADE,
 	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
@@ -386,17 +387,14 @@ or Admin creates an account for another admin. */
 CREATE PROCEDURE create_admin
 	(IN the_login VARCHAR(200), IN the_hash TEXT, IN the_salt TEXT)
 BEGIN
-	START TRANSACTION;
 	INSERT INTO admins (login, hash, salt)
 		VALUES (the_login, the_hash, the_salt);
-	SELECT LAST_INSERT_ID() as id;
-	COMMIT;
 END;
 
 /* Admin logs in and PHP logic validates his password  */
 CREATE PROCEDURE read_admin (IN the_login VARCHAR(200))
 BEGIN
-	SELECT id, hash, salt FROM admins WHERE login = the_login;
+	SELECT hash, salt FROM admins WHERE login = the_login;
 END;
 
 /* Admin changes his password
@@ -404,7 +402,14 @@ or Admin changes another admin's password? */
 CREATE PROCEDURE update_admin_password
 	(IN the_admin INT, IN the_hash TEXT, IN the_salt TEXT)
 BEGIN
-	UPDATE admins SET hash = the_hash, salt = the_salt WHERE id = the_admin;
+	UPDATE admins SET hash = the_hash, salt = the_salt WHERE login = the_admin;
+END;
+
+/* Admin deletes his own account
+or Admin deletes another admin's ac */
+CREATE PROCEDURE delete_admin (IN the_login VARCHAR(200))
+BEGIN
+	DELETE FROM admins WHERE login = the_login;
 END;
 
 
@@ -442,7 +447,7 @@ END;
 CREATE PROCEDURE read_users ()
 BEGIN
 	SELECT id, login, hash, salt, UNIX_TIMESTAMP(last_action) AS last_action,
-		logged_in, name, color, e-mail, subscribed
+		logged_in, name, color, email, subscribed
 		FROM users ORDER BY name, login, id;
 END;
 
@@ -720,7 +725,7 @@ or Admin views all messages in a campaign (the_last_message = 0) */
 CREATE PROCEDURE read_messages (IN the_campaign INT, IN the_last_message INT)
 BEGIN
 	START TRANSACTION; /* TODO: is this needed ? */
-	DELETE FROM messages WHERE time_stamp < DATE_SUB(NOW(), INTERVAL 6 HOUR);
+	DELETE FROM messages WHERE time < DATE_SUB(NOW(), INTERVAL 6 HOUR);
 	SELECT id, campaign_id, user_id, avatar, text, UNIX_TIMESTAMP(time) AS time 
 		FROM messages WHERE campaign_id = the_campaign AND id > the_last_message
 		ORDER BY id ASC;
@@ -731,7 +736,7 @@ END;
 /* TODO: how can we call this at some regular interval? */
 CREATE PROCEDURE delete_messages_expired ()
 BEGIN
-	DELETE FROM messages WHERE time_stamp < DATE_SUB(NOW(), INTERVAL 6 HOUR);
+	DELETE FROM messages WHERE time < DATE_SUB(NOW(), INTERVAL 6 HOUR);
 END;
 
 

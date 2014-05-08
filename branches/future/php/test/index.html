@@ -26,11 +26,17 @@ TEST.TABLE_ARGS = {
 	wall_thickness: 3,
 	wall_color: "black",
 };
-TEST.INSTALL_ARGS = {admin_login: "nymduh", admin_password: "draosup"};
+TEST.ADMIN = {login: "nymduh", password: "draosup"};
+TEST.ADMIN2 = {login: "admin2", password: "password2"};
+TEST.INSTALL_ARGS = {
+	admin_login: TEST.ADMIN.login,
+	admin_password: TEST.ADMIN.password,
+};
 
 // list of tests
 TEST.tests = [
 
+	// INSTALL
 	{group: "INSTALL",
 		action: "../install.php",
 		abort: true,
@@ -38,23 +44,78 @@ TEST.tests = [
 		result: TEST.blank},
 	{action: "../db_config.php", args: {}, result: TEST.exists},
 
+	// clear session variables
+	{action: "../Admin.logout.php", args: {}, result: TEST.exists},
+	{action: "../User.logout.php", args: {}, result: TEST.exists},
 
 	// ADMIN
 
-	{group: "ADMIN.CREATE", action: "../Admin.create.php", args: {}, result: TEST.unimplemented},
-	{group: "ADMIN.LOGIN", action: "../Admin.login.php", args: {}, result: TEST.unimplemented},
-	{group: "ADMIN.LOGOUT", action: "../Admin.logout.php", args: {}, result: TEST.unimplemented},
-	{group: "ADMIN.PASSWORD", action: "../Admin.password.php", args: {}, result: TEST.unimplemented},
+	{group: "ADMIN.CREATE", action: "../Admin.create.php", args: TEST.ADMIN2, result: TEST.logged_out},
+	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
+	{action: "../Admin.create.php", args: TEST.ADMIN2, result: TEST.blank},
+	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
 
-	{group: "ADMIN.CAMPAIGNS", action: "../Admin.campaigns.php", args: {}, result: TEST.unimplemented},
-	{group: "ADMIN.MESSAGES", action: "../Admin.messages.php", args: {}, result: TEST.unimplemented},
-	{group: "ADMIN.EXPIRE MESSAGES", action: "../Admin.expireMessages.php", args: {}, result: TEST.unimplemented},
-	{group: "ADMIN.DELETE CAMPAIGN", action: "../Admin.deleteCampaign.php", args: {}, result: TEST.unimplemented},
+	{group: "ADMIN.LOGIN", action: "../Admin.login.php", args: {login: "admin2", password: "wrong"}, result: TEST.unauthorized},
+	{action: "../Admin.login.php", args: {login: "wrong", password: "password2"}, result: TEST.unauthorized},
+	{action: "../Admin.login.php", args: TEST.ADMIN2, result: TEST.blank},
+	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
 
-	{group: "ADMIN.USERS", action: "../Admin.users.php", args: {}, result: TEST.zero},
-	{group: "ADMIN.FRIENDS", action: "../Admin.friends.php", args: {}, result: TEST.unimplemented},
-	{group: "ADMIN.USER PASSWORD", action: "../Admin.userPassword.php", args: {}, result: TEST.unimplemented},
-	{group: "ADMIN.DELETE USER", action: "../Admin.deleteUser.php", args: {}, result: TEST.unimplemented},
+	{group: "ADMIN.LOGOUT", action: "../Admin.logout.php", args: {}, result: TEST.blank},
+	{action: "../Admin.create.php", args: TEST.ADMIN2, result: TEST.logged_out},
+
+	{group: "ADMIN.DELETE", action: "../Admin.delete.php", args: {login: "admin2"}, result: TEST.logged_out},
+	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
+	{action: "../Admin.delete.php", args: {login: "admin2"}, result: TEST.blank},
+	{action: "../Admin.login.php", args: TEST.ADMIN2, result: TEST.unauthorized},
+	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
+
+	{group: "ADMIN.PASSWORD", action: "../Admin.password.php", args: {password: "newPassword"}, result: TEST.logged_out},
+	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
+	{action: "../Admin.password.php", args: {password: "newPassword"}, result: TEST.blank},
+	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
+	{action: "../Admin.login.php", args: {login: TEST.ADMIN.login, password: "newPassword"}, result: TEST.blank},
+	{action: "../Admin.password.php", args: {password: TEST.ADMIN.password}, result: TEST.blank},
+	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
+
+	{group: "ADMIN.CAMPAIGNS", action: "../Admin.campaigns.php", args: {}, result: TEST.logged_out},
+	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
+	{action: "../Admin.campaigns.php", args: {}, result: TEST.unimplemented},
+	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
+
+	{group: "ADMIN.MESSAGES", action: "../Admin.messages.php", args: {}, result: TEST.logged_out},
+	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
+	{action: "../Admin.messages.php", args: {campaign: 0}, result: TEST.unimplemented},
+	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
+
+	{group: "ADMIN.EXPIRE MESSAGES", action: "../Admin.expireMessages.php", args: {}, result: TEST.logged_out},
+	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
+	{action: "../Admin.expireMessages.php", args: {}, result: TEST.unimplemented},
+	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
+
+	{group: "ADMIN.DELETE CAMPAIGN", action: "../Admin.deleteCampaign.php", args: {}, result: TEST.logged_out},
+	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
+	{action: "../Admin.deleteCampaign.php", args: {campaign: 0}, result: TEST.unimplemented},
+	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
+
+	{group: "ADMIN.USERS", action: "../Admin.users.php", args: {}, result: TEST.logged_out},
+	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
+	{action: "../Admin.users.php", args: {}, result: TEST.unimplemented},
+	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
+
+	{group: "ADMIN.FRIENDS", action: "../Admin.friends.php", args: {}, result: TEST.logged_out},
+	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
+	{action: "../Admin.friends.php", args: {user: 0}, result: TEST.unimplemented},
+	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
+
+	{group: "ADMIN.USER PASSWORD", action: "../Admin.userPassword.php", args: {}, result: TEST.logged_out},
+	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
+	{action: "../Admin.userPassword.php", args: {user: 0, password: "password"}, result: TEST.unimplemented},
+	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
+
+	{group: "ADMIN.DELETE USER", action: "../Admin.deleteUser.php", args: {}, result: TEST.logged_out},
+	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
+	{action: "../Admin.deleteUser.php", args: {user: 0}, result: TEST.unimplemented},
+	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
 
 
 	// U S E R
@@ -78,8 +139,7 @@ TEST.tests = [
 		result: TEST.blank},
 	{action: "../Campaign.create.php",
 		args: {"name": "My Campaign"},
-		result: function (ajax) {
-			return TEST.string(ajax, "You are not logged in.");}},
+		result: TEST.logged_out},
 	{action: "../User.login.php", args: {},
 		args: {username: TEST.LOGIN, password: TEST.PASSWORD},
 		result: TEST.one},
@@ -128,14 +188,11 @@ TEST.tests = [
 	{action: "../read_users.php",
 		args: {},
 		result: function (ajax) {
-			var users = ajax.responseXML.getElementsByTagName("user");
-			for (var i = 0; i < users.length; i++) {
-				if (users[i].getAttribute("id") == "2"
-					&& decodeURIComponent(users[i].getAttribute("name")) == "moe"
-					&& decodeURIComponent(users[i].getAttribute("color")) == "green"
-					&& decodeURIComponent(users[i].getAttribute("permissions")) == "administrator"
-				) return "PASS";
-			}
+			try {var data = JSON.parse(ajax.responseText);}
+			catch (e) {return "FAIL [parse error: " + e + "]";}
+			for (var i = 0; i < data.length; i++)
+				if (data[i].id == 2 && data[i].name == "moe" && data[i].color == "green")
+					return "PASS";
 			return "FAIL [" + ajax.responseText + "]";}},
 
 	{group: "DELETE USER",
@@ -241,20 +298,10 @@ TEST.tests = [
 	{action: "../read_table.php",
 		args: {table_id: 1},
 		result: function (ajax) {
-			var tables = ajax.responseXML.getElementsByTagName("table");
-			for (var i = 0; i < tables.length; i++) {
-				if (tables[i].getAttribute("id") == "1"
-					&& decodeURIComponent(tables[i].getAttribute("name")) == "My Original Table"
-					&& tables[i].getAttribute("image_id") == "3"
-					&& tables[i].getAttribute("tile_width") == "30"
-					&& tables[i].getAttribute("tile_height") == "20"
-					&& tables[i].getAttribute("grid_thickness") == "2"
-					&& decodeURIComponent(tables[i].getAttribute("grid_color")) == "brown"
-					&& tables[i].getAttribute("wall_thickness") == "1"
-					&& decodeURIComponent(tables[i].getAttribute("wall_color")) == "blue"
-					&& decodeURIComponent(tables[i].getAttribute("tile_mode")) == "isometric"
-				) return "PASS";
-			}
+			try {var data = JSON.parse(ajax.responseText);}
+			catch (e) {return "FAIL [parse error: " + e + "]";}
+			for (var i = 0; i < data.length; i++)
+				if (data[i].id == 1 && data[i].name == "My Original Table") return "PASS";
 			return "FAIL [" + ajax.responseText + "]";}},
 
 	{group: "DELETE TABLE",
@@ -397,21 +444,21 @@ TEST.tests = [
 	{action: "../read_pieces.php",
 		args: {table_id: 1},
 		result: function (ajax) {
-			var pieces = ajax.responseXML.getElementsByTagName("piece");
-			for (var i = 0; i < pieces.length; i++) {
-				if (pieces[i].getAttribute("id") == "1"
-					&& pieces[i].getAttribute("image_id") == "11"
-					&& pieces[i].getAttribute("user_id") == "2"
-					&& decodeURIComponent(pieces[i].getAttribute("name")) == "Still My Piece"
-					&& pieces[i].getAttribute("x") == "99"
-					&& pieces[i].getAttribute("y") == "49"
-					&& pieces[i].getAttribute("x_offset") == "5"
-					&& pieces[i].getAttribute("y_offset") == "10"
-					&& pieces[i].getAttribute("width") == "20"
-					&& pieces[i].getAttribute("height") == "40"
-					&& decodeURIComponent(pieces[i].getAttribute("color")) == "orange"
+			try {var data = JSON.parse(ajax.responseText);}
+			catch (e) {return "FAIL [parse error: " + e + "]";}
+			for (var i = 0; i < data.length; i++)
+				if (data[i].id == 1
+					&& data[i].image_id == 11
+					&& data[i].user_id == 2
+					&& data[i].name == "Still My Piece"
+					&& data[i].x == 99
+					&& data[i].y == 49
+					&& data[i].x_offset == 5
+					&& data[i].y_offset == 10
+					&& data[i].width == 20
+					&& data[i].height == 40
+					&& data[i].color == "orange"
 				) return "PASS";
-			}
 			return "FAIL [" + ajax.responseText + "]";}},
 
 	{group: "DELETE PIECE",
@@ -452,6 +499,12 @@ TEST.tests = [
 ];
 
 onload = function () {
+	$.get("test.json", function (data) {
+		$("input[name='location']").val(data.location);
+		$("input[name='database']").val(data.database);
+		$("input[name='username']").val(data.username);
+		$("input[name='password']").val(data.password);
+	});
 	$("input[name='begin']").click(function () {
 		TEST.INSTALL_ARGS.location = $("input[name='location']").val();
 		TEST.INSTALL_ARGS.database = $("input[name='database']").val();
@@ -468,5 +521,6 @@ onload = function () {
 		<div><input type="text" name="username"/>database user name</div>
 		<div><input type="password" name="password"/>database password</div>
 		<div><input type="button" name="begin" value="Begin Test"/></div>
+		<div id="output"></div>
 	</body>
 </html>

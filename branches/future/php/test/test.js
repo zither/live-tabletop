@@ -13,7 +13,9 @@ var TEST = {
 	// TEST.start() starts the tests. It should not be called
 	// until the document is loaded (i.e. "onload = TEST.start;".)
 	start: function () {
-		$("<div>").text("STARTING TESTS ...").appendTo($("body"));
+		$("#output").empty();
+		$("<div>").text("STARTING TESTS ...").appendTo($("#output"));
+		TEST.index = 0;
 		TEST.request();
 	},
 
@@ -35,29 +37,31 @@ var TEST = {
 	// (the ajax parameter) contains nothing but whitespace.
 	blank: function (ajax) {
 		var text = ajax.responseText.replace(/^\s+|\s+$/g, '');
-		if (text == "") {
-			return "PASS";
-		}
-		return "FAIL [" + text + "]";
+		if (text == "") return "PASS";
+		else return "FAIL [" + text + "]";
 	},
 
 	// TEST.exists(ajax) returns "PASS" if the returned XMLHttpRequest object
 	// (the ajax parameter) has the status 200 OK instead of 404 Not Found
 	// or some other status.
 	exists: function (ajax) {
-		if (ajax.status == 200) {
-			return "PASS";
-		}
-		return "FAIL [status = " + ajax.status + "]";
+		if (ajax.status == 200) return "PASS";
+		else return "FAIL [status = " + ajax.status + "]";
+	},
+
+	// TEST.unauthorized(ajax) returns "PASS"
+	// if the response has a status of 401 (Unauthorized).
+	unauthorized: function (ajax) {
+		if (ajax.status == 401) return "PASS";
+		else return "FAIL [status = " + ajax.status + "]";
 	},
 
 	// TEST.unimplemented(ajax) returns "FAIL (test not implemented)" followed
 	// by the text of the returned XMLHttpRequest object (the ajax parameter.)
 	unimplemented: function (ajax) {
-		if (ajax && ajax.responseText) {
+		if (ajax.responseText)
 			return "FAIL (test not implemented) [" + ajax.responseText + "]";
-		}
-		return "FAIL (test not implemented) [no XMLHttpRequest]";
+		else return "FAIL (test not implemented) [status = " + ajax.status + "]";
 	},
 
 	// TEST.uploaded(result) returns "PASS" if result is not a string.
@@ -65,10 +69,8 @@ var TEST = {
 	// Instead the server must return javascript which passes a result
 	// to the TEST.finish method.
 	uploaded: function (result) {
-		if (typeof (result) == 'string') {
-			return "FAIL [" + result + "]";
-		}
-		return "PASS";
+		if (typeof (result) == 'string') return "FAIL [" + result + "]";
+		else return "PASS";
 	},
 
 	// TEST.count(ajax, target) returns "PASS" if the response
@@ -97,6 +99,10 @@ var TEST = {
 		return (text == target) ? "PASS" : "FAIL [" + text + "]";
 	},
 
+	// TEST.logged_out(ajax) returns "PASS" if the response
+	// is the string "You are not logged in."
+	logged_out: function (ajax) {return TEST.string(ajax, "You are not logged in.");},
+
 	// TEST.json(ajax, target) returns "PASS" if the response
 	// is JSON equivalent to the specified javascript object (target.)
 	json: function (ajax, target) {
@@ -111,19 +117,19 @@ var TEST = {
 	finish: function (ajax) {
 		var old_test = TEST.tests[TEST.index];
 		var result = old_test.result(ajax);
-		$("<div>").text(old_test.action + ": " + result).appendTo($("body"))
+		$("<div>").text(old_test.action + ": " + result).appendTo($("#output"))
 			.addClass(result.slice(0, 4));
 		if (old_test.abort && result != "PASS") {
-			$("<div>").text("... STOPPING TESTS!").appendTo($("body"));
+			$("<div>").text("... STOPPING TESTS!").appendTo($("#output"));
 			return;
 		}
 		TEST.index++;
 		if (TEST.index == TEST.tests.length) {
-			$("<div>").text("... FINISHED!").appendTo($("body"));
+			$("<div>").text("... FINISHED!").appendTo($("#output"));
 			return;
 		}
 		var new_test = TEST.tests[TEST.index];
-		if (new_test.group) $("<div>").text(new_test.group).appendTo($("body"));
+		if (new_test.group) $("<div>").text(new_test.group).appendTo($("#output"));
 		TEST.request();
 	}
 };
