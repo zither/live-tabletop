@@ -1,499 +1,472 @@
 <html>
-  <head>
-    <title>Live Tabletop Automated Test</title>
-    <link rel="stylesheet" href="test.css"/>
-    <script type="text/javascript" src="../../js/LT.js"></script>
-    <script type="text/javascript" src="../../js/uploader.js"></script>
-    <script type="text/javascript" src="test.js"></script>
-    <script type="text/javascript">
+	<head>
+		<title>Live Tabletop Automated Test</title>
+		<link rel="stylesheet" href="test.css"/>
+		<script type="text/javascript" src="../../jquery-1.11.0.min.js"></script>
+		<script type="text/javascript" src="../../js/LT.js"></script>
+		<script type="text/javascript" src="../../js/uploader.js"></script>
+		<script type="text/javascript" src="test.js"></script>
+		<script type="text/javascript">
 
 // constants
-TEST.ADMIN_USERNAME = "foo";
-TEST.ADMIN_PASSWORD = "bar";
+TEST.LOGIN = "foo";
+TEST.PASSWORD = "bar";
 TEST.WRONG_PASSWORD = "baz";
 TEST.TABLE_ARGS = {
-  'name': "My Table",
-  image_id: 1,
-  default_tile: 2,
-  rows: 100,
-  columns: 50,
-  tile_width: 45,
-  tile_height: 30,
-  tile_mode: "rectangle",
-  grid_thickness: 1,
-  grid_color: "gray",
-  wall_thickness: 3,
-  wall_color: "black",
+	'name': "My Table",
+	image_id: 1,
+	default_tile: 2,
+	rows: 100,
+	columns: 50,
+	tile_width: 45,
+	tile_height: 30,
+	tile_mode: "rectangle",
+	grid_thickness: 1,
+	grid_color: "gray",
+	wall_thickness: 3,
+	wall_color: "black",
 };
-TEST.INSTALL_ARGS = {
-  admin_username : TEST.ADMIN_USERNAME,
-  admin_password : TEST.ADMIN_PASSWORD,
-},
-
-// special result tests
-TEST.one_table = function (ajax) {return TEST.count(ajax, "table", 1);};
-TEST.one_user = function (ajax) {return TEST.count(ajax, "user", 1);},
-
-TEST.uploader = new LT.Uploader("../create_image.php");
+TEST.INSTALL_ARGS = {admin_login: "nymduh", admin_password: "draosup"};
 
 // list of tests
 TEST.tests = [
 
-  {group: "INSTALL",
-    action: "../install.php",
-    abort: true,
-    args: TEST.INSTALL_ARGS,
-    result: TEST.blank},
-  {action: "../db_config.php", args: {}, result: TEST.exists},
+	{group: "INSTALL",
+		action: "../install.php",
+		abort: true,
+		args: TEST.INSTALL_ARGS,
+		result: TEST.blank},
+	{action: "../db_config.php", args: {}, result: TEST.exists},
 
-  {group: "LOGIN",
-    action: "../login.php",
-    args: {username: TEST.ADMIN_USERNAME, password: TEST.WRONG_PASSWORD},
-    result: function (ajax) {return TEST.count(ajax, "user", 0);}},
-  {action: "../login.php",
-    args: {username: TEST.ADMIN_USERNAME, password: TEST.ADMIN_PASSWORD},
-    result: TEST.one_user},
 
-  {group: "LOGOUT", action: "../logout.php", args: {}, result: TEST.blank},
-  {action: "../create_table.php",
-    args: TEST.TABLE_ARGS,
-    result: function (ajax) {
-      return TEST.equals(ajax, "You are not logged in.");}},
-  {action: "../login.php", args: {},
-    args: {username: TEST.ADMIN_USERNAME, password: TEST.ADMIN_PASSWORD},
-    result: function (ajax) {return TEST.count(ajax, "user", 1);}},
-  {action: "../create_table.php", args: TEST.TABLE_ARGS, result: TEST.one_table},
+	// ADMIN
 
-  // M E S S A G E
+	{group: "ADMIN.CREATE", action: "../Admin.create.php", args: {}, result: TEST.unimplemented},
+	{group: "ADMIN.LOGIN", action: "../Admin.login.php", args: {}, result: TEST.unimplemented},
+	{group: "ADMIN.LOGOUT", action: "../Admin.logout.php", args: {}, result: TEST.unimplemented},
+	{group: "ADMIN.PASSWORD", action: "../Admin.password.php", args: {}, result: TEST.unimplemented},
 
-  {group: "CREATE MESSAGE",
-    action: "../create_message.php",
-    args: {table_id: 1, user_id: 1, text: "Hello, world!"},
-    result: TEST.blank},
+	{group: "ADMIN.CAMPAIGNS", action: "../Admin.campaigns.php", args: {}, result: TEST.unimplemented},
+	{group: "ADMIN.MESSAGES", action: "../Admin.messages.php", args: {}, result: TEST.unimplemented},
+	{group: "ADMIN.EXPIRE MESSAGES", action: "../Admin.expireMessages.php", args: {}, result: TEST.unimplemented},
+	{group: "ADMIN.DELETE CAMPAIGN", action: "../Admin.deleteCampaign.php", args: {}, result: TEST.unimplemented},
 
-  {group: "READ MESSAGES",
-    action: "../read_messages.php",
-    args: {table_id: 1, last_message: 0},
-    result: function (ajax) {return TEST.count(ajax, "message", 1);}},
+	{group: "ADMIN.USERS", action: "../Admin.users.php", args: {}, result: TEST.zero},
+	{group: "ADMIN.FRIENDS", action: "../Admin.friends.php", args: {}, result: TEST.unimplemented},
+	{group: "ADMIN.USER PASSWORD", action: "../Admin.userPassword.php", args: {}, result: TEST.unimplemented},
+	{group: "ADMIN.DELETE USER", action: "../Admin.deleteUser.php", args: {}, result: TEST.unimplemented},
 
-  {group: "PRIVATE ROLL",
-    action: "../private_roll.php",
-    args: {text: "From 1975 - 2010, [0 + 2010 - 1975] years passed."},
-    result: function (ajax) {
-      var roll = ajax.responseXML.getElementsByTagName("message")[0];
-      var text = decodeURIComponent(roll.textContent.replace(/^\s+|\s+$/g, ''));
-      return (text == 'From 1975 - 2010, <span class="roll">0 + 2010 - 1975 = '
-        + '35</span> years passed.') ? "PASS" : "FAIL [" + text + "]";}},
 
-  // U S E R
+	// U S E R
 
-  {group: "CHANGE PASSWORD",
-    action: "../update_user_password.php",
-    args: {password: TEST.WRONG_PASSWORD},
-    result: TEST.blank},
-  {action: "../login.php",
-    args: {username: TEST.ADMIN_USERNAME, password: TEST.WRONG_PASSWORD},
-    result: TEST.one_user},
-  {action: "../update_user_password.php",
-    args: {password: TEST.ADMIN_PASSWORD},
-    result: TEST.blank},
-  {action: "../login.php",
-    args: {username: TEST.ADMIN_USERNAME, password: TEST.ADMIN_PASSWORD},
-    result: TEST.one_user},
+	{group: "USER.CREATE",
+		action: "../User.create.php",
+		args: {login: TEST.LOGIN, password: TEST.PASSWORD},
+		result: TEST.blank},
 
-  {group: "CREATE USER",
-    action: "../create_user.php",
-    args: {username: "larry", password: "curly", permissions: "user"},
-    result: TEST.blank},
-  {action: "../login.php",
-    args: {username: "larry", password: "curly"},
-    result: TEST.one_user},
-  {action: "../login.php",
-    args: {username: TEST.ADMIN_USERNAME, password: TEST.ADMIN_PASSWORD},
-    result: TEST.one_user},
+	{group: "USER.LOGIN",
+		action: "../User.login.php",
+		args: {username: TEST.LOGIN, password: TEST.WRONG_PASSWORD},
+		result: TEST.zero},
+	{action: "../User.login.php",
+		args: {username: TEST.LOGIN, password: TEST.PASSWORD},
+		result: TEST.one},
 
-  {group: "READ USERS",
-    action: "../read_users.php",
-    args: {},
-    result: function (ajax) {return TEST.count(ajax, "user", 2);}},
+	{group: "USER.LOGOUT",
+		action: "../User.logout.php",
+		args: {},
+		result: TEST.blank},
+	{action: "../Campaign.create.php",
+		args: {"name": "My Campaign"},
+		result: function (ajax) {
+			return TEST.string(ajax, "You are not logged in.");}},
+	{action: "../User.login.php", args: {},
+		args: {username: TEST.LOGIN, password: TEST.PASSWORD},
+		result: TEST.one},
+	{action: "../Campaign.create.php",
+		args: {"name": "My Campaign"},
+		result: TEST.one},
 
-  {group: "UPDATE USER",
-    action: "../update_user.php",
-    args: {
-      user_id: 2,
-      username: "moe",
-      color: "green",
-      permissions: "administrator"},
-    result: TEST.blank},
-  {action: "../read_users.php",
-    args: {},
-    result: function (ajax) {
-      var users = ajax.responseXML.getElementsByTagName("user");
-      for (var i = 0; i < users.length; i++) {
-        if (users[i].getAttribute("id") == "2"
-          && decodeURIComponent(users[i].getAttribute("name")) == "moe"
-          && decodeURIComponent(users[i].getAttribute("color")) == "green"
-          && decodeURIComponent(users[i].getAttribute("permissions")) == "administrator"
-        ) return "PASS";
-      }
-      return "FAIL [" + ajax.responseText + "]";}},
+	{group: "USER.CHARACTERS", action: "../User.characters.php", args: {}, result: TEST.unimplemented},
+	{group: "USER.CAMPAIGNS", action: "../User.campaigns.php", args: {}, result: TEST.unimplemented},
+	{group: "USER.MAPS", action: "../User.maps.php", args: {}, result: TEST.unimplemented},
+	{group: "USER.UPDATE", action: "../User.update.php", args: {}, result: TEST.unimplemented},
+	{group: "USER.PASSWORD", action: "../User.password.php", args: {}, result: TEST.unimplemented},
+	{group: "USER.FRIENDS", action: "../User.friends.php", args: {}, result: TEST.unimplemented},
+	{group: "USER.FRIEND", action: "../User.friend.php", args: {}, result: TEST.unimplemented},
+	{group: "USER.UNFRIEND", action: "../User.unfriend.php", args: {}, result: TEST.unimplemented},
 
-  {group: "DELETE USER",
-    action: "../delete_user.php",
-    args: {user_id: 2},
-    result: TEST.blank},
-  {action: "../read_users.php", args: {}, result: TEST.one_user},
+	{group: "CHANGE PASSWORD",
+		action: "../update_user_password.php",
+		args: {password: TEST.WRONG_PASSWORD},
+		result: TEST.blank},
+	{action: "../login.php",
+		args: {username: TEST.LOGIN, password: TEST.WRONG_PASSWORD},
+		result: TEST.one},
+	{action: "../update_user_password.php",
+		args: {password: TEST.PASSWORD},
+		result: TEST.blank},
+	{action: "../login.php",
+		args: {username: TEST.LOGIN, password: TEST.PASSWORD},
+		result: TEST.one},
 
-  // T A B L E
+	{action: "../login.php",
+		args: {username: "larry", password: "curly"},
+		result: TEST.one},
+	{action: "../login.php",
+		args: {username: TEST.LOGIN, password: TEST.PASSWORD},
+		result: TEST.one},
 
-  {group: "CREATE TABLE",
-    action: "../create_table.php",
-    args: {
-      name: "My Other Table",
-      image_id: 5,
-      default_tile: 7,
-      rows: 16,
-      columns: 25,
-      tile_width: 32,
-      tile_height: 40,
-      grid_thickness: 7,
-      grid_color: "red",
-      wall_thickness: 3,
-      wall_color: "green",
-      tile_mode: "rectangle",
-    },
-    result: TEST.one_table},
+	{group: "UPDATE USER",
+		action: "../update_user.php",
+		args: {
+			user_id: 2,
+			username: "moe",
+			color: "green",
+			permissions: "administrator"},
+		result: TEST.blank},
+	{action: "../read_users.php",
+		args: {},
+		result: function (ajax) {
+			var users = ajax.responseXML.getElementsByTagName("user");
+			for (var i = 0; i < users.length; i++) {
+				if (users[i].getAttribute("id") == "2"
+					&& decodeURIComponent(users[i].getAttribute("name")) == "moe"
+					&& decodeURIComponent(users[i].getAttribute("color")) == "green"
+					&& decodeURIComponent(users[i].getAttribute("permissions")) == "administrator"
+				) return "PASS";
+			}
+			return "FAIL [" + ajax.responseText + "]";}},
 
-  {group: "READ TABLE",
-    action: "../read_table.php",
-    args: {table_id: 2},
-    result: TEST.one_table},
+	{group: "DELETE USER",
+		action: "../delete_user.php",
+		args: {user_id: 2},
+		result: TEST.blank},
+	{action: "../read_users.php", args: {}, result: TEST.one},
 
-  {group: "READ TABLES",
-    action: "../read_tables.php",
-    args: {},
-    result: function (ajax) {return TEST.count(ajax, "table", 2);}},
 
-  {group: "UPDATE TABLE",
-    action: "../update_table.php",
-    args: {
-      table_id: 1,
-      name: "My Original Table",
-      image_id: 3,
-      tile_width: 30,
-      tile_height: 20,
-      grid_thickness: 2,
-      grid_color: "brown",
-      wall_thickness: 1,
-      wall_color: "blue",
-      tile_mode: 'isometric',
-    },
-    result: TEST.blank},
-  {action: "../read_table.php",
-    args: {table_id: 1},
-    result: function (ajax) {
-      var tables = ajax.responseXML.getElementsByTagName("table");
-      for (var i = 0; i < tables.length; i++) {
-        if (tables[i].getAttribute("id") == "1"
-          && decodeURIComponent(tables[i].getAttribute("name")) == "My Original Table"
-          && tables[i].getAttribute("image_id") == "3"
-          && tables[i].getAttribute("tile_width") == "30"
-          && tables[i].getAttribute("tile_height") == "20"
-          && tables[i].getAttribute("grid_thickness") == "2"
-          && decodeURIComponent(tables[i].getAttribute("grid_color")) == "brown"
-          && tables[i].getAttribute("wall_thickness") == "1"
-          && decodeURIComponent(tables[i].getAttribute("wall_color")) == "blue"
-          && decodeURIComponent(tables[i].getAttribute("tile_mode")) == "isometric"
-        ) return "PASS";
-      }
-      return "FAIL [" + ajax.responseText + "]";}},
+	// C A M P A I G N
 
-  {group: "DELETE TABLE",
-    action: "../delete_table.php",
-    args: {table_id: 2},
-    result: TEST.blank},
-  {action: "../read_tables.php", args: {}, result: TEST.one_table},
+	{group: "CAMPAIGN.CREATE", action: "../Campaign.create.php", args: {}, result: TEST.unimplemented},
+	{group: "CAMPAIGN.NAME", action: "../Campaign.name.php", args: {}, result: TEST.unimplemented},
+	{group: "CAMPAIGN.PRIVATE", action: "../Campaign.private.php", args: {}, result: TEST.unimplemented},
+	{group: "CAMPAIGN.READ", action: "../Campaign.read.php", args: {}, result: TEST.unimplemented},
+	{group: "CAMPAIGN.MAP", action: "../Campaign.map.php", args: {}, result: TEST.unimplemented},
+	{group: "CAMPAIGN.TURNS", action: "../Campaign.turns.php", args: {}, result: TEST.unimplemented},
+	{group: "CAMPAIGN.USERS", action: "../Campaign.users.php", args: {}, result: TEST.unimplemented},
+	{group: "CAMPAIGN.ARRIVE", action: "../Campaign.arrive.php", args: {}, result: TEST.unimplemented},
+	{group: "CAMPAIGN.MESSAGE", action: "../Campaign.message.php", args: {}, result: TEST.unimplemented},
+	{group: "CAMPAIGN.MESSAGES", action: "../Campaign.messages.php", args: {}, result: TEST.unimplemented},
+	{group: "CAMPAIGN.AVATAR", action: "../Campaign.avatar.php", args: {}, result: TEST.unimplemented},
+	{group: "CAMPAIGN.LEAVE", action: "../Campaign.leave.php", args: {}, result: TEST.unimplemented},
+	{group: "CAMPAIGN.PERMISSION", action: "../Campaign.permission.php", args: {}, result: TEST.unimplemented},
 
-  // T I L E
+	{group: "PRIVATE ROLL",
+		action: "../private_roll.php",
+		args: {text: "From 1975 - 2010, [0 + 2010 - 1975] years passed."},
+		result: function (ajax) {
+			try {var data = JSON.parse(ajax.responseText);}
+			catch (e) {return "FAIL [parse error: " + e + "]";}
+			if (data[0].message == 'From 1975 - 2010, <span class="roll">0 + 2010 - '
+				+ '1975 = 35</span> years passed.') return "PASS";
+			else return "FAIL [" + ajax.responseText + "]";}},
 
-  {group: "READ TILES",
-    action: "../read_tiles.php",
-    args: {table_id: 1},
-    result: function (ajax) {
-      var text = ajax.responseXML.documentElement.textContent;
-      var tiles = text.replace(/^\s+|\s+$/g, '').split(' ');
-      if (tiles.length != 5000) return "FAIL [" + tiles.length + " tiles]";
-      for (var i = 0; i < tiles.length; i++)
-         if (tiles[i] != "02") return "FAIL [" + i + ": " + tiles[i] + "]";
-      return "PASS";}},
+	{group: "CREATE MESSAGE",
+		action: "../create_message.php",
+		args: {table_id: 1, user_id: 1, text: "Hello, world!"},
+		result: TEST.blank},
 
-  {group: "UPDATE TILE",
-    action: "../update_tile.php",
-    args: {
-      table_id: 1,
-      x: 7,
-      y: 10,
-      image_id: 4,
-      fog: 1,
-      right: 2,
-      bottom: 1},
-    result: TEST.blank},
-  {action: "../read_tiles.php",
-    args: {table_id: 1},
-    result: function (ajax) {
-      var text = ajax.responseXML.documentElement.textContent;
-      var tiles = text.replace(/^\s+|\s+$/g, '').split(' ');
-      if (tiles.length != 5000) return "FAIL [" + tiles.length + " tiles]";
-      for (var i = 0; i < tiles.length; i++) {
-         var target = (i == 507) ? "14" : "02";
-         if (tiles[i] != target) return "FAIL [" + i + ": " + tiles[i] + "]";
-      }
-      return "PASS";}},
+	{group: "READ MESSAGES",
+		action: "../read_messages.php",
+		args: {table_id: 1, last_message: 0},
+		result: TEST.one},
 
-  {group: "FILL FOG",
-    action: "../fill_fog.php", args: {table_id: 1}, result: TEST.blank},
-  {action: "../read_tiles.php",
-    args: {table_id: 1},
-    result: function (ajax) {
-      var text = ajax.responseXML.documentElement.textContent;
-      var tiles = text.replace(/^\s+|\s+$/g, '').split(' ');
-      if (tiles.length != 5000) return "FAIL [" + tiles.length + " tiles]";
-      for (var i = 0; i < tiles.length; i++) {
-         var target = (i == 507) ? "14" : "12";
-         if (tiles[i] != target) return "FAIL [" + i + ": " + tiles[i] + "]";
-      }
-      return "PASS";}},
 
-  {group: "CLEAR FOG",
-    action: "../clear_fog.php", args: {table_id: 1}, result: TEST.blank},
-  {action: "../read_tiles.php",
-    args: {table_id: 1},
-    result: function (ajax) {
-      var text = ajax.responseXML.documentElement.textContent;
-      var tiles = text.replace(/^\s+|\s+$/g, '').split(' ');
-      if (tiles.length != 5000) return "FAIL [" + tiles.length + " tiles]";
-      for (var i = 0; i < tiles.length; i++) {
-         var target = (i == 507) ? "04" : "02";
-         if (tiles[i] != target) return "FAIL [" + i + ": " + tiles[i] + "]";
-      }
-      return "PASS";}},
+	// M A P
 
-  // P I E C E
+	{group: "MAP.CREATE", action: "../Map.create.php", args: {}, result: TEST.unimplemented},
+	{group: "MAP.READ", action: "../Map.read.php", args: {}, result: TEST.unimplemented},
+	{group: "MAP.PIECES", action: "../Map.pieces.php", args: {}, result: TEST.unimplemented},
+	{group: "MAP.SETTINGS", action: "../Map.settings.php", args: {}, result: TEST.unimplemented},
+	{group: "MAP.SIZE", action: "../Map.size.php", args: {}, result: TEST.unimplemented},
+	{group: "MAP.TILE", action: "../Map.tile.php", args: {}, result: TEST.unimplemented},
+	{group: "MAP.CHANGES", action: "../Map.changes.php", args: {}, result: TEST.unimplemented},
+	{group: "MAP.SHARE", action: "../Map.share.php", args: {}, result: TEST.unimplemented},
+	{group: "MAP.OWNERS", action: "../Map.owners.php", args: {}, result: TEST.unimplemented},
+	{group: "MAP.DELETE OWNER", action: "../Map.deleteOwner.php", args: {}, result: TEST.unimplemented},
 
-  {group: "CREATE PIECE",
-    action: "../create_piece.php",
-    args: {
-      table_id: 1,
-      image_id: 10,
-      user_id: 1,
-      name: "My Piece",
-      x: 30,
-      y: 100,
-      x_offset: -32,
-      y_offset: -8,
-      height: 16,
-      width: 64},
-    result: TEST.blank},
+	{group: "CREATE TABLE",
+		action: "../create_table.php",
+		args: {
+			name: "My Other Table",
+			image_id: 5,
+			default_tile: 7,
+			rows: 16,
+			columns: 25,
+			tile_width: 32,
+			tile_height: 40,
+			grid_thickness: 7,
+			grid_color: "red",
+			wall_thickness: 3,
+			wall_color: "green",
+			tile_mode: "rectangle",
+		},
+		result: TEST.one},
 
-  {group: "READ PIECES",
-    action: "../read_pieces.php",
-    args: {table_id: 1},
-    result: function (ajax) {return TEST.count(ajax, "piece", 1);}},
+	{group: "READ TABLE",
+		action: "../read_table.php",
+		args: {table_id: 2},
+		result: TEST.one},
 
-  {group: "UPDATE PIECE",
-    action: "../update_piece.php",
-    args: {
-      piece_id: 1,
-      image_id: 11,
-      user_id: 2,
-      name: "Still My Piece",
-      x: 99,
-      y: 49,
-      x_offset: 5,
-      y_offset: 10,
-      width: 20,
-      height: 40,
-      color: "orange"},
-    result: TEST.blank},
-  {action: "../read_pieces.php",
-    args: {table_id: 1},
-    result: function (ajax) {
-      var pieces = ajax.responseXML.getElementsByTagName("piece");
-      for (var i = 0; i < pieces.length; i++) {
-        if (pieces[i].getAttribute("id") == "1"
-          && pieces[i].getAttribute("image_id") == "11"
-          && pieces[i].getAttribute("user_id") == "2"
-          && decodeURIComponent(pieces[i].getAttribute("name")) == "Still My Piece"
-          && pieces[i].getAttribute("x") == "99"
-          && pieces[i].getAttribute("y") == "49"
-          && pieces[i].getAttribute("x_offset") == "5"
-          && pieces[i].getAttribute("y_offset") == "10"
-          && pieces[i].getAttribute("width") == "20"
-          && pieces[i].getAttribute("height") == "40"
-          && decodeURIComponent(pieces[i].getAttribute("color")) == "orange"
-        ) return "PASS";
-      }
-      return "FAIL [" + ajax.responseText + "]";}},
+	{group: "READ TABLES",
+		action: "../read_tables.php",
+		args: {},
+		result: function (ajax) {return TEST.count(ajax, 2);}},
 
-  {group: "UPDATE STAT",
-    action: "../update_stat.php",
-    args: {piece_id: 1, name: "hit points", value: "20"},
-    result: TEST.blank},
-  {action: "../read_pieces.php",
-    args: {table_id: 1},
-    result: function (ajax) {
-      var stats = ajax.responseXML.getElementsByTagName("stat");
-      for (var i = 0; i < stats.length; i++) {
-        if (decodeURIComponent(stats[i].getAttribute("name")) == "hit points"
-          && decodeURIComponent(stats[i].textContent) == "20") return "PASS";
-      }
-      return "FAIL [" + ajax.responseText + "]";}},
+	{group: "UPDATE TABLE",
+		action: "../update_table.php",
+		args: {
+			table_id: 1,
+			name: "My Original Table",
+			image_id: 3,
+			tile_width: 30,
+			tile_height: 20,
+			grid_thickness: 2,
+			grid_color: "brown",
+			wall_thickness: 1,
+			wall_color: "blue",
+			tile_mode: 'isometric',
+		},
+		result: TEST.blank},
+	{action: "../read_table.php",
+		args: {table_id: 1},
+		result: function (ajax) {
+			var tables = ajax.responseXML.getElementsByTagName("table");
+			for (var i = 0; i < tables.length; i++) {
+				if (tables[i].getAttribute("id") == "1"
+					&& decodeURIComponent(tables[i].getAttribute("name")) == "My Original Table"
+					&& tables[i].getAttribute("image_id") == "3"
+					&& tables[i].getAttribute("tile_width") == "30"
+					&& tables[i].getAttribute("tile_height") == "20"
+					&& tables[i].getAttribute("grid_thickness") == "2"
+					&& decodeURIComponent(tables[i].getAttribute("grid_color")) == "brown"
+					&& tables[i].getAttribute("wall_thickness") == "1"
+					&& decodeURIComponent(tables[i].getAttribute("wall_color")) == "blue"
+					&& decodeURIComponent(tables[i].getAttribute("tile_mode")) == "isometric"
+				) return "PASS";
+			}
+			return "FAIL [" + ajax.responseText + "]";}},
 
-  {group: "DELETE STAT",
-    action: "../delete_stat.php",
-    args: {piece_id: 1, name: "hit points"},
-    result: TEST.blank},
-  {action: "../read_pieces.php",
-    args: {table_id: 1},
-    result: function (ajax) {return TEST.count(ajax, "stat", 0);}},
+	{group: "DELETE TABLE",
+		action: "../delete_table.php",
+		args: {table_id: 2},
+		result: TEST.blank},
+	{action: "../read_tables.php", args: {}, result: TEST.one},
 
-  {group: "DELETE PIECE",
-    action: "../delete_piece.php", args: {piece_id: 1}, result: TEST.blank},
-  {action: "../read_pieces.php",
-    args: {table_id: 1},
-    result: function (ajax) {return TEST.count(ajax, "piece", 0);}},
+	// T I L E
 
-  // I M A G E
+	{group: "READ TILES",
+		action: "../read_tiles.php",
+		args: {table_id: 1},
+		result: function (ajax) {
+			var text = ajax.responseXML.documentElement.textContent;
+			var tiles = text.replace(/^\s+|\s+$/g, '').split(' ');
+			if (tiles.length != 5000) return "FAIL [" + tiles.length + " tiles]";
+			for (var i = 0; i < tiles.length; i++)
+				 if (tiles[i] != "02") return "FAIL [" + i + ": " + tiles[i] + "]";
+			return "PASS";}},
 
-  {group: "CREATE IMAGE",
-    action: TEST.uploader.form.action,
-    uploader: TEST.uploader,
-    args: {type: "background"},
-    result: TEST.uploaded},
+	{group: "UPDATE TILE",
+		action: "../update_tile.php",
+		args: {
+			table_id: 1,
+			x: 7,
+			y: 10,
+			image_id: 4,
+			fog: 1,
+			right: 2,
+			bottom: 1},
+		result: TEST.blank},
+	{action: "../read_tiles.php",
+		args: {table_id: 1},
+		result: function (ajax) {
+			var text = ajax.responseXML.documentElement.textContent;
+			var tiles = text.replace(/^\s+|\s+$/g, '').split(' ');
+			if (tiles.length != 5000) return "FAIL [" + tiles.length + " tiles]";
+			for (var i = 0; i < tiles.length; i++) {
+				 var target = (i == 507) ? "14" : "02";
+				 if (tiles[i] != target) return "FAIL [" + i + ": " + tiles[i] + "]";
+			}
+			return "PASS";}},
 
-  {group: "READ IMAGES",
-    action: "../read_images.php",
-    args: {type: "background"},
-    result: function (ajax) {return TEST.count(ajax, "image", 1);}},
+	{group: "FILL FOG",
+		action: "../fill_fog.php", args: {table_id: 1}, result: TEST.blank},
+	{action: "../read_tiles.php",
+		args: {table_id: 1},
+		result: function (ajax) {
+			var text = ajax.responseXML.documentElement.textContent;
+			var tiles = text.replace(/^\s+|\s+$/g, '').split(' ');
+			if (tiles.length != 5000) return "FAIL [" + tiles.length + " tiles]";
+			for (var i = 0; i < tiles.length; i++) {
+				 var target = (i == 507) ? "14" : "12";
+				 if (tiles[i] != target) return "FAIL [" + i + ": " + tiles[i] + "]";
+			}
+			return "PASS";}},
 
-/*
-  {group: "READ IMAGES USEABLE",
-    action: "../read_images_useable.php",
-    args: {type: "background"},
-    result: function (ajax) {return TEST.count(ajax, "image", 1);}},
-*/
+	{group: "CLEAR FOG",
+		action: "../clear_fog.php", args: {table_id: 1}, result: TEST.blank},
+	{action: "../read_tiles.php",
+		args: {table_id: 1},
+		result: function (ajax) {
+			var text = ajax.responseXML.documentElement.textContent;
+			var tiles = text.replace(/^\s+|\s+$/g, '').split(' ');
+			if (tiles.length != 5000) return "FAIL [" + tiles.length + " tiles]";
+			for (var i = 0; i < tiles.length; i++) {
+				 var target = (i == 507) ? "04" : "02";
+				 if (tiles[i] != target) return "FAIL [" + i + ": " + tiles[i] + "]";
+			}
+			return "PASS";}},
 
-  {group: "UPDATE IMAGE",
-    action: "../update_image.php",
-    args: {
-      image_id: 1,
-      user_id: 2,
-      'public': 1,
-      tile_width: 123456,
-      tile_height: 234567,
-      center_x: 345678,
-      center_y: 456789,
-      tile_mode: "isometric",
-      layer: 3,
-    },
-    result: TEST.blank},
-  {action: "../read_images.php",
-    args: {type: "background"},
-    result: function (ajax) {
-      var image = ajax.responseXML.getElementsByTagName("image")[0];
-      if (image.getAttribute("id") == "1"
-        && image.getAttribute("user_id") == "2"
-        && image.getAttribute("public") == "1"
-        && image.getAttribute("tile_width") == "123456"
-        && image.getAttribute("tile_height") == "234567"
-        && image.getAttribute("center_x") == "345678"
-        && image.getAttribute("center_y") == "456789"
-        && decodeURIComponent(image.getAttribute("tile_mode")) == "isometric"
-        && image.getAttribute("layer") == "3"
-        ) return "PASS";
-      else return "FAIL [" + ajax.responseText + "]";}},
+	// WALL
 
-  {group: "DELETE IMAGE",
-    action: "../delete_image.php",
-    args: {image_id: 1},
-    result: TEST.blank},
-  {action: "../read_images.php",
-    args: {type: "background"},
-    result: function (ajax) {return TEST.count(ajax, "image", 0);}},
+	{group: "CREATE WALL",
+		action: "../create_wall.php",
+		args: {table_id: 1, x: 2, y: 3, direction: "sw", contents: "wall"},
+		result: TEST.blank},
 
-  // WALL
+	{group: "READ WALLS",
+		action: "../read_walls.php",
+		args: {table_id: 1},
+		result: function (ajax) {
+			var wall = ajax.responseXML.getElementsByTagName("wall")[0];
+			if (wall.getAttribute("x") == "2"
+				&& wall.getAttribute("y") == "3"
+				&& wall.getAttribute("direction") == "sw"
+				&& wall.getAttribute("contents") == "wall"
+				) return "PASS";
+			return "FAIL [" + ajax.responseText + "]";}},
 
-  {group: "CREATE WALL",
-    action: "../create_wall.php",
-    args: {table_id: 1, x: 2, y: 3, direction: "sw", contents: "wall"},
-    result: TEST.blank},
+	{group: "DELETE WALL",
+		action: "../delete_wall.php",
+		args: {table_id: 1, x: 2, y: 3, direction: "sw"},
+		result: TEST.blank},
+	{action: "../read_walls.php", args: {table_id: 1}, result: TEST.zero},
 
-  {group: "READ WALLS",
-    action: "../read_walls.php",
-    args: {table_id: 1},
-    result: function (ajax) {
-      var wall = ajax.responseXML.getElementsByTagName("wall")[0];
-      if (wall.getAttribute("x") == "2"
-        && wall.getAttribute("y") == "3"
-        && wall.getAttribute("direction") == "sw"
-        && wall.getAttribute("contents") == "wall"
-        ) return "PASS";
-      return "FAIL [" + ajax.responseText + "]";}},
+	// P I E C E
 
-  {group: "DELETE WALL",
-    action: "../delete_wall.php",
-    args: {table_id: 1, x: 2, y: 3, direction: "sw"},
-    result: TEST.blank},
-  {action: "../read_walls.php",
-    args: {table_id: 1},
-    result: function (ajax) {return TEST.count(ajax, "wall", 0);}},
+	{group: "PIECE.CREATE", action: "../Piece.create.php", args: {}, result: TEST.unimplemented},
+	{group: "PIECE.MOVE", action: "../Piece.move.php", args: {}, result: TEST.unimplemented},
+	{group: "PIECE.SETTINGS", action: "../Piece.settings.php", args: {}, result: TEST.unimplemented},
+	{group: "PIECE.DELETE", action: "../Piece.delete.php", args: {}, result: TEST.unimplemented},
+
+	{group: "CREATE PIECE",
+		action: "../create_piece.php",
+		args: {
+			table_id: 1,
+			image_id: 10,
+			user_id: 1,
+			name: "My Piece",
+			x: 30,
+			y: 100,
+			x_offset: -32,
+			y_offset: -8,
+			height: 16,
+			width: 64},
+		result: TEST.blank},
+
+	{group: "READ PIECES",
+		action: "../read_pieces.php",
+		args: {table_id: 1},
+		result: TEST.one},
+
+	{group: "UPDATE PIECE",
+		action: "../update_piece.php",
+		args: {
+			piece_id: 1,
+			image_id: 11,
+			user_id: 2,
+			name: "Still My Piece",
+			x: 99,
+			y: 49,
+			x_offset: 5,
+			y_offset: 10,
+			width: 20,
+			height: 40,
+			color: "orange"},
+		result: TEST.blank},
+	{action: "../read_pieces.php",
+		args: {table_id: 1},
+		result: function (ajax) {
+			var pieces = ajax.responseXML.getElementsByTagName("piece");
+			for (var i = 0; i < pieces.length; i++) {
+				if (pieces[i].getAttribute("id") == "1"
+					&& pieces[i].getAttribute("image_id") == "11"
+					&& pieces[i].getAttribute("user_id") == "2"
+					&& decodeURIComponent(pieces[i].getAttribute("name")) == "Still My Piece"
+					&& pieces[i].getAttribute("x") == "99"
+					&& pieces[i].getAttribute("y") == "49"
+					&& pieces[i].getAttribute("x_offset") == "5"
+					&& pieces[i].getAttribute("y_offset") == "10"
+					&& pieces[i].getAttribute("width") == "20"
+					&& pieces[i].getAttribute("height") == "40"
+					&& decodeURIComponent(pieces[i].getAttribute("color")) == "orange"
+				) return "PASS";
+			}
+			return "FAIL [" + ajax.responseText + "]";}},
+
+	{group: "DELETE PIECE",
+		action: "../delete_piece.php", args: {piece_id: 1}, result: TEST.blank},
+	{action: "../read_pieces.php",
+		args: {table_id: 1},
+		result: TEST.zero},
+
+	// C H A R A C T E R
+
+	{group: "CHARACTER.CREATE", action: "../Character.create.php", args: {}, result: TEST.unimplemented},
+	{group: "CHARACTER.SHARE", action: "../Character.share.php", args: {}, result: TEST.unimplemented},
+	{group: "CHARACTER.OWNERS", action: "../Character.owners.php", args: {}, result: TEST.unimplemented},
+	{group: "CHARACTER.DELETE OWNER", action: "../Character.deleteOwner.php", args: {}, result: TEST.unimplemented},
+
+	{group: "UPDATE STAT",
+		action: "../update_stat.php",
+		args: {piece_id: 1, name: "hit points", value: "20"},
+		result: TEST.blank},
+	{action: "../read_pieces.php",
+		args: {table_id: 1},
+		result: function (ajax) {
+			var stats = ajax.responseXML.getElementsByTagName("stat");
+			for (var i = 0; i < stats.length; i++) {
+				if (decodeURIComponent(stats[i].getAttribute("name")) == "hit points"
+					&& decodeURIComponent(stats[i].textContent) == "20") return "PASS";
+			}
+			return "FAIL [" + ajax.responseText + "]";}},
+
+	{group: "DELETE STAT",
+		action: "../delete_stat.php",
+		args: {piece_id: 1, name: "hit points"},
+		result: TEST.blank},
+	{action: "../read_pieces.php",
+		args: {table_id: 1},
+		result: TEST.zero},
+
 ];
 
 onload = function () {
-  // text fields
-  var descriptions = {
-    location: "URL of database server",
-    database: "database name",
-    username: "database user name",
-    password: "database password",
-  };
-  var inputs = {};
-  for (var field in descriptions) {
-    inputs[field] = LT.text(field);
-    LT.element(document.body, [inputs[field], descriptions[field]]);
-  }
-
-  // image selection
-  LT.element(document.body, ["select an image file:"]);
-  document.body.appendChild(TEST.uploader.form);
-  TEST.uploader.form.onsubmit = function () {
-    LT.element(document.body, ["STARTING UPLOAD..."]);
-  }
-  TEST.uploader.onload = function (result) {    
-    LT.element(document.body, ["... FINISHED UPLOAD"]);
-    TEST.finish(result);
-  }
-  TEST.uploader.iframe.style.removeProperty("border");
-  TEST.uploader.iframe.style.removeProperty("height");
-  TEST.uploader.iframe.style.removeProperty("width");
-  TEST.uploader.iframe.style.display = "block";
-
-  // submit button
-  var begin = LT.element(document.body, "input", {type: "submit"}, ["Begin Test"]);
-  begin.onclick = function (e) {
-    if (!e) var e = window.event;
-    TEST.INSTALL_ARGS.location = inputs.location.value;
-    TEST.INSTALL_ARGS.database = inputs.database.value;
-    TEST.INSTALL_ARGS.username = inputs.username.value;
-    TEST.INSTALL_ARGS.password = inputs.password.value;
-    TEST.start();
-    e.preventDefault();
-    return false;
-  };
+	$("input[name='begin']").click(function () {
+		TEST.INSTALL_ARGS.location = $("input[name='location']").val();
+		TEST.INSTALL_ARGS.database = $("input[name='database']").val();
+		TEST.INSTALL_ARGS.username = $("input[name='username']").val();
+		TEST.INSTALL_ARGS.password = $("input[name='password']").val();
+		TEST.start();
+	});
 }
-
-    </script>
-  </head>
-  <body>
-  </body>
+		</script>
+	</head>
+	<body>
+		<div><input type="text" name="location"/>URL of database server</div>
+		<div><input type="text" name="database"/>database name</div>
+		<div><input type="text" name="username"/>database user name</div>
+		<div><input type="password" name="password"/>database password</div>
+		<div><input type="button" name="begin" value="Begin Test"/></div>
+	</body>
 </html>
