@@ -61,7 +61,7 @@ LT.Uploader = function (url, container) {
 		$("<input>").attr({type: "hidden", name: "uploader", value: this.index}),
 		// hidden iframe that recieves the result of the upload action
 		this.iframe = $("<iframe>").attr({name: target_name, src: "about:blank",})
-			.css({border: "0", height: "0", width: "0"})
+			.css({border: "0", height: "0", width: "0"})[0]
 	);
 };
 
