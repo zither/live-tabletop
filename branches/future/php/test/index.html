@@ -9,9 +9,7 @@
 		<script type="text/javascript">
 
 // constants
-TEST.LOGIN = "foo";
-TEST.PASSWORD = "bar";
-TEST.WRONG_PASSWORD = "baz";
+TEST.USER = {login: "foo", password: "bar"};
 TEST.TABLE_ARGS = {
 	'name': "My Table",
 	image_id: 1,
@@ -120,87 +118,74 @@ TEST.tests = [
 
 	// U S E R
 
-	{group: "USER.CREATE",
-		action: "../User.create.php",
-		args: {login: TEST.LOGIN, password: TEST.PASSWORD},
-		result: TEST.blank},
+	{group: "USER.CREATE", action: "../User.create.php",
+		args: {login: TEST.USER.login, password: TEST.USER.password, email: "x@y.z", subscribed: 0}, result: TEST.blank},
 
-	{group: "USER.LOGIN",
-		action: "../User.login.php",
-		args: {username: TEST.LOGIN, password: TEST.WRONG_PASSWORD},
-		result: TEST.zero},
-	{action: "../User.login.php",
-		args: {username: TEST.LOGIN, password: TEST.PASSWORD},
-		result: TEST.one},
+	{group: "USER.LOGIN", action: "../User.login.php", args: {login: TEST.USER.login, password: "wrong"}, result: TEST.unauthorized},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Campaign.create.php", args: {"name": "My Campaign"}, result: TEST.unimplemented},
+	// TODO: scripts return 401 unauthorized if you are not logged in.
 
-	{group: "USER.LOGOUT",
-		action: "../User.logout.php",
-		args: {},
-		result: TEST.blank},
-	{action: "../Campaign.create.php",
-		args: {"name": "My Campaign"},
-		result: TEST.logged_out},
-	{action: "../User.login.php", args: {},
-		args: {username: TEST.LOGIN, password: TEST.PASSWORD},
-		result: TEST.one},
-	{action: "../Campaign.create.php",
-		args: {"name": "My Campaign"},
-		result: TEST.one},
+	{group: "USER.LOGOUT", action: "../User.logout.php", args: {}, result: TEST.blank},
+	{action: "../Campaign.create.php", args: {"name": "My Campaign"}, result: TEST.logged_out},
 
-	{group: "USER.CHARACTERS", action: "../User.characters.php", args: {}, result: TEST.unimplemented},
-	{group: "USER.CAMPAIGNS", action: "../User.campaigns.php", args: {}, result: TEST.unimplemented},
-	{group: "USER.MAPS", action: "../User.maps.php", args: {}, result: TEST.unimplemented},
-	{group: "USER.UPDATE", action: "../User.update.php", args: {}, result: TEST.unimplemented},
-	{group: "USER.PASSWORD", action: "../User.password.php", args: {}, result: TEST.unimplemented},
-	{group: "USER.FRIENDS", action: "../User.friends.php", args: {}, result: TEST.unimplemented},
-	{group: "USER.FRIEND", action: "../User.friend.php", args: {}, result: TEST.unimplemented},
-	{group: "USER.UNFRIEND", action: "../User.unfriend.php", args: {}, result: TEST.unimplemented},
+	{group: "USER.CHARACTERS", action: "../User.characters.php", args: {}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../User.characters.php", args: {}, result: TEST.unimplemented},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
-	{group: "CHANGE PASSWORD",
-		action: "../update_user_password.php",
-		args: {password: TEST.WRONG_PASSWORD},
-		result: TEST.blank},
-	{action: "../login.php",
-		args: {username: TEST.LOGIN, password: TEST.WRONG_PASSWORD},
-		result: TEST.one},
-	{action: "../update_user_password.php",
-		args: {password: TEST.PASSWORD},
-		result: TEST.blank},
-	{action: "../login.php",
-		args: {username: TEST.LOGIN, password: TEST.PASSWORD},
-		result: TEST.one},
+	{group: "USER.CAMPAIGNS", action: "../User.campaigns.php", args: {}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../User.campaigns.php", args: {}, result: TEST.one},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
-	{action: "../login.php",
-		args: {username: "larry", password: "curly"},
-		result: TEST.one},
-	{action: "../login.php",
-		args: {username: TEST.LOGIN, password: TEST.PASSWORD},
-		result: TEST.one},
+	{group: "USER.MAPS", action: "../User.maps.php", args: {}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../User.maps.php", args: {}, result: TEST.unimplemented},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
-	{group: "UPDATE USER",
-		action: "../update_user.php",
-		args: {
-			user_id: 2,
-			username: "moe",
-			color: "green",
-			permissions: "administrator"},
-		result: TEST.blank},
-	{action: "../read_users.php",
-		args: {},
-		result: function (ajax) {
-			try {var data = JSON.parse(ajax.responseText);}
-			catch (e) {return "FAIL [parse error: " + e + "]";}
-			for (var i = 0; i < data.length; i++)
-				if (data[i].id == 2 && data[i].name == "moe" && data[i].color == "green")
-					return "PASS";
-			return "FAIL [" + ajax.responseText + "]";}},
+	{group: "USER.UPDATE", action: "../User.update.php", args: {}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{group: "USER.UPDATE", action: "../User.update.php", args: {id: 1, name: "moe", color: "green", email: "a@b.c", subscribed: 1}, result: TEST.blank},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
+	{action: "../User.login.php", args: TEST.USER, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
+		if (data.name == "moe" && data.color == "green" && data.email == "a@b.c" && data.subscribed == 1) return "PASS";
+		else return "FAIL [" + ajax.responseText + "]";}},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
+	{group: "USER PASSWORD", action: "../User.password.php", args: {password: "newPassword"}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../User.password.php", args: {password: "newPassword"}, result: TEST.blank},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
+	{action: "../User.login.php", args: {login: TEST.USER.login, password: "newPassword"}, result: TEST.exists},
+	{action: "../User.password.php", args: {password: TEST.USER.password}, result: TEST.blank},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
+
+	{group: "USER.FRIENDS", action: "../User.friends.php", args: {}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../User.friends.php", args: {}, result: TEST.unimplemented},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
+
+	{group: "USER.FRIEND", action: "../User.friend.php", args: {}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../User.friend.php", args: {}, result: TEST.unimplemented},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
+
+	{group: "USER.UNFRIEND", action: "../User.unfriend.php", args: {}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../User.unfriend.php", args: {}, result: TEST.unimplemented},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
+
+
+
+/*
 	{group: "DELETE USER",
 		action: "../delete_user.php",
 		args: {user_id: 2},
 		result: TEST.blank},
 	{action: "../read_users.php", args: {}, result: TEST.one},
-
+*/
 
 	// C A M P A I G N
 
