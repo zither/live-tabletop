@@ -1,11 +1,14 @@
 <?php // User paints or erases tiles, fog or walls
 
-session_start();
-if (!isset($_SESSION['user_id'])) die ('You are not logged in.');
-
 include('db_config.php');
 include('include/query.php');
 include('include/ownership.php');
+
+session_start();
+if (!isset($_SESSION['user_id'])) {
+	header('HTTP/1.1 401 Unauthorized', true, 401);
+	exit('You are not logged in.');
+}
 
 // Interpret the Request
 
@@ -53,8 +56,8 @@ if (LT_can_edit_map($map)) {
 			$i += $new_width + 1)
 				$new_flags[$i] = $code[strpos($new_flags[$i], $code) % 27];
 		// save the changes
-		if (LT_call('update_map_tiles', $map, json_encode($new_tiles), $new_flags))
-			$LT_SQL->commit();
+		if (LT_call('update_map_size', $map, $left, $top, $right, $bottom,
+			json_encode($new_tiles), $new_flags)) $LT_SQL->commit();
 	}
 }
 

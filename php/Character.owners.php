@@ -1,11 +1,14 @@
 <?php // User views a list of this character's owners
 
-session_start();
-if (!isset($_SESSION['user_id'])) die ('You are not logged in.');
-
 include('db_config.php');
 include('include/query.php');
 include('include/ownership.php');
+
+session_start();
+if (!isset($_SESSION['user_id'])) {
+	header('HTTP/1.1 401 Unauthorized', true, 401);
+	exit('You are not logged in.');
+}
 
 // Interpret the Request
 
@@ -14,7 +17,7 @@ $character = intval($_REQUEST['character']);
 // Query the Database
 
 if (LT_can_view_character($character)) {
-	if ($rows = LT_call('read_character_owners', $character)) {
+	if (is_array($rows = LT_call('read_character_owners', $character))) {
 		$string_fields = array('login', 'name', 'color');
 		foreach($rows as $i => $fields)
 			foreach($fields as $key => $value)

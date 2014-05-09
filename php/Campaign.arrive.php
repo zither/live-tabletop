@@ -1,11 +1,14 @@
 <?php // User checks in to a campaign
 
-session_start();
-if (!isset($_SESSION['user_id'])) die ('You are not logged in.');
-
 include('db_config.php');
 include('include/query.php');
 include('include/ownership.php');
+
+session_start();
+if (!isset($_SESSION['user_id'])) {
+	header('HTTP/1.1 401 Unauthorized', true, 401);
+	exit('You are not logged in.');
+}
 
 // Interpret the Request
 

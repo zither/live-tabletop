@@ -446,7 +446,7 @@ END;
 /* Admin views all users */
 CREATE PROCEDURE read_users ()
 BEGIN
-	SELECT id, login, hash, salt, UNIX_TIMESTAMP(last_action) AS last_action,
+	SELECT id, login, UNIX_TIMESTAMP(last_action) AS last_action,
 		logged_in, name, color, email, subscribed
 		FROM users ORDER BY name, login, id;
 END;
@@ -519,8 +519,11 @@ END;
 or User confirms a friend request */
 CREATE PROCEDURE create_friend (IN the_sender INT, IN the_recipient INT)
 BEGIN
-	REPLACE INTO friends (sender, recipient)
-		VALUES (the_sender, the_recipient);
+	IF the_sender <> the_recipient
+	THEN
+		REPLACE INTO friends (sender, recipient)
+			VALUES (the_sender, the_recipient);
+	END IF;
 END;
 
 /* Admin views all friend requests sent and received by the user */
@@ -545,9 +548,10 @@ END;
 /* User views his list of confirmed friends */
 CREATE PROCEDURE read_friends_confirmed (IN the_user INT)
 BEGIN
-	SELECT a.recipient AS user_id FROM friends a, friends b
-		WHERE a.sender = the_user
-		AND a.sender = b.recipient AND b.sender = a.recipient;
+	SELECT requested.recipient AS user_id FROM
+		(SELECT * FROM friends WHERE sender = the_user) AS requested,
+		(SELECT * FROM friends WHERE recipient = the_user) AS received
+		WHERE received.sender = requested.recipient;
 END;
 
 /* User stops being friends with the recipient

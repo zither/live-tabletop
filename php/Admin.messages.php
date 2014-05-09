@@ -1,10 +1,13 @@
 <?php // Admin views all messages in a campaign
 
-session_start();
-if (!isset($_SESSION['admin'])) die ('You are not logged in.');
-
 include('db_config.php');
 include('include/query.php');
+
+session_start();
+if (!isset($_SESSION['admin'])) {
+	header('HTTP/1.1 401 Unauthorized', true, 401);
+	exit('You are not logged in.');
+}
 
 // Interpret the Request
 
@@ -13,7 +16,7 @@ $last_message_id = 0; // show all messages
 
 // Query the Database
 
-if ($rows = LT_call('read_messages', $campaign, $last_message_id)) {
+if (is_array($rows = LT_call('read_messages', $campaign, $last_message_id))) {
 	$string_fields = array('text');
 	foreach ($rows as $i => $message)
 		foreach ($message as $key => $value)
