@@ -11,7 +11,7 @@ if (!isset($_SESSION['admin'])) {
 
 // Interpret the Request
 
-$campaign = $LT_SQL->real_escape_string($_REQUEST['campaign']);
+$campaign = intval($_REQUEST['campaign']);
 $last_message_id = 0; // show all messages
 
 // Query the Database

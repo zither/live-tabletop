@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 // Interpret the Request
 
-$campaign = $LT_SQL->real_escape_string($_REQUEST['campaign']);
+$campaign = intval($_REQUEST['campaign']);
 $turns = $LT_SQL->real_escape_string($_REQUEST['turns']);
 
 // Query the Database

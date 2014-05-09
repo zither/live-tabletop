@@ -11,7 +11,7 @@ if (!isset($_SESSION['admin'])) {
 
 // Interpret the Request
 
-$user = $LT_SQL->real_escape_string($_REQUEST['user']);
+$user = intval($_REQUEST['user']);
 
 // Query the Database
 

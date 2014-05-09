@@ -9,7 +9,6 @@ if (!isset($_SESSION['admin'])) {
 	exit('You are not logged in.');
 }
 
-$user = $LT_SQL->real_escape_string($_REQUEST['user']);
-LT_call('delete_user', $user);
+LT_call('delete_user', intval($_REQUEST['user']));
 
 ?>

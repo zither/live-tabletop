@@ -12,8 +12,8 @@ if (!isset($_SESSION['user_id'])) {
 
 // Interpret the Request
 
-$campaign = $LT_SQL->real_escape_string($_REQUEST['campaign']);
-$private = $LT_SQL->real_escape_string($_REQUEST['private']);
+$campaign = intval($_REQUEST['campaign']);
+$private = intval($_REQUEST['private']);
 
 // Query the Database
 

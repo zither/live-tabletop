@@ -13,9 +13,9 @@ if (!isset($_SESSION['user_id'])) {
 
 // Interpret the Request
 
-$user_id = $LT_SQL->real_escape_string($_SESSION['user_id']);
-$campaign = $LT_SQL->real_escape_string($_REQUEST['campaign']);
-$avatar = $LT_SQL->real_escape_string($_REQUEST['avatar']);
+$user_id = intval($_SESSION['user_id']);
+$campaign = intval($_REQUEST['campaign']);
+$avatar = intval($_REQUEST['avatar']);
 $text = $LT_SQL->real_escape_string(LT_expand_rolls($_REQUEST['text']));
 
 // Query the Database

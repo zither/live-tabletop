@@ -12,7 +12,7 @@ if (!isset($_SESSION['admin'])) {
 
 // Interpret the Request
 
-$user = $LT_SQL->real_escape_string($_REQUEST['user']);
+$user = intval($_REQUEST['user']);
 $password = $LT_SQL->real_escape_string($_REQUEST['password']);
 $salt = LT_random_salt();
 $hash = LT_hash_password($password, $salt);
