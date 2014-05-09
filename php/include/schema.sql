@@ -431,7 +431,7 @@ END;
 CREATE PROCEDURE read_user_login (IN the_login VARCHAR(200))
 BEGIN
 	SELECT id, login, hash, salt, UNIX_TIMESTAMP(last_action) AS last_action,
-		logged_in, name, color, e-mail, subscribed
+		logged_in, name, color, email, subscribed
 		FROM users WHERE login = the_login;
 END;
 
@@ -439,7 +439,7 @@ END;
 or User views another user's id, login, logged_in, name and color */
 CREATE PROCEDURE read_user (IN the_user INT)
 BEGIN
-	SELECT id, login, logged_in, name, color, e-mail, subscribed
+	SELECT id, login, logged_in, name, color, email, subscribed
 		FROM users WHERE id = the_user;
 END;
 
@@ -638,7 +638,7 @@ CREATE PROCEDURE read_campaign_user_campaigns (IN the_user INT)
 BEGIN
 	SELECT campaign_id, name, permission FROM campaign_users
 		WHERE user_id = the_user AND permission IN ('owner', 'member')
-		ORDER BY name, id;
+		ORDER BY name, campaign_id;
 END;
 
 /* User views the owners, members, viewers and blacklist of this campaign */

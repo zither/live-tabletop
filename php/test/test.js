@@ -77,10 +77,10 @@ var TEST = {
 	// is a JSON array with the specified length (target.)
 	count: function (ajax, target) {
 		try {var data = JSON.parse(ajax.responseText);}
-		catch (e) {return "FAIL [parse error: " + e + "]";}
+		catch (e) {return "FAIL [" + ajax.responseText + "]";}
 		if (typeof(data.length) == "undefined")
-			return "FAIL [data is a " + typeof(data.length) + "]";
-		if (data.length == target) return "PASS";
+			return "FAIL [data is " + typeof(data) + "]";
+		else if (data.length == target) return "PASS";
 		else return "FAIL [returned " + data.length + "objects]";
 	},
 
@@ -107,7 +107,7 @@ var TEST = {
 	// is JSON equivalent to the specified javascript object (target.)
 	json: function (ajax, target) {
 		try {var data = JSON.parse(ajax.responseText);}
-		catch (e) {return "FAIL [parse error: " + e + "]";}
+		catch (e) {return "FAIL [parse error: " + ajax.responseText + "]";}
 		if (JSON.stringify(data) == JSON.stringify(target)) return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";
 	},

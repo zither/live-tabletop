@@ -12,7 +12,7 @@ $user_id = $LT_SQL->real_escape_string($_SESSION['user_id']);
 
 // Query the Database
 
-if ($rows = LT_call('read_campaign_user_campaigns', $campaign)) {
+if ($rows = LT_call('read_campaign_user_campaigns', $user_id)) {
 	foreach ($rows as $i => $campaign)
 		$rows[$i]['campaign_id'] = intval($campaign['campaign_id']);
 	include('include/json_headers.php');

@@ -16,6 +16,6 @@ $name = $LT_SQL->real_escape_string($_REQUEST['name']);
 $rows = LT_call('create_campaign', $user_id, $name);
 
 include('include/json_headers.php');
-echo json_encode(array('id' => integer($rows[0]['id'])));
+echo json_encode(array('id' => intval($rows[0]['id'])));
 
 ?>
