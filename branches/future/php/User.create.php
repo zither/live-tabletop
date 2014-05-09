@@ -1,10 +1,10 @@
 <?php // User creates a new account for himself
 
-session_start();
-
 include('db_config.php');
 include('include/query.php');
 include('include/password.php');
+
+session_start();
 
 // Interpret the Request
 

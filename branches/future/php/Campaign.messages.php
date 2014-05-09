@@ -1,11 +1,14 @@
 <?php // User joins a campaign or looks for new messages
 
-session_start();
-if (!isset($_SESSION['user_id'])) die ('You are not logged in.');
-
 include('db_config.php');
 include('include/query.php');
 include('include/ownership.php');
+
+session_start();
+if (!isset($_SESSION['user_id'])) {
+	header('HTTP/1.1 401 Unauthorized', true, 401);
+	exit('You are not logged in.');
+}
 
 // Interpret the Request
 
@@ -15,7 +18,7 @@ $last_message_id = $LT_SQL->real_escape_string($_REQUEST['last_message_id']);
 // Query the Database
 
 if (LT_can_view_campaign($campaign)) {
-	if ($rows = LT_call('read_messages', $campaign, $last_message_id)) {
+	if (is_array($rows = LT_call('read_messages', $campaign, $last_message_id))) {
 		$string_fields = array('text');
 		foreach ($rows as $i => $fields)
 			foreach ($fields as $key => $value)

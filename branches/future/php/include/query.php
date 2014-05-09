@@ -57,28 +57,22 @@ function LT_query($query, $die = TRUE) {
 	// perform query
 	$success = $LT_SQL->multi_query($query);
 	if (!$success) {
-		if ($die) {
-			die('Query failed: ' . $LT_SQL->error);
-		}
-		else {
-			return FALSE;
-		}
+		if ($die) die('Query failed: ' . $LT_SQL->error);
+		else return FALSE;
 	}
 
 	// get the first result set as an array of associative arrays
 	$rows = array();
 	$result = $LT_SQL->store_result();
 	if ($result) {
-		while ($row = $result->fetch_assoc()) {
+		while ($row = $result->fetch_assoc())
 			$rows[] = $row;
-		}
 		$result->close();
 	}
 
 	// ignore subsequent result sets
-	while ($LT_SQL->more_results()) {
+	while ($LT_SQL->more_results())
 		$LT_SQL->next_result();
-	}
 
 	// return first result set array
 	return $rows;
@@ -88,12 +82,10 @@ function LT_query($query, $die = TRUE) {
 // or a default value if the request variable has not been provided.
 function LT_request($variable, $default) {
 	global $LT_SQL;
-	if (array_key_exists($variable, $_REQUEST)) {
+	if (array_key_exists($variable, $_REQUEST))
 		return $LT_SQL->real_escape_string($_REQUEST[$variable]);
-	}
-	else {
+	else
 		return $LT_SQL->real_escape_string($default);
-	}
 }
 
 ?>
