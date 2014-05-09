@@ -196,8 +196,6 @@ TEST.tests = [
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
-
-
 /*
 	{group: "DELETE USER",
 		action: "../delete_user.php",
@@ -208,19 +206,98 @@ TEST.tests = [
 
 	// C A M P A I G N
 
-	{group: "CAMPAIGN.CREATE", action: "../Campaign.create.php", args: {}, result: TEST.unimplemented},
-	{group: "CAMPAIGN.NAME", action: "../Campaign.name.php", args: {}, result: TEST.unimplemented},
-	{group: "CAMPAIGN.PRIVATE", action: "../Campaign.private.php", args: {}, result: TEST.unimplemented},
-	{group: "CAMPAIGN.READ", action: "../Campaign.read.php", args: {}, result: TEST.unimplemented},
-	{group: "CAMPAIGN.MAP", action: "../Campaign.map.php", args: {}, result: TEST.unimplemented},
-	{group: "CAMPAIGN.TURNS", action: "../Campaign.turns.php", args: {}, result: TEST.unimplemented},
-	{group: "CAMPAIGN.USERS", action: "../Campaign.users.php", args: {}, result: TEST.unimplemented},
-	{group: "CAMPAIGN.ARRIVE", action: "../Campaign.arrive.php", args: {}, result: TEST.unimplemented},
-	{group: "CAMPAIGN.MESSAGE", action: "../Campaign.message.php", args: {}, result: TEST.unimplemented},
-	{group: "CAMPAIGN.MESSAGES", action: "../Campaign.messages.php", args: {}, result: TEST.unimplemented},
-	{group: "CAMPAIGN.AVATAR", action: "../Campaign.avatar.php", args: {}, result: TEST.unimplemented},
-	{group: "CAMPAIGN.LEAVE", action: "../Campaign.leave.php", args: {}, result: TEST.unimplemented},
-	{group: "CAMPAIGN.PERMISSION", action: "../Campaign.permission.php", args: {}, result: TEST.unimplemented},
+	{group: "CAMPAIGN.CREATE", action: "../Campaign.create.php", args: {name: "My Campaign"}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Campaign.create.php", args: {name: "My Campaign"}, result: function (ajax) {return TEST.json(ajax, {id: 2});}},
+	{action: "../User.campaigns.php", args: {}, result: TEST.one},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
+
+	{group: "CAMPAIGN.NAME", action: "../Campaign.name.php", args: {campaign: 2, name: "Still My Campaign"}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Campaign.name.php", args: {campaign: 2, name: "Still My Campaign"}, result: TEST.blank},
+	{action: "../User.campaigns.php", args: {}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
+		if (data[0].id == 2 && data[0].name == "Still My Campaign") return "PASS";
+		else return "FAIL [" + ajax.responseText + "]";}},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
+
+	{group: "CAMPAIGN.PRIVATE", action: "../Campaign.private.php", args: {campaign: 2, 'private': 0}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Campaign.private.php", args: {campaign: 2, 'private': 0}, result: TEST.blank},
+	{action: "../Campaign.read.php", args: {campaign: 2}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
+		if (data['private'] == 0) return "PASS"; else return "FAIL [" + ajax.responseText + "]";}},
+	{action: "../Campaign.private.php", args: {campaign: 2, 'private': 1}, result: TEST.blank},
+	{action: "../Campaign.read.php", args: {campaign: 2}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
+		if (data['private'] == 1) return "PASS"; else return "FAIL [" + ajax.responseText + "]";}},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
+
+	{group: "CAMPAIGN.READ", action: "../Campaign.read.php", args: {campaign: 2}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Campaign.read.php", args: {campaign: 2}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
+		if (data.id == 2 && data.name == "Still My Campaign" && data['private'] == 1 && data.map == null
+			&& JSON.stringify(data.turns) == "[]" && typeof(data.last_message) == "number"
+			&& typeof(data.users_modified) == 'number') return "PASS";
+		else return "FAIL [" + ajax.responseText + "]";}},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
+
+	{group: "CAMPAIGN.MAP", action: "../Campaign.map.php", args: {campaign: 2, map: 1}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Campaign.map.php", args: {campaign: 2, map: 1}, result: TEST.blank},
+	{action: "../Campaign.read.php", args: {campaign: 2}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
+		if (data.map == 1) return "PASS"; else return "FAIL [" + ajax.responseText + "]";}},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
+
+	{group: "CAMPAIGN.TURNS", action: "../Campaign.turns.php", args: {campaign: 2, turns: "[1,1,2,3,5,8,13,21]"}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Campaign.turns.php", args: {campaign: 2, turns: "[1,1,2,3,5,8,13,21]"}, result: TEST.blank},
+	{action: "../Campaign.read.php", args: {campaign: 2}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
+		if (JSON.stringify(data.turns) == "[1,1,2,3,5,8,13,21]") return "PASS"; else return "FAIL [" + ajax.responseText + "]";}},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
+
+	{group: "CAMPAIGN.USERS", action: "../Campaign.users.php", args: {campaign: 2}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Campaign.users.php", args: {campaign: 2}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
+		if (data[0].user_id == 3 && data[0].permission == "owner" && data[0].viewing == 0 && data[0].avatar == null
+			&& data[0].login == TEST.USER.login && data[0].name == null) return "PASS";
+		else return "FAIL [" + ajax.responseText + "]";}},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
+
+	{group: "CAMPAIGN.ARRIVE", action: "../Campaign.arrive.php", args: {}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Campaign.arrive.php", args: {}, result: TEST.unimplemented},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
+
+	{group: "CAMPAIGN.MESSAGE", action: "../Campaign.message.php", args: {}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Campaign.message.php", args: {}, result: TEST.unimplemented},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
+
+	{group: "CAMPAIGN.MESSAGES", action: "../Campaign.messages.php", args: {}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Campaign.messages.php", args: {}, result: TEST.unimplemented},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
+
+	{group: "CAMPAIGN.AVATAR", action: "../Campaign.avatar.php", args: {}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Campaign.avatar.php", args: {}, result: TEST.unimplemented},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
+
+	{group: "CAMPAIGN.LEAVE", action: "../Campaign.leave.php", args: {}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Campaign.leave.php", args: {}, result: TEST.unimplemented},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
+
+	{group: "CAMPAIGN.PERMISSION", action: "../Campaign.permission.php", args: {}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Campaign.permission.php", args: {}, result: TEST.unimplemented},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
+
 
 	{group: "PRIVATE ROLL",
 		action: "../private_roll.php",

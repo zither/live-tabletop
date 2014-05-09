@@ -93,7 +93,7 @@ function LT_can_move_piece($piece_id) {
 			if ($rows = LT_call_silent('read_campaigns_by_map', $map_id)) {
 				foreach ($rows as $i => $campaign) {
 					// anyone can move unlocked pieces in a public campaign
-					if ($campaign['private'] == '0') return TRUE
+					if ($campaign['private'] == '0') return TRUE;
 					// only owners and members can move unlocked pieces in a private campaign
 					if ($rows = LT_call_silent('read_campaign_user_permission', $user_id, $campaign['id']))
 						if ($rows[0]['permission'] == 'owner' or $rows[0]['permission'] == 'member')
