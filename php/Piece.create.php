@@ -2,7 +2,7 @@
 
 include('db_config.php');
 include('include/query.php');
-include('include/permissions.php');
+include('include/ownership.php');
 
 session_start();
 if (!isset($_SESSION['user_id'])) {

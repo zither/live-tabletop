@@ -571,7 +571,8 @@ BEGIN
 	DECLARE new_campaign_id INT;
 	START TRANSACTION;
 /* create the campaign */
-	INSERT INTO campaigns (name, users_modified) VALUES (the_name, NOW());
+	INSERT INTO campaigns (name, turns, users_modified)
+		VALUES (the_name, '[]', NOW());
 	SET new_campaign_id = LAST_INSERT_ID();
 /* make the user an owner */
 	INSERT INTO campaign_users (user_id, campaign_id, permission)
