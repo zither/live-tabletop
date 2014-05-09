@@ -17,7 +17,11 @@ $name = $LT_SQL->real_escape_string($_REQUEST['name']);
 
 // Query the Database
 
-if (LT_can_edit_campaign($campaign))
+if (LT_can_edit_campaign($campaign)) {
 	LT_call('update_campaign_name', $campaign, $name);
+} else {
+	header('HTTP/1.1 401 Unauthorized', true, 401);
+	exit('You are not an owner of this campaign.');
+}
 
 ?>

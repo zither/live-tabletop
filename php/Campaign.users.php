@@ -19,10 +19,13 @@ $campaign = intval($_REQUEST['campaign']);
 if (LT_can_view_campaign($campaign)) {
 	if (is_array($rows = LT_call('read_campaign_users', $campaign))) {
 		$string_fields = array('permission', 'login', 'name');
+		$boolean_fields = array('viewing');
 		foreach ($rows as $i => $table)
 			foreach ($table as $key => $value)
+				if (in_array($key, $boolean_fields)
+					$rows[$i][$key] = $value == '1' ? TRUE : FALSE;
 				if (!in_array($key, $string_fields))
-					$rows[$i][$key] = intval($value);
+					$rows[$i][$key] = $value === NULL ? NULL : intval($value);
 		include('include/json_headers.php');
 		echo json_encode($rows);
 	}

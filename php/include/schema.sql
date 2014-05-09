@@ -575,8 +575,8 @@ BEGIN
 		VALUES (the_name, '[]', NOW());
 	SET new_campaign_id = LAST_INSERT_ID();
 /* make the user an owner */
-	INSERT INTO campaign_users (user_id, campaign_id, permission)
-		VALUES (the_user, new_campaign_id, 'owner');
+	INSERT INTO campaign_users (user_id, campaign_id, name, permission)
+		VALUES (the_user, new_campaign_id, the_name, 'owner');
 /* return the new campaign's id */
 	SELECT new_campaign_id AS id;
 	COMMIT;
@@ -608,7 +608,10 @@ END;
 /* User renames the campaign */
 CREATE PROCEDURE update_campaign_name (IN the_campaign INT, IN the_name TEXT)
 BEGIN
+	START TRANSACTION;
 	UPDATE campaigns SET name = the_name WHERE id = the_campaign;
+	UPDATE campaign_users SET name = the_name WHERE campaign_id = the_campaign;
+	COMMIT;
 END;
 
 /* User toggles the campaign's private/public setting */
@@ -632,10 +635,12 @@ END;
 
 /*** CAMPAIGN_USERS PROCEDURES ***/
 
-/* User tries to view the campaign and PHP logic checks whether that is allowed */
-CREATE PROCEDURE read_campaign_user_permission (IN the_user INT)
+/* User tries to view campaign and PHP logic checks whether that is allowed */
+CREATE PROCEDURE read_campaign_user_permission
+	(IN the_user INT, IN the_campaign INT)
 BEGIN
-	SELECT permission FROM campaign_users WHERE user_id = the_user;
+	SELECT permission FROM campaign_users
+		WHERE user_id = the_user AND campaign_id = the_campaign;
 END;
 
 /* User views campaigns he owns and campaigns he has been invited to */
@@ -664,10 +669,12 @@ or User disowns the campaign (NULL permission) */
 CREATE PROCEDURE update_campaign_users_permission
 	(IN the_user INT, IN the_campaign INT, IN the_permission INT)
 BEGIN
+	DECLARE the_name TEXT;
 	START TRANSACTION;
 /* create or update the campaign user's permission */
-	REPLACE INTO campaign_users (user_id, campaign_id, permission)
-		VALUES (the_user, the_campaign, the_permission);
+	SELECT name INTO the_name FROM campaigns WHERE id = the_campaign;
+	REPLACE INTO campaign_users (user_id, campaign_id, name, permission)
+		VALUES (the_user, the_campaign, the_name, the_permission);
 /* delete guests (NULL permission) who are not viewing the campaign */
 	DELETE FROM campaign_users WHERE user_id = the_user AND campaign_id = the_campaign
 		AND permission = NULL AND viewing = 0;
@@ -683,8 +690,12 @@ END;
 /* User joins a campaign */
 CREATE PROCEDURE update_campaign_users_arrive (IN the_user INT, IN the_campaign INT)
 BEGIN
-	REPLACE INTO campaign_users (user_id, campaign_id, viewing)
-		VALUES (the_user, the_campaign, 1);
+	DECLARE the_name TEXT;
+	START TRANSACTION;
+	SELECT name INTO the_name FROM campaigns WHERE id = the_campaign;
+	REPLACE INTO campaign_users (user_id, campaign_id, name, viewing)
+		VALUES (the_user, the_campaign, the_name, 1);
+	COMMIT;
 END;
 
 /* User leaves a campaign */

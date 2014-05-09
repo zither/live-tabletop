@@ -217,7 +217,7 @@ TEST.tests = [
 	{action: "../Campaign.name.php", args: {campaign: 2, name: "Still My Campaign"}, result: TEST.blank},
 	{action: "../User.campaigns.php", args: {}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
-		if (data[0].id == 2 && data[0].name == "Still My Campaign") return "PASS";
+		if (data[0].campaign_id == 2 && data[0].name == "Still My Campaign") return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
@@ -237,7 +237,7 @@ TEST.tests = [
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
 	{action: "../Campaign.read.php", args: {campaign: 2}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
-		if (data.id == 2 && data.name == "Still My Campaign" && data['private'] == 1 && data.map == null
+		if (data.id == 2 && data.name == "Still My Campaign" && data['private'] === true && data.map === null
 			&& JSON.stringify(data.turns) == "[]" && typeof(data.last_message) == "number"
 			&& typeof(data.users_modified) == 'number') return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
@@ -263,8 +263,8 @@ TEST.tests = [
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
 	{action: "../Campaign.users.php", args: {campaign: 2}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
-		if (data[0].user_id == 3 && data[0].permission == "owner" && data[0].viewing == 0 && data[0].avatar == null
-			&& data[0].login == TEST.USER.login && data[0].name == null) return "PASS";
+		if (data[0].user_id == 3 && data[0].permission == "owner" && data[0].viewing === false && data[0].avatar === null
+			&& data[0].login == TEST.USER.login && data[0].name === null) return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
