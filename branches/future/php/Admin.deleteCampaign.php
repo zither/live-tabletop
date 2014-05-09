@@ -9,7 +9,6 @@ if (!isset($_SESSION['admin'])) {
 	exit('You are not logged in.');
 }
 
-$campaign = $LT_SQL->real_escape_string($_REQUEST['campaign']);
-LT_call('delete_campaign', $campaign);
+LT_call('delete_campaign', intval($_REQUEST['campaign']));
 
 ?>

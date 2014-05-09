@@ -12,7 +12,7 @@ if (!isset($_SESSION['user_id'])) {
 
 // Interpret the Request
 
-$campaign = $LT_SQL->real_escape_string($_REQUEST['campaign']);
+$campaign = intval($_REQUEST['campaign']);
 $name = $LT_SQL->real_escape_string($_REQUEST['name']);
 
 // Query the Database

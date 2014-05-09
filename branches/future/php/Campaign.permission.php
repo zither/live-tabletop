@@ -19,8 +19,8 @@ if (!isset($_SESSION['user_id'])) {
 
 // Interpret the Request
 
-$user = $LT_SQL->real_escape_string($_REQUEST['user']);
-$campaign = $LT_SQL->real_escape_string($_REQUEST['campaign']);
+$user = intval($_REQUEST['user']);
+$campaign = intval($_REQUEST['campaign']);
 $permission = $LT_SQL->real_escape_string($_REQUEST['permission']);
 
 // Query the Database

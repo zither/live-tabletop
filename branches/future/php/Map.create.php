@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id'])) {
 
 // Interpret the Request
 
-$user_id = $LT_SQL->real_escape_string($_SESSION['user_id']);
+$user_id = intval($_SESSION['user_id']);
 $type = $LT_SQL->real_escape_string($_REQUEST['type']);
 $rows = intval($_REQUEST['rows']);
 $columns = intval($_REQUEST['columns']);

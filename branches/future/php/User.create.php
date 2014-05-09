@@ -11,7 +11,7 @@ session_start();
 $login = $LT_SQL->real_escape_string($_REQUEST['login']);
 $password = $LT_SQL->real_escape_string($_REQUEST['password']);
 $email = $LT_SQL->real_escape_string($_REQUEST['email']);
-$subscribed = $LT_SQL->real_escape_string($_REQUEST['subscribed']); // 0 or 1
+$subscribed = intval($_REQUEST['subscribed']); // 0 or 1
 
 $salt = LT_random_salt();
 $hash = LT_hash_password($password, $salt);

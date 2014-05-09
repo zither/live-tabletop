@@ -11,8 +11,8 @@ if (!isset($_SESSION['user_id'])) {
 
 // Interpret the Request
 
-$sender = $LT_SQL->real_escape_string($_SESSION['user_id']);
-$recipient = $LT_SQL->real_escape_string($_REQUEST['recipient']);
+$sender = intval($_SESSION['user_id']);
+$recipient = intval($_REQUEST['recipient']);
 
 // Query the Database
 
