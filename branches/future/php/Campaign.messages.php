@@ -23,7 +23,7 @@ if (LT_can_view_campaign($campaign)) {
 		foreach ($rows as $i => $fields)
 			foreach ($fields as $key => $value)
 				if (!in_array($key, $string_fields))
-					$rows[$i][$key] = intval($value);
+					if ($rows[$i][$key] !== NULL) $rows[$i][$key] = intval($value);
 		include('include/json_headers.php');
 		echo json_encode($rows);
 	}

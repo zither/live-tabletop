@@ -26,6 +26,6 @@ $permission = $LT_SQL->real_escape_string($_REQUEST['permission']);
 // Query the Database
 
 if (LT_can_edit_campaign($campaign))
-	LT_call('update_campaign_user_permisssion', $user, $campaign, $permission);
+	LT_call('update_campaign_user_permission', $user, $campaign, $permission);
 
 ?>

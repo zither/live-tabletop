@@ -84,7 +84,7 @@ function LT_can_move_piece($piece_id) {
 			return TRUE;
 
 		// users can move pieces linked to their characters
-		if ($character_id != 'null')
+		if ($character_id !== NULL)
 			if (LT_call_silent('read_character_owner_exists', $user_id, $character_id))
 				return TRUE;
 

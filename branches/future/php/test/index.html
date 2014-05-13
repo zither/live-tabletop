@@ -31,15 +31,15 @@ TEST.INSTALL_ARGS = {
 	admin_password: TEST.ADMIN.password,
 };
 
+TEST.MESSAGE_IN = "From 1975 - 2010, [0 + 2010 - 1975] years passed.";
+TEST.MESSAGE_OUT = 'From 1975 - 2010, <span class="roll">0 + 2010 - 1975 = 35</span> years passed.';
+
 // list of tests
 TEST.tests = [
 
 	// INSTALL
-	{group: "INSTALL",
-		action: "../install.php",
-		abort: true,
-		args: TEST.INSTALL_ARGS,
-		result: TEST.blank},
+	{group: "INSTALL"},
+	{action: "../install.php", abort: true, args: TEST.INSTALL_ARGS, result: TEST.blank},
 	{action: "../db_config.php", args: {}, result: TEST.exists},
 
 	// clear session variables
@@ -48,26 +48,31 @@ TEST.tests = [
 
 	// ADMIN
 
-	{group: "ADMIN.CREATE", action: "../Admin.create.php", args: TEST.ADMIN2, result: TEST.logged_out},
+	{group: "ADMIN.CREATE"},
+	{action: "../Admin.create.php", args: TEST.ADMIN2, result: TEST.logged_out},
 	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
 	{action: "../Admin.create.php", args: TEST.ADMIN2, result: TEST.blank},
 	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
 
-	{group: "ADMIN.LOGIN", action: "../Admin.login.php", args: {login: "admin2", password: "wrong"}, result: TEST.unauthorized},
+	{group: "ADMIN.LOGIN"},
+	{action: "../Admin.login.php", args: {login: "admin2", password: "wrong"}, result: TEST.unauthorized},
 	{action: "../Admin.login.php", args: {login: "wrong", password: "password2"}, result: TEST.unauthorized},
 	{action: "../Admin.login.php", args: TEST.ADMIN2, result: TEST.blank},
 	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
 
-	{group: "ADMIN.LOGOUT", action: "../Admin.logout.php", args: {}, result: TEST.blank},
+	{group: "ADMIN.LOGOUT"},
+	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
 	{action: "../Admin.create.php", args: TEST.ADMIN2, result: TEST.logged_out},
 
-	{group: "ADMIN.DELETE", action: "../Admin.delete.php", args: {login: "admin2"}, result: TEST.logged_out},
+	{group: "ADMIN.DELETE"},
+	{action: "../Admin.delete.php", args: {login: "admin2"}, result: TEST.logged_out},
 	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
 	{action: "../Admin.delete.php", args: {login: "admin2"}, result: TEST.blank},
 	{action: "../Admin.login.php", args: TEST.ADMIN2, result: TEST.unauthorized},
 	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
 
-	{group: "ADMIN.PASSWORD", action: "../Admin.password.php", args: {password: "newPassword"}, result: TEST.logged_out},
+	{group: "ADMIN.PASSWORD"},
+	{action: "../Admin.password.php", args: {password: "newPassword"}, result: TEST.logged_out},
 	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
 	{action: "../Admin.password.php", args: {password: "newPassword"}, result: TEST.blank},
 	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
@@ -75,25 +80,29 @@ TEST.tests = [
 	{action: "../Admin.password.php", args: {password: TEST.ADMIN.password}, result: TEST.blank},
 	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
 
-	{group: "ADMIN.USERS", action: "../Admin.users.php", args: {}, result: TEST.logged_out},
+	{group: "ADMIN.USERS"},
+	{action: "../Admin.users.php", args: {}, result: TEST.logged_out},
 	{action: "../User.create.php", args: {login: "larry", password: "curly", email: "a@b.c", subscribed: 1}, result: TEST.blank},
 	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
 	{action: "../Admin.users.php", args: {}, result: TEST.one},
 	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
 
-	{group: "ADMIN.FRIENDS", action: "../Admin.friends.php", args: {}, result: TEST.logged_out},
+	{group: "ADMIN.FRIENDS"},
+	{action: "../Admin.friends.php", args: {}, result: TEST.logged_out},
 	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
 	{action: "../Admin.friends.php", args: {user: 1}, result: TEST.zero},
 	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
 
-	{group: "ADMIN.USER PASSWORD", action: "../Admin.userPassword.php", args: {}, result: TEST.logged_out},
+	{group: "ADMIN.USER PASSWORD"},
+	{action: "../Admin.userPassword.php", args: {}, result: TEST.logged_out},
 	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
 	{action: "../Admin.userPassword.php", args: {user: 1, password: "shemp"}, result: TEST.blank},
 	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
 	{action: "../User.login.php", args: {login: "larry", password: "shemp"}, result: TEST.exists},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
-	{group: "ADMIN.CAMPAIGNS", action: "../Admin.campaigns.php", args: {}, result: TEST.logged_out},
+	{group: "ADMIN.CAMPAIGNS"},
+	{action: "../Admin.campaigns.php", args: {}, result: TEST.logged_out},
 	{action: "../User.login.php", args: {login: "larry", password: "shemp"}, result: TEST.exists},
 	{action: "../Campaign.create.php", args: {name: "My Campaign"}, result: TEST.exists},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
@@ -101,23 +110,27 @@ TEST.tests = [
 	{action: "../Admin.campaigns.php", args: {}, result: TEST.one},
 	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
 
-	{group: "ADMIN.MESSAGES", action: "../Admin.messages.php", args: {}, result: TEST.logged_out},
+	{group: "ADMIN.MESSAGES"},
+	{action: "../Admin.messages.php", args: {}, result: TEST.logged_out},
 	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
 	{action: "../Admin.messages.php", args: {campaign: 1}, result: TEST.zero},
 	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
 
-	{group: "ADMIN.EXPIRE MESSAGES", action: "../Admin.expireMessages.php", args: {}, result: TEST.logged_out},
+	{group: "ADMIN.EXPIRE MESSAGES"},
+	{action: "../Admin.expireMessages.php", args: {}, result: TEST.logged_out},
 	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
 	{action: "../Admin.expireMessages.php", args: {}, result: TEST.blank},
 	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
 
-	{group: "ADMIN.DELETE CAMPAIGN", action: "../Admin.deleteCampaign.php", args: {}, result: TEST.logged_out},
+	{group: "ADMIN.DELETE CAMPAIGN"},
+	{action: "../Admin.deleteCampaign.php", args: {}, result: TEST.logged_out},
 	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
 	{action: "../Admin.deleteCampaign.php", args: {campaign: 1}, result: TEST.blank},
 	{action: "../Admin.campaigns.php", args: {}, result: TEST.zero},
 	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
 
-	{group: "ADMIN.DELETE USER", action: "../Admin.deleteUser.php", args: {}, result: TEST.logged_out},
+	{group: "ADMIN.DELETE USER"},
+	{action: "../Admin.deleteUser.php", args: {}, result: TEST.logged_out},
 	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
 	{action: "../Admin.deleteUser.php", args: {user: 1}, result: TEST.blank},
 	{action: "../Admin.users.php", args: {}, result: TEST.zero},
@@ -125,34 +138,41 @@ TEST.tests = [
 
 	// U S E R
 
-	{group: "USER.CREATE", action: "../User.create.php",
+	{group: "USER.CREATE"},
+	{action: "../User.create.php",
 		args: {login: TEST.USER.login, password: TEST.USER.password, email: "x@y.z", subscribed: 0}, result: TEST.blank},
 
-	{group: "USER.LOGIN", action: "../User.login.php", args: {login: TEST.USER.login, password: "wrong"}, result: TEST.unauthorized},
+	{group: "USER.LOGIN"},
+	{action: "../User.login.php", args: {login: TEST.USER.login, password: "wrong"}, result: TEST.unauthorized},
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
 	{action: "../User.campaigns.php", args: {}, result: TEST.exists},
 
-	{group: "USER.LOGOUT", action: "../User.logout.php", args: {}, result: TEST.blank},
+	{group: "USER.LOGOUT"},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
 	{action: "../User.campaigns.php", args: {}, result: TEST.logged_out},
 
-	{group: "USER.CHARACTERS", action: "../User.characters.php", args: {}, result: TEST.logged_out},
+	{group: "USER.CHARACTERS"},
+	{action: "../User.characters.php", args: {}, result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
 	{action: "../User.characters.php", args: {}, result: TEST.zero},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
-	{group: "USER.CAMPAIGNS", action: "../User.campaigns.php", args: {}, result: TEST.logged_out},
+	{group: "USER.CAMPAIGNS"},
+	{action: "../User.campaigns.php", args: {}, result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
 	{action: "../User.campaigns.php", args: {}, result: TEST.zero},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
-	{group: "USER.MAPS", action: "../User.maps.php", args: {}, result: TEST.logged_out},
+	{group: "USER.MAPS"},
+	{action: "../User.maps.php", args: {}, result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
 	{action: "../User.maps.php", args: {}, result: TEST.zero},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
-	{group: "USER.UPDATE", action: "../User.update.php", args: {}, result: TEST.logged_out},
+	{group: "USER.UPDATE"},
+	{action: "../User.update.php", args: {}, result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{group: "USER.UPDATE", action: "../User.update.php", args: {name: "moe", color: "green", email: "a@b.c", subscribed: 1}, result: TEST.blank},
+	{action: "../User.update.php", args: {name: "moe", color: "green", email: "a@b.c", subscribed: 1}, result: TEST.blank},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 	{action: "../User.login.php", args: TEST.USER, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
@@ -160,7 +180,8 @@ TEST.tests = [
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
-	{group: "USER PASSWORD", action: "../User.password.php", args: {password: "newPassword"}, result: TEST.logged_out},
+	{group: "USER PASSWORD"},
+	{action: "../User.password.php", args: {password: "newPassword"}, result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
 	{action: "../User.password.php", args: {password: "newPassword"}, result: TEST.blank},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
@@ -168,7 +189,8 @@ TEST.tests = [
 	{action: "../User.password.php", args: {password: TEST.USER.password}, result: TEST.blank},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
-	{group: "USER.FRIENDS", action: "../User.friends.php", args: {}, result: TEST.logged_out},
+	{group: "USER.FRIENDS"},
+	{action: "../User.friends.php", args: {}, result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
 	{action: "../User.friends.php", args: {}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
@@ -176,7 +198,8 @@ TEST.tests = [
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
-	{group: "USER.FRIEND", action: "../User.friend.php", args: {}, result: TEST.logged_out},
+	{group: "USER.FRIEND"},
+	{action: "../User.friend.php", args: {}, result: TEST.logged_out},
 	{action: "../User.create.php", args: {login: "toad", password: "hall", email: "a@b.c", subscribed: 1}, result: TEST.blank},
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
 	{action: "../User.friend.php", args: {recipient: 2}, result: TEST.blank}, // friending self should fail silently
@@ -187,7 +210,8 @@ TEST.tests = [
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
-	{group: "USER.UNFRIEND", action: "../User.unfriend.php", args: {}, result: TEST.logged_out},
+	{group: "USER.UNFRIEND"},
+	{action: "../User.unfriend.php", args: {}, result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
 	{action: "../User.unfriend.php", args: {recipient: 3}, result: TEST.blank},
 	{action: "../User.friends.php", args: {}, result: function (ajax) {
@@ -197,8 +221,8 @@ TEST.tests = [
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 /*
-	{group: "DELETE USER",
-		action: "../delete_user.php",
+	{group: "DELETE USER"},
+	{action: "../delete_user.php",
 		args: {user_id: 2},
 		result: TEST.blank},
 	{action: "../read_users.php", args: {}, result: TEST.one},
@@ -206,13 +230,15 @@ TEST.tests = [
 
 	// C A M P A I G N
 
-	{group: "CAMPAIGN.CREATE", action: "../Campaign.create.php", args: {name: "My Campaign"}, result: TEST.logged_out},
+	{group: "CAMPAIGN.CREATE"},
+	{action: "../Campaign.create.php", args: {name: "My Campaign"}, result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
 	{action: "../Campaign.create.php", args: {name: "My Campaign"}, result: function (ajax) {return TEST.json(ajax, {id: 2});}},
 	{action: "../User.campaigns.php", args: {}, result: TEST.one},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
-	{group: "CAMPAIGN.NAME", action: "../Campaign.name.php", args: {campaign: 2, name: "Still My Campaign"}, result: TEST.logged_out},
+	{group: "CAMPAIGN.NAME"},
+	{action: "../Campaign.name.php", args: {campaign: 2, name: "Still My Campaign"}, result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
 	{action: "../Campaign.name.php", args: {campaign: 2, name: "Still My Campaign"}, result: TEST.blank},
 	{action: "../User.campaigns.php", args: {}, result: function (ajax) {
@@ -221,7 +247,8 @@ TEST.tests = [
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
-	{group: "CAMPAIGN.PRIVATE", action: "../Campaign.private.php", args: {campaign: 2, 'private': 0}, result: TEST.logged_out},
+	{group: "CAMPAIGN.PRIVATE"},
+	{action: "../Campaign.private.php", args: {campaign: 2, 'private': 0}, result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
 	{action: "../Campaign.private.php", args: {campaign: 2, 'private': 0}, result: TEST.blank},
 	{action: "../Campaign.read.php", args: {campaign: 2}, result: function (ajax) {
@@ -233,7 +260,8 @@ TEST.tests = [
 		if (data['private'] == 1) return "PASS"; else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
-	{group: "CAMPAIGN.READ", action: "../Campaign.read.php", args: {campaign: 2}, result: TEST.logged_out},
+	{group: "CAMPAIGN.READ"},
+	{action: "../Campaign.read.php", args: {campaign: 2}, result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
 	{action: "../Campaign.read.php", args: {campaign: 2}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
@@ -243,7 +271,8 @@ TEST.tests = [
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
-	{group: "CAMPAIGN.MAP", action: "../Campaign.map.php", args: {campaign: 2, map: 1}, result: TEST.logged_out},
+	{group: "CAMPAIGN.MAP"},
+	{action: "../Campaign.map.php", args: {campaign: 2, map: 1}, result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
 	{action: "../Campaign.map.php", args: {campaign: 2, map: 1}, result: TEST.blank},
 	{action: "../Campaign.read.php", args: {campaign: 2}, result: function (ajax) {
@@ -251,7 +280,8 @@ TEST.tests = [
 		if (data.map == 1) return "PASS"; else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
-	{group: "CAMPAIGN.TURNS", action: "../Campaign.turns.php", args: {campaign: 2, turns: "[1,1,2,3,5,8,13,21]"}, result: TEST.logged_out},
+	{group: "CAMPAIGN.TURNS"},
+	{action: "../Campaign.turns.php", args: {campaign: 2, turns: "[1,1,2,3,5,8,13,21]"}, result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
 	{action: "../Campaign.turns.php", args: {campaign: 2, turns: "[1,1,2,3,5,8,13,21]"}, result: TEST.blank},
 	{action: "../Campaign.read.php", args: {campaign: 2}, result: function (ajax) {
@@ -259,82 +289,118 @@ TEST.tests = [
 		if (JSON.stringify(data.turns) == "[1,1,2,3,5,8,13,21]") return "PASS"; else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
-	{group: "CAMPAIGN.USERS", action: "../Campaign.users.php", args: {campaign: 2}, result: TEST.logged_out},
+	{group: "CAMPAIGN.USERS"},
+	{action: "../Campaign.users.php", args: {campaign: 2}, result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
 	{action: "../Campaign.users.php", args: {campaign: 2}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
-		if (data[0].user_id == 3 && data[0].permission == "owner" && data[0].viewing === false && data[0].avatar === null
-			&& data[0].login == TEST.USER.login && data[0].name === null) return "PASS";
+		if (data[0].user_id == 2 && data[0].permission == "owner" && data[0].viewing === false && data[0].avatar === null
+			&& data[0].login == TEST.USER.login && data[0].name == "moe") return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
-	{group: "CAMPAIGN.ARRIVE", action: "../Campaign.arrive.php", args: {}, result: TEST.logged_out},
+	{group: "CAMPAIGN.ARRIVE"},
+	{action: "../Campaign.arrive.php", args: {campaign: 2}, result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Campaign.arrive.php", args: {}, result: TEST.unimplemented},
+	{action: "../Campaign.arrive.php", args: {campaign: 2}, result: TEST.blank},
+	{action: "../Campaign.users.php", args: {campaign: 2}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
+		if (data[0].user_id == 2 && data[0].permission == "owner" && data[0].viewing === true && data[0].avatar === null
+			&& data[0].login == TEST.USER.login && data[0].name == "moe") return "PASS";
+		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
-	{group: "CAMPAIGN.MESSAGE", action: "../Campaign.message.php", args: {}, result: TEST.logged_out},
+	{group: "CAMPAIGN.MESSAGE"},
+	{action: "../Campaign.message.php", args: {campaign: 2, avatar: 0, text: TEST.MESSAGE_IN}, result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Campaign.message.php", args: {}, result: TEST.unimplemented},
+	{action: "../Campaign.message.php", args: {campaign: 2, avatar: 0, text: TEST.MESSAGE_IN}, result: TEST.blank},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
-	{group: "CAMPAIGN.MESSAGES", action: "../Campaign.messages.php", args: {}, result: TEST.logged_out},
+	{group: "CAMPAIGN.MESSAGES"},
+	{action: "../Campaign.messages.php", args: {campaign: 2, last_message_id: 0}, result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Campaign.messages.php", args: {}, result: TEST.unimplemented},
+	{action: "../Campaign.messages.php", args: {campaign: 2, last_message_id: 0}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
+		if (data[0].id == 1 && data[0].user_id == 2 && data[0].avatar === 0 && data[0].text == TEST.MESSAGE_OUT) return "PASS";
+		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
-	{group: "CAMPAIGN.AVATAR", action: "../Campaign.avatar.php", args: {}, result: TEST.logged_out},
+	{group: "CAMPAIGN.AVATAR"},
+	{action: "../Campaign.avatar.php", args: {campaign: 2, avatar: 1}, result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Campaign.avatar.php", args: {}, result: TEST.unimplemented},
+	{action: "../Campaign.avatar.php", args: {campaign: 2, avatar: 1}, result: TEST.blank},
+	{action: "../Campaign.users.php", args: {campaign: 2}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
+		if (data[0].user_id == 2 && data[0].permission == "owner" && data[0].viewing === true && data[0].avatar === 1
+			&& data[0].login == TEST.USER.login && data[0].name == "moe") return "PASS";
+		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
-	{group: "CAMPAIGN.LEAVE", action: "../Campaign.leave.php", args: {}, result: TEST.logged_out},
+	{group: "CAMPAIGN.LEAVE"},
+	{action: "../Campaign.leave.php", args: {campaign: 2}, result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Campaign.leave.php", args: {}, result: TEST.unimplemented},
+	{action: "../Campaign.leave.php", args: {campaign: 2}, result: TEST.blank},
+	{action: "../Campaign.users.php", args: {campaign: 2}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
+		if (data[0].user_id == 2 && data[0].permission == "owner" && data[0].viewing === false && data[0].avatar === 1
+			&& data[0].login == TEST.USER.login && data[0].name == "moe") return "PASS";
+		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
-	{group: "CAMPAIGN.PERMISSION", action: "../Campaign.permission.php", args: {}, result: TEST.logged_out},
+	{group: "CAMPAIGN.PERMISSION"},
+	{action: "../User.create.php", args: {login: "nobody", password: "ydobon", email: "a@b.c", subscribed: 1}, result: TEST.blank},
+	{action: "../Campaign.permission.php", args: {user: 4, campaign: 2, permission: "member"}, result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Campaign.permission.php", args: {}, result: TEST.unimplemented},
+	{action: "../Campaign.permission.php", args: {user: 4, campaign: 2, permission: "member"}, result: TEST.blank},
+	{action: "../Campaign.users.php", args: {campaign: 2}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
+		for (var i = 0; i < data.length; i++)
+			if (data[i].user_id == 4 && data[i].permission == "member" && data[i].viewing === false && data[i].avatar === null
+				&& data[i].login == "nobody" && data[i].name === null) return "PASS";
+		return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
+	{group: "PRIVATE ROLL"},
+	{action: "../private_roll.php", args: {text: TEST.MESSAGE_IN}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
+		if (data[0].text == TEST.MESSAGE_OUT) return "PASS"; else return "FAIL [" + ajax.responseText + "]";}},
 
-	{group: "PRIVATE ROLL",
-		action: "../private_roll.php",
-		args: {text: "From 1975 - 2010, [0 + 2010 - 1975] years passed."},
-		result: function (ajax) {
-			try {var data = JSON.parse(ajax.responseText);}
-			catch (e) {return "FAIL [parse error: " + e + "]";}
-			if (data[0].message == 'From 1975 - 2010, <span class="roll">0 + 2010 - '
-				+ '1975 = 35</span> years passed.') return "PASS";
-			else return "FAIL [" + ajax.responseText + "]";}},
-
-	{group: "CREATE MESSAGE",
-		action: "../create_message.php",
-		args: {table_id: 1, user_id: 1, text: "Hello, world!"},
-		result: TEST.blank},
-
-	{group: "READ MESSAGES",
-		action: "../read_messages.php",
-		args: {table_id: 1, last_message: 0},
-		result: TEST.one},
-
+/*
 
 	// M A P
 
-	{group: "MAP.CREATE", action: "../Map.create.php", args: {}, result: TEST.unimplemented},
-	{group: "MAP.READ", action: "../Map.read.php", args: {}, result: TEST.unimplemented},
-	{group: "MAP.PIECES", action: "../Map.pieces.php", args: {}, result: TEST.unimplemented},
-	{group: "MAP.SETTINGS", action: "../Map.settings.php", args: {}, result: TEST.unimplemented},
-	{group: "MAP.SIZE", action: "../Map.size.php", args: {}, result: TEST.unimplemented},
-	{group: "MAP.TILE", action: "../Map.tile.php", args: {}, result: TEST.unimplemented},
-	{group: "MAP.CHANGES", action: "../Map.changes.php", args: {}, result: TEST.unimplemented},
-	{group: "MAP.SHARE", action: "../Map.share.php", args: {}, result: TEST.unimplemented},
-	{group: "MAP.OWNERS", action: "../Map.owners.php", args: {}, result: TEST.unimplemented},
-	{group: "MAP.DELETE OWNER", action: "../Map.deleteOwner.php", args: {}, result: TEST.unimplemented},
+	{group: "MAP.CREATE"},
+	{action: "../Map.create.php", args: {}, result: TEST.unimplemented},
 
-	{group: "CREATE TABLE",
-		action: "../create_table.php",
+	{group: "MAP.READ"},
+	{action: "../Map.read.php", args: {}, result: TEST.unimplemented},
+
+	{group: "MAP.PIECES"},
+	{action: "../Map.pieces.php", args: {}, result: TEST.unimplemented},
+
+	{group: "MAP.SETTINGS"},
+	{action: "../Map.settings.php", args: {}, result: TEST.unimplemented},
+
+	{group: "MAP.SIZE"},
+	{action: "../Map.size.php", args: {}, result: TEST.unimplemented},
+
+	{group: "MAP.TILE"},
+	{action: "../Map.tile.php", args: {}, result: TEST.unimplemented},
+
+	{group: "MAP.CHANGES"},
+	{action: "../Map.changes.php", args: {}, result: TEST.unimplemented},
+
+	{group: "MAP.SHARE"},
+	{action: "../Map.share.php", args: {}, result: TEST.unimplemented},
+
+	{group: "MAP.OWNERS"},
+	{action: "../Map.owners.php", args: {}, result: TEST.unimplemented},
+
+	{group: "MAP.DELETE OWNER"},
+	{action: "../Map.deleteOwner.php", args: {}, result: TEST.unimplemented},
+
+	{group: "CREATE TABLE"},
+	{action: "../create_table.php",
 		args: {
 			name: "My Other Table",
 			image_id: 5,
@@ -351,18 +417,18 @@ TEST.tests = [
 		},
 		result: TEST.one},
 
-	{group: "READ TABLE",
-		action: "../read_table.php",
+	{group: "READ TABLE"},
+	{action: "../read_table.php",
 		args: {table_id: 2},
 		result: TEST.one},
 
-	{group: "READ TABLES",
-		action: "../read_tables.php",
+	{group: "READ TABLES"},
+	{action: "../read_tables.php",
 		args: {},
 		result: function (ajax) {return TEST.count(ajax, 2);}},
 
-	{group: "UPDATE TABLE",
-		action: "../update_table.php",
+	{group: "UPDATE TABLE"},
+	{action: "../update_table.php",
 		args: {
 			table_id: 1,
 			name: "My Original Table",
@@ -385,16 +451,16 @@ TEST.tests = [
 				if (data[i].id == 1 && data[i].name == "My Original Table") return "PASS";
 			return "FAIL [" + ajax.responseText + "]";}},
 
-	{group: "DELETE TABLE",
-		action: "../delete_table.php",
+	{group: "DELETE TABLE"},
+	{action: "../delete_table.php",
 		args: {table_id: 2},
 		result: TEST.blank},
 	{action: "../read_tables.php", args: {}, result: TEST.one},
 
 	// T I L E
 
-	{group: "READ TILES",
-		action: "../read_tiles.php",
+	{group: "READ TILES"},
+	{action: "../read_tiles.php",
 		args: {table_id: 1},
 		result: function (ajax) {
 			var text = ajax.responseXML.documentElement.textContent;
@@ -404,8 +470,8 @@ TEST.tests = [
 				 if (tiles[i] != "02") return "FAIL [" + i + ": " + tiles[i] + "]";
 			return "PASS";}},
 
-	{group: "UPDATE TILE",
-		action: "../update_tile.php",
+	{group: "UPDATE TILE"},
+	{action: "../update_tile.php",
 		args: {
 			table_id: 1,
 			x: 7,
@@ -427,8 +493,8 @@ TEST.tests = [
 			}
 			return "PASS";}},
 
-	{group: "FILL FOG",
-		action: "../fill_fog.php", args: {table_id: 1}, result: TEST.blank},
+	{group: "FILL FOG"},
+	{action: "../fill_fog.php", args: {table_id: 1}, result: TEST.blank},
 	{action: "../read_tiles.php",
 		args: {table_id: 1},
 		result: function (ajax) {
@@ -441,8 +507,8 @@ TEST.tests = [
 			}
 			return "PASS";}},
 
-	{group: "CLEAR FOG",
-		action: "../clear_fog.php", args: {table_id: 1}, result: TEST.blank},
+	{group: "CLEAR FOG"},
+	{action: "../clear_fog.php", args: {table_id: 1}, result: TEST.blank},
 	{action: "../read_tiles.php",
 		args: {table_id: 1},
 		result: function (ajax) {
@@ -457,13 +523,13 @@ TEST.tests = [
 
 	// WALL
 
-	{group: "CREATE WALL",
-		action: "../create_wall.php",
+	{group: "CREATE WALL"},
+	{action: "../create_wall.php",
 		args: {table_id: 1, x: 2, y: 3, direction: "sw", contents: "wall"},
 		result: TEST.blank},
 
-	{group: "READ WALLS",
-		action: "../read_walls.php",
+	{group: "READ WALLS"},
+	{action: "../read_walls.php",
 		args: {table_id: 1},
 		result: function (ajax) {
 			var wall = ajax.responseXML.getElementsByTagName("wall")[0];
@@ -474,21 +540,28 @@ TEST.tests = [
 				) return "PASS";
 			return "FAIL [" + ajax.responseText + "]";}},
 
-	{group: "DELETE WALL",
-		action: "../delete_wall.php",
+	{group: "DELETE WALL"},
+	{action: "../delete_wall.php",
 		args: {table_id: 1, x: 2, y: 3, direction: "sw"},
 		result: TEST.blank},
 	{action: "../read_walls.php", args: {table_id: 1}, result: TEST.zero},
 
 	// P I E C E
 
-	{group: "PIECE.CREATE", action: "../Piece.create.php", args: {}, result: TEST.unimplemented},
-	{group: "PIECE.MOVE", action: "../Piece.move.php", args: {}, result: TEST.unimplemented},
-	{group: "PIECE.SETTINGS", action: "../Piece.settings.php", args: {}, result: TEST.unimplemented},
-	{group: "PIECE.DELETE", action: "../Piece.delete.php", args: {}, result: TEST.unimplemented},
+	{group: "PIECE.CREATE"},
+	{action: "../Piece.create.php", args: {}, result: TEST.unimplemented},
 
-	{group: "CREATE PIECE",
-		action: "../create_piece.php",
+	{group: "PIECE.MOVE"},
+	{action: "../Piece.move.php", args: {}, result: TEST.unimplemented},
+
+	{group: "PIECE.SETTINGS"},
+	{action: "../Piece.settings.php", args: {}, result: TEST.unimplemented},
+
+	{group: "PIECE.DELETE"},
+	{action: "../Piece.delete.php", args: {}, result: TEST.unimplemented},
+
+	{group: "CREATE PIECE"},
+	{action: "../create_piece.php",
 		args: {
 			table_id: 1,
 			image_id: 10,
@@ -502,13 +575,13 @@ TEST.tests = [
 			width: 64},
 		result: TEST.blank},
 
-	{group: "READ PIECES",
-		action: "../read_pieces.php",
+	{group: "READ PIECES"},
+	{action: "../read_pieces.php",
 		args: {table_id: 1},
 		result: TEST.one},
 
-	{group: "UPDATE PIECE",
-		action: "../update_piece.php",
+	{group: "UPDATE PIECE"},
+	{action: "../update_piece.php",
 		args: {
 			piece_id: 1,
 			image_id: 11,
@@ -542,21 +615,28 @@ TEST.tests = [
 				) return "PASS";
 			return "FAIL [" + ajax.responseText + "]";}},
 
-	{group: "DELETE PIECE",
-		action: "../delete_piece.php", args: {piece_id: 1}, result: TEST.blank},
+	{group: "DELETE PIECE"},
+	{action: "../delete_piece.php", args: {piece_id: 1}, result: TEST.blank},
 	{action: "../read_pieces.php",
 		args: {table_id: 1},
 		result: TEST.zero},
 
 	// C H A R A C T E R
 
-	{group: "CHARACTER.CREATE", action: "../Character.create.php", args: {}, result: TEST.unimplemented},
-	{group: "CHARACTER.SHARE", action: "../Character.share.php", args: {}, result: TEST.unimplemented},
-	{group: "CHARACTER.OWNERS", action: "../Character.owners.php", args: {}, result: TEST.unimplemented},
-	{group: "CHARACTER.DELETE OWNER", action: "../Character.deleteOwner.php", args: {}, result: TEST.unimplemented},
+	{group: "CHARACTER.CREATE"},
+	{action: "../Character.create.php", args: {}, result: TEST.unimplemented},
 
-	{group: "UPDATE STAT",
-		action: "../update_stat.php",
+	{group: "CHARACTER.SHARE"},
+	{action: "../Character.share.php", args: {}, result: TEST.unimplemented},
+
+	{group: "CHARACTER.OWNERS"},
+	{action: "../Character.owners.php", args: {}, result: TEST.unimplemented},
+
+	{group: "CHARACTER.DELETE OWNER"},
+	{action: "../Character.deleteOwner.php", args: {}, result: TEST.unimplemented},
+
+	{group: "UPDATE STAT"},
+	{action: "../update_stat.php",
 		args: {piece_id: 1, name: "hit points", value: "20"},
 		result: TEST.blank},
 	{action: "../read_pieces.php",
@@ -569,13 +649,14 @@ TEST.tests = [
 			}
 			return "FAIL [" + ajax.responseText + "]";}},
 
-	{group: "DELETE STAT",
-		action: "../delete_stat.php",
+	{group: "DELETE STAT"},
+	{action: "../delete_stat.php",
 		args: {piece_id: 1, name: "hit points"},
 		result: TEST.blank},
 	{action: "../read_pieces.php",
 		args: {table_id: 1},
 		result: TEST.zero},
+*/
 
 ];
 
