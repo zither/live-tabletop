@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $piece = intval($_REQUEST['piece']);
-if (LT_can_edit_piece($peice))
+if (LT_can_edit_piece($piece))
 	LT_call('delete_piece', $piece);
 
 ?>

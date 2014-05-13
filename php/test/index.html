@@ -365,40 +365,84 @@ TEST.tests = [
 		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
 		if (data[0].text == TEST.MESSAGE_OUT) return "PASS"; else return "FAIL [" + ajax.responseText + "]";}},
 
-/*
-
 	// M A P
 
 	{group: "MAP.CREATE"},
-	{action: "../Map.create.php", args: {}, result: TEST.unimplemented},
+	{action: "../Map.create.php", args: {type: "square", rows: 30, columns: 40, tile: 1, background: "{}", name: "My Map"},
+		result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Map.create.php", args: {type: "square", rows: 30, columns: 40, tile: 1, background: "{}", name: "My Map"},
+		result: TEST.unimplemented},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.READ"},
-	{action: "../Map.read.php", args: {}, result: TEST.unimplemented},
+	{action: "../Map.read.php", args: {map: 1}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Map.read.php", args: {map: 1}, result: TEST.unimplemented},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.PIECES"},
-	{action: "../Map.pieces.php", args: {}, result: TEST.unimplemented},
+	{action: "../Map.pieces.php", args: {map: 1}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Map.pieces.php", args: {map: 1}, result: TEST.unimplemented},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.SETTINGS"},
-	{action: "../Map.settings.php", args: {}, result: TEST.unimplemented},
+	{action: "../Map.settings.php", args: {map: 1, type: "hex", background: "{}", min_zoom: 0.5, max_zoom: 2,
+		min_rotate: -45, max_rotate: 45, min_tilt: 15, max_tilt: 45, grid_thickness: 0, grid_color: "orange",
+		wall_thickness: 1, wall_color: "brown", door_thickness: 9, door_color: "green"}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Map.settings.php", args: {map: 1, type: "hex", background: "{}", min_zoom: 0.5, max_zoom: 2,
+		min_rotate: -45, max_rotate: 45, min_tilt: 15, max_tilt: 45, grid_thickness: 0, grid_color: "orange",
+		wall_thickness: 1, wall_color: "brown", door_thickness: 9, door_color: "green"}, result: TEST.unimplemented},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.SIZE"},
-	{action: "../Map.size.php", args: {}, result: TEST.unimplemented},
+	{action: "../Map.size.php", args: {map: 1, left: -5, top: -5, right: 45, bottom: 35, tile: 1, flags: "0"},
+		result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Map.size.php", args: {map: 1, left: -5, top: -5, right: 45, bottom: 35, tile: 1, flags: "0"},
+		result: TEST.unimplemented},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.TILE"},
-	{action: "../Map.tile.php", args: {}, result: TEST.unimplemented},
+	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, tile: 2}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, tile: 2}, result: TEST.unimplemented},
+	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, fog: 1}, result: TEST.unimplemented},
+	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, fog: 0}, result: TEST.unimplemented},
+	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, s: 'wall'}, result: TEST.unimplemented},
+	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, s: 'none'}, result: TEST.unimplemented},
+	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, e: 'wall'}, result: TEST.unimplemented},
+	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, se: 'door'}, result: TEST.unimplemented},
+	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, ne: 'door'}, result: TEST.unimplemented},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.CHANGES"},
-	{action: "../Map.changes.php", args: {}, result: TEST.unimplemented},
+	{action: "../Map.changes.php", args: {map: 1}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Map.changes.php", args: {map: 1}, result: TEST.unimplemented},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.SHARE"},
-	{action: "../Map.share.php", args: {}, result: TEST.unimplemented},
+	{action: "../Map.share.php", args: {map: 1, user: 3}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Map.share.php", args: {map: 1, user: 3}, result: TEST.unimplemented},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.OWNERS"},
-	{action: "../Map.owners.php", args: {}, result: TEST.unimplemented},
+	{action: "../Map.owners.php", args: {map: 1}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Map.owners.php", args: {map: 1}, result: TEST.unimplemented},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.DELETE OWNER"},
-	{action: "../Map.deleteOwner.php", args: {}, result: TEST.unimplemented},
+	{action: "../Map.deleteOwner.php", args: {map: 1, user: 3}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Map.deleteOwner.php", args: {map: 1, user: 3}, result: TEST.unimplemented},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
+/*
 	{group: "CREATE TABLE"},
 	{action: "../create_table.php",
 		args: {
@@ -545,21 +589,37 @@ TEST.tests = [
 		args: {table_id: 1, x: 2, y: 3, direction: "sw"},
 		result: TEST.blank},
 	{action: "../read_walls.php", args: {table_id: 1}, result: TEST.zero},
+*/
 
 	// P I E C E
 
 	{group: "PIECE.CREATE"},
-	{action: "../Piece.create.php", args: {}, result: TEST.unimplemented},
+	{action: "../Piece.create.php", args: {map: 1, image: "{}"}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Piece.create.php", args: {map: 1, image: "{}"}, result: TEST.unimplemented},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "PIECE.MOVE"},
-	{action: "../Piece.move.php", args: {}, result: TEST.unimplemented},
+	{action: "../Piece.move.php", args: {piece: 1, x: 2.5, y: 3.5}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Piece.move.php", args: {piece: 1, x: 2.5, y: 3.5}, result: TEST.unimplemented},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "PIECE.SETTINGS"},
-	{action: "../Piece.settings.php", args: {}, result: TEST.unimplemented},
+	{action: "../Piece.settings.php", args: {piece: 1, image: "{}", name: "The Piece", character: 1, markers: "[]", color: "red"},
+		result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Piece.settings.php", args: {piece: 1, image: "{}", name: "The Piece", character: 1, markers: "[]", color: "red"},
+		result: TEST.unimplemented},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "PIECE.DELETE"},
-	{action: "../Piece.delete.php", args: {}, result: TEST.unimplemented},
+	{action: "../Piece.delete.php", args: {piece: 1}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Piece.delete.php", args: {piece: 1}, result: TEST.unimplemented},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
+/*
 	{group: "CREATE PIECE"},
 	{action: "../create_piece.php",
 		args: {
@@ -620,21 +680,37 @@ TEST.tests = [
 	{action: "../read_pieces.php",
 		args: {table_id: 1},
 		result: TEST.zero},
+*/
 
 	// C H A R A C T E R
 
 	{group: "CHARACTER.CREATE"},
-	{action: "../Character.create.php", args: {}, result: TEST.unimplemented},
+	{action: "../Character.create.php", args: {name: "My Character", system: "The System", stats: "{}",
+		notes: "These are the notes.", portrait: "{}", piece: "{}", color: "red"}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Character.create.php", args: {name: "My Character", system: "The System", stats: "{}",
+		notes: "These are the notes.", portrait: "{}", piece: "{}", color: "red"}, result: TEST.unimplemented},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "CHARACTER.SHARE"},
-	{action: "../Character.share.php", args: {}, result: TEST.unimplemented},
+	{action: "../Character.share.php", args: {character: 1, user: 3}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Character.share.php", args: {character: 1, user: 3}, result: TEST.unimplemented},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "CHARACTER.OWNERS"},
-	{action: "../Character.owners.php", args: {}, result: TEST.unimplemented},
+	{action: "../Character.owners.php", args: {character: 1}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Character.owners.php", args: {character: 1}, result: TEST.unimplemented},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "CHARACTER.DELETE OWNER"},
-	{action: "../Character.deleteOwner.php", args: {}, result: TEST.unimplemented},
+	{action: "../Character.deleteOwner.php", args: {character: 1, user: 3}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Character.deleteOwner.php", args: {character: 1, user: 3}, result: TEST.unimplemented},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
+/*
 	{group: "UPDATE STAT"},
 	{action: "../update_stat.php",
 		args: {piece_id: 1, name: "hit points", value: "20"},

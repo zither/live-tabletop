@@ -44,6 +44,29 @@ function LT_can_edit_campaign($campaign_id) {
 
 // MAP
 
+function LT_can_view_map($map_id) {
+	global $LT_SQL;
+	if (!isset($_SESSION['user_id'])) return FALSE; // you must be logged in
+
+	// viewers of campaigns displaying the map may view the map
+	if ($campaign_rows = LT_call_silent('read_map_campaigns', $map_id)) {
+
+		// anyone can view public campaigns
+		foreach ($campaign_rows as $i => $fields)
+			if ($fields['private'] == '0') return TRUE;
+
+		// only members and owners can view private campaigns
+		foreach ($campaign_rows as $i => $fields) {
+			$user_id = $LT_SQL->real_escape_string($_SESSION['user_id']);
+			$campaign_id = $fields['id'];
+			if ($rows = LT_call_silent('read_campaign_user_permission', $user_id, $campaign_id))
+				if ($rows[0]['permission'] == 'owner' or $rows[0]['permission'] == 'member')
+					return TRUE;
+		}
+	}
+	return FALSE; // a FALSE result could also mean an SQL error or bad id
+}
+
 function LT_can_edit_map($map_id) {
 	global $LT_SQL;
 	if (!isset($_SESSION['user_id'])) return FALSE; // you must be logged in
@@ -55,6 +78,8 @@ function LT_can_edit_map($map_id) {
 
 	return FALSE; // a FALSE result could also mean an SQL error or bad id
 }
+
+// PIECE
 
 function LT_can_edit_piece($piece_id) {
 	global $LT_SQL;
@@ -107,6 +132,22 @@ function LT_can_move_piece($piece_id) {
 
 // CHARACTER
 
+function LT_can_view_character($character_id) {
+	global $LT_SQL;
+	if (!isset($_SESSION['user_id'])) return FALSE; // you must be logged in
+
+	// owners may view
+	$user_id = $LT_SQL->real_escape_string($_SESSION['user_id']);
+	if (LT_call_silent('read_character_owner_exists', $user_id, $character_id))
+		return TRUE;
+
+	// TODO: viewers of campaigns where the character has a turn may view?
+	// TODO: viewers of campaigns where the character has a piece may view?
+	// TODO: viewers of campaigns where the character is a user's avatar may view?
+
+	return FALSE; // a FALSE result could also mean an SQL error or bad id
+}
+
 function LT_can_edit_character($character_id) {
 	global $LT_SQL;
 	if (!isset($_SESSION['user_id'])) return FALSE; // you must be logged in
@@ -118,7 +159,5 @@ function LT_can_edit_character($character_id) {
 
 	return FALSE; // a FALSE result could also mean an SQL error or bad id
 }
-
-
 
 ?>
