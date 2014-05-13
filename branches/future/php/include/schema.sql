@@ -47,6 +47,7 @@ DROP PROCEDURE IF EXISTS read_maps;
 DROP PROCEDURE IF EXISTS read_map_changes;
 DROP PROCEDURE IF EXISTS read_map;
 DROP PROCEDURE IF EXISTS read_map_tiles;
+DROP PROCEDURE IF EXISTS read_map_campaigns;
 DROP PROCEDURE IF EXISTS update_map_tiles;
 DROP PROCEDURE IF EXISTS update_map_size;
 DROP PROCEDURE IF EXISTS update_map;
@@ -379,6 +380,7 @@ CREATE TABLE character_owners (
  /*************************** P R O C E D U R E S ***************************/
 /***************************************************************************/
 
+/* DELIMITER // /* MySQL Workbench speaks only MySQL command-line syntax. */
 
 /*** ADMINS PROCEDURES ***/
 
@@ -792,39 +794,45 @@ END;
 CREATE PROCEDURE read_maps (IN the_user INT)
 BEGIN
 	SELECT id, name, type, tile_rows, tile_columns
-		FROM maps, map_owners WHERE id = map_id and user_id = the_user;
+		FROM maps, map_owners WHERE id = map_id AND user_id = the_user;
 END;
 
 /* User polls for changes to the map, its pieces and tiles */
 CREATE PROCEDURE read_map_changes (IN the_map INT)
 BEGIN
-	SELECT id, name, type, tile_rows, tile_columns, background,
+	SELECT name, type, tile_rows, tile_columns, background,
 		min_zoom, max_zoom, min_rotate, max_rotate, min_tilt, max_tilt,
 		grid_thickness, grid_color, wall_thickness, wall_color, 
 		door_thickness, door_color,
 		UNIX_TIMESTAMP(piece_stamp) AS piece_stamp,
 		UNIX_TIMESTAMP(tile_stamp) AS tile_stamp
-		FROM maps WHERE map_id = the_map;
+		FROM maps WHERE id = the_map;
 END;
 
 /* User opens a map
 or User refreshes an updated map */
 CREATE PROCEDURE read_map (IN the_map INT)
 BEGIN
-	SELECT id, name, type, tile_rows, tile_columns, background,
+	SELECT name, type, tile_rows, tile_columns, background,
 		min_zoom, max_zoom, min_rotate, max_rotate, min_tilt, max_tilt,
 		grid_thickness, grid_color, wall_thickness, wall_color, 
 		door_thickness, door_color,
 		UNIX_TIMESTAMP(piece_stamp) AS piece_stamp,
 		UNIX_TIMESTAMP(tile_stamp) AS tile_stamp, tiles, flags
-		FROM map WHERE map_id = the_map;
+		FROM maps WHERE id = the_map;
 END;
 
 /* User paints or erases tiles, fog or walls */
 CREATE PROCEDURE read_map_tiles (IN the_map INT)
 BEGIN
-	SELECT tile_rows, tile_columns, tiles, flags FROM map WHERE map_id = the_map
+	SELECT tile_rows, tile_columns, tiles, flags FROM maps WHERE map_id = the_map
 		FOR UPDATE; /* lock row so simultaneous edits don't cancel each other */
+END;
+
+/* User tries to view a map and PHP logic checks whether the user can. */
+CREATE PROCEDURE read_map_campaigns (IN the_map INT)
+BEGIN
+	SELECT id, private FROM campaigns WHERE map = the_map;
 END;
 
 /* User paints or erases tiles, fog or walls */
@@ -921,7 +929,7 @@ END;
 or User refreshes an updated map */
 CREATE PROCEDURE read_pieces (IN the_map INT)
 BEGIN
-	SELECT * FROM pieces WHERE map_id = the_map ORDER BY name, user_id;
+	SELECT * FROM pieces WHERE map_id = the_map ORDER BY name, image, id;
 END;
 
 /* User moves a piece */
@@ -966,7 +974,7 @@ END;
 /* TODO: do we actually need to initialize all these fields? */
 CREATE PROCEDURE create_character (IN the_user INT, IN the_name TEXT,
 	IN the_system TEXT, IN the_stats TEXT, IN the_notes TEXT,
-	IN the_portrait TEXT, IN the_piece TEXT, IN color TEXT)
+	IN the_portrait TEXT, IN the_piece TEXT, IN the_color TEXT)
 BEGIN
 	START TRANSACTION;
 /* create the character */

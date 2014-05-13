@@ -2,6 +2,7 @@
 
 include('db_config.php');
 include('include/query.php');
+include('include/ownership.php');
 
 session_start();
 if (!isset($_SESSION['user_id'])) {
@@ -24,7 +25,7 @@ if (LT_can_view_map($map)) {
 			foreach ($fields as $key => $value)
 				if (in_array($key, $floats)) $rows[$i][$key] = floatval($value);
 				else if (in_array($key, $json)) $rows[$i][$key] = json_decode($value);
-				else if (!in_array($key, $strings)) $rows[$i] = intval($value);
+				else if (!in_array($key, $strings)) $rows[$i][$key] = intval($value);
 		include('include/json_headers.php');
 		echo json_encode($rows);
 	}
