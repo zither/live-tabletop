@@ -23,6 +23,11 @@ var TEST = {
 	// Do not use this method in your own functions and methods.
 	request: function () {
 		var current_test = TEST.tests[TEST.index];
+		if (current_test.group) {
+			$("<div>").text(current_test.group).appendTo($("#output"));
+			TEST.index++;
+			current_test = TEST.tests[TEST.index];
+		}
 		if (current_test.uploader)
 			current_test.uploader.submit(current_test.args);
 		else $.ajax({
@@ -128,8 +133,6 @@ var TEST = {
 			$("<div>").text("... FINISHED!").appendTo($("#output"));
 			return;
 		}
-		var new_test = TEST.tests[TEST.index];
-		if (new_test.group) $("<div>").text(new_test.group).appendTo($("#output"));
 		TEST.request();
 	}
 };

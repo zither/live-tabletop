@@ -34,10 +34,10 @@ DROP PROCEDURE IF EXISTS delete_campaign;
 DROP PROCEDURE IF EXISTS read_campaign_user_permission;
 DROP PROCEDURE IF EXISTS read_campaign_user_campaigns;
 DROP PROCEDURE IF EXISTS read_campaign_users;
-DROP PROCEDURE IF EXISTS update_campaign_users_permission;
-DROP PROCEDURE IF EXISTS update_campaign_users_arrive;
-DROP PROCEDURE IF EXISTS update_campaign_users_leave;
-DROP PROCEDURE IF EXISTS update_campaign_users_avatar;
+DROP PROCEDURE IF EXISTS update_campaign_user_permission;
+DROP PROCEDURE IF EXISTS update_campaign_user_arrive;
+DROP PROCEDURE IF EXISTS update_campaign_user_leave;
+DROP PROCEDURE IF EXISTS update_campaign_user_avatar;
 DROP PROCEDURE IF EXISTS create_message;
 DROP PROCEDURE IF EXISTS read_messages;
 DROP PROCEDURE IF EXISTS delete_messages_expired;
@@ -495,7 +495,7 @@ BEGIN
 /* delete maps without owners */
 	DELETE FROM maps WHERE id NOT IN
 		(SELECT map_id FROM map_owners);
-/* delete maps without owners */
+/* delete characters without owners */
 	DELETE FROM characters WHERE id NOT IN
 		(SELECT character_id FROM character_owners);
 /*
@@ -568,17 +568,16 @@ END;
 CREATE PROCEDURE create_campaign
 	(IN the_user INT, IN the_name VARCHAR(200))
 BEGIN
-	DECLARE new_campaign_id INT;
 	START TRANSACTION;
 /* create the campaign */
 	INSERT INTO campaigns (name, turns, users_modified)
 		VALUES (the_name, '[]', NOW());
-	SET new_campaign_id = LAST_INSERT_ID();
+	SET @new_id = LAST_INSERT_ID();
 /* make the user an owner */
 	INSERT INTO campaign_users (user_id, campaign_id, name, permission)
-		VALUES (the_user, new_campaign_id, the_name, 'owner');
+		VALUES (the_user, @new_id, the_name, 'owner');
 /* return the new campaign's id */
-	SELECT new_campaign_id AS id;
+	SELECT @new_id AS id;
 	COMMIT;
 END;
 
@@ -666,21 +665,27 @@ or User adds a user to the campaign's blacklist
 or User removes a user from the campaign's blacklist (NULL permission)
 or User revokes a user's ownership or membership (NULL permission)
 or User disowns the campaign (NULL permission) */
-CREATE PROCEDURE update_campaign_users_permission
-	(IN the_user INT, IN the_campaign INT, IN the_permission INT)
+CREATE PROCEDURE update_campaign_user_permission
+	(IN the_user INT, IN the_campaign INT, IN the_permission TEXT)
 BEGIN
-	DECLARE the_name TEXT;
 	START TRANSACTION;
 /* create or update the campaign user's permission */
-	SELECT name INTO the_name FROM campaigns WHERE id = the_campaign;
-	REPLACE INTO campaign_users (user_id, campaign_id, name, permission)
-		VALUES (the_user, the_campaign, the_name, the_permission);
+	IF (SELECT COUNT(*) FROM campaign_users
+		WHERE user_id = the_user AND campaign_id = the_campaign) = 0
+	THEN
+		SELECT name INTO @name FROM campaigns WHERE id = the_campaign;
+		INSERT INTO campaign_users (user_id, campaign_id, name, permission)
+			VALUES (the_user, the_campaign, @name, the_permission);
+	ELSE
+		UPDATE campaign_users SET permission = the_permission
+			WHERE user_id = the_user AND campaign_id = the_campaign;
+	END IF;
 /* delete guests (NULL permission) who are not viewing the campaign */
 	DELETE FROM campaign_users WHERE user_id = the_user AND campaign_id = the_campaign
 		AND permission = NULL AND viewing = 0;
 /* delete campaigns without owners */
-	IF (SELECT COUNT(*) FROM campaign_users WHERE user_id = the_user
-		AND campaign_id = the_campaign AND permission = 'owner') = 0
+	IF (SELECT COUNT(*) FROM campaign_users
+		WHERE campaign_id = the_campaign AND permission = 'owner') = 0
 	THEN
 		DELETE FROM campaigns WHERE id = the_campaign;
 	END IF;
@@ -688,18 +693,24 @@ BEGIN
 END;
 
 /* User joins a campaign */
-CREATE PROCEDURE update_campaign_users_arrive (IN the_user INT, IN the_campaign INT)
+CREATE PROCEDURE update_campaign_user_arrive (IN the_user INT, IN the_campaign INT)
 BEGIN
-	DECLARE the_name TEXT;
 	START TRANSACTION;
-	SELECT name INTO the_name FROM campaigns WHERE id = the_campaign;
-	REPLACE INTO campaign_users (user_id, campaign_id, name, viewing)
-		VALUES (the_user, the_campaign, the_name, 1);
+	IF (SELECT COUNT(*) FROM campaign_users
+		WHERE user_id = the_user AND campaign_id = the_campaign) = 0
+	THEN
+		SELECT name INTO @name FROM campaigns WHERE id = the_campaign;
+		INSERT INTO campaign_users (user_id, campaign_id, name, viewing)
+			VALUES (the_user, the_campaign, @name, 1);
+	ELSE
+		UPDATE campaign_users SET viewing = 1
+			WHERE user_id = the_user AND campaign_id = the_campaign;
+	END IF;
 	COMMIT;
 END;
 
 /* User leaves a campaign */
-CREATE PROCEDURE update_campaign_users_leave (IN the_user INT, IN the_campaign INT)
+CREATE PROCEDURE update_campaign_user_leave (IN the_user INT, IN the_campaign INT)
 BEGIN
 	START TRANSACTION;
 /* delete this campaign user if it was just a guest (NULL permission) */
@@ -713,7 +724,7 @@ BEGIN
 END;
 
 /* User selects his avatar for this campaign */
-CREATE PROCEDURE update_campaign_users_avatar
+CREATE PROCEDURE update_campaign_user_avatar
 	(IN the_user INT, IN the_campaign INT, IN the_avatar INT)
 BEGIN
 	UPDATE campaign_users SET avatar = the_avatar
@@ -742,7 +753,7 @@ CREATE PROCEDURE read_messages (IN the_campaign INT, IN the_last_message INT)
 BEGIN
 	START TRANSACTION; /* TODO: is this needed ? */
 	DELETE FROM messages WHERE time < DATE_SUB(NOW(), INTERVAL 6 HOUR);
-	SELECT id, campaign_id, user_id, avatar, text, UNIX_TIMESTAMP(time) AS time 
+	SELECT id, user_id, avatar, text, UNIX_TIMESTAMP(time) AS time 
 		FROM messages WHERE campaign_id = the_campaign AND id > the_last_message
 		ORDER BY id ASC;
 	COMMIT;
@@ -763,18 +774,17 @@ CREATE PROCEDURE create_map (IN the_user INT, IN the_type TEXT,
 	IN the_rows SMALLINT, IN the_columns SMALLINT, IN the_background TEXT,
 	IN the_name TEXT, IN the_tiles TEXT, IN the_flags TEXT)
 BEGIN
-	DECLARE new_map_id INT;
 	START TRANSACTION;
 /* create the map */
 	INSERT INTO maps 
 		(type, tile_rows, tile_columns, background, name, tiles, flags)
 	VALUES (the_type, the_rows, the_columns, the_background, the_name,
 		the_tiles, the_flags);
-	SET new_map_id = LAST_INSERT_ID();
+	SET @new_id = LAST_INSERT_ID();
 /* make the user an owner */
-	INSERT INTO map_owners (user_id, map_id) VALUES (the_user, new_map_id);
+	INSERT INTO map_owners (user_id, map_id) VALUES (the_user, @new_id);
 /* return the new map's id */
-	SELECT new_map_id AS id;
+	SELECT @new_id AS id;
 	COMMIT;
 END;
 
@@ -885,8 +895,7 @@ BEGIN
 /* remove the map owner */
 	DELETE FROM map_owners WHERE user_id = the_user AND map_id = the_map;	
 /* delete maps without owners */
-	IF (SELECT COUNT(*) FROM map_owners WHERE user_id = the_user
-		AND map_id = the_map) = 0
+	IF (SELECT COUNT(*) FROM map_owners WHERE map_id = the_map) = 0
 	THEN
 		DELETE FROM maps WHERE id = the_map;
 	END IF;
@@ -899,13 +908,12 @@ END;
 /* User creates a new piece */
 CREATE PROCEDURE create_piece (IN the_map INT, IN the_image TEXT)
 BEGIN
-	DECLARE new_id INT;
 	START TRANSACTION;
 	INSERT INTO pieces (map_id, image, markers)
 		VALUES (the_map, the_image, '[]');
-	SET new_id = LAST_INSERT_ID();
+	SET @new_id = LAST_INSERT_ID();
 	UPDATE maps SET piece_stamp = NOW() WHERE id = the_map;
-	SELECT new_id AS id;
+	SELECT @new_id AS id;
 	COMMIT;
 END;
 
@@ -944,10 +952,9 @@ END;
 /* User deletes a piece */
 CREATE PROCEDURE delete_piece (IN the_piece INT)
 BEGIN
-	DECLARE my_map_id INT;
 	START TRANSACTION;
-	SELECT my_map_id = map_id FROM pieces WHERE id = the_piece;
-	UPDATE maps SET piece_stamp = NOW() WHERE id = my_map_id;
+	SELECT map_id INTO @map FROM pieces WHERE id = the_piece;
+	UPDATE maps SET piece_stamp = NOW() WHERE id = @map;
 	DELETE FROM pieces WHERE id = the_piece;
 	COMMIT;
 END;
@@ -961,18 +968,17 @@ CREATE PROCEDURE create_character (IN the_user INT, IN the_name TEXT,
 	IN the_system TEXT, IN the_stats TEXT, IN the_notes TEXT,
 	IN the_portrait TEXT, IN the_piece TEXT, IN color TEXT)
 BEGIN
-	DECLARE new_character_id INT;
 	START TRANSACTION;
 /* create the character */
 	INSERT INTO characters (name, system, stats, notes, portrait, piece, color)
 		VALUES (the_name, the_system, the_stats, the_notes, the_portrait,
 		the_piece, the_color);
-	SELECT new_character_id = LAST_INSERT_ID();
+	SET @new_id = LAST_INSERT_ID();
 /* make this user the character's owner */
 	INSERT INTO character_owners (user_id, character_id)
-		VALUES (the_user, new_character_id);
+		VALUES (the_user, @new_id);
 /* return the new character's id */
-	SELECT new_character_id;
+	SELECT @new_id;
 	COMMIT;
 END;
  
@@ -1010,8 +1016,8 @@ BEGIN
 	DELETE FROM character_owners
 		WHERE user_id = the_user AND character_id = the_character;	
 /* delete characters without owners */
-	IF (SELECT COUNT(*) FROM character_owners WHERE user_id = the_user
-		AND character_id = the_character) = 0
+	IF (SELECT COUNT(*) FROM character_owners
+		WHERE character_id = the_character) = 0
 	THEN
 		DELETE FROM characters WHERE id = the_character;
 	END IF;

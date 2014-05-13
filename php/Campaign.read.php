@@ -19,7 +19,7 @@ $campaign = intval($_REQUEST['campaign']);
 if (LT_can_view_campaign($campaign)) {
 	$rows = LT_call('read_campaign', $campaign);
 	$rows[0]['id'] = intval($rows[0]['id']);
-	if ($rows[0]['map'] !== null) $rows[0]['map'] = intval($rows[0]['map']);
+	if ($rows[0]['map'] !== NULL) $rows[0]['map'] = intval($rows[0]['map']);
 	$rows[0]['private'] = $rows[0]['private'] == '1' ? TRUE : FALSE;
 	$rows[0]['turns'] = json_decode($rows[0]['turns']);
 	$rows[0]['last_message'] = intval($rows[0]['last_message']);
