@@ -18,7 +18,7 @@ $map = intval($_REQUEST['map']);
 
 if (LT_can_view_map($map)) {
 	if ($rows = LT_call('read_map', $map)) {
-		$strings = array('name', 'type', 'grid_color', 'wall_color', 'door_color', 'fog');
+		$strings = array('name', 'type', 'grid_color', 'wall_color', 'door_color', 'flags');
 		$floats = array('min_zoom', 'max_zoom');
 		$json = array('background', 'tiles');
 		foreach ($rows as $i => $fields)

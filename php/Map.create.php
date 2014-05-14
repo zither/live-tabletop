@@ -20,12 +20,12 @@ $background = $LT_SQL->real_escape_string($_REQUEST['background']);
 $name = $LT_SQL->real_escape_string($_REQUEST['name']);
 
 $tiles = json_encode(array_fill(0, $rows * $columns, $tile));
-$fog = json_encode(array_fill(0, $rows * $columns, 0));
+$flags = str_repeat('0', ($rows + 1) * ($columns + 1));
 
 // Query the Database
 
 $rows = LT_call('create_map', $user_id, $type, $rows, $columns, $background,
-	$name, $tiles, $fog);
+	$name, $tiles, $flags);
 
 include('include/json_headers.php');
 echo json_encode(array('id' => intval($rows[0]['id'])));

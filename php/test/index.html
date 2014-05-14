@@ -372,19 +372,29 @@ TEST.tests = [
 		result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
 	{action: "../Map.create.php", args: {type: "square", rows: 30, columns: 40, tile: 1, background: "{}", name: "My Map"},
-		result: TEST.unimplemented},
+		result: function (ajax) {return TEST.json(ajax, {id: 1});}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.READ"},
 	{action: "../Map.read.php", args: {map: 1}, result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Map.read.php", args: {map: 1}, result: TEST.unimplemented},
+	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
+		if (data[0].name == "My Map" && data[0].type == "square" && data[0].tile_rows == 30 && data[0].tile_columns == 40
+			&& JSON.stringify(data[0].background) == JSON.stringify({}) && data[0].min_zoom == 0.25 && data[0].max_zoom == 4
+			&& data[0].min_rotate == -180 && data[0].max_rotate == 180 && data[0].min_tilt == 30 && data[0].max_tilt == 90
+			&& data[0].grid_thickness == 1 && data[0].wall_thickness == 3 && data[0].door_thickness == 3
+			&& data[0].grid_color === null && data[0].wall_color === null && data[0].door_color === null
+			&& typeof(data[0].piece_stamp) == "number" && typeof(data[0].tile_stamp) == "number"
+			&& JSON.stringify(data[0].tiles) == JSON.stringify(Array(30 * 40 + 1).join().split('').map(function () {return 1;}))
+			&& data[0].flags == Array(31 * 41 + 1).join("0")) return "PASS";
+		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.PIECES"},
 	{action: "../Map.pieces.php", args: {map: 1}, result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Map.pieces.php", args: {map: 1}, result: TEST.unimplemented},
+	{action: "../Map.pieces.php", args: {map: 1}, result: TEST.zero},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.SETTINGS"},
