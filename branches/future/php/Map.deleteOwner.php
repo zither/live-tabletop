@@ -17,6 +17,6 @@ $user = intval($_REQUEST['user']);
 
 // Query the Database
 
-if (LT_can_edit_map($map)) LT_call('delete_map_owner', $map, $user);
+if (LT_can_edit_map($map)) LT_call('delete_map_owner', $user, $map);
 
 ?>
