@@ -398,13 +398,24 @@ TEST.tests = [
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.SETTINGS"},
-	{action: "../Map.settings.php", args: {map: 1, type: "hex", background: "{}", min_zoom: 0.5, max_zoom: 2,
+	{action: "../Map.settings.php", args: {map: 1, name: "Still My Map", type: "hex", background: "{}", min_zoom: 0.5, max_zoom: 2,
 		min_rotate: -45, max_rotate: 45, min_tilt: 15, max_tilt: 45, grid_thickness: 0, grid_color: "orange",
 		wall_thickness: 1, wall_color: "brown", door_thickness: 9, door_color: "green"}, result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Map.settings.php", args: {map: 1, type: "hex", background: "{}", min_zoom: 0.5, max_zoom: 2,
+	{action: "../Map.settings.php", args: {map: 1, name: "Still My Map", type: "hex", background: "{}", min_zoom: 0.5, max_zoom: 2,
 		min_rotate: -45, max_rotate: 45, min_tilt: 15, max_tilt: 45, grid_thickness: 0, grid_color: "orange",
-		wall_thickness: 1, wall_color: "brown", door_thickness: 9, door_color: "green"}, result: TEST.unimplemented},
+		wall_thickness: 1, wall_color: "brown", door_thickness: 9, door_color: "green"}, result: TEST.blank},
+	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
+		if (data[0].name == "Still My Map" && data[0].type == "hex" && data[0].tile_rows == 30 && data[0].tile_columns == 40
+			&& JSON.stringify(data[0].background) == JSON.stringify({}) && data[0].min_zoom == 0.5 && data[0].max_zoom == 2
+			&& data[0].min_rotate == -45 && data[0].max_rotate == 45 && data[0].min_tilt == 15 && data[0].max_tilt == 45
+			&& data[0].grid_thickness == 0 && data[0].wall_thickness == 1 && data[0].door_thickness == 9
+			&& data[0].grid_color == "orange" && data[0].wall_color == "brown" && data[0].door_color == "green"
+			&& typeof(data[0].piece_stamp) == "number" && typeof(data[0].tile_stamp) == "number"
+			&& JSON.stringify(data[0].tiles) == JSON.stringify(Array(30 * 40 + 1).join().split('').map(function () {return 1;}))
+			&& data[0].flags == Array(31 * 41 + 1).join("0")) return "PASS";
+		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.SIZE"},
@@ -412,20 +423,74 @@ TEST.tests = [
 		result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
 	{action: "../Map.size.php", args: {map: 1, left: -5, top: -5, right: 45, bottom: 35, tile: 1, flags: "0"},
-		result: TEST.unimplemented},
+		result: TEST.blank},
+	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
+		if (data[0].name == "Still My Map" && data[0].type == "hex" && data[0].tile_rows == 40 && data[0].tile_columns == 50
+			&& JSON.stringify(data[0].background) == JSON.stringify({}) && data[0].min_zoom == 0.5 && data[0].max_zoom == 2
+			&& data[0].min_rotate == -45 && data[0].max_rotate == 45 && data[0].min_tilt == 15 && data[0].max_tilt == 45
+			&& data[0].grid_thickness == 0 && data[0].wall_thickness == 1 && data[0].door_thickness == 9
+			&& data[0].grid_color == "orange" && data[0].wall_color == "brown" && data[0].door_color == "green"
+			&& typeof(data[0].piece_stamp) == "number" && typeof(data[0].tile_stamp) == "number"
+			&& JSON.stringify(data[0].tiles) == JSON.stringify(Array(40 * 50 + 1).join().split('').map(function () {return 1;}))
+			&& data[0].flags == Array(41 * 51 + 1).join("0")) return "PASS";
+		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
+
+// symbol  0ABCDEFGHIJKLMNOPQRSTUVWXYZ1abcdefghijklmnopqrstuvwxyz
+// fog                                ***************************
+// S wall           *********                  *********
+// S door                    *********                  *********
+// E wall     ***      ***      ***      ***      ***      ***   
+// E door        ***      ***      ***      ***      ***      ***
+// SE wall    ***      ***      ***      ***      ***      ***   
+// SE door       ***      ***      ***      ***      ***      ***
+// NE wall  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * 
+// NE door   *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
 
 	{group: "MAP.TILE"},
 	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, tile: 2}, result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, tile: 2}, result: TEST.unimplemented},
-	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, fog: 1}, result: TEST.unimplemented},
-	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, fog: 0}, result: TEST.unimplemented},
-	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, s: 'wall'}, result: TEST.unimplemented},
-	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, s: 'none'}, result: TEST.unimplemented},
-	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, e: 'wall'}, result: TEST.unimplemented},
-	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, se: 'door'}, result: TEST.unimplemented},
-	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, ne: 'door'}, result: TEST.unimplemented},
+	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, tile: 2}, result: TEST.blank},
+	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
+		if (data[0].tiles[3 + 2 * 50] == 2) return "PASS";
+		else return "FAIL [" + data[0].tiles.indexOf(2) + "]";}},
+	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, fog: 1}, result: TEST.blank},
+	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
+		if (data[0].flags[(3 + 1) + (2 + 1) * (50 + 1)] == "1") return "PASS";
+		else return "FAIL [" + data[0].flags.indexOf("1") + "]";}},
+	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, fog: 0}, result: TEST.blank},
+	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
+		if (data[0].flags[(3 + 1) + (2 + 1) * (50 + 1)] == "0") return "PASS";
+		else return "FAIL [0 != " + data[0].flags[(3 + 1) + (2 + 1) * (50 + 1)] + "]";}},
+	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, s: 'wall'}, result: TEST.blank},
+	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
+		if (data[0].flags[(3 + 1) + (2 + 1) * (50 + 1)] == "I") return "PASS";
+		else return "FAIL [" + data[0].flags.indexOf("I") + "]";}},
+	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, s: 'none'}, result: TEST.blank},
+	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
+		if (data[0].flags[(3 + 1) + (2 + 1) * (50 + 1)] == "0") return "PASS";
+		else return "FAIL [0 != " + data[0].flags[(3 + 1) + (2 + 1) * (50 + 1)] + "]";}},
+	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, e: 'wall'}, result: TEST.blank},
+	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
+		if (data[0].flags[(3 + 1) + (2 + 1) * (50 + 1)] == "C") return "PASS";
+		else return "FAIL [" + data[0].flags.indexOf("C") + "]";}},
+	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, se: 'door'}, result: TEST.blank},
+	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
+		if (data[0].flags[(3 + 1) + (2 + 1) * (50 + 1)] == "F") return "PASS";
+		else return "FAIL [" + data[0].flags.indexOf("F") + "]";}},
+	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, ne: 'door'}, result: TEST.blank},
+	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [parse error: " + e + "]";}
+		if (data[0].flags[(3 + 1) + (2 + 1) * (50 + 1)] == "H") return "PASS";
+		else return "FAIL [" + data[0].flags.indexOf("H") + " " + data[0].flags[(3 + 1) + (2 + 1) * (50 + 1)] + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.CHANGES"},

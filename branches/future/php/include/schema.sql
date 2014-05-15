@@ -53,6 +53,8 @@ DROP PROCEDURE IF EXISTS update_map_size;
 DROP PROCEDURE IF EXISTS update_map;
 DROP PROCEDURE IF EXISTS create_map_owner;
 DROP PROCEDURE IF EXISTS read_map_owners;
+DROP PROCEDURE IF EXISTS read_map_owner;
+DROP PROCEDURE IF EXISTS read_map_viewer;
 DROP PROCEDURE IF EXISTS delete_map_owner;
 DROP PROCEDURE IF EXISTS create_piece;
 DROP PROCEDURE IF EXISTS read_pieces;
@@ -64,6 +66,7 @@ DROP PROCEDURE IF EXISTS create_character;
 DROP PROCEDURE IF EXISTS read_characters;
 DROP PROCEDURE IF EXISTS create_character_owner;
 DROP PROCEDURE IF EXISTS read_character_owners;
+DROP PROCEDURE IF EXISTS read_character_owner;
 DROP PROCEDURE IF EXISTS delete_character_owner;
 
   /***************************************************************************/
@@ -180,6 +183,7 @@ CREATE TABLE campaigns (
 
 	name: the name of the campaign, duplicated here so we only need this table
 		to populate and frequently refresh the user's campaign list
+		TODO: is this an efficient and useful optimization?
 	permission: one of four mutually exclusive states
 		“owner”: can invite people to join the campaign, change the public/private
 			setting, invite members, change the map, edit the map and move any
@@ -655,8 +659,13 @@ END;
 /* User views the owners, members, viewers and blacklist of this campaign */
 CREATE PROCEDURE read_campaign_users (IN the_campaign INT)
 BEGIN
+/*
 	SELECT user_id, permission, viewing, avatar, login, users.name AS name
 		FROM campaign_users, users WHERE id = user_id AND campaign_id = the_campaign;
+*/
+	SELECT user_id, permission, viewing, avatar, login, users.name AS name
+		FROM campaign_users JOIN users ON id = user_id
+		WHERE campaign_id = the_campaign;
 END;
 
 /* User invites another user to play at the campaign (who becomes a member)
@@ -672,8 +681,12 @@ CREATE PROCEDURE update_campaign_user_permission
 BEGIN
 	START TRANSACTION;
 /* create or update the campaign user's permission */
+/*
 	IF (SELECT COUNT(*) FROM campaign_users
 		WHERE user_id = the_user AND campaign_id = the_campaign) = 0
+*/
+	IF (the_user, the_campaign) NOT IN
+		(SELECT user_id, campaign_id FROM campaign_users)
 	THEN
 		SELECT name INTO @name FROM campaigns WHERE id = the_campaign;
 		INSERT INTO campaign_users (user_id, campaign_id, name, permission)
@@ -686,8 +699,12 @@ BEGIN
 	DELETE FROM campaign_users WHERE user_id = the_user AND campaign_id = the_campaign
 		AND permission = NULL AND viewing = 0;
 /* delete campaigns without owners */
+/*
 	IF (SELECT COUNT(*) FROM campaign_users
 		WHERE campaign_id = the_campaign AND permission = 'owner') = 0
+*/
+	IF the_campaign NOT IN
+		(SELECT campaign_id FROM campaign_users WHERE permission = 'owner')
 	THEN
 		DELETE FROM campaigns WHERE id = the_campaign;
 	END IF;
@@ -698,8 +715,12 @@ END;
 CREATE PROCEDURE update_campaign_user_arrive (IN the_user INT, IN the_campaign INT)
 BEGIN
 	START TRANSACTION;
+/*
 	IF (SELECT COUNT(*) FROM campaign_users
 		WHERE user_id = the_user AND campaign_id = the_campaign) = 0
+*/
+	IF (the_user, the_campaign) NOT IN
+		(SELECT user_id, campaign_id FROM campaign_users)
 	THEN
 		SELECT name INTO @name FROM campaigns WHERE id = the_campaign;
 		INSERT INTO campaign_users (user_id, campaign_id, name, viewing)
@@ -793,8 +814,12 @@ END;
 /* User views the maps he owns */
 CREATE PROCEDURE read_maps (IN the_user INT)
 BEGIN
+/*
 	SELECT id, name, type, tile_rows, tile_columns
 		FROM maps, map_owners WHERE id = map_id AND user_id = the_user;
+*/
+	SELECT id, name, type, tile_rows, tile_columns
+		FROM maps JOIN map_owners ON id = map_id WHERE user_id = the_user;
 END;
 
 /* User polls for changes to the map, its pieces and tiles */
@@ -825,7 +850,7 @@ END;
 /* User paints or erases tiles, fog or walls */
 CREATE PROCEDURE read_map_tiles (IN the_map INT)
 BEGIN
-	SELECT tile_rows, tile_columns, tiles, flags FROM maps WHERE map_id = the_map
+	SELECT tile_rows, tile_columns, tiles, flags FROM maps WHERE id = the_map
 		FOR UPDATE; /* lock row so simultaneous edits don't cancel each other */
 END;
 
@@ -833,6 +858,20 @@ END;
 CREATE PROCEDURE read_map_campaigns (IN the_map INT)
 BEGIN
 	SELECT id, private FROM campaigns WHERE map = the_map;
+END;
+
+/* User tries to view a map and PHP logic checks whether they can */
+CREATE PROCEDURE read_map_viewer (IN the_user INT, the_map INT)
+BEGIN
+	SELECT * FROM (SELECT id, private FROM campaigns WHERE map = the_map) AS c
+		LEFT JOIN campaign_users ON id = campaign_id
+		WHERE private = 0 OR (id = user_id AND permission IN ('member', 'owner'));
+/*
+	SELECT * FROM (SELECT id FROM campaigns WHERE map = the_map AND private = 1)
+		JOIN (SELECT campaign_id FROM campaign_users WHERE user_id = the_user
+			AND permission IN ('member', 'owner')) ON id = campaign_id
+		UNION (SELECT id FROM campaigns WHERE map = the_map AND private = 0);
+*/
 END;
 
 /* User paints or erases tiles, fog or walls */
@@ -891,8 +930,18 @@ END;
 /* User opens a map and sees the map's owners */
 CREATE PROCEDURE read_map_owners (IN the_map INT)
 BEGIN
+/*
 	SELECT id, login, logged_in, name, color FROM map_owners, users
 		WHERE map_id = the_map AND id = user_id;
+*/
+	SELECT id, login, logged_in, name, color
+		FROM map_owners JOIN users ON id = user_id WHERE map_id = the_map;
+END;
+
+/* User tries to edit a map and and PHP logic checks whether they own it */
+CREATE PROCEDURE read_map_owner (IN the_user INT, IN the_map INT)
+BEGIN
+	SELECT * FROM map_owners WHERE user_id = the_user AND map_id = the_map;
 END;
 
 /* User disowns map
@@ -903,7 +952,10 @@ BEGIN
 /* remove the map owner */
 	DELETE FROM map_owners WHERE user_id = the_user AND map_id = the_map;	
 /* delete maps without owners */
+/*
 	IF (SELECT COUNT(*) FROM map_owners WHERE map_id = the_map) = 0
+*/
+	IF the_map NOT IN (SELECT map_id FROM map_owners)
 	THEN
 		DELETE FROM maps WHERE id = the_map;
 	END IF;
@@ -993,9 +1045,14 @@ END;
 /* User views a list of characters he owns */
 CREATE PROCEDURE read_characters (IN the_user INT)
 BEGIN
+/*
 	SELECT id, name, system, stats, notes, portrait, piece, color
 		FROM characters, character_owners
 		WHERE id = character_id AND user_id = the_user;
+*/
+	SELECT id, name, system, stats, notes, portrait, piece, color
+		FROM characters JOIN character_owners ON id = character_id
+		WHERE user_id = the_user;
 END;
 
 
@@ -1011,8 +1068,20 @@ END;
 /* User views a list of this character's owners */
 CREATE PROCEDURE read_character_owners (IN the_character INT)
 BEGIN
+/*
 	SELECT id, login, logged_in, name, color FROM character_owners, users
 		WHERE character_id = the_character AND id = user_id;
+*/
+	SELECT id, login, logged_in, name, color
+		FROM character_owners JOIN users ON id = user_id
+		WHERE character_id = the_character;
+END;
+
+/* User edits character and PHP logic checks whether user owns character */
+CREATE PROCEDURE read_character_owner (IN the_user INT, IN the_character INT)
+BEGIN
+	SELECT * FROM character_owners
+		WHERE user_id = the_user AND character_id = the_character;
 END;
 
 /* User disowns a character
@@ -1024,8 +1093,11 @@ BEGIN
 	DELETE FROM character_owners
 		WHERE user_id = the_user AND character_id = the_character;	
 /* delete characters without owners */
+/*
 	IF (SELECT COUNT(*) FROM character_owners
 		WHERE character_id = the_character) = 0
+*/
+	IF the_character NOT IN (SELECT character_id FROM character_owners)
 	THEN
 		DELETE FROM characters WHERE id = the_character;
 	END IF;

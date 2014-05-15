@@ -12,6 +12,10 @@ if (!isset($_SESSION['user_id'])) {
 
 // Interpret the Request
 
+$tile_change = FALSE;
+$fog_change = FALSE;
+$wall_change = FALSE;
+
 // all requests specify a certain tile on a certain map
 $map = intval($_REQUEST['map']);
 $x = intval($_REQUEST['x']);
@@ -68,7 +72,7 @@ if (LT_can_edit_map($map)) {
 		// modify fog
 		if ($fog_change && $x >= 0 && $x < $width && $y >= 0 && $y < $height) {
 			$i = ($x + 1) + ($y + 1) * ($width + 1);
-			$flag_number = strpos($flags[$i], $code);
+			$flag_number = strpos($code, $flags[$i]);
 			$flag_number %= 27; // remove fog
 			if ($fog_value == 1) $flag_number += 27; // add fog
 			$flags[$i] = $code[$flag_number];
@@ -76,7 +80,7 @@ if (LT_can_edit_map($map)) {
 		// modify wall
 		if ($wall_change && $x >= -1 && $x < $width && $y >= -1 && $y < $height) {
 			$i = ($x + 1) + ($y + 1) * ($width + 1);
-			$flag_number = strpos($flags[$i], $code);
+			$flag_number = strpos($code, $flags[$i]);
 			// break flag number down into components
 			$ne = $flag_number % 3;
 			$se = ($flag_number - $ne) % 9;
@@ -109,7 +113,8 @@ if (LT_can_edit_map($map)) {
 			$flags[$i] = $code[$fog + $s + $se + $ne];
 		}
 		// save changes
-		if (LT_call('update_map_tiles', $map, $tiles, $fog)) $LT_SQL->commit();
+		if (is_array(LT_call('update_map_tiles', $map, $tiles, $flags)))
+			$LT_SQL->commit();
 	}
 }
 
