@@ -131,6 +131,7 @@ var TEST = {
 		TEST.index++;
 		if (TEST.index == TEST.tests.length) {
 			$("<div>").text("... FINISHED!").appendTo($("#output"));
+			$("html, body").scrollTop($(".FAIL").offset().top);
 			return;
 		}
 		TEST.request();

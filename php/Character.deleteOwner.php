@@ -17,6 +17,6 @@ $character = intval($_REQUEST['character']);
 // Query the Database
 
 if (LT_can_edit_character($character)) 
-	LT_call('delete_character_ownrer', $user, $character);
+	LT_call('delete_character_owner', $user, $character);
 
 ?>
