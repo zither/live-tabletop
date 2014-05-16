@@ -2,6 +2,7 @@
 
 include('db_config.php');
 include('include/query.php');
+include('include/output.php');
 
 session_start();
 if (!isset($_SESSION['user_id'])) {
@@ -9,20 +10,8 @@ if (!isset($_SESSION['user_id'])) {
 	exit('You are not logged in.');
 }
 
-// Interpret the Request
-
-$user_id = intval($_SESSION['user_id']);
-
-// Query the Database
-
-if (is_array($rows = LT_call('read_maps', $user_id))) {
-	$string_fields = array('type', 'name');
-	foreach ($rows as $i => $fields)
-		foreach ($fields as $key => $value)
-			if (!in_array($key, $string_fields))
-				$rows[$i][$key] = intval($value);
-	include('include/json_headers.php');
-	echo json_encode($rows);
-}
+if (is_array($rows = LT_call('read_maps', intval($_SESSION['user_id']))))
+	LT_output_array($rows,
+		array('integer' => array('id', 'tile_rows', 'tile_columns')));
 
 ?>

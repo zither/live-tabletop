@@ -2,6 +2,7 @@
 
 include('db_config.php');
 include('include/query.php');
+include('include/output.php');
 
 session_start();
 if (!isset($_SESSION['admin'])) {
@@ -16,14 +17,8 @@ $last_message_id = 0; // show all messages
 
 // Query the Database
 
-if (is_array($rows = LT_call('read_messages', $campaign, $last_message_id))) {
-	$string_fields = array('text');
-	foreach ($rows as $i => $message)
-		foreach ($message as $key => $value)
-			if (!in_array($key, $string_fields))
-				$rows[$i][$key] = intval($value);
-	include('include/json_headers.php');
-	echo json_encode($rows);
-}
+if (is_array($rows = LT_call('read_messages', $campaign, $last_message_id)))
+	LT_output_array($rows,
+		array('integer' => array('id', 'user_id', 'avatar', 'time')));
 
 ?>
