@@ -5,7 +5,7 @@ include('include/query.php');
 include('include/ownership.php');
 
 session_start();
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user'])) {
 	header('HTTP/1.1 401 Unauthorized', true, 401);
 	exit('You are not logged in.');
 }
@@ -59,8 +59,8 @@ $code = "0ABCDEFGHIJKLMNOPQRSTUVWXYZ1abcdefghijklmnopqrstuvwxyz";
 if (LT_can_edit_map($map)) {
 	$LT_SQL->autocommit(FALSE); /* avoid canceling simultaneous edits */
 	if ($rows = LT_call('read_map_tiles', $map)) {
-		$width = intval($rows[0]['tile_columns']);
-		$height = intval($rows[0]['tile_rows']);
+		$width = intval($rows[0]['columns']);
+		$height = intval($rows[0]['rows']);
 		$tiles = $rows[0]['tiles'];
 		$flags = $rows[0]['flags'];
 		// modify tile id

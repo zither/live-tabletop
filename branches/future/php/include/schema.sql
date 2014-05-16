@@ -93,11 +93,10 @@ DROP PROCEDURE IF EXISTS delete_character_owner;
 */
 
 CREATE TABLE admins (
-	id INT AUTO_INCREMENT PRIMARY KEY,
-	login VARCHAR(200) NOT NULL UNIQUE,
-	hash TEXT NOT NULL,
-	salt TEXT NOT NULL
-);
+	`id` INT AUTO_INCREMENT PRIMARY KEY,
+	`login` VARCHAR(200) NOT NULL UNIQUE,
+	`hash` TEXT NOT NULL,
+	`salt` TEXT NOT NULL);
 
 
 /* USERS TABLE
@@ -124,17 +123,16 @@ CREATE TABLE admins (
 */
 
 CREATE TABLE users (
-	id INT AUTO_INCREMENT PRIMARY KEY,
-	login VARCHAR(200) NOT NULL UNIQUE,
-	hash TEXT NOT NULL,
-	salt TEXT NOT NULL,
-	last_action TIMESTAMP,
-	logged_in TINYINT NOT NULL DEFAULT 0,
-	name TEXT,
-	color TEXT,
-	email TEXT,
-	subscribed TINYINT NOT NULL DEFAULT 0
-);
+	`id` INT AUTO_INCREMENT PRIMARY KEY,
+	`login` VARCHAR(200) NOT NULL UNIQUE,
+	`hash` TEXT NOT NULL,
+	`salt` TEXT NOT NULL,
+	`last_action` TIMESTAMP,
+	`logged_in` TINYINT NOT NULL DEFAULT 0,
+	`name` TEXT,
+	`color` TEXT,
+	`email` TEXT,
+	`subscribed` TINYINT NOT NULL DEFAULT 0);
 
 
 /* FRIENDS TABLE
@@ -144,13 +142,12 @@ CREATE TABLE users (
 */
 
 CREATE TABLE friends (
-	sender INT NOT NULL,
-	recipient INT NOT NULL,
-	time TIMESTAMP, /* TODO: do we need this? */
-	FOREIGN KEY (sender) REFERENCES users(id) ON DELETE CASCADE,
-	FOREIGN KEY (recipient) REFERENCES users(id) ON DELETE CASCADE,
-	PRIMARY KEY (sender, recipient)
-);
+	`sender` INT NOT NULL,
+	`recipient` INT NOT NULL,
+	`time` TIMESTAMP, /* TODO: do we need this? */
+	FOREIGN KEY (`sender`) REFERENCES users(`id`) ON DELETE CASCADE,
+	FOREIGN KEY (`recipient`) REFERENCES users(`id`) ON DELETE CASCADE,
+	PRIMARY KEY (`sender`, `recipient`));
 
 
 /* CAMPAIGNS TABLE
@@ -167,14 +164,13 @@ CREATE TABLE friends (
 */
 
 CREATE TABLE campaigns (
-	id INT AUTO_INCREMENT PRIMARY KEY,
-	name TEXT,
-	map INT,
-	private TINYINT NOT NULL DEFAULT 1,
-	turns TEXT NOT NULL, /* DEFAULT '[]' */
-	last_message INT NOT NULL DEFAULT 0,
-	users_modified DATETIME
-);
+	`id` INT AUTO_INCREMENT PRIMARY KEY,
+	`name` TEXT,
+	`map` INT,
+	`private` TINYINT NOT NULL DEFAULT 1,
+	`turns` TEXT NOT NULL, /* DEFAULT '[]' */
+	`last_message` INT NOT NULL DEFAULT 0,
+	`users_modified` DATETIME);
 
 
 /* CAMPAIGN_USERS TABLE
@@ -196,16 +192,15 @@ CREATE TABLE campaigns (
 */
 
 CREATE TABLE campaign_users (
-	user_id INT NOT NULL,
-	campaign_id INT NOT NULL,
-	name TEXT,
-	permission TEXT,
-	viewing TINYINT NOT NULL DEFAULT 0,
-	avatar INT,
-	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-	FOREIGN KEY (campaign_id) REFERENCES campaigns(id) ON DELETE CASCADE,
-	PRIMARY KEY (user_id, campaign_id)
-);
+	`user` INT NOT NULL,
+	`campaign` INT NOT NULL,
+	`name` TEXT,
+	`permission` TEXT,
+	`viewing` TINYINT NOT NULL DEFAULT 0,
+	`avatar` INT,
+	FOREIGN KEY (`user`) REFERENCES users(`id`) ON DELETE CASCADE,
+	FOREIGN KEY (`campaign`) REFERENCES campaigns(`id`) ON DELETE CASCADE,
+	PRIMARY KEY (`user`, `campaign`));
 
 
 /* MESSAGES TABLE
@@ -217,14 +212,13 @@ CREATE TABLE campaign_users (
 
 CREATE TABLE messages (
 	id INT AUTO_INCREMENT PRIMARY KEY,
-	campaign_id INT NOT NULL,
-	user_id INT NOT NULL,
-	avatar INT,
-	text TEXT,
-	time TIMESTAMP,
-	FOREIGN KEY (campaign_id) REFERENCES campaigns(id) ON DELETE CASCADE,
-	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+	`campaign` INT NOT NULL,
+	`user` INT NOT NULL,
+	`avatar` INT,
+	`text` TEXT,
+	`time` TIMESTAMP,
+	FOREIGN KEY (`campaign`) REFERENCES campaigns(`id`) ON DELETE CASCADE,
+	FOREIGN KEY (`user`) REFERENCES users(`id`) ON DELETE CASCADE);
 
 
 /* MAPS TABLE
@@ -233,8 +227,8 @@ CREATE TABLE messages (
 
 	name: an optional name to help identify the map
 		(only visible to map and campaign owners?)
-	type: "hex" or "square"
-	tile_rows/columns: height and width of the map, in grid units
+	type: 'hex' or 'square'
+	rows/columns: height and width of the map, in grid units
 	background: image JSON data. See piece.image. No base; Probably no view.
 	min/max zoom, rotate and tilt: allowed viewing options
 	grid/wall/door thickness and color: style for grid and wall overlay
@@ -253,29 +247,28 @@ CREATE TABLE messages (
 */
 
 CREATE TABLE maps (
-	id INT AUTO_INCREMENT PRIMARY KEY,
-	name TEXT,
-	type TEXT NOT NULL,
-	tile_rows SMALLINT NOT NULL,
-	tile_columns SMALLINT NOT NULL,
-	background TEXT,
-	min_zoom FLOAT NOT NULL DEFAULT 0.25,
-	max_zoom FLOAT NOT NULL DEFAULT 4.0,
-	min_rotate SMALLINT NOT NULL DEFAULT -180,
-	max_rotate SMALLINT NOT NULL DEFAULT 180,
-	min_tilt SMALLINT NOT NULL DEFAULT 30,
-	max_tilt SMALLINT NOT NULL DEFAULT 90,
-	grid_thickness TINYINT NOT NULL DEFAULT 1,
-	grid_color TEXT,
-	wall_thickness TINYINT NOT NULL DEFAULT 3,
-	wall_color TEXT,
-	door_thickness TINYINT NOT NULL DEFAULT 3, /* TODO: Is this needed? */
-	door_color TEXT,
-	piece_changes INT NOT NULL DEFAULT 0,
-	tile_changes INT NOT NULL DEFAULT 0,
-	tiles TEXT,
-	flags TEXT
-);
+	`id` INT AUTO_INCREMENT PRIMARY KEY,
+	`name` TEXT,
+	`type` TEXT NOT NULL,
+	`rows` SMALLINT NOT NULL,
+	`columns` SMALLINT NOT NULL,
+	`background` TEXT,
+	`min_zoom` FLOAT NOT NULL DEFAULT 0.25,
+	`max_zoom` FLOAT NOT NULL DEFAULT 4.0,
+	`min_rotate` SMALLINT NOT NULL DEFAULT -180,
+	`max_rotate` SMALLINT NOT NULL DEFAULT 180,
+	`min_tilt` SMALLINT NOT NULL DEFAULT 30,
+	`max_tilt` SMALLINT NOT NULL DEFAULT 90,
+	`grid_thickness` TINYINT NOT NULL DEFAULT 1,
+	`grid_color` TEXT,
+	`wall_thickness` TINYINT NOT NULL DEFAULT 3,
+	`wall_color` TEXT,
+	`door_thickness` TINYINT NOT NULL DEFAULT 3, /* TODO: Is this needed? */
+	`door_color` TEXT,
+	`piece_changes` INT NOT NULL DEFAULT 0,
+	`tile_changes` INT NOT NULL DEFAULT 0,
+	`tiles` TEXT,
+	`flags` TEXT);
 
 
 /* MAP_OWNERS TABLE
@@ -284,19 +277,16 @@ CREATE TABLE maps (
 */
 
 CREATE TABLE map_owners (
-	user_id INT NOT NULL,
-	map_id INT NOT NULL,
-	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-	FOREIGN KEY (map_id) REFERENCES maps(id) ON DELETE CASCADE,
-	PRIMARY KEY (user_id, map_id)
-);
+	`user` INT NOT NULL,
+	`map` INT NOT NULL,
+	FOREIGN KEY (`user`) REFERENCES users(`id`) ON DELETE CASCADE,
+	FOREIGN KEY (`map`) REFERENCES maps(`id`) ON DELETE CASCADE,
+	PRIMARY KEY (`user`, `map`));
 
 
 /* PIECES TABLE
 
-	map_id: every piece is part of a map
-	image_id: piece image/class
-	image_url: link to a piece image from another site
+	map: every piece is part of a map
 	x, y: center of the piece in square map units
 	   if you use square tiles the center of tile 0, 0 is 0.5, 0.5
 	image: JSON data {
@@ -317,23 +307,23 @@ CREATE TABLE map_owners (
 			flat: low-relief, can squish/tilt but does not rotate
 			multi: the image has been rendered from each direction
 	}
-	character_id: an optional character associated with this piece
+	character: an optional character associated with this piece
 	locked: only campaign+map owners & character owners can move the piece if 1
 	markers: status icons with metadata attached to the piece
 */
 
 CREATE TABLE pieces (
-	id INT AUTO_INCREMENT PRIMARY KEY,
-	map_id INT NOT NULL,
-	image TEXT,
-	name TEXT,
-	x FLOAT NOT NULL DEFAULT 0.5,
-	y FLOAT NOT NULL DEFAULT 0.5,
-	character_id INT,
-	locked TINYINT NOT NULL DEFAULT 1,
-	markers TEXT NOT NULL,
-	color TEXT, /* TODO: do we need this? */
-	FOREIGN KEY (map_id) REFERENCES maps(id) ON DELETE CASCADE
+	`id` INT AUTO_INCREMENT PRIMARY KEY,
+	`map` INT NOT NULL,
+	`image` TEXT,
+	`name` TEXT,
+	`x` FLOAT NOT NULL DEFAULT 0.5,
+	`y` FLOAT NOT NULL DEFAULT 0.5,
+	`character` INT,
+	`locked` TINYINT NOT NULL DEFAULT 1,
+	`markers` TEXT NOT NULL,
+	`color` TEXT, /* TODO: do we need this? */
+	FOREIGN KEY (`map`) REFERENCES maps(`id`) ON DELETE CASCADE
 );
 
 
@@ -354,15 +344,14 @@ CREATE TABLE pieces (
 */
 
 CREATE TABLE characters (
-	id INT AUTO_INCREMENT PRIMARY KEY,
-	name TEXT,
-	system TEXT,
-	stats TEXT,
-	notes TEXT,
-	portrait TEXT,
-	piece TEXT,
-	color TEXT
-);
+	`id` INT AUTO_INCREMENT PRIMARY KEY,
+	`name` TEXT,
+	`system` TEXT,
+	`stats` TEXT,
+	`notes` TEXT,
+	`portrait` TEXT,
+	`piece` TEXT,
+	`color` TEXT);
 
 
 /* CHARACTER_OWNERS TABLE
@@ -372,12 +361,11 @@ CREATE TABLE characters (
 */
 
 CREATE TABLE character_owners (
-	user_id INT,
-	character_id INT,
-	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-	FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
-	PRIMARY KEY (user_id, character_id)
-);
+	`user` INT,
+	`character` INT,
+	FOREIGN KEY (`user`) REFERENCES users(`id`) ON DELETE CASCADE,
+	FOREIGN KEY (`character`) REFERENCES characters(`id`) ON DELETE CASCADE,
+	PRIMARY KEY (`user`, `character`));
 
 
   /***************************************************************************/
@@ -494,26 +482,26 @@ CREATE PROCEDURE delete_user (IN the_user INT)
 BEGIN
 	START TRANSACTION;
 /* delete the user */
-	DELETE FROM users WHERE id = the_user;
+	DELETE FROM users WHERE `id` = the_user;
 /* delete campaigns without owners */
-	DELETE FROM campaigns WHERE id NOT IN 
-		(SELECT campaign_id FROM campaign_users WHERE permission = "owner");
+	DELETE FROM campaigns WHERE `id` NOT IN 
+		(SELECT `campaign` FROM campaign_users WHERE `permission` = 'owner');
 /* delete maps without owners */
-	DELETE FROM maps WHERE id NOT IN
-		(SELECT map_id FROM map_owners);
+	DELETE FROM maps WHERE `id` NOT IN
+		(SELECT `map` FROM map_owners);
 /* delete characters without owners */
-	DELETE FROM characters WHERE id NOT IN
-		(SELECT character_id FROM character_owners);
+	DELETE FROM characters WHERE `id` NOT IN
+		(SELECT `character` FROM character_owners);
 /*
 handled by ON DELETE CASCADE when you delete the user:
-	DELETE FROM friends WHERE sender = the_user OR recipient = the_user;
-	DELETE FROM campaign_users WHERE user_id = the_user;
-	DELETE FROM messages WHERE user_id = the_user;
-	DELETE FROM map_owners WHERE user_id = the_user;
+	DELETE FROM friends WHERE `sender` = the_user OR `recipient` = the_user;
+	DELETE FROM campaign_users WHERE `user` = the_user;
+	DELETE FROM messages WHERE `user` = the_user;
+	DELETE FROM map_owners WHERE `user` = the_user;
 handled by ON DELETE CASCADE when you delete the campaign:
-	DELETE FROM messages WHERE campaign_id NOT IN (SELECT id FROM campaigns);
+	DELETE FROM messages WHERE `campaign` NOT IN (SELECT `id` FROM campaigns);
 handled by ON DELETE CASCADE when you delete the map:
-	DELETE FROM pieces WHERE map_id NOT IN (SELECT id FROM maps);
+	DELETE FROM pieces WHERE `map` NOT IN (SELECT `id` FROM maps);
 */
 	COMMIT;
 END;
@@ -554,9 +542,9 @@ END;
 /* User views his list of confirmed friends */
 CREATE PROCEDURE read_friends_confirmed (IN the_user INT)
 BEGIN
-	SELECT requested.recipient AS user_id FROM
-		(SELECT * FROM friends WHERE sender = the_user) AS requested,
-		(SELECT * FROM friends WHERE recipient = the_user) AS received
+	SELECT requested.recipient AS `user` FROM
+		(SELECT * FROM friends WHERE `sender` = the_user) AS requested,
+		(SELECT * FROM friends WHERE `recipient` = the_user) AS received
 		WHERE received.sender = requested.recipient;
 END;
 
@@ -576,14 +564,14 @@ CREATE PROCEDURE create_campaign
 BEGIN
 	START TRANSACTION;
 /* create the campaign */
-	INSERT INTO campaigns (name, turns, users_modified)
+	INSERT INTO campaigns (`name`, `turns`, `users_modified`)
 		VALUES (the_name, '[]', NOW());
-	SET @new_id = LAST_INSERT_ID();
+	SET @id = LAST_INSERT_ID();
 /* make the user an owner */
-	INSERT INTO campaign_users (user_id, campaign_id, name, permission)
-		VALUES (the_user, @new_id, the_name, 'owner');
+	INSERT INTO campaign_users (`user`, `campaign`, `name`, `permission`)
+		VALUES (the_user, @id, the_name, 'owner');
 /* return the new campaign's id */
-	SELECT @new_id AS id;
+	SELECT @id AS id;
 	COMMIT;
 END;
 
@@ -614,8 +602,8 @@ END;
 CREATE PROCEDURE update_campaign_name (IN the_campaign INT, IN the_name TEXT)
 BEGIN
 	START TRANSACTION;
-	UPDATE campaigns SET name = the_name WHERE id = the_campaign;
-	UPDATE campaign_users SET name = the_name WHERE campaign_id = the_campaign;
+	UPDATE campaigns SET `name` = the_name WHERE `id` = the_campaign;
+	UPDATE campaign_users SET `name` = the_name WHERE `campaign` = the_campaign;
 	COMMIT;
 END;
 
@@ -644,28 +632,24 @@ END;
 CREATE PROCEDURE read_campaign_user_permission
 	(IN the_user INT, IN the_campaign INT)
 BEGIN
-	SELECT permission FROM campaign_users
-		WHERE user_id = the_user AND campaign_id = the_campaign;
+	SELECT `permission` FROM campaign_users
+		WHERE `user` = the_user AND `campaign` = the_campaign;
 END;
 
 /* User views campaigns he owns and campaigns he has been invited to */
 CREATE PROCEDURE read_campaign_user_campaigns (IN the_user INT)
 BEGIN
-	SELECT campaign_id, name, permission FROM campaign_users
-		WHERE user_id = the_user AND permission IN ('owner', 'member')
-		ORDER BY name, campaign_id;
+	SELECT `campaign`, `name`, `permission` FROM campaign_users
+		WHERE `user` = the_user AND `permission` IN ('owner', 'member')
+		ORDER BY name, `campaign`;
 END;
 
 /* User views the owners, members, viewers and blacklist of this campaign */
 CREATE PROCEDURE read_campaign_users (IN the_campaign INT)
 BEGIN
-/*
-	SELECT user_id, permission, viewing, avatar, login, users.name AS name
-		FROM campaign_users, users WHERE id = user_id AND campaign_id = the_campaign;
-*/
-	SELECT user_id, permission, viewing, avatar, login, users.name AS name
-		FROM campaign_users JOIN users ON id = user_id
-		WHERE campaign_id = the_campaign;
+	SELECT `user`, `permission`, `viewing`, `avatar`, `login`, users.name AS name
+		FROM campaign_users JOIN users ON `id` = `user`
+		WHERE `campaign` = the_campaign;
 END;
 
 /* User invites another user to play at the campaign (who becomes a member)
@@ -681,32 +665,24 @@ CREATE PROCEDURE update_campaign_user_permission
 BEGIN
 	START TRANSACTION;
 /* create or update the campaign user's permission */
-/*
-	IF (SELECT COUNT(*) FROM campaign_users
-		WHERE user_id = the_user AND campaign_id = the_campaign) = 0
-*/
 	IF (the_user, the_campaign) NOT IN
-		(SELECT user_id, campaign_id FROM campaign_users)
+		(SELECT `user`, `campaign` FROM campaign_users)
 	THEN
-		SELECT name INTO @name FROM campaigns WHERE id = the_campaign;
-		INSERT INTO campaign_users (user_id, campaign_id, name, permission)
+		SELECT `name` INTO @name FROM campaigns WHERE `id` = the_campaign;
+		INSERT INTO campaign_users (`user`, `campaign`, `name`, `permission`)
 			VALUES (the_user, the_campaign, @name, the_permission);
 	ELSE
-		UPDATE campaign_users SET permission = the_permission
-			WHERE user_id = the_user AND campaign_id = the_campaign;
+		UPDATE campaign_users SET `permission` = the_permission
+			WHERE `user` = the_user AND `campaign` = the_campaign;
 	END IF;
 /* delete guests (NULL permission) who are not viewing the campaign */
-	DELETE FROM campaign_users WHERE user_id = the_user AND campaign_id = the_campaign
-		AND permission = NULL AND viewing = 0;
+	DELETE FROM campaign_users WHERE `user` = the_user AND `campaign` = the_campaign
+		AND `permission` = NULL AND `viewing` = 0;
 /* delete campaigns without owners */
-/*
-	IF (SELECT COUNT(*) FROM campaign_users
-		WHERE campaign_id = the_campaign AND permission = 'owner') = 0
-*/
 	IF the_campaign NOT IN
-		(SELECT campaign_id FROM campaign_users WHERE permission = 'owner')
+		(SELECT `campaign` FROM campaign_users WHERE `permission` = 'owner')
 	THEN
-		DELETE FROM campaigns WHERE id = the_campaign;
+		DELETE FROM campaigns WHERE `id` = the_campaign;
 	END IF;
 	COMMIT;
 END;
@@ -715,19 +691,15 @@ END;
 CREATE PROCEDURE update_campaign_user_arrive (IN the_user INT, IN the_campaign INT)
 BEGIN
 	START TRANSACTION;
-/*
-	IF (SELECT COUNT(*) FROM campaign_users
-		WHERE user_id = the_user AND campaign_id = the_campaign) = 0
-*/
 	IF (the_user, the_campaign) NOT IN
-		(SELECT user_id, campaign_id FROM campaign_users)
+		(SELECT `user`, `campaign` FROM campaign_users)
 	THEN
-		SELECT name INTO @name FROM campaigns WHERE id = the_campaign;
-		INSERT INTO campaign_users (user_id, campaign_id, name, viewing)
+		SELECT `name` INTO @name FROM campaigns WHERE `id` = the_campaign;
+		INSERT INTO campaign_users (`user`, `campaign`, `name`, `viewing`)
 			VALUES (the_user, the_campaign, @name, 1);
 	ELSE
-		UPDATE campaign_users SET viewing = 1
-			WHERE user_id = the_user AND campaign_id = the_campaign;
+		UPDATE campaign_users SET `viewing` = 1
+			WHERE `user` = the_user AND `campaign` = the_campaign;
 	END IF;
 	COMMIT;
 END;
@@ -738,11 +710,11 @@ BEGIN
 	START TRANSACTION;
 /* delete this campaign user if it was just a guest (NULL permission) */
 	DELETE FROM campaign_users 
-		WHERE user_id = the_user AND campaign_id = the_campaign 
-		AND permission = NULL;
+		WHERE `user` = the_user AND `campaign` = the_campaign 
+		AND `permission` = NULL;
 /* set this campaign user's viewing to 0 if the user is a member or owner */
-	UPDATE campaign_users SET viewing = 0
-		WHERE user_id = the_user AND campaign_id = the_campaign;
+	UPDATE campaign_users SET `viewing` = 0
+		WHERE `user` = the_user AND `campaign` = the_campaign;
 	COMMIT;
 END;
 
@@ -750,8 +722,8 @@ END;
 CREATE PROCEDURE update_campaign_user_avatar
 	(IN the_user INT, IN the_campaign INT, IN the_avatar INT)
 BEGIN
-	UPDATE campaign_users SET avatar = the_avatar
-		WHERE user_id = the_user AND campaign_id = the_campaign;
+	UPDATE campaign_users SET `avatar` = the_avatar
+		WHERE `user` = the_user AND `campaign` = the_campaign;
 END;
 
 
@@ -762,9 +734,10 @@ CREATE PROCEDURE create_message
 	(IN the_campaign INT, IN the_user INT, IN the_avatar INT, IN the_text TEXT)
 BEGIN
 	START TRANSACTION;
-	INSERT INTO messages (campaign_id, user_id, avatar, text)
+	INSERT INTO messages (`campaign`, `user`, `avatar`, `text`)
 		VALUES (the_campaign, the_user, the_avatar, the_text);
-	UPDATE campaigns SET last_message = LAST_INSERT_ID() WHERE id = the_campaign;
+	UPDATE campaigns SET `last_message` = LAST_INSERT_ID()
+		WHERE `id` = the_campaign;
 	COMMIT;
 END;
 
@@ -776,9 +749,9 @@ CREATE PROCEDURE read_messages (IN the_campaign INT, IN the_last_message INT)
 BEGIN
 	START TRANSACTION; /* TODO: is this needed ? */
 	DELETE FROM messages WHERE time < DATE_SUB(NOW(), INTERVAL 6 HOUR);
-	SELECT id, user_id, avatar, text, UNIX_TIMESTAMP(time) AS time 
-		FROM messages WHERE campaign_id = the_campaign AND id > the_last_message
-		ORDER BY id ASC;
+	SELECT `id`, `user`, `avatar`, `text`, UNIX_TIMESTAMP(`time`) AS time 
+		FROM messages WHERE `campaign` = the_campaign AND `id` > the_last_message
+		ORDER BY `id` ASC;
 	COMMIT;
 END;
 
@@ -786,7 +759,7 @@ END;
 /* TODO: how can we call this at some regular interval? */
 CREATE PROCEDURE delete_messages_expired ()
 BEGIN
-	DELETE FROM messages WHERE time < DATE_SUB(NOW(), INTERVAL 6 HOUR);
+	DELETE FROM messages WHERE `time` < DATE_SUB(NOW(), INTERVAL 6 HOUR);
 END;
 
 
@@ -800,68 +773,66 @@ BEGIN
 	START TRANSACTION;
 /* create the map */
 	INSERT INTO maps 
-		(type, tile_rows, tile_columns, background, name, tiles, flags)
+		(type, `rows`, `columns`, `background`, `name`, `tiles`, `flags`)
 	VALUES (the_type, the_rows, the_columns, the_background, the_name,
 		the_tiles, the_flags);
-	SET @new_id = LAST_INSERT_ID();
+	SET @id = LAST_INSERT_ID();
 /* make the user an owner */
-	INSERT INTO map_owners (user_id, map_id) VALUES (the_user, @new_id);
+	INSERT INTO map_owners (`user`, `map`) VALUES (the_user, @id);
 /* return the new map's id */
-	SELECT @new_id AS id;
+	SELECT @id AS id;
 	COMMIT;
 END;
 
 /* User views the maps he owns */
 CREATE PROCEDURE read_maps (IN the_user INT)
 BEGIN
-/*
-	SELECT id, name, type, tile_rows, tile_columns
-		FROM maps, map_owners WHERE id = map_id AND user_id = the_user;
-*/
-	SELECT id, name, type, tile_rows, tile_columns
-		FROM maps JOIN map_owners ON id = map_id WHERE user_id = the_user;
+	SELECT `id`, `name`, `type`, `rows`, `columns`
+		FROM maps JOIN map_owners ON `id` = `map` WHERE `user` = the_user;
 END;
 
 /* User polls for changes to the map, its pieces and tiles */
 CREATE PROCEDURE read_map_changes (IN the_map INT)
 BEGIN
-	SELECT name, type, tile_rows, tile_columns, background,
-		min_zoom, max_zoom, min_rotate, max_rotate, min_tilt, max_tilt,
-		grid_thickness, grid_color, wall_thickness, wall_color, 
-		door_thickness, door_color, piece_changes, tile_changes
-		FROM maps WHERE id = the_map;
+	SELECT `name`, `type`, `rows`, `columns`, `background`,
+		`min_zoom`, `max_zoom`, `min_rotate`, `max_rotate`, `min_tilt`, `max_tilt`,
+		`grid_thickness`, `grid_color`, `wall_thickness`, `wall_color`, 
+		`door_thickness`, `door_color`, `piece_changes`, `tile_changes`
+		FROM maps WHERE `id` = the_map;
 END;
 
 /* User opens a map
 or User refreshes an updated map */
 CREATE PROCEDURE read_map (IN the_map INT)
 BEGIN
-	SELECT * FROM maps WHERE id = the_map;
+	SELECT * FROM maps WHERE `id` = the_map;
 END;
 
 /* User paints or erases tiles, fog or walls */
 CREATE PROCEDURE read_map_tiles (IN the_map INT)
 BEGIN
-	SELECT tile_rows, tile_columns, tiles, flags FROM maps WHERE id = the_map
+	SELECT `rows`, `columns`, `tiles`, `flags` FROM maps WHERE `id` = the_map
 		FOR UPDATE; /* lock row so simultaneous edits don't cancel each other */
 END;
 
 /* User tries to view a map and PHP logic checks whether the user can. */
 CREATE PROCEDURE read_map_campaigns (IN the_map INT)
 BEGIN
-	SELECT id, private FROM campaigns WHERE map = the_map;
+	SELECT `id`, `private` FROM campaigns WHERE `map` = the_map;
 END;
 
 /* User tries to view a map and PHP logic checks whether they can */
 CREATE PROCEDURE read_map_viewer (IN the_user INT, the_map INT)
 BEGIN
-	SELECT * FROM (SELECT id, private FROM campaigns WHERE map = the_map) AS c
-		LEFT JOIN campaign_users ON id = campaign_id
-		WHERE private = 0 OR (id = user_id AND permission IN ('member', 'owner'));
+	SELECT *
+		FROM (SELECT `id`, `private` FROM campaigns WHERE `map` = the_map) AS c
+			LEFT JOIN campaign_users ON `id` = `campaign`
+		WHERE `private` = 0
+			OR (`id` = `user` AND `permission` IN ('member', 'owner'));
 /*
 	SELECT * FROM (SELECT id FROM campaigns WHERE map = the_map AND private = 1)
-		JOIN (SELECT campaign_id FROM campaign_users WHERE user_id = the_user
-			AND permission IN ('member', 'owner')) ON id = campaign_id
+		JOIN (SELECT `campaign` FROM campaign_users WHERE `user` = the_user
+			AND permission IN ('member', 'owner')) ON id = `campaign`
 		UNION (SELECT id FROM campaigns WHERE map = the_map AND private = 0);
 */
 END;
@@ -870,8 +841,8 @@ END;
 CREATE PROCEDURE update_map_tiles
 	(IN the_map INT, IN the_tiles TEXT, IN the_flags TEXT)
 BEGIN
-	UPDATE maps
-		SET tile_changes = tile_changes + 1, tiles = the_tiles, flags = the_flags
+	UPDATE maps SET `tile_changes` = `tile_changes` + 1,
+		`tiles` = the_tiles, `flags` = the_flags
 		WHERE id = the_map;
 END;
 
@@ -882,12 +853,13 @@ CREATE PROCEDURE update_map_size (IN the_map INT, IN the_left SMALLINT,
 BEGIN
 	START TRANSACTION;
 /* update map properties */
-	UPDATE maps SET tile_changes = tile_changes + 1,
-		tile_rows = the_bottom - the_top, tile_columns = the_right - the_left,
-		tiles = the_tiles, flags = the_flags
-		WHERE id = the_map;
+	UPDATE maps SET `tile_changes` = `tile_changes` + 1,
+		`rows` = the_bottom - the_top, `columns` = the_right - the_left,
+		`tiles` = the_tiles, `flags` = the_flags
+		WHERE `id` = the_map;
 /* shift coordinates to post-resize coordinate system */
-	UPDATE pieces SET x = x - the_left, y = y - the_top WHERE map_id = the_map;
+	UPDATE pieces SET `x` = `x` - the_left, `y` = `y` - the_top
+		WHERE `map` = the_map;
 	COMMIT;
 END;
 
@@ -902,14 +874,14 @@ CREATE PROCEDURE update_map (IN the_map INT,
 	IN the_door_thickness TINYINT, IN the_door_color TEXT)
 BEGIN
 	UPDATE maps SET
-		name = the_name, type = the_type, background = the_background,
-		min_zoom   = the_min_zoom,   max_zoom   = the_max_zoom,
-		min_rotate = the_min_rotate, max_rotate = the_max_rotate,
-		min_tilt   = the_min_tilt,   max_tilt   = the_max_tilt,
-		grid_thickness = the_grid_thickness, grid_color = the_grid_color,
-		wall_thickness = the_wall_thickness, wall_color = the_wall_color,
-		door_thickness = the_door_thickness, door_color = the_door_color
-		WHERE id = the_map;
+		`name` = the_name, `type` = the_type, `background` = the_background,
+		`min_zoom`   = the_min_zoom,   `max_zoom`   = the_max_zoom,
+		`min_rotate` = the_min_rotate, `max_rotate` = the_max_rotate,
+		`min_tilt`   = the_min_tilt,   `max_tilt`   = the_max_tilt,
+		`grid_thickness` = the_grid_thickness, `grid_color` = the_grid_color,
+		`wall_thickness` = the_wall_thickness, `wall_color` = the_wall_color,
+		`door_thickness` = the_door_thickness, `door_color` = the_door_color
+		WHERE `id` = the_map;
 END;
 
 
@@ -918,24 +890,20 @@ END;
 /* User shares map with another user */
 CREATE PROCEDURE create_map_owner (IN the_user INT, IN the_map INT)
 BEGIN
-	INSERT INTO map_owners (user_id, map_id) VALUES (the_user, the_map);
+	INSERT INTO map_owners (`user`, `map`) VALUES (the_user, the_map);
 END;
 
 /* User opens a map and sees the map's owners */
 CREATE PROCEDURE read_map_owners (IN the_map INT)
 BEGIN
-/*
-	SELECT id, login, logged_in, name, color FROM map_owners, users
-		WHERE map_id = the_map AND id = user_id;
-*/
-	SELECT id, login, logged_in, name, color
-		FROM map_owners JOIN users ON id = user_id WHERE map_id = the_map;
+	SELECT `id`, `login`, `logged_in`, `name`, `color`
+		FROM map_owners JOIN users ON `id` = `user` WHERE `map` = the_map;
 END;
 
 /* User tries to edit a map and and PHP logic checks whether they own it */
 CREATE PROCEDURE read_map_owner (IN the_user INT, IN the_map INT)
 BEGIN
-	SELECT * FROM map_owners WHERE user_id = the_user AND map_id = the_map;
+	SELECT * FROM map_owners WHERE `user` = the_user AND `map` = the_map;
 END;
 
 /* User disowns map
@@ -944,14 +912,11 @@ CREATE PROCEDURE delete_map_owner (IN the_user INT, IN the_map INT)
 BEGIN
 	START TRANSACTION;
 /* remove the map owner */
-	DELETE FROM map_owners WHERE user_id = the_user AND map_id = the_map;	
+	DELETE FROM map_owners WHERE `user` = the_user AND `map` = the_map;	
 /* delete maps without owners */
-/*
-	IF (SELECT COUNT(*) FROM map_owners WHERE map_id = the_map) = 0
-*/
-	IF the_map NOT IN (SELECT map_id FROM map_owners)
+	IF the_map NOT IN (SELECT `map` FROM map_owners)
 	THEN
-		DELETE FROM maps WHERE id = the_map;
+		DELETE FROM maps WHERE `id` = the_map;
 	END IF;
 	COMMIT;
 END;
@@ -963,8 +928,8 @@ END;
 CREATE PROCEDURE create_piece (IN the_map INT, IN the_image TEXT)
 BEGIN
 	START TRANSACTION;
-	UPDATE maps SET piece_changes = piece_changes + 1 WHERE id = the_map;
-	INSERT INTO pieces (map_id, image, markers)
+	UPDATE maps SET `piece_changes` = `piece_changes` + 1 WHERE `id` = the_map;
+	INSERT INTO pieces (`map`, `image`, `markers`)
 		VALUES (the_map, the_image, '[]');
 	SELECT LAST_INSERT_ID() AS id;
 	COMMIT;
@@ -974,7 +939,7 @@ END;
 or User refreshes an updated map */
 CREATE PROCEDURE read_pieces (IN the_map INT)
 BEGIN
-	SELECT * FROM pieces WHERE map_id = the_map ORDER BY name, image, id;
+	SELECT * FROM pieces WHERE `map` = the_map ORDER BY `name`, `image`, `id`;
 END;
 
 /* User moves a piece */
@@ -982,9 +947,9 @@ CREATE PROCEDURE update_piece_position
 	(IN the_piece INT, IN the_x FLOAT, IN the_y FLOAT)
 BEGIN
 	START TRANSACTION;
-	UPDATE pieces SET x = the_x, y = the_y WHERE id = the_piece;
-	UPDATE maps SET piece_changes = piece_changes + 1
-		WHERE id = (SELECT map_id FROM pieces WHERE id = the_piece);
+	UPDATE pieces SET `x` = the_x, `y` = the_y WHERE `id` = the_piece;
+	UPDATE maps SET `piece_changes` = `piece_changes` + 1
+		WHERE `id` = (SELECT `map` FROM pieces WHERE `id` = the_piece);
 	COMMIT;
 END;
 
@@ -994,11 +959,12 @@ CREATE PROCEDURE update_piece (IN the_piece INT, IN the_image TEXT,
 	IN the_markers TEXT, IN the_color TEXT)
 BEGIN
 	START TRANSACTION;
-	UPDATE pieces SET image = the_image, name = the_name, locked = the_locked,
-		character_id = the_character, markers = the_markers, color = the_color
-		WHERE id = the_piece;
-	UPDATE maps SET piece_changes = piece_changes + 1 
-		WHERE id = (SELECT map_id FROM pieces WHERE id = the_piece);
+	UPDATE pieces
+		SET `image` = the_image, `name` = the_name, `locked` = the_locked,
+		`character` = the_character, `markers` = the_markers, `color` = the_color
+		WHERE `id` = the_piece;
+	UPDATE maps SET `piece_changes` = `piece_changes` + 1 
+		WHERE `id` = (SELECT `map` FROM pieces WHERE `id` = the_piece);
 	COMMIT;
 END;
 
@@ -1006,9 +972,9 @@ END;
 CREATE PROCEDURE delete_piece (IN the_piece INT)
 BEGIN
 	START TRANSACTION;
-	UPDATE maps SET piece_changes = piece_changes + 1
-		WHERE id = (SELECT map_id FROM pieces WHERE id = the_piece);
-	DELETE FROM pieces WHERE id = the_piece;
+	UPDATE maps SET `piece_changes` = `piece_changes` + 1
+		WHERE `id` = (SELECT `map` FROM pieces WHERE `id` = the_piece);
+	DELETE FROM pieces WHERE `id` = the_piece;
 	COMMIT;
 END;
 
@@ -1023,29 +989,25 @@ CREATE PROCEDURE create_character (IN the_user INT, IN the_name TEXT,
 BEGIN
 	START TRANSACTION;
 /* create the character */
-	INSERT INTO characters (name, system, stats, notes, portrait, piece, color)
+	INSERT INTO characters
+		(`name`, `system`, `stats`, `notes`, `portrait`, `piece`, `color`)
 		VALUES (the_name, the_system, the_stats, the_notes, the_portrait,
 		the_piece, the_color);
-	SET @new_id = LAST_INSERT_ID();
+	SET @id = LAST_INSERT_ID();
 /* make this user the character's owner */
-	INSERT INTO character_owners (user_id, character_id)
-		VALUES (the_user, @new_id);
+	INSERT INTO character_owners (`user`, `character`)
+		VALUES (the_user, @id);
 /* return the new character's id */
-	SELECT @new_id;
+	SELECT @id;
 	COMMIT;
 END;
  
 /* User views a list of characters he owns */
 CREATE PROCEDURE read_characters (IN the_user INT)
 BEGIN
-/*
-	SELECT id, name, system, stats, notes, portrait, piece, color
-		FROM characters, character_owners
-		WHERE id = character_id AND user_id = the_user;
-*/
-	SELECT id, name, system, stats, notes, portrait, piece, color
-		FROM characters JOIN character_owners ON id = character_id
-		WHERE user_id = the_user;
+	SELECT `id`, `name`, `system`, `stats`, `notes`, `portrait`, `piece`, `color`
+		FROM characters JOIN character_owners ON `id` = `character`
+		WHERE `user` = the_user;
 END;
 
 
@@ -1054,27 +1016,23 @@ END;
 /* User shares this character with another user */
 CREATE PROCEDURE create_character_owner (IN the_user INT, IN the_character INT)
 BEGIN
-	INSERT INTO character_owners (user_id, character_id)
+	INSERT INTO character_owners (`user`, `character`)
 		VALUES (the_user, the_character);
 END;
 
 /* User views a list of this character's owners */
 CREATE PROCEDURE read_character_owners (IN the_character INT)
 BEGIN
-/*
-	SELECT id, login, logged_in, name, color FROM character_owners, users
-		WHERE character_id = the_character AND id = user_id;
-*/
-	SELECT id, login, logged_in, name, color
-		FROM character_owners JOIN users ON id = user_id
-		WHERE character_id = the_character;
+	SELECT `id`, `login`, `logged_in`, `name`, `color`
+		FROM character_owners JOIN users ON `id` = `user`
+		WHERE `character` = the_character;
 END;
 
 /* User edits character and PHP logic checks whether user owns character */
 CREATE PROCEDURE read_character_owner (IN the_user INT, IN the_character INT)
 BEGIN
 	SELECT * FROM character_owners
-		WHERE user_id = the_user AND character_id = the_character;
+		WHERE `user` = the_user AND `character` = the_character;
 END;
 
 /* User disowns a character
@@ -1084,15 +1042,11 @@ BEGIN
 	START TRANSACTION;
 /* remove the character owner */
 	DELETE FROM character_owners
-		WHERE user_id = the_user AND character_id = the_character;	
+		WHERE `user` = the_user AND `character` = the_character;	
 /* delete characters without owners */
-/*
-	IF (SELECT COUNT(*) FROM character_owners
-		WHERE character_id = the_character) = 0
-*/
-	IF the_character NOT IN (SELECT character_id FROM character_owners)
+	IF the_character NOT IN (SELECT `character` FROM character_owners)
 	THEN
-		DELETE FROM characters WHERE id = the_character;
+		DELETE FROM characters WHERE `id` = the_character;
 	END IF;
 	COMMIT;
 END;

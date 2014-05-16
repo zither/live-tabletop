@@ -13,11 +13,11 @@ if (!isset($_SESSION['admin'])) {
 // Interpret the Request
 
 $campaign = intval($_REQUEST['campaign']);
-$last_message_id = 0; // show all messages
+$last_message = 0; // show all messages
 
 // Query the Database
 
-if (is_array($rows = LT_call('read_messages', $campaign, $last_message_id)))
+if (is_array($rows = LT_call('read_messages', $campaign, $last_message)))
 	LT_output_array($rows,
 		array('integer' => array('id', 'user_id', 'avatar', 'time')));
 

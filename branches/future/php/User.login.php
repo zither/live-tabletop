@@ -18,7 +18,7 @@ if ($rows = LT_call_silent('read_user_login', $login)) {
   $hash = LT_hash_password($password, $rows[0]['salt']);
   if (strcmp($hash, $rows[0]['hash']) == 0) {
 		// the server associates the user with this session
-  	$_SESSION['user_id'] = $rows[0]['id'];
+  	$_SESSION['user'] = $rows[0]['id'];
 		// the database remembers that the user logged in
 		LT_call('update_user_logged_in', $rows[0]['id'], 1);
 		// return the user as a json object

@@ -12,7 +12,7 @@ include('include/query.php');
 include('include/ownership.php');
 
 session_start();
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user'])) {
 	header('HTTP/1.1 401 Unauthorized', true, 401);
 	exit('You are not logged in.');
 }

@@ -6,7 +6,7 @@ include('include/ownership.php');
 include('include/output.php');
 
 session_start();
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user'])) {
 	header('HTTP/1.1 401 Unauthorized', true, 401);
 	exit('You are not logged in.');
 }
@@ -14,13 +14,13 @@ if (!isset($_SESSION['user_id'])) {
 // Interpret the Request
 
 $campaign = intval($_REQUEST['campaign']);
-$last_message_id = intval($_REQUEST['last_message_id']);
+$last_message = intval($_REQUEST['last_message']);
 
 // Query the Database
 
 if (LT_can_view_campaign($campaign))
-	if (is_array($rows = LT_call('read_messages', $campaign, $last_message_id)))
+	if (is_array($rows = LT_call('read_messages', $campaign, $last_message)))
 		LT_output_array($rows,
-			array('integer' => array('id', 'user_id', 'avatar', 'time')));
+			array('integer' => array('id', 'user', 'avatar', 'time')));
 
 ?>
