@@ -271,8 +271,8 @@ CREATE TABLE maps (
 	wall_color TEXT,
 	door_thickness TINYINT NOT NULL DEFAULT 3, /* TODO: Is this needed? */
 	door_color TEXT,
-	piece_stamp DATETIME,
-	tile_stamp DATETIME,
+	piece_changes INT NOT NULL DEFAULT 0,
+	tile_changes INT NOT NULL DEFAULT 0,
 	tiles TEXT,
 	flags TEXT
 );
@@ -828,9 +828,7 @@ BEGIN
 	SELECT name, type, tile_rows, tile_columns, background,
 		min_zoom, max_zoom, min_rotate, max_rotate, min_tilt, max_tilt,
 		grid_thickness, grid_color, wall_thickness, wall_color, 
-		door_thickness, door_color,
-		UNIX_TIMESTAMP(piece_stamp) AS piece_stamp,
-		UNIX_TIMESTAMP(tile_stamp) AS tile_stamp
+		door_thickness, door_color, piece_changes, tile_changes
 		FROM maps WHERE id = the_map;
 END;
 
@@ -838,13 +836,7 @@ END;
 or User refreshes an updated map */
 CREATE PROCEDURE read_map (IN the_map INT)
 BEGIN
-	SELECT name, type, tile_rows, tile_columns, background,
-		min_zoom, max_zoom, min_rotate, max_rotate, min_tilt, max_tilt,
-		grid_thickness, grid_color, wall_thickness, wall_color, 
-		door_thickness, door_color,
-		UNIX_TIMESTAMP(piece_stamp) AS piece_stamp,
-		UNIX_TIMESTAMP(tile_stamp) AS tile_stamp, tiles, flags
-		FROM maps WHERE id = the_map;
+	SELECT * FROM maps WHERE id = the_map;
 END;
 
 /* User paints or erases tiles, fog or walls */
@@ -878,7 +870,8 @@ END;
 CREATE PROCEDURE update_map_tiles
 	(IN the_map INT, IN the_tiles TEXT, IN the_flags TEXT)
 BEGIN
-	UPDATE maps SET tile_stamp = NOW(), tiles = the_tiles, flags = the_flags
+	UPDATE maps
+		SET tile_changes = tile_changes + 1, tiles = the_tiles, flags = the_flags
 		WHERE id = the_map;
 END;
 
@@ -889,8 +882,9 @@ CREATE PROCEDURE update_map_size (IN the_map INT, IN the_left SMALLINT,
 BEGIN
 	START TRANSACTION;
 /* update map properties */
-	UPDATE maps SET tile_rows = the_bottom - the_top,
-		tile_columns = the_right - the_left, tiles = the_tiles, flags = the_flags
+	UPDATE maps SET tile_changes = tile_changes + 1,
+		tile_rows = the_bottom - the_top, tile_columns = the_right - the_left,
+		tiles = the_tiles, flags = the_flags
 		WHERE id = the_map;
 /* shift coordinates to post-resize coordinate system */
 	UPDATE pieces SET x = x - the_left, y = y - the_top WHERE map_id = the_map;
@@ -969,11 +963,10 @@ END;
 CREATE PROCEDURE create_piece (IN the_map INT, IN the_image TEXT)
 BEGIN
 	START TRANSACTION;
+	UPDATE maps SET piece_changes = piece_changes + 1 WHERE id = the_map;
 	INSERT INTO pieces (map_id, image, markers)
 		VALUES (the_map, the_image, '[]');
-	SET @new_id = LAST_INSERT_ID();
-	UPDATE maps SET piece_stamp = NOW() WHERE id = the_map;
-	SELECT @new_id AS id;
+	SELECT LAST_INSERT_ID() AS id;
 	COMMIT;
 END;
 
@@ -990,8 +983,8 @@ CREATE PROCEDURE update_piece_position
 BEGIN
 	START TRANSACTION;
 	UPDATE pieces SET x = the_x, y = the_y WHERE id = the_piece;
-	UPDATE maps SET piece_stamp = NOW() WHERE id = (
-		SELECT map_id FROM pieces WHERE id = the_piece);
+	UPDATE maps SET piece_changes = piece_changes + 1
+		WHERE id = (SELECT map_id FROM pieces WHERE id = the_piece);
 	COMMIT;
 END;
 
@@ -1004,8 +997,8 @@ BEGIN
 	UPDATE pieces SET image = the_image, name = the_name, locked = the_locked,
 		character_id = the_character, markers = the_markers, color = the_color
 		WHERE id = the_piece;
-	UPDATE maps SET piece_stamp = NOW() WHERE id = (
-		SELECT map_id FROM pieces WHERE id = the_piece);
+	UPDATE maps SET piece_changes = piece_changes + 1 
+		WHERE id = (SELECT map_id FROM pieces WHERE id = the_piece);
 	COMMIT;
 END;
 
@@ -1013,8 +1006,8 @@ END;
 CREATE PROCEDURE delete_piece (IN the_piece INT)
 BEGIN
 	START TRANSACTION;
-	SELECT map_id INTO @map FROM pieces WHERE id = the_piece;
-	UPDATE maps SET piece_stamp = NOW() WHERE id = @map;
+	UPDATE maps SET piece_changes = piece_changes + 1
+		WHERE id = (SELECT map_id FROM pieces WHERE id = the_piece);
 	DELETE FROM pieces WHERE id = the_piece;
 	COMMIT;
 END;
