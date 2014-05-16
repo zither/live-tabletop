@@ -4,14 +4,14 @@ include('db_config.php');
 include('include/query.php');
 
 session_start();
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user'])) {
 	header('HTTP/1.1 401 Unauthorized', true, 401);
 	exit('You are not logged in.');
 }
 
 // Interpret the Request
 
-$sender = intval($_SESSION['user_id']);
+$sender = intval($_SESSION['user']);
 $recipient = intval($_REQUEST['recipient']);
 
 // Query the Database

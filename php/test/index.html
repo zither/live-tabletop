@@ -10,20 +10,6 @@
 
 // constants
 TEST.USER = {login: "foo", password: "bar"};
-TEST.TABLE_ARGS = {
-	'name': "My Table",
-	image_id: 1,
-	default_tile: 2,
-	rows: 100,
-	columns: 50,
-	tile_width: 45,
-	tile_height: 30,
-	tile_mode: "rectangle",
-	grid_thickness: 1,
-	grid_color: "gray",
-	wall_thickness: 3,
-	wall_color: "black",
-};
 TEST.ADMIN = {login: "nymduh", password: "draosup"};
 TEST.ADMIN2 = {login: "admin2", password: "password2"};
 TEST.INSTALL_ARGS = {
@@ -223,7 +209,7 @@ TEST.tests = [
 /*
 	{group: "DELETE USER"},
 	{action: "../delete_user.php",
-		args: {user_id: 2},
+		args: {user: 2},
 		result: TEST.blank},
 	{action: "../read_users.php", args: {}, result: TEST.one},
 */
@@ -243,7 +229,7 @@ TEST.tests = [
 	{action: "../Campaign.name.php", args: {campaign: 2, name: "Still My Campaign"}, result: TEST.blank},
 	{action: "../User.campaigns.php", args: {}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data[0].campaign_id == 2 && data[0].name == "Still My Campaign") return "PASS";
+		if (data[0].campaign == 2 && data[0].name == "Still My Campaign") return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
@@ -294,7 +280,7 @@ TEST.tests = [
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
 	{action: "../Campaign.users.php", args: {campaign: 2}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data[0].user_id == 2 && data[0].permission == "owner" && data[0].viewing === false && data[0].avatar === null
+		if (data[0].user == 2 && data[0].permission == "owner" && data[0].viewing === false && data[0].avatar === null
 			&& data[0].login == TEST.USER.login && data[0].name == "moe") return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
@@ -305,7 +291,7 @@ TEST.tests = [
 	{action: "../Campaign.arrive.php", args: {campaign: 2}, result: TEST.blank},
 	{action: "../Campaign.users.php", args: {campaign: 2}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data[0].user_id == 2 && data[0].permission == "owner" && data[0].viewing === true && data[0].avatar === null
+		if (data[0].user == 2 && data[0].permission == "owner" && data[0].viewing === true && data[0].avatar === null
 			&& data[0].login == TEST.USER.login && data[0].name == "moe") return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
@@ -317,11 +303,11 @@ TEST.tests = [
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "CAMPAIGN.MESSAGES"},
-	{action: "../Campaign.messages.php", args: {campaign: 2, last_message_id: 0}, result: TEST.logged_out},
+	{action: "../Campaign.messages.php", args: {campaign: 2, last_message: 0}, result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Campaign.messages.php", args: {campaign: 2, last_message_id: 0}, result: function (ajax) {
+	{action: "../Campaign.messages.php", args: {campaign: 2, last_message: 0}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data[0].id == 1 && data[0].user_id == 2 && data[0].avatar === 0 && data[0].text == TEST.MESSAGE_OUT) return "PASS";
+		if (data[0].id == 1 && data[0].user == 2 && data[0].avatar === 0 && data[0].text == TEST.MESSAGE_OUT) return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
@@ -331,7 +317,7 @@ TEST.tests = [
 	{action: "../Campaign.avatar.php", args: {campaign: 2, avatar: 1}, result: TEST.blank},
 	{action: "../Campaign.users.php", args: {campaign: 2}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data[0].user_id == 2 && data[0].permission == "owner" && data[0].viewing === true && data[0].avatar === 1
+		if (data[0].user == 2 && data[0].permission == "owner" && data[0].viewing === true && data[0].avatar === 1
 			&& data[0].login == TEST.USER.login && data[0].name == "moe") return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
@@ -342,7 +328,7 @@ TEST.tests = [
 	{action: "../Campaign.leave.php", args: {campaign: 2}, result: TEST.blank},
 	{action: "../Campaign.users.php", args: {campaign: 2}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data[0].user_id == 2 && data[0].permission == "owner" && data[0].viewing === false && data[0].avatar === 1
+		if (data[0].user == 2 && data[0].permission == "owner" && data[0].viewing === false && data[0].avatar === 1
 			&& data[0].login == TEST.USER.login && data[0].name == "moe") return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
@@ -355,7 +341,7 @@ TEST.tests = [
 	{action: "../Campaign.users.php", args: {campaign: 2}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
 		for (var i = 0; i < data.length; i++)
-			if (data[i].user_id == 4 && data[i].permission == "member" && data[i].viewing === false && data[i].avatar === null
+			if (data[i].user == 4 && data[i].permission == "member" && data[i].viewing === false && data[i].avatar === null
 				&& data[i].login == "nobody" && data[i].name === null) return "PASS";
 		return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
@@ -380,7 +366,7 @@ TEST.tests = [
 	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
 	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data.name == "My Map" && data.type == "square" && data.tile_rows == 30 && data.tile_columns == 40
+		if (data.name == "My Map" && data.type == "square" && data.rows == 30 && data.columns == 40
 			&& JSON.stringify(data.background) == JSON.stringify({}) && data.min_zoom == 0.25 && data.max_zoom == 4
 			&& data.min_rotate == -180 && data.max_rotate == 180 && data.min_tilt == 30 && data.max_tilt == 90
 			&& data.grid_thickness == 1 && data.wall_thickness == 3 && data.door_thickness == 3
@@ -407,7 +393,7 @@ TEST.tests = [
 		wall_thickness: 1, wall_color: "brown", door_thickness: 9, door_color: "green"}, result: TEST.blank},
 	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data.name == "Still My Map" && data.type == "hex" && data.tile_rows == 30 && data.tile_columns == 40
+		if (data.name == "Still My Map" && data.type == "hex" && data.rows == 30 && data.columns == 40
 			&& JSON.stringify(data.background) == JSON.stringify({}) && data.min_zoom == 0.5 && data.max_zoom == 2
 			&& data.min_rotate == -45 && data.max_rotate == 45 && data.min_tilt == 15 && data.max_tilt == 45
 			&& data.grid_thickness == 0 && data.wall_thickness == 1 && data.door_thickness == 9
@@ -426,7 +412,7 @@ TEST.tests = [
 		result: TEST.blank},
 	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data.name == "Still My Map" && data.type == "hex" && data.tile_rows == 40 && data.tile_columns == 50
+		if (data.name == "Still My Map" && data.type == "hex" && data.rows == 40 && data.columns == 50
 			&& JSON.stringify(data.background) == JSON.stringify({}) && data.min_zoom == 0.5 && data.max_zoom == 2
 			&& data.min_rotate == -45 && data.max_rotate == 45 && data.min_tilt == 15 && data.max_tilt == 45
 			&& data.grid_thickness == 0 && data.wall_thickness == 1 && data.door_thickness == 9
@@ -535,105 +521,12 @@ TEST.tests = [
 		return "PASS";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
+
 /*
-	{group: "CREATE TABLE"},
-	{action: "../create_table.php",
-		args: {
-			name: "My Other Table",
-			image_id: 5,
-			default_tile: 7,
-			rows: 16,
-			columns: 25,
-			tile_width: 32,
-			tile_height: 40,
-			grid_thickness: 7,
-			grid_color: "red",
-			wall_thickness: 3,
-			wall_color: "green",
-			tile_mode: "rectangle",
-		},
-		result: TEST.one},
-
-	{group: "READ TABLE"},
-	{action: "../read_table.php",
-		args: {table_id: 2},
-		result: TEST.one},
-
-	{group: "READ TABLES"},
-	{action: "../read_tables.php",
-		args: {},
-		result: function (ajax) {return TEST.count(ajax, 2);}},
-
-	{group: "UPDATE TABLE"},
-	{action: "../update_table.php",
-		args: {
-			table_id: 1,
-			name: "My Original Table",
-			image_id: 3,
-			tile_width: 30,
-			tile_height: 20,
-			grid_thickness: 2,
-			grid_color: "brown",
-			wall_thickness: 1,
-			wall_color: "blue",
-			tile_mode: 'isometric',
-		},
-		result: TEST.blank},
-	{action: "../read_table.php",
-		args: {table_id: 1},
-		result: function (ajax) {
-			try {var data = JSON.parse(ajax.responseText);}
-			catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-			for (var i = 0; i < data.length; i++)
-				if (data[i].id == 1 && data[i].name == "My Original Table") return "PASS";
-			return "FAIL [" + ajax.responseText + "]";}},
-
-	{group: "DELETE TABLE"},
-	{action: "../delete_table.php",
-		args: {table_id: 2},
-		result: TEST.blank},
-	{action: "../read_tables.php", args: {}, result: TEST.one},
-
-	// T I L E
-
-	{group: "READ TILES"},
-	{action: "../read_tiles.php",
-		args: {table_id: 1},
-		result: function (ajax) {
-			var text = ajax.responseXML.documentElement.textContent;
-			var tiles = text.replace(/^\s+|\s+$/g, '').split(' ');
-			if (tiles.length != 5000) return "FAIL [" + tiles.length + " tiles]";
-			for (var i = 0; i < tiles.length; i++)
-				 if (tiles[i] != "02") return "FAIL [" + i + ": " + tiles[i] + "]";
-			return "PASS";}},
-
-	{group: "UPDATE TILE"},
-	{action: "../update_tile.php",
-		args: {
-			table_id: 1,
-			x: 7,
-			y: 10,
-			image_id: 4,
-			fog: 1,
-			right: 2,
-			bottom: 1},
-		result: TEST.blank},
-	{action: "../read_tiles.php",
-		args: {table_id: 1},
-		result: function (ajax) {
-			var text = ajax.responseXML.documentElement.textContent;
-			var tiles = text.replace(/^\s+|\s+$/g, '').split(' ');
-			if (tiles.length != 5000) return "FAIL [" + tiles.length + " tiles]";
-			for (var i = 0; i < tiles.length; i++) {
-				 var target = (i == 507) ? "14" : "02";
-				 if (tiles[i] != target) return "FAIL [" + i + ": " + tiles[i] + "]";
-			}
-			return "PASS";}},
-
 	{group: "FILL FOG"},
-	{action: "../fill_fog.php", args: {table_id: 1}, result: TEST.blank},
+	{action: "../fill_fog.php", args: {table: 1}, result: TEST.blank},
 	{action: "../read_tiles.php",
-		args: {table_id: 1},
+		args: {table: 1},
 		result: function (ajax) {
 			var text = ajax.responseXML.documentElement.textContent;
 			var tiles = text.replace(/^\s+|\s+$/g, '').split(' ');
@@ -645,9 +538,9 @@ TEST.tests = [
 			return "PASS";}},
 
 	{group: "CLEAR FOG"},
-	{action: "../clear_fog.php", args: {table_id: 1}, result: TEST.blank},
+	{action: "../clear_fog.php", args: {table: 1}, result: TEST.blank},
 	{action: "../read_tiles.php",
-		args: {table_id: 1},
+		args: {table: 1},
 		result: function (ajax) {
 			var text = ajax.responseXML.documentElement.textContent;
 			var tiles = text.replace(/^\s+|\s+$/g, '').split(' ');
@@ -657,31 +550,6 @@ TEST.tests = [
 				 if (tiles[i] != target) return "FAIL [" + i + ": " + tiles[i] + "]";
 			}
 			return "PASS";}},
-
-	// WALL
-
-	{group: "CREATE WALL"},
-	{action: "../create_wall.php",
-		args: {table_id: 1, x: 2, y: 3, direction: "sw", contents: "wall"},
-		result: TEST.blank},
-
-	{group: "READ WALLS"},
-	{action: "../read_walls.php",
-		args: {table_id: 1},
-		result: function (ajax) {
-			var wall = ajax.responseXML.getElementsByTagName("wall")[0];
-			if (wall.getAttribute("x") == "2"
-				&& wall.getAttribute("y") == "3"
-				&& wall.getAttribute("direction") == "sw"
-				&& wall.getAttribute("contents") == "wall"
-				) return "PASS";
-			return "FAIL [" + ajax.responseText + "]";}},
-
-	{group: "DELETE WALL"},
-	{action: "../delete_wall.php",
-		args: {table_id: 1, x: 2, y: 3, direction: "sw"},
-		result: TEST.blank},
-	{action: "../read_walls.php", args: {table_id: 1}, result: TEST.zero},
 */
 
 	// P I E C E
@@ -716,9 +584,9 @@ TEST.tests = [
 	{group: "CREATE PIECE"},
 	{action: "../create_piece.php",
 		args: {
-			table_id: 1,
-			image_id: 10,
-			user_id: 1,
+			table: 1,
+			image: 10,
+			user: 1,
 			name: "My Piece",
 			x: 30,
 			y: 100,
@@ -730,15 +598,15 @@ TEST.tests = [
 
 	{group: "READ PIECES"},
 	{action: "../read_pieces.php",
-		args: {table_id: 1},
+		args: {table: 1},
 		result: TEST.one},
 
 	{group: "UPDATE PIECE"},
 	{action: "../update_piece.php",
 		args: {
-			piece_id: 1,
-			image_id: 11,
-			user_id: 2,
+			piece: 1,
+			image: 11,
+			user: 2,
 			name: "Still My Piece",
 			x: 99,
 			y: 49,
@@ -749,14 +617,14 @@ TEST.tests = [
 			color: "orange"},
 		result: TEST.blank},
 	{action: "../read_pieces.php",
-		args: {table_id: 1},
+		args: {table: 1},
 		result: function (ajax) {
 			try {var data = JSON.parse(ajax.responseText);}
 			catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
 			for (var i = 0; i < data.length; i++)
 				if (data[i].id == 1
-					&& data[i].image_id == 11
-					&& data[i].user_id == 2
+					&& data[i].image == 11
+					&& data[i].user == 2
 					&& data[i].name == "Still My Piece"
 					&& data[i].x == 99
 					&& data[i].y == 49
@@ -769,9 +637,9 @@ TEST.tests = [
 			return "FAIL [" + ajax.responseText + "]";}},
 
 	{group: "DELETE PIECE"},
-	{action: "../delete_piece.php", args: {piece_id: 1}, result: TEST.blank},
+	{action: "../delete_piece.php", args: {piece: 1}, result: TEST.blank},
 	{action: "../read_pieces.php",
-		args: {table_id: 1},
+		args: {table: 1},
 		result: TEST.zero},
 */
 
@@ -806,10 +674,10 @@ TEST.tests = [
 /*
 	{group: "UPDATE STAT"},
 	{action: "../update_stat.php",
-		args: {piece_id: 1, name: "hit points", value: "20"},
+		args: {piece: 1, name: "hit points", value: "20"},
 		result: TEST.blank},
 	{action: "../read_pieces.php",
-		args: {table_id: 1},
+		args: {table: 1},
 		result: function (ajax) {
 			var stats = ajax.responseXML.getElementsByTagName("stat");
 			for (var i = 0; i < stats.length; i++) {
@@ -820,10 +688,10 @@ TEST.tests = [
 
 	{group: "DELETE STAT"},
 	{action: "../delete_stat.php",
-		args: {piece_id: 1, name: "hit points"},
+		args: {piece: 1, name: "hit points"},
 		result: TEST.blank},
 	{action: "../read_pieces.php",
-		args: {table_id: 1},
+		args: {table: 1},
 		result: TEST.zero},
 */
 

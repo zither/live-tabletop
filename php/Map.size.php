@@ -5,7 +5,7 @@ include('include/query.php');
 include('include/ownership.php');
 
 session_start();
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user'])) {
 	header('HTTP/1.1 401 Unauthorized', true, 401);
 	exit('You are not logged in.');
 }
@@ -17,7 +17,7 @@ $left = intval($_REQUEST['left']);
 $top = intval($_REQUEST['top']);
 $right = intval($_REQUEST['right']);
 $bottom = intval($_REQUEST['bottom']);
-$tile_id = intval($_REQUEST['tile']);
+$tile = intval($_REQUEST['tile']);
 $flags_char = $LT_SQL->real_escape_string($_REQUEST['flags']);
 
 // symbol  0ABCDEFGHIJKLMNOPQRSTUVWXYZ1abcdefghijklmnopqrstuvwxyz
@@ -38,14 +38,14 @@ if (LT_can_edit_map($map)) {
 	$LT_SQL->autocommit(FALSE); /* avoid canceling simultaneous edits */
 	if ($rows = LT_call('read_map_tiles', $map)) {
 		// get old tiles and flags
-		$old_width  = intval($rows[0]['tile_columns']);
-		$old_height = intval($rows[0]['tile_rows']);
+		$old_width  = intval($rows[0]['columns']);
+		$old_height = intval($rows[0]['rows']);
 		$old_tiles  = array_chunk(json_decode($rows[0]['tiles']), $old_width);
 		$old_flags  = str_split($rows[0]['flags'], $old_width + 1);
 		// create new tiles and flags
 		$new_width  = $right - $left;
 		$new_height = $bottom - $top;
-		$new_tiles  = array_fill(0, $new_width * $new_height, $tile_id);
+		$new_tiles  = array_fill(0, $new_width * $new_height, $tile);
 		$new_flags  = str_repeat($flags_char, ($new_width + 1) * ($new_height + 1));
 		// copy old tiles over new tiles
 		$start = max(0, $left);
