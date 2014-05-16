@@ -2,7 +2,7 @@
 
 include('db_config.php');
 include('include/query.php');
-include('include/password.php');
+include('include/output.php');
 
 session_start();
 if (!isset($_SESSION['admin'])) {
@@ -12,14 +12,9 @@ if (!isset($_SESSION['admin'])) {
 
 // Query the Database
 
-if (is_array($rows = LT_call('read_users'))) {
-	$string_fields = array('login', 'name', 'color', 'email');
-	foreach ($rows as $i => $fields)
-		foreach ($fields as $key => $value)
-			if (!in_array($key, $string_fields))
-				$rows[$i][$key] = intval($value);
-	include('include/json_headers.php');
-	echo json_encode($rows);
-}
+if (is_array($rows = LT_call('read_users')))
+	LT_output_array($rows, array(
+		'integer' => array('id', 'last_action'),
+		'boolean' => array('logged_in', 'subscribed')));
 
 ?>

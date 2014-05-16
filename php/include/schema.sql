@@ -172,7 +172,7 @@ CREATE TABLE campaigns (
 	map INT,
 	private TINYINT NOT NULL DEFAULT 1,
 	turns TEXT NOT NULL, /* DEFAULT '[]' */
-	last_message INT,
+	last_message INT NOT NULL DEFAULT 0,
 	users_modified DATETIME
 );
 

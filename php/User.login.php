@@ -3,6 +3,7 @@
 include('db_config.php');
 include('include/query.php');
 include('include/password.php');
+include('include/output.php');
 
 session_start();
 
@@ -21,14 +22,10 @@ if ($rows = LT_call_silent('read_user_login', $login)) {
 		// the database remembers that the user logged in
 		LT_call('update_user_logged_in', $rows[0]['id'], 1);
 		// return the user as a json object
-		unset($rows[0]['hash']); // secret
-		unset($rows[0]['salt']); // secret
-		unset($rows[0]['logged_in']); // changed, obviously
-		$rows[0]['id'] = intval($rows[0]['id']);
-		$rows[0]['last_action'] = intval($rows[0]['last_action']); // unset?
-		$rows[0]['subscribed'] = intval($rows[0]['subscribed']);
-		include('include/json_headers.php');
-  	echo json_encode($rows[0]);
+		LT_output_object($rows[0], array(
+			'boolean' => array('subscribed'),
+			'integer' => array('id', 'last_action'),
+			'blocked' => array('hash', 'salt', 'logged_in')));
 		exit();
   }
 }

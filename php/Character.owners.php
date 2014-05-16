@@ -3,6 +3,7 @@
 include('db_config.php');
 include('include/query.php');
 include('include/ownership.php');
+include('include/output.php');
 
 session_start();
 if (!isset($_SESSION['user_id'])) {
@@ -10,22 +11,10 @@ if (!isset($_SESSION['user_id'])) {
 	exit('You are not logged in.');
 }
 
-// Interpret the Request
-
 $character = intval($_REQUEST['character']);
-
-// Query the Database
-
 if (LT_can_view_character($character)) {
-	if (is_array($rows = LT_call('read_character_owners', $character))) {
-		$string_fields = array('login', 'name', 'color');
-		foreach($rows as $i => $fields)
-			foreach($fields as $key => $value)
-				if (!in_array($key, $string_fields))
-					$rows[$i][$key] = intval($value);
-		include('include/json_headers.php');
-		echo json_encode($rows);
-	}
-}
+	if (is_array($rows = LT_call('read_character_owners', $character)))
+		LT_output_array($rows,
+			array('integer' => array('id'), 'boolean' => array('logged_in')));
 
 ?>
