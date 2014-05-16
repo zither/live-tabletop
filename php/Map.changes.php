@@ -21,13 +21,12 @@ if (LT_can_view_map($map)) {
 		$strings = array('name', 'type', 'grid_color', 'wall_color', 'door_color', 'fog');
 		$floats = array('min_zoom', 'max_zoom');
 		$json = array('background', 'tiles');
-		foreach ($rows as $i => $fields)
-			foreach ($fields as $key => $value)
-				if (in_array($key, $floats)) $rows[$i][$key] = floatval($value);
-				else if (in_array($key, $json)) $rows[$i][$key] = json_decode($value);
-				else if (!in_array($key, $strings)) $rows[$i][$key] = intval($value);
+		foreach ($rows[0] as $key => $value)
+			if (in_array($key, $floats)) $rows[0][$key] = floatval($value);
+			else if (in_array($key, $json)) $rows[0][$key] = json_decode($value);
+			else if (!in_array($key, $strings)) $rows[0][$key] = intval($value);
 		include('include/json_headers.php');
-		echo json_encode($rows);
+		echo json_encode($rows[0]);
 	}
 }
 

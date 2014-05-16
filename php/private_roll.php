@@ -11,16 +11,9 @@ if (!isset($_SESSION['user_id'])) {
 }
 */
 
-echo json_encode(
-	array( // list of 1 messages
-		array( // the message as an associative array
-//			"user_id" => $_SESSION['user_id'],
-			"user_id" => 0,
-			"time" => time(),
-			"text" => LT_expand_rolls($_REQUEST['text'])
-		)
-	)
-);
+//echo json_encode(array("user_id" => SESSION['user_id'], "time" => time(),
+echo json_encode(array("time" => time(),
+	"text" => LT_expand_rolls($_REQUEST['text'])));
 
 ?>
 
