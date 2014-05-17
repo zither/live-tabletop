@@ -477,6 +477,12 @@ TEST.tests = [
 		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
 		if (data.flags[(3 + 1) + (2 + 1) * (50 + 1)] == "H") return "PASS";
 		else return "FAIL [" + data.flags.indexOf("H") + " " + data.flags[(3 + 1) + (2 + 1) * (50 + 1)] + "]";}},
+	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, se: 'none'}, result: TEST.blank},
+	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, ne: 'none'}, result: TEST.blank},
+	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		if (data.flags[(3 + 1) + (2 + 1) * (50 + 1)] == "0") return "PASS";
+		else return "FAIL [0 != " + data.flags[(3 + 1) + (2 + 1) * (50 + 1)] + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.CHANGES"},
@@ -486,13 +492,15 @@ TEST.tests = [
 		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
 		TEST.piece_changes = data.piece_changes; TEST.tile_changes = data.tile_changes; return "PASS";}},
 	{action: "../Map.tile.php", args: {map: 1, x: 0, y: 0, ne: 'wall'}, result: TEST.blank},
+	{action: "../Map.tile.php", args: {map: 1, x: 0, y: 0, ne: 'none'}, result: TEST.blank},
 	{action: "../Map.changes.php", args: {map: 1}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (TEST.tile_changes + 1 == data.tile_changes) return "PASS"; else return "FAIL [" + ajax.responseText + "]";}},
+		if (data.tile_changes == TEST.tile_changes + 2) return "PASS"; else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../Piece.create.php", args: {map: 1, image: "{}"}, result: TEST.blank},
+	{action: "../Piece.delete.php", args: {piece: 1}, result: TEST.blank},
 	{action: "../Map.changes.php", args: {map: 1}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (TEST.piece_changes + 1 == data.piece_changes) return "PASS"; else return "FAIL [" + ajax.responseText + "]";}},
+		if (data.piece_changes = TEST.piece_changes + 2) return "PASS"; else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.SHARE"},
@@ -521,36 +529,23 @@ TEST.tests = [
 		return "PASS";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
+	{group: "MAP.FILL FOG"},
+	{action: "../Map.fillFog.php", args: {map: 1}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Map.fillFog.php", args: {map: 1}, result: TEST.blank},
+	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		if (data.flags == Array(41 * 51 + 1).join("1")) return "PASS"; else return "FAIL [" + data.flags + "]";}},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
-/*
-	{group: "FILL FOG"},
-	{action: "../fill_fog.php", args: {table: 1}, result: TEST.blank},
-	{action: "../read_tiles.php",
-		args: {table: 1},
-		result: function (ajax) {
-			var text = ajax.responseXML.documentElement.textContent;
-			var tiles = text.replace(/^\s+|\s+$/g, '').split(' ');
-			if (tiles.length != 5000) return "FAIL [" + tiles.length + " tiles]";
-			for (var i = 0; i < tiles.length; i++) {
-				 var target = (i == 507) ? "14" : "12";
-				 if (tiles[i] != target) return "FAIL [" + i + ": " + tiles[i] + "]";
-			}
-			return "PASS";}},
-
-	{group: "CLEAR FOG"},
-	{action: "../clear_fog.php", args: {table: 1}, result: TEST.blank},
-	{action: "../read_tiles.php",
-		args: {table: 1},
-		result: function (ajax) {
-			var text = ajax.responseXML.documentElement.textContent;
-			var tiles = text.replace(/^\s+|\s+$/g, '').split(' ');
-			if (tiles.length != 5000) return "FAIL [" + tiles.length + " tiles]";
-			for (var i = 0; i < tiles.length; i++) {
-				 var target = (i == 507) ? "04" : "02";
-				 if (tiles[i] != target) return "FAIL [" + i + ": " + tiles[i] + "]";
-			}
-			return "PASS";}},
-*/
+	{group: "MAP.CLEAR FOG"},
+	{action: "../Map.clearFog.php", args: {map: 1}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../Map.clearFog.php", args: {map: 1}, result: TEST.blank},
+	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		if (data.flags == Array(41 * 51 + 1).join("0")) return "PASS"; else return "FAIL [" + data.flags + "]";}},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	// P I E C E
 
