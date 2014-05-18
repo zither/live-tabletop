@@ -1,7 +1,8 @@
-<?php // User creates a new character
+<?php // User modifies a character
 
 include('db_config.php');
 include('include/query.php');
+include('include/ownership.php');
 
 session_start();
 if (!isset($_SESSION['user'])) {
@@ -10,9 +11,8 @@ if (!isset($_SESSION['user'])) {
 }
 
 // Interpret the Request
-// TODO: do we really need to initialize all these fields?
 
-$user = intval($_SESSION['user']);
+$character = intval($_REQUEST['character']);
 $name = $LT_SQL->real_escape_string($_REQUEST['name']);
 $system = $LT_SQL->real_escape_string($_REQUEST['system']);
 $stats = $LT_SQL->real_escape_string($_REQUEST['stats']);
@@ -23,9 +23,7 @@ $color = $LT_SQL->real_escape_string($_REQUEST['color']);
 
 // Query the Database
 
-$rows = LT_call('create_character',
-	$user, $name, $system, $stats, $notes, $portrait, $piece, $color);
-include('include/json_headers.php');
-echo json_encode(array('id' => $rows[0]['id']));
+if (LT_can_edit_character($character)) LT_call('update_character',
+	$character, $name, $system, $stats, $notes, $portrait, $piece, $color);
 
 ?>

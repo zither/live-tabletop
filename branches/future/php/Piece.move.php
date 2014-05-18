@@ -13,12 +13,16 @@ if (!isset($_SESSION['user'])) {
 // Interpret the Request
 
 $piece = intval($_REQUEST['piece']);
-$x = intval($_REQUEST['x']);
-$y = intval($_REQUEST['y']);
+$x = floatval($_REQUEST['x']);
+$y = floatval($_REQUEST['y']);
 
 // Query the Database
 
-if (LT_can_edit_piece($piece))
+if (LT_can_move_piece($piece)) {
 	LT_call('update_piece_position', $piece, $x, $y);
+} else {
+	header('HTTP/1.1 401 Unauthorized', true, 401);
+	exit('You are not allowed to move this piece.');
+}
 
 ?>

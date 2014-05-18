@@ -57,12 +57,14 @@ DROP PROCEDURE IF EXISTS read_map_owner;
 DROP PROCEDURE IF EXISTS read_map_viewer;
 DROP PROCEDURE IF EXISTS delete_map_owner;
 DROP PROCEDURE IF EXISTS create_piece;
+DROP PROCEDURE IF EXISTS read_piece;
 DROP PROCEDURE IF EXISTS read_pieces;
 DROP PROCEDURE IF EXISTS update_piece_position;
 DROP PROCEDURE IF EXISTS update_piece;
 DROP PROCEDURE IF EXISTS delete_piece;
 
 DROP PROCEDURE IF EXISTS create_character;
+DROP PROCEDURE IF EXISTS update_character;
 DROP PROCEDURE IF EXISTS read_characters;
 DROP PROCEDURE IF EXISTS create_character_owner;
 DROP PROCEDURE IF EXISTS read_character_owners;
@@ -372,12 +374,12 @@ CREATE TABLE character_owners (
  /*************************** P R O C E D U R E S ***************************/
 /***************************************************************************/
 
-/* DELIMITER // /* MySQL Workbench speaks only MySQL command-line syntax. */
+/* DELIMITER // /* MySQL Workbench speaks only MySQL command-line syntax */
 
 /*** ADMINS PROCEDURES ***/
 
 /* Admin creates an account while installing Live Tabletop
-or Admin creates an account for another admin. */ 
+or Admin creates an account for another admin */ 
 CREATE PROCEDURE create_admin
 	(IN the_login VARCHAR(200), IN the_hash TEXT, IN the_salt TEXT)
 BEGIN
@@ -385,7 +387,7 @@ BEGIN
 		VALUES (the_login, the_hash, the_salt);
 END;
 
-/* Admin logs in and PHP logic validates his password  */
+/* Admin must validate his password to login  */
 CREATE PROCEDURE read_admin (IN the_login VARCHAR(200))
 BEGIN
 	SELECT hash, salt FROM admins WHERE login = the_login;
@@ -409,7 +411,7 @@ END;
 
 /*** USERS PROCEDURES ***/
 
-/* User creates his own account. */
+/* User creates his own account */
 CREATE PROCEDURE create_user (IN the_login VARCHAR(200), IN the_hash TEXT,
 	IN the_salt TEXT, IN the_email TEXT, IN the_subscribed TINYINT)
 BEGIN
@@ -417,11 +419,11 @@ BEGIN
 	INSERT INTO users (login, hash, salt, last_action, email, subscribed)
 		VALUES 
 			(the_login, the_hash, the_salt, NOW(), the_email, the_subscribed);
-	SELECT LAST_INSERT_ID() as id;
+	SELECT LAST_INSERT_ID() AS id;
 	COMMIT;
 END;
 
-/* User logs in and PHP logic validates his password */
+/* User must validates his password to log in */
 CREATE PROCEDURE read_user_login (IN the_login VARCHAR(200))
 BEGIN
 	SELECT id, login, hash, salt, UNIX_TIMESTAMP(last_action) AS last_action,
@@ -558,7 +560,7 @@ END;
 
 /*** CAMPAIGNS PROCEDURES ***/
 
-/* User creates a new campaign. */
+/* User creates a new campaign */
 CREATE PROCEDURE create_campaign
 	(IN the_user INT, IN the_name VARCHAR(200))
 BEGIN
@@ -584,7 +586,7 @@ BEGIN
 		FROM campaigns WHERE id = the_campaign;
 END;
 
-/* Admin views all the campaigns. */
+/* Admin views all the campaigns */
 CREATE PROCEDURE read_campaigns ()
 BEGIN
 	SELECT id, name, map, private, turns, last_message,
@@ -628,7 +630,7 @@ END;
 
 /*** CAMPAIGN_USERS PROCEDURES ***/
 
-/* User tries to view campaign and PHP logic checks whether that is allowed */
+/* User needs permission to view or edit this campaign */
 CREATE PROCEDURE read_campaign_user_permission
 	(IN the_user INT, IN the_campaign INT)
 BEGIN
@@ -815,13 +817,13 @@ BEGIN
 		FOR UPDATE; /* lock row so simultaneous edits don't cancel each other */
 END;
 
-/* User tries to view a map and PHP logic checks whether the user can. */
+/* User needs permission to view this map */
 CREATE PROCEDURE read_map_campaigns (IN the_map INT)
 BEGIN
 	SELECT `id`, `private` FROM campaigns WHERE `map` = the_map;
 END;
 
-/* User tries to view a map and PHP logic checks whether they can */
+/* User needs permission to view this map */
 CREATE PROCEDURE read_map_viewer (IN the_user INT, the_map INT)
 BEGIN
 	SELECT *
@@ -900,7 +902,7 @@ BEGIN
 		FROM map_owners JOIN users ON `id` = `user` WHERE `map` = the_map;
 END;
 
-/* User tries to edit a map and and PHP logic checks whether they own it */
+/* User needs permission to edit this map */
 CREATE PROCEDURE read_map_owner (IN the_user INT, IN the_map INT)
 BEGIN
 	SELECT * FROM map_owners WHERE `user` = the_user AND `map` = the_map;
@@ -933,6 +935,12 @@ BEGIN
 		VALUES (the_map, the_image, '[]');
 	SELECT LAST_INSERT_ID() AS id;
 	COMMIT;
+END;
+
+/* User needs permission to move this piece */
+CREATE PROCEDURE read_piece (IN the_piece INT)
+BEGIN
+	SELECT `map`, `locked`, `character` FROM pieces WHERE `id` = the_piece;
 END;
 
 /* User loads a map
@@ -998,10 +1006,21 @@ BEGIN
 	INSERT INTO character_owners (`user`, `character`)
 		VALUES (the_user, @id);
 /* return the new character's id */
-	SELECT @id;
+	SELECT @id AS id;
 	COMMIT;
 END;
  
+/* User modifies a character */
+CREATE PROCEDURE update_character (IN the_character INT, IN the_name TEXT,
+	IN the_system TEXT, IN the_stats TEXT, IN the_notes TEXT,
+	IN the_portrait TEXT, IN the_piece TEXT, IN the_color TEXT)
+BEGIN
+	UPDATE characters SET `name` = the_name, `system` = the_system,
+		`stats` = the_stats, `notes` = the_notes, `portrait` = the_portrait,
+		`piece` = the_piece, `color` = the_color
+		WHERE `id` = the_character;
+END;
+
 /* User views a list of characters he owns */
 CREATE PROCEDURE read_characters (IN the_user INT)
 BEGIN
@@ -1028,7 +1047,7 @@ BEGIN
 		WHERE `character` = the_character;
 END;
 
-/* User edits character and PHP logic checks whether user owns character */
+/* User needs permission to edit this character */
 CREATE PROCEDURE read_character_owner (IN the_user INT, IN the_character INT)
 BEGIN
 	SELECT * FROM character_owners

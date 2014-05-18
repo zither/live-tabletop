@@ -16,12 +16,14 @@ $piece = intval($_REQUEST['piece']);
 $image = $LT_SQL->real_escape_string($_REQUEST['image']);
 $name = $LT_SQL->real_escape_string($_REQUEST['name']);
 $character = intval($_REQUEST['character']);
+$locked = intval($_REQUEST['locked']);
 $markers = $LT_SQL->real_escape_string($_REQUEST['markers']);
 $color = $LT_SQL->real_escape_string($_REQUEST['color']);
 
 // Query the Database
 
 if (LT_can_edit_piece($piece))
-	LT_call('update_piece', $piece, $image, $name, $character, $markers, $color);
+	LT_call('update_piece',
+		$piece, $image, $name, $character, $locked, $markers, $color);
 
 ?>
