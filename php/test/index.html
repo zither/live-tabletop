@@ -9,12 +9,19 @@
 		<script type="text/javascript">
 
 // constants
-TEST.USER = {login: "foo", password: "bar"};
-TEST.ADMIN = {login: "nymduh", password: "draosup"};
+TEST.USER1 = {login: "curly", password: "bar", email: "d@e.f", subscribed: 1}; // created and deleted to test admin scripts
+TEST.USER2 = {login: "larry", password: "foo", email: "a@b.c", subscribed: 1}; // used for all of the non-admin scripts
+TEST.USER3 = {login: "moe",   password: "baz", email: "g@h.i", subscribed: 1}; // used when non-admin scripts require another user
+//TEST.USER4 = {login: "shep",  password: "boo", email: "j@k.l", subscribed: 1};
+TEST.LOGIN = {login: "larry", password: "foo"};
+TEST.CHARACTER_OWNER = function () {return {character: TEST.character, user: TEST.USER3.id};};
+TEST.PIECE_SETTINGS = function () {return {piece: TEST.piece, image: "{}",
+	name: "The Piece", character: 1, locked: 0, markers: "[]", color: "red"};},
+TEST.ADMIN1 = {login: "nymduh", password: "draosup"};
 TEST.ADMIN2 = {login: "admin2", password: "password2"};
 TEST.INSTALL_ARGS = {
-	admin_login: TEST.ADMIN.login,
-	admin_password: TEST.ADMIN.password,
+	admin_login: TEST.ADMIN1.login,
+	admin_password: TEST.ADMIN1.password,
 };
 
 TEST.MESSAGE_IN = "From 1975 - 2010, [0 + 2010 - 1975] years passed.";
@@ -36,13 +43,13 @@ TEST.tests = [
 
 	{group: "ADMIN.CREATE"},
 	{action: "../Admin.create.php", args: TEST.ADMIN2, result: TEST.logged_out},
-	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
+	{action: "../Admin.login.php", args: TEST.ADMIN1, result: TEST.blank},
 	{action: "../Admin.create.php", args: TEST.ADMIN2, result: TEST.blank},
 	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
 
 	{group: "ADMIN.LOGIN"},
-	{action: "../Admin.login.php", args: {login: "admin2", password: "wrong"}, result: TEST.unauthorized},
-	{action: "../Admin.login.php", args: {login: "wrong", password: "password2"}, result: TEST.unauthorized},
+	{action: "../Admin.login.php", args: {login: TEST.ADMIN2.login, password: "wrong"}, result: TEST.unauthorized},
+	{action: "../Admin.login.php", args: {login: "wrong", password: TEST.ADMIN2.password}, result: TEST.unauthorized},
 	{action: "../Admin.login.php", args: TEST.ADMIN2, result: TEST.blank},
 	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
 
@@ -51,86 +58,108 @@ TEST.tests = [
 	{action: "../Admin.create.php", args: TEST.ADMIN2, result: TEST.logged_out},
 
 	{group: "ADMIN.DELETE"},
-	{action: "../Admin.delete.php", args: {login: "admin2"}, result: TEST.logged_out},
-	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
-	{action: "../Admin.delete.php", args: {login: "admin2"}, result: TEST.blank},
+	{action: "../Admin.delete.php", args: {login: TEST.ADMIN2.login}, result: TEST.logged_out},
+	{action: "../Admin.login.php", args: TEST.ADMIN1, result: TEST.blank},
+	{action: "../Admin.delete.php", args: {login: TEST.ADMIN2.login}, result: TEST.blank},
 	{action: "../Admin.login.php", args: TEST.ADMIN2, result: TEST.unauthorized},
 	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
 
 	{group: "ADMIN.PASSWORD"},
 	{action: "../Admin.password.php", args: {password: "newPassword"}, result: TEST.logged_out},
-	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
+	{action: "../Admin.login.php", args: TEST.ADMIN1, result: TEST.blank},
 	{action: "../Admin.password.php", args: {password: "newPassword"}, result: TEST.blank},
 	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
-	{action: "../Admin.login.php", args: {login: TEST.ADMIN.login, password: "newPassword"}, result: TEST.blank},
-	{action: "../Admin.password.php", args: {password: TEST.ADMIN.password}, result: TEST.blank},
+	{action: "../Admin.login.php", args: {login: TEST.ADMIN1.login, password: "newPassword"}, result: TEST.blank},
+	{action: "../Admin.password.php", args: {password: TEST.ADMIN1.password}, result: TEST.blank},
 	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
 
 	{group: "ADMIN.USERS"},
 	{action: "../Admin.users.php", args: {}, result: TEST.logged_out},
-	{action: "../User.create.php", args: {login: "larry", password: "curly", email: "a@b.c", subscribed: 1}, result: TEST.blank},
-	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
+	{action: "../User.create.php", args: TEST.USER1, result: TEST.blank},
+	{action: "../User.login.php", args: {login: TEST.USER1.login, password: TEST.USER1.password}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [parse error: " + ajax.responseText + "]";}
+		TEST.user = data.id;
+		return "PASS";}},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
+	{action: "../Admin.login.php", args: TEST.ADMIN1, result: TEST.blank},
 	{action: "../Admin.users.php", args: {}, result: TEST.one},
 	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
 
 	{group: "ADMIN.FRIENDS"},
 	{action: "../Admin.friends.php", args: {}, result: TEST.logged_out},
-	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
-	{action: "../Admin.friends.php", args: {user: 1}, result: TEST.zero},
+	{action: "../Admin.login.php", args: TEST.ADMIN1, result: TEST.blank},
+	{action: "../Admin.friends.php", args: function () {return {user: TEST.user};}, result: TEST.zero},
 	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
 
 	{group: "ADMIN.USER PASSWORD"},
 	{action: "../Admin.userPassword.php", args: {}, result: TEST.logged_out},
-	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
-	{action: "../Admin.userPassword.php", args: {user: 1, password: "shemp"}, result: TEST.blank},
+	{action: "../Admin.login.php", args: TEST.ADMIN1, result: TEST.blank},
+	{action: "../Admin.userPassword.php", args: function () {return {user: TEST.user, password: "newPassword"};}, result: TEST.blank},
 	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
-	{action: "../User.login.php", args: {login: "larry", password: "shemp"}, result: TEST.exists},
+	{action: "../User.login.php", args: {login: TEST.USER1.login, password: "newPassword"}, result: TEST.exists},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
+	{action: "../Admin.login.php", args: TEST.ADMIN1, result: TEST.blank},
+	{action: "../Admin.userPassword.php", args: function () {return {user: TEST.user, password: TEST.USER1.password};}, result: TEST.blank},
+	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
 
 	{group: "ADMIN.CAMPAIGNS"},
 	{action: "../Admin.campaigns.php", args: {}, result: TEST.logged_out},
-	{action: "../User.login.php", args: {login: "larry", password: "shemp"}, result: TEST.exists},
-	{action: "../Campaign.create.php", args: {name: "My Campaign"}, result: TEST.exists},
+	{action: "../User.login.php", args: {login: TEST.USER1.login, password: TEST.USER1.password}, result: TEST.exists},
+	{action: "../Campaign.create.php", args: {name: "My Campaign"}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		TEST.campaign = data.id;
+		return "PASS";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
-	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
+	{action: "../Admin.login.php", args: TEST.ADMIN1, result: TEST.blank},
 	{action: "../Admin.campaigns.php", args: {}, result: TEST.one},
 	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
 
 	{group: "ADMIN.MESSAGES"},
 	{action: "../Admin.messages.php", args: {}, result: TEST.logged_out},
-	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
-	{action: "../Admin.messages.php", args: {campaign: 1}, result: TEST.zero},
+	{action: "../Admin.login.php", args: TEST.ADMIN1, result: TEST.blank},
+	{action: "../Admin.messages.php", args: function () {return {campaign: TEST.campaign};}, result: TEST.zero},
 	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
 
 	{group: "ADMIN.EXPIRE MESSAGES"},
 	{action: "../Admin.expireMessages.php", args: {}, result: TEST.logged_out},
-	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
+	{action: "../Admin.login.php", args: TEST.ADMIN1, result: TEST.blank},
 	{action: "../Admin.expireMessages.php", args: {}, result: TEST.blank},
 	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
 
 	{group: "ADMIN.DELETE CAMPAIGN"},
 	{action: "../Admin.deleteCampaign.php", args: {}, result: TEST.logged_out},
-	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
-	{action: "../Admin.deleteCampaign.php", args: {campaign: 1}, result: TEST.blank},
+	{action: "../Admin.login.php", args: TEST.ADMIN1, result: TEST.blank},
+	{action: "../Admin.deleteCampaign.php", args: function () {return {campaign: TEST.campaign};}, result: TEST.blank},
 	{action: "../Admin.campaigns.php", args: {}, result: TEST.zero},
 	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
 
 	{group: "ADMIN.DELETE USER"},
 	{action: "../Admin.deleteUser.php", args: {}, result: TEST.logged_out},
-	{action: "../Admin.login.php", args: TEST.ADMIN, result: TEST.blank},
-	{action: "../Admin.deleteUser.php", args: {user: 1}, result: TEST.blank},
+	{action: "../Admin.login.php", args: TEST.ADMIN1, result: TEST.blank},
+	{action: "../Admin.deleteUser.php", args: function () {return {user: TEST.user};}, result: TEST.blank},
 	{action: "../Admin.users.php", args: {}, result: TEST.zero},
+	{action: "../Admin.campaigns.php", args: {}, result: TEST.zero},
 	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
 
 	// U S E R
 
 	{group: "USER.CREATE"},
-	{action: "../User.create.php",
-		args: {login: TEST.USER.login, password: TEST.USER.password, email: "x@y.z", subscribed: 0}, result: TEST.blank},
+	{action: "../User.create.php", args: TEST.USER2, result: TEST.blank},
 
 	{group: "USER.LOGIN"},
-	{action: "../User.login.php", args: {login: TEST.USER.login, password: "wrong"}, result: TEST.unauthorized},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../User.login.php", args: {login: TEST.USER2.login, password: "wrong"},
+		result: TEST.unauthorized},
+	{action: "../User.login.php", args: TEST.USER2, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		TEST.USER2.id = data.id;
+		if (data.name === null
+			&& data.color === null
+			&& data.email == TEST.USER2.email
+			&& data.subscribed == TEST.USER2.subscribed) return "PASS";
+		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.campaigns.php", args: {}, result: TEST.exists},
 
 	{group: "USER.LOGOUT"},
@@ -139,78 +168,90 @@ TEST.tests = [
 
 	{group: "USER.CHARACTERS"},
 	{action: "../User.characters.php", args: {}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
 	{action: "../User.characters.php", args: {}, result: TEST.zero},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "USER.CAMPAIGNS"},
 	{action: "../User.campaigns.php", args: {}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
 	{action: "../User.campaigns.php", args: {}, result: TEST.zero},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "USER.MAPS"},
 	{action: "../User.maps.php", args: {}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
 	{action: "../User.maps.php", args: {}, result: TEST.zero},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "USER.UPDATE"},
 	{action: "../User.update.php", args: {}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../User.update.php", args: {name: "moe", color: "green", email: "a@b.c", subscribed: 1}, result: TEST.blank},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../User.update.php", args: {name: "moe", color: "green", email: "x@y.z", subscribed: 0}, result: TEST.blank},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
-	{action: "../User.login.php", args: TEST.USER, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data.name == "moe" && data.color == "green" && data.email == "a@b.c" && data.subscribed == 1) return "PASS";
+	{action: "../User.login.php", args: TEST.LOGIN, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		if (data.name == "moe"
+			&& data.color == "green"
+			&& data.email == "x@y.z"
+			&& data.subscribed == 0) return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "USER PASSWORD"},
 	{action: "../User.password.php", args: {password: "newPassword"}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
 	{action: "../User.password.php", args: {password: "newPassword"}, result: TEST.blank},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
-	{action: "../User.login.php", args: {login: TEST.USER.login, password: "newPassword"}, result: TEST.exists},
-	{action: "../User.password.php", args: {password: TEST.USER.password}, result: TEST.blank},
+	{action: "../User.login.php", args: {login: TEST.LOGIN.login, password: "newPassword"}, result: TEST.exists},
+	{action: "../User.password.php", args: {password: TEST.LOGIN.password}, result: TEST.blank},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "USER.FRIENDS"},
 	{action: "../User.friends.php", args: {}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
 	{action: "../User.friends.php", args: {}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
 		if (data.requested.length + data.recieved.length + data.confirmed.length == 0) return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "USER.FRIEND"},
 	{action: "../User.friend.php", args: {}, result: TEST.logged_out},
-	{action: "../User.create.php", args: {login: "toad", password: "hall", email: "a@b.c", subscribed: 1}, result: TEST.blank},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../User.friend.php", args: {recipient: 2}, result: TEST.blank}, // friending self should fail silently
-	{action: "../User.friend.php", args: {recipient: 3}, result: TEST.blank},
+	{action: "../User.create.php", args: TEST.USER3, result: TEST.blank},
+	{action: "../User.login.php", args: {login: TEST.USER3.login, password: TEST.USER3.password}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		TEST.USER3.id = data.id;
+		return "PASS";}},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	// friending self should fail silently
+	{action: "../User.friend.php", args: function () {return {recipient: TEST.USER2.id};}, result: TEST.blank},
+	{action: "../User.friend.php", args: function () {return {recipient: TEST.USER3.id};}, result: TEST.blank},
 	{action: "../User.friends.php", args: {}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
 		if (data.requested.length + data.recieved.length + data.confirmed.length == 1) return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "USER.UNFRIEND"},
 	{action: "../User.unfriend.php", args: {}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../User.unfriend.php", args: {recipient: 3}, result: TEST.blank},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../User.unfriend.php", args: function () {return {recipient: TEST.USER3.id};}, result: TEST.blank},
 	{action: "../User.friends.php", args: {}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
 		if (data.requested.length + data.recieved.length + data.confirmed.length == 0) return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 /*
 	{group: "DELETE USER"},
-	{action: "../delete_user.php",
-		args: {user: 2},
-		result: TEST.blank},
+	{action: "../delete_user.php", args: function () {return {user: TEST.USER3.id};}, result: TEST.blank},
 	{action: "../read_users.php", args: {}, result: TEST.one},
 */
 
@@ -218,206 +259,315 @@ TEST.tests = [
 
 	{group: "CAMPAIGN.CREATE"},
 	{action: "../Campaign.create.php", args: {name: "My Campaign"}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Campaign.create.php", args: {name: "My Campaign"}, result: function (ajax) {return TEST.json(ajax, {id: 2});}},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Campaign.create.php", args: {name: "My Campaign"}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		TEST.campaign = data.id;
+		return "PASS";}},
 	{action: "../User.campaigns.php", args: {}, result: TEST.one},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "CAMPAIGN.NAME"},
-	{action: "../Campaign.name.php", args: {campaign: 2, name: "Still My Campaign"}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Campaign.name.php", args: {campaign: 2, name: "Still My Campaign"}, result: TEST.blank},
+	{action: "../Campaign.name.php", args: function () {return {campaign: TEST.campaign, name: "Still My Campaign"};},
+		result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Campaign.name.php", args: function () {return {campaign: TEST.campaign, name: "Still My Campaign"};},
+		result: TEST.blank},
 	{action: "../User.campaigns.php", args: {}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data[0].campaign == 2 && data[0].name == "Still My Campaign") return "PASS";
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		if (data[0].campaign == TEST.campaign && data[0].name == "Still My Campaign") return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "CAMPAIGN.PRIVATE"},
-	{action: "../Campaign.private.php", args: {campaign: 2, 'private': 0}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Campaign.private.php", args: {campaign: 2, 'private': 0}, result: TEST.blank},
-	{action: "../Campaign.read.php", args: {campaign: 2}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data['private'] == 0) return "PASS"; else return "FAIL [" + ajax.responseText + "]";}},
-	{action: "../Campaign.private.php", args: {campaign: 2, 'private': 1}, result: TEST.blank},
-	{action: "../Campaign.read.php", args: {campaign: 2}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data['private'] == 1) return "PASS"; else return "FAIL [" + ajax.responseText + "]";}},
+	{action: "../Campaign.private.php", args: function () {return {campaign: TEST.campaign, 'private': 0};}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Campaign.private.php", args: function () {return {campaign: TEST.campaign, 'private': 0};}, result: TEST.blank},
+	{action: "../Campaign.read.php", args: function () {return {campaign: TEST.campaign};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		if (data['private'] == 0) return "PASS";
+		else return "FAIL [" + ajax.responseText + "]";}},
+	{action: "../Campaign.private.php", args: function () {return {campaign: TEST.campaign, 'private': 1};}, result: TEST.blank},
+	{action: "../Campaign.read.php", args: function () {return {campaign: TEST.campaign};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		if (data['private'] == 1) return "PASS";
+		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "CAMPAIGN.READ"},
-	{action: "../Campaign.read.php", args: {campaign: 2}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Campaign.read.php", args: {campaign: 2}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data.id == 2 && data.name == "Still My Campaign" && data['private'] === true && data.map === null
-			&& JSON.stringify(data.turns) == JSON.stringify([]) && typeof(data.last_message) == "number"
+	{action: "../Campaign.read.php", args: function () {return {campaign: TEST.campaign};}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Campaign.read.php", args: function () {return {campaign: TEST.campaign};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		if (data.id == TEST.campaign
+			&& data.name == "Still My Campaign"
+			&& data['private'] === true
+			&& data.map === null
+			&& JSON.stringify(data.turns) == JSON.stringify([])
+			&& typeof(data.last_message) == "number"
 			&& typeof(data.users_modified) == 'number') return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "CAMPAIGN.MAP"},
-	{action: "../Campaign.map.php", args: {campaign: 2, map: 1}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Campaign.map.php", args: {campaign: 2, map: 1}, result: TEST.blank},
-	{action: "../Campaign.read.php", args: {campaign: 2}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data.map == 1) return "PASS"; else return "FAIL [" + ajax.responseText + "]";}},
+	// TODO: use the id of a real map?
+	{action: "../Campaign.map.php", args: function () {return {campaign: TEST.campaign, map: 1};}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Campaign.map.php", args: function () {return {campaign: TEST.campaign, map: 1};}, result: TEST.blank},
+	{action: "../Campaign.read.php", args: function () {return {campaign: TEST.campaign};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		if (data.map == 1) return "PASS";
+		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "CAMPAIGN.TURNS"},
-	{action: "../Campaign.turns.php", args: {campaign: 2, turns: "[1,1,2,3,5,8,13,21]"}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Campaign.turns.php", args: {campaign: 2, turns: "[1,1,2,3,5,8,13,21]"}, result: TEST.blank},
-	{action: "../Campaign.read.php", args: {campaign: 2}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (JSON.stringify(data.turns) == "[1,1,2,3,5,8,13,21]") return "PASS"; else return "FAIL [" + ajax.responseText + "]";}},
+	{action: "../Campaign.turns.php", args: function () {return {campaign: TEST.campaign, turns: "[1,1,2,3,5,8,13,21]"};},
+		result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Campaign.turns.php", args: function () {return {campaign: TEST.campaign, turns: "[1,1,2,3,5,8,13,21]"};},
+		result: TEST.blank},
+	{action: "../Campaign.read.php", args: function () {return {campaign: TEST.campaign};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		if (JSON.stringify(data.turns) == "[1,1,2,3,5,8,13,21]") return "PASS";
+		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "CAMPAIGN.USERS"},
-	{action: "../Campaign.users.php", args: {campaign: 2}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Campaign.users.php", args: {campaign: 2}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data[0].user == 2 && data[0].permission == "owner" && data[0].viewing === false && data[0].avatar === null
-			&& data[0].login == TEST.USER.login && data[0].name == "moe") return "PASS";
+	{action: "../Campaign.users.php", args: function () {return {campaign: TEST.campaign};}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Campaign.users.php", args: function () {return {campaign: TEST.campaign};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		if (data[0].user == 2
+			&& data[0].permission == "owner"
+			&& data[0].viewing === false
+			&& data[0].avatar === null
+			&& data[0].login == TEST.LOGIN.login
+			&& data[0].name == "moe") return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "CAMPAIGN.ARRIVE"},
-	{action: "../Campaign.arrive.php", args: {campaign: 2}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Campaign.arrive.php", args: {campaign: 2}, result: TEST.blank},
-	{action: "../Campaign.users.php", args: {campaign: 2}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data[0].user == 2 && data[0].permission == "owner" && data[0].viewing === true && data[0].avatar === null
-			&& data[0].login == TEST.USER.login && data[0].name == "moe") return "PASS";
+	{action: "../Campaign.arrive.php", args: function () {return {campaign: TEST.campaign};}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Campaign.arrive.php", args: function () {return {campaign: TEST.campaign};}, result: TEST.blank},
+	{action: "../Campaign.users.php", args: function () {return {campaign: TEST.campaign};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		if (data[0].user == 2
+			&& data[0].permission == "owner"
+			&& data[0].viewing === true
+			&& data[0].avatar === null
+			&& data[0].login == TEST.LOGIN.login
+			&& data[0].name == "moe") return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "CAMPAIGN.MESSAGE"},
-	{action: "../Campaign.message.php", args: {campaign: 2, avatar: 0, text: TEST.MESSAGE_IN}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Campaign.message.php", args: {campaign: 2, avatar: 0, text: TEST.MESSAGE_IN}, result: TEST.blank},
+	{action: "../Campaign.message.php", args: function () {return {campaign: TEST.campaign, avatar: 0, text: TEST.MESSAGE_IN};},
+		result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Campaign.message.php", args: function () {return {campaign: TEST.campaign, avatar: 0, text: TEST.MESSAGE_IN};},
+		result: TEST.blank},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "CAMPAIGN.MESSAGES"},
-	{action: "../Campaign.messages.php", args: {campaign: 2, last_message: 0}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Campaign.messages.php", args: {campaign: 2, last_message: 0}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data[0].id == 1 && data[0].user == 2 && data[0].avatar === 0 && data[0].text == TEST.MESSAGE_OUT) return "PASS";
+	{action: "../Campaign.messages.php", args: function () {return {campaign: TEST.campaign, last_message: 0};}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Campaign.messages.php", args: function () {return {campaign: TEST.campaign, last_message: 0};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		if (data[0].id == 1
+			&& data[0].user == 2
+			&& data[0].avatar === 0
+			&& data[0].text == TEST.MESSAGE_OUT) return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "CAMPAIGN.AVATAR"},
-	{action: "../Campaign.avatar.php", args: {campaign: 2, avatar: 1}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Campaign.avatar.php", args: {campaign: 2, avatar: 1}, result: TEST.blank},
-	{action: "../Campaign.users.php", args: {campaign: 2}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data[0].user == 2 && data[0].permission == "owner" && data[0].viewing === true && data[0].avatar === 1
-			&& data[0].login == TEST.USER.login && data[0].name == "moe") return "PASS";
+	{action: "../Campaign.avatar.php", args: function () {return {campaign: TEST.campaign, avatar: 1};}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Campaign.avatar.php", args: function () {return {campaign: TEST.campaign, avatar: 1};}, result: TEST.blank},
+	{action: "../Campaign.users.php", args: function () {return {campaign: TEST.campaign};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		if (data[0].user == 2
+			&& data[0].permission == "owner"
+			&& data[0].viewing === true
+			&& data[0].avatar === 1
+			&& data[0].login == TEST.LOGIN.login
+			&& data[0].name == "moe") return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "CAMPAIGN.LEAVE"},
-	{action: "../Campaign.leave.php", args: {campaign: 2}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Campaign.leave.php", args: {campaign: 2}, result: TEST.blank},
-	{action: "../Campaign.users.php", args: {campaign: 2}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data[0].user == 2 && data[0].permission == "owner" && data[0].viewing === false && data[0].avatar === 1
-			&& data[0].login == TEST.USER.login && data[0].name == "moe") return "PASS";
+	{action: "../Campaign.leave.php", args: function () {return {campaign: TEST.campaign};}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Campaign.leave.php", args: function () {return {campaign: TEST.campaign};}, result: TEST.blank},
+	{action: "../Campaign.users.php", args: function () {return {campaign: TEST.campaign};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		if (data[0].user == 2
+			&& data[0].permission == "owner"
+			&& data[0].viewing === false
+			&& data[0].avatar === 1
+			&& data[0].login == TEST.LOGIN.login
+			&& data[0].name == "moe") return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "CAMPAIGN.PERMISSION"},
-	{action: "../User.create.php", args: {login: "nobody", password: "ydobon", email: "a@b.c", subscribed: 1}, result: TEST.blank},
-	{action: "../Campaign.permission.php", args: {user: 4, campaign: 2, permission: "member"}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Campaign.permission.php", args: {user: 4, campaign: 2, permission: "member"}, result: TEST.blank},
-	{action: "../Campaign.users.php", args: {campaign: 2}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+	{action: "../Campaign.permission.php",
+		args: function () {return {user: TEST.USER3.id, campaign: TEST.campaign, permission: "member"};},
+		result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Campaign.permission.php",
+		args: function () {return {user: TEST.USER3.id, campaign: TEST.campaign, permission: "member"};},
+		result: TEST.blank},
+	{action: "../Campaign.users.php", args: function () {return {campaign: TEST.campaign};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
 		for (var i = 0; i < data.length; i++)
-			if (data[i].user == 4 && data[i].permission == "member" && data[i].viewing === false && data[i].avatar === null
-				&& data[i].login == "nobody" && data[i].name === null) return "PASS";
+			if (data[i].user == TEST.USER3.id
+				&& data[i].permission == "member"
+				&& data[i].viewing === false
+				&& data[i].avatar === null
+				&& data[i].login == TEST.USER3.login
+				&& data[i].name === null) return "PASS";
 		return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "PRIVATE ROLL"},
 	{action: "../private_roll.php", args: {text: TEST.MESSAGE_IN}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data.text == TEST.MESSAGE_OUT) return "PASS"; else return "FAIL [" + ajax.responseText + "]";}},
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		if (data.text == TEST.MESSAGE_OUT) return "PASS";
+		else return "FAIL [" + ajax.responseText + "]";}},
 
 	// M A P
 
 	{group: "MAP.CREATE"},
 	{action: "../Map.create.php", args: {type: "square", rows: 30, columns: 40, tile: 1, background: "{}", name: "My Map"},
 		result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
 	{action: "../Map.create.php", args: {type: "square", rows: 30, columns: 40, tile: 1, background: "{}", name: "My Map"},
-		result: function (ajax) {return TEST.json(ajax, {id: 1});}},
+		result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		TEST.map = data.id;
+		return "PASS";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.READ"},
-	{action: "../Map.read.php", args: {map: 1}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data.name == "My Map" && data.type == "square" && data.rows == 30 && data.columns == 40
-			&& JSON.stringify(data.background) == JSON.stringify({}) && data.min_zoom == 0.25 && data.max_zoom == 4
-			&& data.min_rotate == -180 && data.max_rotate == 180 && data.min_tilt == 30 && data.max_tilt == 90
-			&& data.grid_thickness == 1 && data.wall_thickness == 3 && data.door_thickness == 3
-			&& data.grid_color === null && data.wall_color === null && data.door_color === null
-			&& typeof(data.piece_changes) == "number" && typeof(data.tile_changes) == "number"
+	{action: "../Map.read.php", args: function () {return {map: TEST.map};}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Map.read.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		if (data.name == "My Map"
+			&& data.type == "square"
+			&& data.rows == 30
+			&& data.columns == 40
+			&& JSON.stringify(data.background) == JSON.stringify({})
+			&& data.min_zoom == 0.25
+			&& data.max_zoom == 4
+			&& data.min_rotate == -180
+			&& data.max_rotate == 180
+			&& data.min_tilt == 30
+			&& data.max_tilt == 90
+			&& data.grid_thickness == 1
+			&& data.wall_thickness == 3
+			&& data.door_thickness == 3
+			&& data.grid_color === null
+			&& data.wall_color === null
+			&& data.door_color === null
+			&& typeof(data.piece_changes) == "number"
+			&& typeof(data.tile_changes) == "number"
 			&& JSON.stringify(data.tiles) == JSON.stringify(Array(30 * 40 + 1).join().split('').map(function () {return 1;}))
 			&& data.flags == Array(31 * 41 + 1).join("0")) return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.PIECES"},
-	{action: "../Map.pieces.php", args: {map: 1}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Map.pieces.php", args: {map: 1}, result: TEST.zero},
+	{action: "../Map.pieces.php", args: function () {return {map: TEST.map};}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Map.pieces.php", args: function () {return {map: TEST.map};}, result: TEST.zero},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.SETTINGS"},
-	{action: "../Map.settings.php", args: {map: 1, name: "Still My Map", type: "hex", background: "{}", min_zoom: 0.5, max_zoom: 2,
-		min_rotate: -45, max_rotate: 45, min_tilt: 15, max_tilt: 45, grid_thickness: 0, grid_color: "orange",
-		wall_thickness: 1, wall_color: "brown", door_thickness: 9, door_color: "green"}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Map.settings.php", args: {map: 1, name: "Still My Map", type: "hex", background: "{}", min_zoom: 0.5, max_zoom: 2,
-		min_rotate: -45, max_rotate: 45, min_tilt: 15, max_tilt: 45, grid_thickness: 0, grid_color: "orange",
-		wall_thickness: 1, wall_color: "brown", door_thickness: 9, door_color: "green"}, result: TEST.blank},
-	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data.name == "Still My Map" && data.type == "hex" && data.rows == 30 && data.columns == 40
-			&& JSON.stringify(data.background) == JSON.stringify({}) && data.min_zoom == 0.5 && data.max_zoom == 2
-			&& data.min_rotate == -45 && data.max_rotate == 45 && data.min_tilt == 15 && data.max_tilt == 45
-			&& data.grid_thickness == 0 && data.wall_thickness == 1 && data.door_thickness == 9
-			&& data.grid_color == "orange" && data.wall_color == "brown" && data.door_color == "green"
-			&& typeof(data.piece_changes) == "number" && typeof(data.tile_changes) == "number"
+	{action: "../Map.settings.php", args: function () {return {map: TEST.map, name: "Still My Map", type: "hex", background: "{}",
+		min_zoom: 0.5, max_zoom: 2, min_rotate: -45, max_rotate: 45, min_tilt: 15, max_tilt: 45,
+		grid_thickness: 0, grid_color: "orange", wall_thickness: 1, wall_color: "brown", door_thickness: 9, door_color: "green"};},
+		result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Map.settings.php", args: function () {return {map: TEST.map, name: "Still My Map", type: "hex", background: "{}",
+		min_zoom: 0.5, max_zoom: 2, min_rotate: -45, max_rotate: 45, min_tilt: 15, max_tilt: 45,
+		grid_thickness: 0, grid_color: "orange", wall_thickness: 1, wall_color: "brown", door_thickness: 9, door_color: "green"};},
+		result: TEST.blank},
+	{action: "../Map.read.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		if (data.name == "Still My Map"
+			&& data.type == "hex"
+			&& data.rows == 30
+			&& data.columns == 40
+			&& JSON.stringify(data.background) == JSON.stringify({})
+			&& data.min_zoom == 0.5
+			&& data.max_zoom == 2
+			&& data.min_rotate == -45
+			&& data.max_rotate == 45
+			&& data.min_tilt == 15
+			&& data.max_tilt == 45
+			&& data.grid_thickness == 0
+			&& data.wall_thickness == 1
+			&& data.door_thickness == 9
+			&& data.grid_color == "orange"
+			&& data.wall_color == "brown"
+			&& data.door_color == "green"
+			&& typeof(data.piece_changes) == "number"
+			&& typeof(data.tile_changes) == "number"
 			&& JSON.stringify(data.tiles) == JSON.stringify(Array(30 * 40 + 1).join().split('').map(function () {return 1;}))
 			&& data.flags == Array(31 * 41 + 1).join("0")) return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.SIZE"},
-	{action: "../Map.size.php", args: {map: 1, left: -5, top: -5, right: 45, bottom: 35, tile: 1, flags: "0"},
+	{action: "../Map.size.php",
+		args: function () {return {map: TEST.map, left: -5, top: -5, right: 45, bottom: 35, tile: 1, flags: "0"};},
 		result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Map.size.php", args: {map: 1, left: -5, top: -5, right: 45, bottom: 35, tile: 1, flags: "0"},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Map.size.php",
+		args: function () {return {map: TEST.map, left: -5, top: -5, right: 45, bottom: 35, tile: 1, flags: "0"};},
 		result: TEST.blank},
-	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data.name == "Still My Map" && data.type == "hex" && data.rows == 40 && data.columns == 50
-			&& JSON.stringify(data.background) == JSON.stringify({}) && data.min_zoom == 0.5 && data.max_zoom == 2
-			&& data.min_rotate == -45 && data.max_rotate == 45 && data.min_tilt == 15 && data.max_tilt == 45
-			&& data.grid_thickness == 0 && data.wall_thickness == 1 && data.door_thickness == 9
-			&& data.grid_color == "orange" && data.wall_color == "brown" && data.door_color == "green"
-			&& typeof(data.piece_changes) == "number" && typeof(data.tile_changes) == "number"
+	{action: "../Map.read.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		if (data.name == "Still My Map"
+			&& data.type == "hex"
+			&& data.rows == 40
+			&& data.columns == 50
+			&& JSON.stringify(data.background) == JSON.stringify({})
+			&& data.min_zoom == 0.5
+			&& data.max_zoom == 2
+			&& data.min_rotate == -45
+			&& data.max_rotate == 45
+			&& data.min_tilt == 15
+			&& data.max_tilt == 45
+			&& data.grid_thickness == 0
+			&& data.wall_thickness == 1
+			&& data.door_thickness == 9
+			&& data.grid_color == "orange"
+			&& data.wall_color == "brown"
+			&& data.door_color == "green"
+			&& typeof(data.piece_changes) == "number"
+			&& typeof(data.tile_changes) == "number"
 			&& JSON.stringify(data.tiles) == JSON.stringify(Array(40 * 50 + 1).join().split('').map(function () {return 1;}))
 			&& data.flags == Array(41 * 51 + 1).join("0")) return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
@@ -435,260 +585,285 @@ TEST.tests = [
 // NE door   *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
 
 	{group: "MAP.TILE"},
-	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, tile: 2}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, tile: 2}, result: TEST.blank},
-	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+	{action: "../Map.tile.php", args: function () {return {map: TEST.map, x: 3, y: 2, tile: 2};}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Map.tile.php", args: function () {return {map: TEST.map, x: 3, y: 2, tile: 2};}, result: TEST.blank},
+	{action: "../Map.read.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
 		if (data.tiles[3 + 2 * 50] == 2) return "PASS";
 		else return "FAIL [" + data.tiles.indexOf(2) + "]";}},
-	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, fog: 1}, result: TEST.blank},
-	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+	{action: "../Map.tile.php", args: function () {return {map: TEST.map, x: 3, y: 2, fog: 1};}, result: TEST.blank},
+	{action: "../Map.read.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
 		if (data.flags[(3 + 1) + (2 + 1) * (50 + 1)] == "1") return "PASS";
 		else return "FAIL [" + data.flags.indexOf("1") + "]";}},
-	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, fog: 0}, result: TEST.blank},
-	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+	{action: "../Map.tile.php", args: function () {return {map: TEST.map, x: 3, y: 2, fog: 0};}, result: TEST.blank},
+	{action: "../Map.read.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
 		if (data.flags[(3 + 1) + (2 + 1) * (50 + 1)] == "0") return "PASS";
 		else return "FAIL [0 != " + data.flags[(3 + 1) + (2 + 1) * (50 + 1)] + "]";}},
-	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, s: 'wall'}, result: TEST.blank},
-	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+	{action: "../Map.tile.php", args: function () {return {map: TEST.map, x: 3, y: 2, s: 'wall'};}, result: TEST.blank},
+	{action: "../Map.read.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
 		if (data.flags[(3 + 1) + (2 + 1) * (50 + 1)] == "I") return "PASS";
 		else return "FAIL [" + data.flags.indexOf("I") + "]";}},
-	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, s: 'none'}, result: TEST.blank},
-	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+	{action: "../Map.tile.php", args: function () {return {map: TEST.map, x: 3, y: 2, s: 'none'};}, result: TEST.blank},
+	{action: "../Map.read.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
 		if (data.flags[(3 + 1) + (2 + 1) * (50 + 1)] == "0") return "PASS";
 		else return "FAIL [0 != " + data.flags[(3 + 1) + (2 + 1) * (50 + 1)] + "]";}},
-	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, e: 'wall'}, result: TEST.blank},
-	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+	{action: "../Map.tile.php", args: function () {return {map: TEST.map, x: 3, y: 2, e: 'wall'};}, result: TEST.blank},
+	{action: "../Map.read.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
 		if (data.flags[(3 + 1) + (2 + 1) * (50 + 1)] == "C") return "PASS";
 		else return "FAIL [" + data.flags.indexOf("C") + "]";}},
-	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, se: 'door'}, result: TEST.blank},
-	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+	{action: "../Map.tile.php", args: function () {return {map: TEST.map, x: 3, y: 2, se: 'door'};}, result: TEST.blank},
+	{action: "../Map.read.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
 		if (data.flags[(3 + 1) + (2 + 1) * (50 + 1)] == "F") return "PASS";
 		else return "FAIL [" + data.flags.indexOf("F") + "]";}},
-	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, ne: 'door'}, result: TEST.blank},
-	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+	{action: "../Map.tile.php", args: function () {return {map: TEST.map, x: 3, y: 2, ne: 'door'};}, result: TEST.blank},
+	{action: "../Map.read.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
 		if (data.flags[(3 + 1) + (2 + 1) * (50 + 1)] == "H") return "PASS";
 		else return "FAIL [" + data.flags.indexOf("H") + " " + data.flags[(3 + 1) + (2 + 1) * (50 + 1)] + "]";}},
-	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, se: 'none'}, result: TEST.blank},
-	{action: "../Map.tile.php", args: {map: 1, x: 3, y: 2, ne: 'none'}, result: TEST.blank},
-	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+	{action: "../Map.tile.php", args: function () {return {map: TEST.map, x: 3, y: 2, se: 'none'};}, result: TEST.blank},
+	{action: "../Map.tile.php", args: function () {return {map: TEST.map, x: 3, y: 2, ne: 'none'};}, result: TEST.blank},
+	{action: "../Map.read.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
 		if (data.flags[(3 + 1) + (2 + 1) * (50 + 1)] == "0") return "PASS";
 		else return "FAIL [0 != " + data.flags[(3 + 1) + (2 + 1) * (50 + 1)] + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.CHANGES"},
-	{action: "../Map.changes.php", args: {map: 1}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Map.changes.php", args: {map: 1}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		TEST.piece_changes = data.piece_changes; TEST.tile_changes = data.tile_changes; return "PASS";}},
-	{action: "../Map.tile.php", args: {map: 1, x: 0, y: 0, ne: 'wall'}, result: TEST.blank},
-	{action: "../Map.tile.php", args: {map: 1, x: 0, y: 0, ne: 'none'}, result: TEST.blank},
-	{action: "../Map.changes.php", args: {map: 1}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data.tile_changes == TEST.tile_changes + 2) return "PASS"; else return "FAIL [" + ajax.responseText + "]";}},
-	{action: "../Piece.create.php", args: {map: 1, image: "{}"}, result: TEST.blank},
-	{action: "../Piece.delete.php", args: {piece: 1}, result: TEST.blank},
-	{action: "../Map.changes.php", args: {map: 1}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data.piece_changes = TEST.piece_changes + 2) return "PASS"; else return "FAIL [" + ajax.responseText + "]";}},
+	{action: "../Map.changes.php", args: function () {return {map: TEST.map};}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Map.changes.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		TEST.piece_changes = data.piece_changes;
+		TEST.tile_changes = data.tile_changes;
+		return "PASS";}},
+	{action: "../Map.tile.php", args: function () {return {map: TEST.map, x: 0, y: 0, ne: 'wall'};}, result: TEST.blank},
+	{action: "../Map.tile.php", args: function () {return {map: TEST.map, x: 0, y: 0, ne: 'none'};}, result: TEST.blank},
+	{action: "../Map.changes.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		if (data.tile_changes == TEST.tile_changes + 2) return "PASS";
+		else return "FAIL [" + ajax.responseText + "]";}},
+	{action: "../Piece.create.php", args: function () {return {map: TEST.map, image: "{}"};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		TEST.piece = data.id;
+		return "PASS";}},
+	{action: "../Piece.delete.php", args: function () {return {piece: TEST.piece};}, result: TEST.blank},
+	{action: "../Map.changes.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		if (data.piece_changes = TEST.piece_changes + 2) return "PASS";
+		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.SHARE"},
-	{action: "../Map.share.php", args: {map: 1, user: 3}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Map.share.php", args: {map: 1, user: 3}, result: TEST.blank},
+	{action: "../Map.share.php", args: function () {return {map: TEST.map, user: TEST.USER3.id};}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Map.share.php", args: function () {return {map: TEST.map, user: TEST.USER3.id};}, result: TEST.blank},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.OWNERS"},
-	{action: "../Map.owners.php", args: {map: 1}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Map.owners.php", args: {map: 1}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		for (var i = 0; i < data.length; i++) if (data[i].id == 3 && data[i].login == "toad"
-			&& data[i].logged_in == false && data[i].name === null && data[i].color === null) return "PASS";
+	{action: "../Map.owners.php", args: function () {return {map: TEST.map};}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Map.owners.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		for (var i = 0; i < data.length; i++)
+			if (data[i].id == TEST.USER3.id
+				&& data[i].login == TEST.USER3.login
+				&& data[i].logged_in == false
+				&& data[i].name === null
+				&& data[i].color === null) return "PASS";
 		return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.DELETE OWNER"},
-	{action: "../Map.deleteOwner.php", args: {map: 1, user: 3}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Map.deleteOwner.php", args: {map: 1, user: 3}, result: TEST.blank},
-	{action: "../Map.owners.php", args: {map: 1}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		for (var i = 0; i < data.length; i++) if (data[i].id == 3) return "FAIL [" + ajax.responseText + "]";
+	{action: "../Map.deleteOwner.php", args: function () {return {map: TEST.map, user: TEST.USER3.id};}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Map.deleteOwner.php", args: function () {return {map: TEST.map, user: TEST.USER3.id};}, result: TEST.blank},
+	{action: "../Map.owners.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		for (var i = 0; i < data.length; i++)
+			if (data[i].id == TEST.USER3.id)
+				return "FAIL [" + ajax.responseText + "]";
 		return "PASS";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.FILL FOG"},
-	{action: "../Map.fillFog.php", args: {map: 1}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Map.fillFog.php", args: {map: 1}, result: TEST.blank},
-	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data.flags == Array(41 * 51 + 1).join("1")) return "PASS"; else return "FAIL [" + data.flags + "]";}},
+	{action: "../Map.fillFog.php", args: function () {return {map: TEST.map};}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Map.fillFog.php", args: function () {return {map: TEST.map};}, result: TEST.blank},
+	{action: "../Map.read.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		if (data.flags == Array(41 * 51 + 1).join("1")) return "PASS";
+		else return "FAIL [" + data.flags + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.CLEAR FOG"},
-	{action: "../Map.clearFog.php", args: {map: 1}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Map.clearFog.php", args: {map: 1}, result: TEST.blank},
-	{action: "../Map.read.php", args: {map: 1}, result: function (ajax) {
-		try {var data = JSON.parse(ajax.responseText);} catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data.flags == Array(41 * 51 + 1).join("0")) return "PASS"; else return "FAIL [" + data.flags + "]";}},
+	{action: "../Map.clearFog.php", args: function () {return {map: TEST.map};}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Map.clearFog.php", args: function () {return {map: TEST.map};}, result: TEST.blank},
+	{action: "../Map.read.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		if (data.flags == Array(41 * 51 + 1).join("0")) return "PASS";
+		else return "FAIL [" + data.flags + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	// P I E C E
 
 	{group: "PIECE.CREATE"},
-	{action: "../Piece.create.php", args: {map: 1, image: "{}"}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Piece.create.php", args: {map: 1, image: "{}"}, result: TEST.unimplemented},
+	{action: "../Piece.create.php", args: function () {return {map: TEST.map, image: "{}"};}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Piece.create.php", args: function () {return {map: TEST.map, image: "{}"};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		TEST.piece = data.id;
+		return "PASS";}},
+	{action: "../Map.pieces.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		for (var i = 0; i < data.length; i++)
+			if (data[i].id == TEST.piece
+				&& JSON.stringify(data[i].image) == JSON.stringify({})
+				&& data[i].name === null
+				&& data[i].x == 0.5
+				&& data[i].y == 0.5
+				&& data[i].character === null
+				&& data[i].locked == true
+				&& JSON.stringify(data[i].markers) == JSON.stringify([])
+				&& data[i].color === null) return "PASS";
+		return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "PIECE.MOVE"},
-	{action: "../Piece.move.php", args: {piece: 1, x: 2.5, y: 3.5}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Piece.move.php", args: {piece: 1, x: 2.5, y: 3.5}, result: TEST.unimplemented},
+	{action: "../Piece.move.php", args: function () {return {piece: TEST.piece, x: 2.5, y: 3.5};}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Piece.move.php", args: function () {return {piece: TEST.piece, x: 2.5, y: 3.5};}, result: TEST.blank},
+	{action: "../Map.pieces.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		for (var i = 0; i < data.length; i++)
+			if (data[i].id == TEST.piece
+				&& JSON.stringify(data[i].image) == JSON.stringify({})
+				&& data[i].name === null
+				&& data[i].x == 2.5
+				&& data[i].y == 3.5
+				&& data[i].character === null
+				&& data[i].locked == true
+				&& JSON.stringify(data[i].markers) == JSON.stringify([])
+				&& data[i].color === null) return "PASS";
+		return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "PIECE.SETTINGS"},
-	{action: "../Piece.settings.php", args: {piece: 1, image: "{}", name: "The Piece", character: 1, markers: "[]", color: "red"},
-		result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Piece.settings.php", args: {piece: 1, image: "{}", name: "The Piece", character: 1, markers: "[]", color: "red"},
-		result: TEST.unimplemented},
+	{action: "../Piece.settings.php", args: TEST.PIECE_SETTINGS, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Piece.settings.php", args: TEST.PIECE_SETTINGS, result: TEST.blank},
+	{action: "../Map.pieces.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		for (var i = 0; i < data.length; i++) if (data[i].id == TEST.piece
+			&& JSON.stringify(data[i].image) == JSON.stringify({})
+			&& data[i].name == "The Piece"
+			&& data[i].x == 2.5
+			&& data[i].y == 3.5
+			&& data[i].character == 1
+			&& data[i].locked == false
+			&& JSON.stringify(data[i].markers) == JSON.stringify([])
+			&& data[i].color == "red")
+				return "PASS";
+		return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "PIECE.DELETE"},
-	{action: "../Piece.delete.php", args: {piece: 1}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Piece.delete.php", args: {piece: 1}, result: TEST.unimplemented},
+	{action: "../Piece.delete.php", args: function () {return {piece: TEST.piece};}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Piece.delete.php", args: function () {return {piece: TEST.piece};}, result: TEST.blank},
+	{action: "../Map.pieces.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		for (var i = 0; i < data.length; i++)
+			if (data[i].id == TEST.piece)
+				return "FAIL [" + ajax.responseText + "]";
+		return "PASS";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
-
-/*
-	{group: "CREATE PIECE"},
-	{action: "../create_piece.php",
-		args: {
-			table: 1,
-			image: 10,
-			user: 1,
-			name: "My Piece",
-			x: 30,
-			y: 100,
-			x_offset: -32,
-			y_offset: -8,
-			height: 16,
-			width: 64},
-		result: TEST.blank},
-
-	{group: "READ PIECES"},
-	{action: "../read_pieces.php",
-		args: {table: 1},
-		result: TEST.one},
-
-	{group: "UPDATE PIECE"},
-	{action: "../update_piece.php",
-		args: {
-			piece: 1,
-			image: 11,
-			user: 2,
-			name: "Still My Piece",
-			x: 99,
-			y: 49,
-			x_offset: 5,
-			y_offset: 10,
-			width: 20,
-			height: 40,
-			color: "orange"},
-		result: TEST.blank},
-	{action: "../read_pieces.php",
-		args: {table: 1},
-		result: function (ajax) {
-			try {var data = JSON.parse(ajax.responseText);}
-			catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-			for (var i = 0; i < data.length; i++)
-				if (data[i].id == 1
-					&& data[i].image == 11
-					&& data[i].user == 2
-					&& data[i].name == "Still My Piece"
-					&& data[i].x == 99
-					&& data[i].y == 49
-					&& data[i].x_offset == 5
-					&& data[i].y_offset == 10
-					&& data[i].width == 20
-					&& data[i].height == 40
-					&& data[i].color == "orange"
-				) return "PASS";
-			return "FAIL [" + ajax.responseText + "]";}},
-
-	{group: "DELETE PIECE"},
-	{action: "../delete_piece.php", args: {piece: 1}, result: TEST.blank},
-	{action: "../read_pieces.php",
-		args: {table: 1},
-		result: TEST.zero},
-*/
 
 	// C H A R A C T E R
 
 	{group: "CHARACTER.CREATE"},
 	{action: "../Character.create.php", args: {name: "My Character", system: "The System", stats: "{}",
 		notes: "These are the notes.", portrait: "{}", piece: "{}", color: "red"}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
 	{action: "../Character.create.php", args: {name: "My Character", system: "The System", stats: "{}",
-		notes: "These are the notes.", portrait: "{}", piece: "{}", color: "red"}, result: TEST.unimplemented},
+		notes: "These are the notes.", portrait: "{}", piece: "{}", color: "red"}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		TEST.character = data.id;
+		return "PASS";}},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
+
+	{group: "CHARACTER.SETTINGS"},
+	{action: "../Character.settings.php", args: function () {return {character: TEST.character,
+		name: "Still My Character", system: "Some System", stats: "{\"gold\": 500, \"luck\": 7}",
+		notes: "Nothing of note.", portrait: "{}", piece: "{}", color: "white"};}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Character.settings.php", args: function () {return {character: TEST.character,
+		name: "Still My Character", system: "Some System", stats: "{\"gold\": 500, \"luck\": 7}",
+		notes: "[\"Nothing of note.\"]", portrait: "{}", piece: "{}", color: "white"};}, result: TEST.blank},
+	{action: "../User.characters.php", args: {}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		for (var i = 0; i < data.length; i++)
+			if (data[i].id == TEST.character
+				&& data[i].name == "Still My Character"
+				&& data[i].system == "Some System"
+				&& data[i].stats.gold == 500
+				&& data[i].stats.luck == 7
+				&& data[i].notes[0] == "Nothing of note."
+				&& JSON.stringify(data[i].portrait) == JSON.stringify({})
+				&& JSON.stringify(data[i].piece) == JSON.stringify({})
+				&& data[i].color == "white")return "PASS";
+		return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "CHARACTER.SHARE"},
-	{action: "../Character.share.php", args: {character: 1, user: 3}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Character.share.php", args: {character: 1, user: 3}, result: TEST.unimplemented},
+	{action: "../Character.share.php", args: TEST.CHARACTER_OWNER, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Character.share.php", args: TEST.CHARACTER_OWNER, result: TEST.blank},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "CHARACTER.OWNERS"},
-	{action: "../Character.owners.php", args: {character: 1}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Character.owners.php", args: {character: 1}, result: TEST.unimplemented},
+	{action: "../Character.owners.php", args: function () {return {character: TEST.character};}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Character.owners.php", args: function () {return {character: TEST.character};}, result: TEST.two},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "CHARACTER.DELETE OWNER"},
-	{action: "../Character.deleteOwner.php", args: {character: 1, user: 3}, result: TEST.logged_out},
-	{action: "../User.login.php", args: TEST.USER, result: TEST.exists},
-	{action: "../Character.deleteOwner.php", args: {character: 1, user: 3}, result: TEST.unimplemented},
+	{action: "../Character.deleteOwner.php", args: TEST.CHARACTER_OWNER, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../Character.deleteOwner.php", args: TEST.CHARACTER_OWNER, result: TEST.blank},
+	{action: "../Character.owners.php", args: function () {return {character: TEST.character};}, result: TEST.one},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
-
-/*
-	{group: "UPDATE STAT"},
-	{action: "../update_stat.php",
-		args: {piece: 1, name: "hit points", value: "20"},
-		result: TEST.blank},
-	{action: "../read_pieces.php",
-		args: {table: 1},
-		result: function (ajax) {
-			var stats = ajax.responseXML.getElementsByTagName("stat");
-			for (var i = 0; i < stats.length; i++) {
-				if (decodeURIComponent(stats[i].getAttribute("name")) == "hit points"
-					&& decodeURIComponent(stats[i].textContent) == "20") return "PASS";
-			}
-			return "FAIL [" + ajax.responseText + "]";}},
-
-	{group: "DELETE STAT"},
-	{action: "../delete_stat.php",
-		args: {piece: 1, name: "hit points"},
-		result: TEST.blank},
-	{action: "../read_pieces.php",
-		args: {table: 1},
-		result: TEST.zero},
-*/
 
 ];
 

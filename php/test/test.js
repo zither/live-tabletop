@@ -28,6 +28,8 @@ var TEST = {
 			TEST.index++;
 			current_test = TEST.tests[TEST.index];
 		}
+		if (typeof(current_test.args) == "function")
+			current_test.args = current_test.args();
 		if (current_test.uploader)
 			current_test.uploader.submit(current_test.args);
 		else $.ajax({
@@ -93,8 +95,9 @@ var TEST = {
 	// TEST.count(ajax, 1) and TEST.count(ajax, 0).
 	// They can also be directly used as test.result callbacks
 	// because they only require an ajax argument.
-	one: function (ajax) {return TEST.count(ajax, 1);},
 	zero: function (ajax) {return TEST.count(ajax, 0);},
+	one: function (ajax) {return TEST.count(ajax, 1);},
+	two: function (ajax) {return TEST.count(ajax, 2);},
 
 	// TEST.string(ajax, target) returns "PASS" if the response
 	// contains the specified text (target)

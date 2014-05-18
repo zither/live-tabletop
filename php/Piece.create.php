@@ -17,7 +17,11 @@ $image = $LT_SQL->real_escape_string($_REQUEST['image']);
 
 // Query the Database
 
-if (LT_can_edit_map($map))
-	LT_call('create_piece', $map, $image);
+if (LT_can_edit_map($map)) {
+	if ($rows = LT_call('create_piece', $map, $image)) {
+		include('include/json_headers.php');
+		echo json_encode(array('id' => intval($rows[0]['id'])));
+	}
+}
 
 ?>
