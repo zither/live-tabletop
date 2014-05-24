@@ -1,30 +1,27 @@
-  /////////////////////////////////////////////////////////////////////////////
- // tablesPanel.js ///////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-
 $(function () { // This anonymous function runs after the page loads.
 	LT.mapPanel = new LT.Panel("map");
 
-	// refresh table list
+	// refresh map list
 	// TODO: automatically refresh this list as needed (user timestamps?) 
-	$("#refreshTables").click(function () {LT.refreshTables();});
+	$("#refreshMaps").click(function () {LT.refreshMaps();});
 
-	// submit table settings form
-	$("#applyTableChanges").click(function () {
-		LT.currentTable.update(LT.formValues("#tableEditor")).done(function () {
-			LT.loadTable(LT.currentTable);
+	// submit map settings form
+	$("#applyMapChanges").click(function () {
+		LT.currentMap.update(LT.formValues("#mapEditor")).done(function () {
+			LT.loadMap(LT.currentMap);
 		});
 	});
 
-	// submit table creation form
-	$("#createTable").click(function () {
-		$.post("php/create_table.php", LT.formValues("#tableCreator"), function (data) {
-			LT.loadTable(new LT.Table(data[0]));
+	// submit map creation form
+	$("#createMap").click(function () {
+		$.post("php/Map.create.php", LT.formValues("#mapCreator"), function (data) {
+			LT.loadMap(new LT.Map(data[0]));
 		});
 	});
 
 	// TODO: UI for choosing presets
-	$.get("presets.json", function (data) {LT.Table.presets = data;});
+	// TODO: does the new design need presets?
+	$.get("presets.json", function (data) {LT.Map.presets = data;});
 
 	// tools tab
 	$("#toolsTab").click(function () {
@@ -47,6 +44,17 @@ $(function () { // This anonymous function runs after the page loads.
 		LT.chooseTool(this, "piece", "#clickPieceLayer");
 	});
 
+	// pieces
+
+	$("#submitStats").click(function () {LT.Piece.updateStats();});
+	$("#applyPieceChanges").click(function () {LT.Piece.selected.edit();});
+	$("#deletePiece").click(function () {
+		// TODO: what about unnamed peices?
+		if (confirm("Are you sure you want to delete "
+			+ LT.Piece.selected.name + "?")) LT.Piece.selected.remove({});
+	});
+	$("#createPiece").click(function () {LT.createPiece();});
+	$("#addStat").click(function () {LT.Piece.addStat();});
 });
 
 LT.chooseTool = function (swatch, name, layer) {
@@ -60,30 +68,31 @@ LT.chooseTool = function (swatch, name, layer) {
 	$(layer).show();
 };
 
-LT.loadTable = function (table) {
-	LT.currentTable = table;
-	LT.setCookie("table", table.id);
-	if (table.user_id == LT.currentUser.id 
-		|| LT.currentUser.permissions == "administrator") {
-		// show tabs only visible to table owner
-		LT.piecesPanel.showTab("pieceCreationTab");
-		LT.piecesPanel.showTab("pieceSettingsTab");
-		LT.tablesPanel.showTab("tableSettingsTab");
-		LT.tablesPanel.showTab("toolsTab");
+LT.loadMap = function (map) {
+	LT.currentMap = map;
+	LT.setCookie("map", map.id);
+	// FIXME: maps can have multiple owners
+	// TODO: do you also need campaign ownership?
+	if (map.user_id == LT.currentUser.id) {
+		// show tabs only visible to owners
+		LT.mapPanel.showTab("piece list");
+		LT.mapPanel.showTab("piece info");
+		LT.mapPanel.showTab("map info");
+		LT.mapPanel.showTab("map tools");
 	} else {
-		// hide tabs only visible to table owner
-		if ($("#tableSettingsTab").hasClass("active"))
-			LT.tablesPanel.selectTab("tableListTab");
-		LT.piecesPanel.hideTab("pieceCreationTab");
-		LT.piecesPanel.hideTab("pieceSettingsTab");
-		LT.tablesPanel.hideTab("tableSettingsTab");
-		LT.tablesPanel.hideTab("toolsTab");
+		// hide tabs only visible to owners
+		LT.mapPanel.hideTab("piece list");
+		LT.mapPanel.hideTab("piece info");
+		LT.mapPanel.hideTab("map info");
+		LT.mapPanel.hideTab("map tools");
+		LT.mapPanel.selectTab("map list");
 		$(".clickLayer").hide();
 		$("#clickPieceLayer").show();
 	}
-	LT.refreshTables(); // TODO: should we do this here?
 
-	// TODO: this might change when we refactor tables and notifications
+	LT.refreshMaps(); // TODO: should we do this here?
+
+	// FIXME: this is a campaign thing
 	LT.alert();
 	LT.alert("Loading chat log for " + table.name + "...");
 	LT.lastMessageID = 0;
@@ -91,79 +100,50 @@ LT.loadTable = function (table) {
 	LT.alert("Arriving at " + table.name);
 	LT.alert();
 
-	table.createGrid();
-	table.loadTiles();
+	map.createGrid();
+	map.loadTiles();
 	LT.loadPieces();
 
-	// create new pieces sized to fit this grid
-	$("#pieceCreator [name=width]").val(table.tile_width);
-	$("#pieceCreator [name=height]").val(table.tile_height);
-
 	// load background image
-	if (table.image_id != -1)
+	// FIXME: new background system
+	if (map.image_id != -1)
 		$("#map").css({background: "url('images/upload/background/"
-			+ LT.Table.images[table.image_id].file + "')"});
+			+ LT.Map.images[map.image_id].file + "')"});
 
-	// populate table settings form
-	$("#tableEditor [name=name]").val(table.name);
-	$("#tableEditor [name=tile_columns]").val(table.tile_columns);
-	$("#tableEditor [name=tile_rows]").val(table.tile_rows);
-	$("#tableEditor [name=tile_height]").val(table.tile_height);
-	$("#tableEditor [name=tile_width]").val(table.tile_width);
-	$("#tableEditor [name=grid_thickness]").val(table.grid_thickness);
-	$("#tableEditor [name=wall_thickness]").val(table.wall_thickness);
-	$("#tableEditor [name=image_id]").val(table.image_id);
-	$("#tableEditor [name=tile_mode]").val(table.tile_mode);
+	// populate map info form
+	$("#mapEditor [name=name]").val(map.name);
+	$("#mapEditor [name=type]").val(map.type);
+	$("#mapEditor [name=background]").val(map.background);
+	$("#mapEditor [name=columns]").val(map.tile_columns);
+	$("#mapEditor [name=rows]").val(map.tile_rows);
+	$("#mapEditor [name=grid_thickness]").val(map.grid_thickness);
+	$("#mapEditor [name=wall_thickness]").val(map.wall_thickness);
+	$("#mapEditor [name=door_thickness]").val(map.door_thickness);
+	$("#mapEditor [name=grid_color]").val(map.grid_color);
+	$("#mapEditor [name=wall_color]").val(map.wall_color);
+	$("#mapEditor [name=door_color]").val(map.door_color);
 };
 
-LT.refreshTables = function () {
-	$.post("php/read_tables.php", function (data) {		
-//		// TODO: when is this used?
-//		var tableID = parseInt(LT.getCookie("table"));
-		$("#tableList").empty();
-		for (var i = 0; i < data.length; i++) {
-//			if (!LT.currentTable && data[i].id == tableID)
-//				LT.currentTable = new Table(data[i]);
-			// TODO: move CSS to style.css
-			$("<div>").appendTo("#tableList").css({clear: "both"}).append([
-				LT.loadTableButton(data[i]),
-				LT.deleteTableButton(data[i]),
-				$("<div>").addClass("separator"),
-			]);
-		}
+LT.refreshMaps = function () {
+	$.post("php/User.maps.php", function (data) {		
+		$(".content[data-tab='map list'] .mapRow:not(.template)").empty();
+		$.each(data, function (i, theMap) {
+			var row = $(".content[data-tab='map list'] .mapRow.template")
+				.clone().removeClass("template").appendTo(;
+			row.find(".load").text(theMap.name)
+				.click(function () {LT.loadMap(new LT.Map(theMap));});
+			row.find(".info").text(map.columns + " &times; " + theMap.rows + ")"));
+			row.find(".disown").click(function () {
+				if (confirm("Are you sure you want to disown "
+					+ (theMap.name === null || theMap.name == "" ? "this map" : theMap.name)
+					+ "? The map will be deleted if it has no other owners.")) {
+					if (theMap.id == LT.currentMap.id) LT.unloadMap();
+					$.post("php/Map.disown.php", {"map": theMap.id}, LT.refreshMaps);
+				}
+			});
+		});
 	}, "json");
 };
-LT.loadTableButton = function (data) {
-	return $("<a>").addClass("textButton").text(data.name).click(function () {
-		LT.loadTable(new LT.Table(data));
-	});
-};
-LT.deleteTableButton = function (data) {
-	return $("<a>").addClass("deleteButton").text("Delete").click(function () {
-		if (confirm("Are you sure you want to delete " + data.name + "?")) {
-			$.post("php/delete_table.php", {table_id: data.id}, function () {
-				// TODO: unload current table if you deleted the current table
-				LT.refreshTables();
-			});
-		}
-	});
-};
-
-  /////////////////////////////////////////////////////////////////////////////
- // piecesPanel.js ///////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-
-$(function () { // This anonymous function runs after the page loads.
-	LT.piecesPanel = new LT.Panel("piecesPanel");
-	$("#submitStats").click(function () {LT.Piece.updateStats();});
-	$("#applyPieceChanges").click(function () {LT.Piece.selected.edit();});
-	$("#deletePiece").click(function () {
-		if (confirm("Are you sure you want to delete "
-			+ LT.Piece.selected.name + "?")) LT.Piece.selected.remove({});
-	});
-	$("#createPiece").click(function () {LT.createPiece();});
-	$("#addStat").click(function () {LT.Piece.addStat();});
-});
 
 // Populate image selectors in the create piece and piece settings tabs
 // (called for each piece image after loading piece image data in Piece.js)
@@ -198,7 +178,7 @@ LT.createPieceImageSwatch = function (image) {
 LT.loadPieces = function () {
 	$("#pieceLayer").empty();
 	$("#clickPieceLayer").empty();
-	$.post("php/read_pieces.php", {table_id: LT.currentTable.id}, function (data) {
+	$.post("php/Map.pieces.php", {map: LT.currentMap.id}, function (data) {
 		LT.pieces = [];
 		for (var i = 0; i < data.length; i++)
 			LT.pieces.push(new LT.Piece(data[i]));
@@ -207,7 +187,7 @@ LT.loadPieces = function () {
 
 LT.createPiece = function () {
 	var args = LT.formValues("#pieceCreator");
-	args.table_id = LT.currentTable.id;
+	args.map = LT.currentMap.id;
 	if (args.image_id == "") {
 		alert("Cannot create piece. No piece image selected.");
 		return;

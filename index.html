@@ -15,12 +15,12 @@
 		<script type="text/javascript" src="js/Palette.js"></script>
 		<script type="text/javascript" src="js/Panel.js"></script>
 		<script type="text/javascript" src="js/Piece.js"></script>
-		<script type="text/javascript" src="js/Table.js"></script>
+		<script type="text/javascript" src="js/Campaign.js"></script>
 		<script type="text/javascript" src="js/Tile.js"></script>
 		<script type="text/javascript" src="js/User.js"></script>
 		<!-- panels: LT.characterPanel, LT.userPanel, etc. -->
 		<script type="text/javascript" src="js/userPanel.js"></script>
-		<script type="text/javascript" src="js/tablePanel.js"></script>
+		<script type="text/javascript" src="js/campignPanel.js"></script>
 		<script type="text/javascript" src="js/mapPanel.js"></script>
 		<script type="text/javascript" src="js/characterPanel.js"></script>
 		<!-- utility functions -->
@@ -59,7 +59,7 @@
 			<input type="button" value="Configure Live Tabletop"/>
 		</form>
 
-		<!-- displays the table's current map -->
+		<!-- displays the campaign's current map -->
 		<div id="map">
 			<div id="tileLayer"></div>
 			<div id="wallLayer"></div>
@@ -106,28 +106,28 @@
 			</div>
 		</div>
 
-		<div class="panel" data-panel="table">
+		<div class="panel" data-panel="campaign">
 			<div class="title">
 				<div class="resizeTL"></div>
-				<div class="caption">Table</div>
+				<div class="caption">Campaign</div>
 				<div class="resizeTR"></div>
 				<div class="close"></div>
 			</div>
 			<div class="tabBar">
-				<div class="tab active" data-tab="table list">List</div>
-				<div class="tab" data-tab="table info">Info</div>
+				<div class="tab active" data-tab="campaign list">List</div>
+				<div class="tab" data-tab="campaign info">Info</div>
 				<div class="tab" data-tab="chat">Chat & Roll</div>
 			</div>
-			<div class="content" data-tab="table list">
+			<div class="content" data-tab="campaign list">
 				<table>
 					<tbody>
-						<tr><td><a>My Table</a> (owned)</td><td><input type="button" value="disown"/></td></tr>
-						<tr><td><a>My Friend's Table</a></td><td></td></tr>
+						<tr><td><a>My Campaign</a> (owned)</td><td><input type="button" value="disown"/></td></tr>
+						<tr><td><a>My Friend's Campaign</a></td><td></td></tr>
 					</tbody>
 				</table>
 			</div>
-			<div class="content" data-tab="table info">
-				<span id="tableName">My Table</span>
+			<div class="content" data-tab="campaign info">
+				<span id="campaignName">My Campaign</span>
 				<input type="button" value="rename"/>
 				<input type="checkbox" value="private" id="private" checked="checked"/>
 				<label for="private">private</label>
@@ -152,8 +152,8 @@
 					</tbody>
 				</table>
 				<select name="user"><option>My Friend</option></select>
-				<input type="button" value="invite to table"/>
-				<input type="button" value="share table"/>
+				<input type="button" value="invite to campaign"/>
+				<input type="button" value="share campaign"/>
 			</div>
 			<div class="content" data-tab="chat">
 				<div id="chatOutput"><a id="chatBottom"> </a></div>
@@ -182,13 +182,9 @@
 			</div>
 			<div class="content" data-tab="map list">
 				<table>
-					<tr>
-						<td><a>My Map</a> (25 &times; 25 square, owned)</td>
-						<td><input type="button" value="disown"/></td>
-					</tr>
-					<tr>
-						<td><a>My Friend's Map</a> (30 &times; 50 hex)</td>
-						<td><input type="button" value="disown"/></td>
+					<tr class="mapRow template">
+						<td><a class="load">Map Name</a> <span class="info">(25 &times; 25 square)</span></td>
+						<td><input type="button" value="disown" class="disown"/></td>
 					</tr>
 				</table>
 				<form id="mapCreator">
@@ -389,7 +385,7 @@
 			<div id="logo"></div>
 			<div id="panelButtons">
 				<div class="panelButton" data-panel="user">User</div>
-				<div class="panelButton" data-panel="table">Table</div>
+				<div class="panelButton" data-panel="campaign">Campaign</div>
 				<div class="panelButton" data-panel="map">Map</div>
 				<div class="panelButton" data-panel="character">Character</div>
 			</div>
