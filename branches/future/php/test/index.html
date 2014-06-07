@@ -166,6 +166,20 @@ TEST.tests = [
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 	{action: "../User.campaigns.php", args: {}, result: TEST.logged_out},
 
+	{group: "USER.CHECK"},
+	{action: "../User.check.php", args: {}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},
+	{action: "../User.check.php", args: {}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		TEST.USER2.id = data.id;
+		if (data.name === null
+			&& data.color === null
+			&& data.email == TEST.USER2.email
+			&& data.subscribed == TEST.USER2.subscribed) return "PASS";
+		else return "FAIL [" + ajax.responseText + "]";}},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
+
 	{group: "USER.CHARACTERS"},
 	{action: "../User.characters.php", args: {}, result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.LOGIN, result: TEST.exists},

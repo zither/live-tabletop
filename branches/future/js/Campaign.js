@@ -1,32 +1,32 @@
-// TABLE CONSTRUCTOR
-LT.Table = function (data) {
-	for (var i = 0; i < LT.Table.PROPERTIES.length; i++)
-		this[LT.Table.PROPERTIES[i]] = data[LT.Table.PROPERTIES[i]];
+// CAMPAIGN CONSTRUCTOR
+LT.Campaign = function (data) {
+	for (var i = 0; i < LT.Campaign.PROPERTIES.length; i++)
+		this[LT.Campaign.PROPERTIES[i]] = data[LT.Campaign.PROPERTIES[i]];
 };
 
 
 // GLOBAL VARIABLES
 
-LT.Table.PROPERTIES = ["id", "user_id", "image_id", "name",
+LT.Campaign.PROPERTIES = ["id", "user_id", "image_id", "name",
 	"tile_rows", "tile_columns", "tile_width", "tile_height",
 	"grid_thickness", "grid_color", "wall_thickness", "wall_color",
 	"piece_stamp", "tile_stamp", "message_stamp", "tile_mode"
 ];
-LT.Table.STRINGS = ["name", "grid_color", "wall_color", "tile_mode"];
+LT.Campaign.STRINGS = ["name", "grid_color", "wall_color", "tile_mode"];
 
-LT.Table.images = {};
+LT.Campaign.images = {};
 
-LT.Table.presets = [];
+LT.Campaign.presets = [];
 
 
 // STATIC FUNCTIONS
 
-LT.Table.readImages = function () {
+LT.Campaign.readImages = function () {
 	$.post("php/read_images.php", {type: "background"}, function (data) {
-		LT.Table.images = {};
+		LT.Campaign.images = {};
 		for (var i = 0; i < data.length; i++) {
-			LT.Table.images[data[i].id] = new LT.Image(data[i]);
-			$("#tableEditor [name=image_id], #tableCreator [name=image_id]")
+			LT.Campaign.images[data[i].id] = new LT.Image(data[i]);
+			$("#campaignEditor [name=image_id], #campaignCreator [name=image_id]")
 				.append($("<option>").attr("value", data[i].id)
 				.text(data[i].file.slice(0, -4))); // remove file extension
 		}
@@ -35,17 +35,17 @@ LT.Table.readImages = function () {
 
 
 // METHODS OF TABLE OBJECTS
-LT.Table.prototype = {
+LT.Campaign.prototype = {
 
 	// CLIENT-SERVER COMMUNICATION
 
 	update: function (mods) {
-		var args = LT.applyChanges(this, mods, LT.Table.PROPERTIES, LT.Table.STRINGS);
-		return $.post("php/update_table.php", args);
+		var args = LT.applyChanges(this, mods, LT.Campaign.PROPERTIES, LT.Campaign.STRINGS);
+		return $.post("php/Campaign.settings.php", args);
 	},
 	
 	remove: function () {
-		return $.post("php/delete_table.php", {table_id: this.id});
+		return $.post("php/Campaign.disown.php", {campaign: this.id});
 	},
 	
 	loadTiles: function () {

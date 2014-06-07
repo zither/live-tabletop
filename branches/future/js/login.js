@@ -10,8 +10,8 @@ $(function () { // This anonymous function runs after the page loads.
 
 LT.loginCheck = function () {
 //	LT.createUserPanel(); // FIXME: why was this here?.
-	$.post("php/login_check.php", function (data) {
-		LT.login(new LT.User(data[0]));
+	$.post("php/User.check.php", function (theData) {
+		LT.login(new LT.User(theData));
 	}, "json");
 };
 
