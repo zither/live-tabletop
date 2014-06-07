@@ -10,8 +10,8 @@ $(function () { // This anonymous function runs after the page loads.
 
 LT.loginCheck = function () {
 //	LT.createUserPanel(); // FIXME: why was this here?.
-	$.post("php/login_check.php", function (data) {
-		LT.login(new LT.User(data[0]));
+	$.post("php/User.check.php", function (theData) {
+		LT.login(new LT.User(theData));
 	}, "json");
 };
 
@@ -36,10 +36,11 @@ LT.login = function (theUser) {
 	LT.Panel.loadCookie();
 
 	LT.alert("You have logged in.");
-//	LT.refreshChatPanel(); // FIXME: don't do this until a table is loaded
+//	LT.refreshChatPanel(); // FIXME: don't do this until a campaign is loaded
 
 	// TODO: load a table by id if there's a cookie for it
-	LT.refreshTables();
+	// FIXME: campaign or map?
+	LT.refreshMaps();
 
 	LT.holdTimestamps = 0;
 	setInterval(LT.checkTimestamps, 2000);

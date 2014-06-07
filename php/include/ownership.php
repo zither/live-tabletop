@@ -4,74 +4,142 @@
 include_once('db_config.php');
 include_once('include/query.php');
 
-// Returns TRUE if this user has permission to modify the image.
-// Returns FALSE if this user does not have permission to modify the image.
-// A FALSE result could also mean an SQL error or bad image id.
-function LT_can_modify_image($image_id) {
-  
-  global $LT_SQL;
-  
-  // you must be logged in to modify images
-  if (!isset($_SESSION['user_id'])) return FALSE;
+/*
+These functions return TRUE if the user has permission, and FALSE if:
+	- they don't have permission
+	- they provided a bad campaign, map or character id
+	- an SQL error occured
+*/
 
-  // admins may update other user's images
-  if (strcmp($_SESSION['permissions'], 'administrator') == 0) return TRUE;
+// CAMPAIGN
 
-  // other users can only update images they own
-  $user_id = $LT_SQL->real_escape_string($_SESSION['user_id']);
-  if ($rows = LT_call_silent('read_image', $image_id)) {
-    return $user_id == $rows[0]['user_id'];
-  }
-  // a FALSE result could also mean an SQL error or bad image id
-  return FALSE;
+function LT_can_view_campaign($campaign) {
+	global $LT_SQL;
+	if (!isset($_SESSION['user'])) return FALSE; // you must be logged in
+
+	// anyone can view public campaigns
+	$rows = LT_call_silent('read_campaign', $campaign);
+	if ($rows[0]['private'] == '0') return TRUE;
+
+	// only members and owners can view private campaigns
+	$user = $LT_SQL->real_escape_string($_SESSION['user']);
+	if ($rows = LT_call_silent('read_campaign_user_permission', $user, $campaign))
+		if ($rows[0]['permission'] == 'owner' or $rows[0]['permission'] == 'member')
+			return TRUE;
+
+	return FALSE; // a FALSE result could also mean an SQL error or bad id
 }
 
-// Returns TRUE if this user has permission to modify the table.
-// Returns FALSE if this user does not have permission to modify the table.
-// A FALSE result could also mean an SQL error or bad table id.
-function LT_can_modify_table($table_id) {
-  
-  global $LT_SQL;
-  
-  // you must be logged in to modify tables
-  if (!isset($_SESSION['user_id'])) return FALSE;
+function LT_can_edit_campaign($campaign) {
+	global $LT_SQL;
+	if (!isset($_SESSION['user'])) return FALSE; // you must be logged in
 
-  // admins may update other user's tables
-  if (strcmp($_SESSION['permissions'], 'administrator') == 0) return TRUE;
+	// only owners may edit
+	$user = $LT_SQL->real_escape_string($_SESSION['user']);
+	if ($rows = LT_call_silent('read_campaign_user_permission', $user, $campaign))
+		if ($rows[0]['permission'] == 'owner') return TRUE;
 
-  // other users can only update tables they own
-  $user_id = $LT_SQL->real_escape_string($_SESSION['user_id']);
-  if ($rows = LT_call_silent('read_table', $table_id)) {
-    return $user_id == $rows[0]['user_id'];
-  }
-  // a FALSE result could also mean an SQL error or bad table id
-  return FALSE;
+	return FALSE; // a FALSE result could also mean an SQL error or bad id
 }
 
-// Returns TRUE if this user has permission to modify the piece.
-// Returns FALSE if this user does not have permission to modify the piece.
-// A FALSE result could also mean an SQL error or bad piece id.
-function LT_can_modify_piece($piece_id) {
-  
-  global $LT_SQL;
-  
-  // you must be logged in to modify pieces
-  if (!isset($_SESSION['user_id'])) return FALSE;
+// MAP
 
-  // admins may update other user's pieces
-  if (strcmp($_SESSION['permissions'], 'administrator') == 0) return TRUE;
+function LT_can_view_map($map) {
+	global $LT_SQL;
+	if (!isset($_SESSION['user'])) return FALSE; // you must be logged in
 
-  // users can update pieces they own and pieces belonging to tables they own
-  if ($rows = LT_call_silent('read_piece', $piece_id)) {
-    $user_id = $LT_SQL->real_escape_string($_SESSION['user_id']);
-    if ($rows[0]['user_id'] == $user_id) return TRUE;
-    $table_id = $rows[0]['table_id'];
-    if ($rows = LT_call_silent('read_table', $table_id)) {
-      return $user_id == $rows[0]['user_id'];
-    }
-  }
-  // a FALSE result could also mean an SQL error or bad piece id
-  return FALSE;
+	// viewers of campaigns displaying the map may view the map
+	$user = $LT_SQL->real_escape_string($_SESSION['user']);
+	if (LT_call_silent('read_map_viewer', $user, $map))
+		return TRUE;
+
+	return FALSE; // a FALSE result could also mean an SQL error or bad id
+}
+
+function LT_can_edit_map($map) {
+	global $LT_SQL;
+	if (!isset($_SESSION['user'])) return FALSE; // you must be logged in
+
+	// only owners may edit
+	$user = $LT_SQL->real_escape_string($_SESSION['user']);
+	if (LT_call_silent('read_map_owner', $user, $map))
+		return TRUE;
+
+	return FALSE; // a FALSE result could also mean an SQL error or bad id
+}
+
+// PIECE
+
+function LT_can_edit_piece($piece) {
+	global $LT_SQL;
+	if (!isset($_SESSION['user'])) return FALSE; // you must be logged in
+
+	// users can only edit pieces belonging to maps they own
+	if ($rows = LT_call_silent('read_piece', $piece)) {
+		$user = $LT_SQL->real_escape_string($_SESSION['user']);
+		$map = $rows[0]['map'];
+		if (LT_call_silent('read_map_owner', $user, $map))
+			return TRUE;
+	}
+
+	return FALSE; // a FALSE result could also mean an SQL error or bad id
+}
+
+function LT_can_move_piece($piece) {
+	global $LT_SQL;
+	if (!isset($_SESSION['user'])) return FALSE; // you must be logged in
+
+	if ($piece_rows = LT_call_silent('read_piece', $piece)) {
+		$user = $LT_SQL->real_escape_string($_SESSION['user']);
+		$character = $piece_rows[0]['character'];
+		$map = $piece_rows[0]['map'];
+
+		// map owners can move all the pieces on the map
+		if (LT_call_silent('read_map_owner', $user, $map))
+			return TRUE;
+
+		// users can move pieces linked to their characters
+		if ($character !== NULL)
+			if (LT_call_silent('read_character_owner', $user, $character))
+				return TRUE;
+
+		// users can move unlocked pieces displayed on their campaign map
+		if ($piece_rows[0]['locked'] == '0')
+			if (LT_call_silent('read_map_viewer', $user, $map))
+				return TRUE;
+	}
+
+	return FALSE; // a FALSE result could also mean an SQL error or bad id
+}
+
+// CHARACTER
+
+function LT_can_view_character($character) {
+	global $LT_SQL;
+	if (!isset($_SESSION['user'])) return FALSE; // you must be logged in
+
+	// owners may view
+	$user = $LT_SQL->real_escape_string($_SESSION['user']);
+	if (LT_call_silent('read_character_owner', $user, $character))
+		return TRUE;
+
+	// TODO: viewers of campaigns where the character has a turn may view?
+	// TODO: viewers of campaigns where the character has a piece may view?
+	// TODO: viewers of campaigns where the character is a user's avatar may view?
+
+	return FALSE; // a FALSE result could also mean an SQL error or bad id
+}
+
+function LT_can_edit_character($character) {
+	global $LT_SQL;
+	if (!isset($_SESSION['user'])) return FALSE; // you must be logged in
+
+	// only owners may edit
+	$user = $LT_SQL->real_escape_string($_SESSION['user']);
+	if (LT_call_silent('read_character_owner', $user, $character))
+		return TRUE;
+
+	return FALSE; // a FALSE result could also mean an SQL error or bad id
 }
 
 ?>
