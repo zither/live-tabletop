@@ -7,11 +7,15 @@ LT.lastMessageID = 0;
 
 // Store data as JSON in the browser's cookie
 LT.setCookie = function (name, value) {
-	document.cookie = name + "=" + JSON.stringify(value) + ";";
+	document.cookie = name + "=" + encodeURIComponent(JSON.stringify(value)) + ";";
 }
 
 // Get JSON data stored in the browser's cookie
 LT.getCookie = function (name) {
+	var re = new RegExp("(?:(?:^|.*;\s*)" + name + "\s*\=\s*([^;]*).*$)|^.*$");
+	var cookie = decodeURIComponent(document.cookie.replace(re, "$1"));
+	if (cookie != "") return JSON.parse(cookie);
+/*
 	var cookieArray = document.cookie.split(";");
 	for (var i = 0; i < cookieArray.length; i++) {
 		var cookieString = cookieArray[i].replace(/^\s+|\s+$/g, ""); // trim white space
@@ -19,6 +23,7 @@ LT.getCookie = function (name) {
 			return JSON.parse(cookieString.substr(name.length + 1, cookieString.length));
 		}
 	}
+*/
 };
 
 // Creates an array from an object
