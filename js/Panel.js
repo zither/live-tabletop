@@ -137,7 +137,7 @@ LT.Panel.prototype = {
 	// Get selected tab
 	getTab: function () {
 		return $(this.outside).find(".tab.active").data("tab");
-	}
+	},
 
 	// Hide tab
 	hideTab: function (tabName) {

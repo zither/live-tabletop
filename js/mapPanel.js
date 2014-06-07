@@ -125,14 +125,14 @@ LT.loadMap = function (map) {
 };
 
 LT.refreshMaps = function () {
-	$.post("php/User.maps.php", function (data) {		
-		$(".content[data-tab='map list'] .mapRow:not(.template)").empty();
-		$.each(data, function (i, theMap) {
-			var row = $(".content[data-tab='map list'] .mapRow.template")
-				.clone().removeClass("template").appendTo(;
+	$.post("php/User.maps.php", function (theData) {
+		var list = $(".content[data-tab='map list']");
+		list.find(".mapRow:not(.template)").remove();
+		$.each(theData, function (i, theMap) {
+			var row = list.find(".mapRow.template").clone().removeClass("template").appendTo(list);
 			row.find(".load").text(theMap.name)
 				.click(function () {LT.loadMap(new LT.Map(theMap));});
-			row.find(".info").text(map.columns + " &times; " + theMap.rows + ")"));
+			row.find(".info").text(theMap.columns + " &times; " + theMap.rows);
 			row.find(".disown").click(function () {
 				if (confirm("Are you sure you want to disown "
 					+ (theMap.name === null || theMap.name == "" ? "this map" : theMap.name)
