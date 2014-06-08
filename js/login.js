@@ -1,6 +1,6 @@
 $(function () { // This anonymous function runs after the page loads.
 	$("#loginForm input[type=button]").click(function () {
-		$.post("php/login.php", $("#loginForm").serialize(), function (data) {
+		$.post("php/login.php", LT.formValues("#loginForm"), function (data) {
 			LT.login(new LT.User(data[0]));
 		}, "json").fail(function () {
 			alert("Incorrect username or password.");
