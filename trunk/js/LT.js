@@ -83,10 +83,6 @@ LT.checkTimestamps = function () {
 	}
 }
 
-LT.processImages = function () {
-	$.post("php/create_images.php", {});
-}
-
 
 // DRAG AND DROP TO MOVE PIECES AND RESIZE PANELS
 

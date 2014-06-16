@@ -1,9 +1,13 @@
 $(function () { // This anonymous function runs after the page loads.
 	$.post("php/db_config.php", function () {
-		LT.loginCheck();
+		$.post("php/User.check.php", function (theData) {
+			LT.login(new LT.User(theData));
+		}, "json").fail(function () {
+			$("#welcome").show();
+		});
 	}).fail(function () {
+		$("#map, #pageBar, .panel").hide();
 		$("#installBox").show();
-		$("#map, #pageBar").hide();
 	});
 });
 
