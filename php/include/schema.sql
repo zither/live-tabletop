@@ -130,7 +130,7 @@ CREATE TABLE users (
 	`hash` TEXT NOT NULL,
 	`salt` TEXT NOT NULL,
 	`last_action` TIMESTAMP,
-	`logged_in` TINYINT NOT NULL DEFAULT 0,
+	`logged_in` TINYINT NOT NULL DEFAULT 1,
 	`name` TEXT,
 	`color` TEXT,
 	`email` TEXT,
@@ -419,7 +419,9 @@ BEGIN
 	INSERT INTO users (login, hash, salt, last_action, email, subscribed)
 		VALUES 
 			(the_login, the_hash, the_salt, NOW(), the_email, the_subscribed);
-	SELECT LAST_INSERT_ID() AS id;
+	SELECT id, login, UNIX_TIMESTAMP(last_action) AS last_action, name, color,
+		email, subscribed
+		FROM users WHERE id = LAST_INSERT_ID();
 	COMMIT;
 END;
 

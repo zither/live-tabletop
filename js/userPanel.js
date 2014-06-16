@@ -2,8 +2,11 @@ $(function () { // This anonymous function runs after the page loads.
 	LT.userPanel = new LT.Panel("user");
 	
 	// options tab
-	$("#logout").click(LT.logout);
-	$("#createImages").click(LT.processImages);
+	$("#logout").click(function () {
+		$.post("php/logout.php");
+		$("#map, #pageBar, .panel").hide();
+		$("#welcome").show();
+	});
 	$("#defaultPanels").click(function () {
 		LT.tablesPanel.reset();
 		LT.chatPanel.reset();
@@ -13,6 +16,7 @@ $(function () { // This anonymous function runs after the page loads.
 		LT.userPanel.reset();
 	});
 
+/*
 	// edit user tab
 	var editUserPalette = new LT.Palette(null, $(".panelContent .userSettingsTab")[0], 5);
 	// TODO: hook this palette up to some handler that reads it?
@@ -24,6 +28,7 @@ $(function () { // This anonymous function runs after the page loads.
 		args.color = addUserPalette.getColor(); // TODO: connect palettes to hidden inputs?
 		$.post("php/create_user.php", args);
 	});
+*/
 
 });
 

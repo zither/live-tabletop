@@ -4,7 +4,6 @@ Table of Contents:
 	ELEMENTS
 	PAGE BAR
 		Panel Buttons
-		Login Form
 	PANELS
 		Default Panel Sizes
 		Panel Sections
@@ -21,6 +20,7 @@ Table of Contents:
 	MAP
 		Layers
 		Pieces
+	WELCOME
 	INSTALL BOX
 	MISCELLANEOUS
 
@@ -68,6 +68,7 @@ th, td {padding: 0;}
 	position: fixed;
 	top: 0;
 	overflow: auto;
+	display: none;
 }
 
 #logo {
@@ -122,26 +123,6 @@ th, td {padding: 0;}
 	height: 21px;
 	width: 21px;
 	background-color: #999;
-}
-
-/* Login Form */
-
-#loginForm {
-	float: right;
-	margin: 2px 0 0 12px;
-	color: #999;
-	padding: 1px 1px 1px 1px;;
-}
-
-#loginForm input {
-	background: #CCC;
-	color: #333;
-	margin-right: 4px;
-	width: 5em;
-}
-
-#loginForm input[type=text] {
-	border: 1px solid #CCC;
 }
 
 /* PANELS: moveable, resizeable windows overlaying the map */
@@ -395,6 +376,7 @@ th, td {padding: 0;}
 #map {
 	position: relative;
 	margin: 200px 200px 200px 200px;
+	display: none;
 }
 
 /* Layers */
@@ -424,6 +406,23 @@ th, td {padding: 0;}
 	opacity: 0.8;
 }
 .pieceMover.selected {border: black;}
+
+/* WELCOME */
+
+#welcome {
+	margin: 0 auto;
+	width: 600px;
+	display: none;
+}
+
+#welcome table {
+	width: 100%;
+}
+
+#welcome td, #welcome th {
+	vertical-align: top;
+	padding: 0.2em 0;
+}
 
 /* INSTALL BOX */
 

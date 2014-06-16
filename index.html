@@ -39,8 +39,7 @@
 				The database server URL, the name of the database, and the
 				username and password required to access the database will vary
 				from site to site. (Live Tabletop will try to create the database
-				if it does not yet exist.)
-				
+				if it does not yet exist.)	
 			</p>
 			<table>
 				<tr><td>Database Server (URL): </td><td><input type="text" size="12" name="location"/></td></tr>
@@ -49,8 +48,10 @@
 				<tr><td>Database Password: </td><td><input type="password" size="12" name="password"/></td></tr>
 				<tr>
 					<td colspan="2">
-						<p>Choose a username and password for Live Tabletop
-						administration. (This is not a user account.)</p>
+						<p>
+							Choose a username and password for Live Tabletop
+							administration. (This is not a user account.)
+						</p>
 					</td>
 				</tr>
 				<tr><td>Administrator Username: </td><td><input type="text" size="12" name="admin_login"/></td></tr>
@@ -59,6 +60,42 @@
 			</table>
 			<input type="button" value="Configure Live Tabletop"/>
 		</form>
+
+		<!-- welcome screen -->
+		<div id="welcome">
+			<h1>Welcome to Live Tabletop!</h1>
+			<div id="video"></div>
+			<p>
+				Play tabletop roleplaying games online with your friends.
+				Live Tabletop provides the game boards, pieces and dice.
+				You supply the imagination, stories, rules and snacks.
+				Live Tabletop is free to use and open source.
+			</p>
+			<table>
+				<tr>
+					<td>
+						<table id="loginForm">
+							<tr><th colspan="2">Login to Your Account</th></tr>
+							<tr><td>login name</td><td><input type="text" name="login"/></td></tr>
+							<tr><td>password</td><td><input type="password" name="password"/></td></tr>
+							<tr><th colspan="2"><input type="button" value="log in"/></th></tr>
+						</table>
+					</td>
+					<td>
+						<table id="signupForm">
+							<tr><th colspan="2">Create a New Account</th></tr>
+							<tr><td>login name</td><td><input type="text" name="login"/></td></tr>
+							<tr><td>password</td><td><input type="password" name="password"/></td></tr>
+							<tr><td>retype password</td><td><input type="password" name="retype_password"/></td></tr>
+							<tr><td>e-mail address</td><td><input type="text" name="email"/></td></tr>
+							<tr><td colspan="2"><input type="checkbox" checked="checked" name="subscribed" id="subscribe"/>
+								<label for="subscribe">receive e-mail about Live Tabletop</label></td></tr>
+							<tr><th colspan="2"><input type="button" value="create account"/></th></tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</div>
 
 		<!-- displays the campaign's current map -->
 		<div id="map">
@@ -83,23 +120,13 @@
 			</div>
 			<div class="tabBar">
 				<div class="tab" data-tab="user list">Friends</div>
-				<div class="tab" data-tab="user info">My Account</div>
-				<div class="tab active" data-tab="help">Help</div>
+				<div class="tab active" data-tab="user info">My Account</div>
 			</div>
 			<div class="content" data-tab="user list">
 			</div>
 			<div class="content" data-tab="user info">
 				<a id="logout">Logout</a>
 				<a id="defaultPanels">Default Panels</a>
-			</div>
-			<div class="content" data-tab="help">
-				<form id="userCreator">
-					<!-- FIXME: placeholder not supported in IE9 and earlier -->
-					<input type="text" name="username" placeholder="username"/>
-					<input type="password" name="password" placeholder="password"/>
-					<input type="password" name="retype_password" placeholder="re-type password"/>
-					<input type="button" id="createUser" value="Create Account"/>
-				</form>
 			</div>
 			<div class="bottom">
 				<div class="resizeBL"></div>
@@ -390,11 +417,6 @@
 				<div class="panelButton" data-panel="map">Map</div>
 				<div class="panelButton" data-panel="character">Character</div>
 			</div>
-			<form id="loginForm">
-				<input type="text" name="username" placeholder="username"/>
-				<input type="text" name="password" placeholder="password"/>
-				<input type="button" value="Login">
-			</form>
 			<div id="viewControls">
 				<input type="button" value="-"/>
 				<input type="button" value="+"/>

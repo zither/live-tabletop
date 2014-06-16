@@ -1,22 +1,26 @@
 $(function () { // This anonymous function runs after the page loads.
+
+	// create account
+	$("#signupForm input[type=button]").click(function () {
+		$.post("php/User.create.php", LT.formValues("#signupForm"), function (theData) {
+			LT.login(new LT.User(theData));
+		}, "json");
+	});
+
+	// login form
 	$("#loginForm input[type=button]").click(function () {
-		$.post("php/login.php", LT.formValues("#loginForm"), function (data) {
-			LT.login(new LT.User(data[0]));
+		$.post("php/User.login.php", LT.formValues("#loginForm"), function (theData) {
+			LT.login(new LT.User(theData));
 		}, "json").fail(function () {
 			alert("Incorrect username or password.");
 		});
 	});
-});
 
-LT.loginCheck = function () {
-//	LT.createUserPanel(); // FIXME: why was this here?.
-	$.post("php/User.check.php", function (theData) {
-		LT.login(new LT.User(theData));
-	}, "json");
-};
+});
 
 LT.login = function (theUser) {
 	LT.currentUser = theUser;
+	LT.alert("You have logged in.");
 
 	$.post("php/read_users.php", function (data) {
 		LT.users = {};
@@ -25,33 +29,23 @@ LT.login = function (theUser) {
 		LT.User.populateSelectors();
 	}, "json");
 
-	$("#loginForm").hide();
-	$("#userButton").show();
+	$("#welcome").hide();
+	$("#map, #pageBar").show();
 	$("#userButtonCaption").text(LT.currentUser.name);
-
-	LT.Piece.readImages();
-	LT.Table.readImages();
-	LT.Tile.readImages();
-
 	LT.Panel.loadCookie();
 
-	LT.alert("You have logged in.");
+	LT.Piece.readImages();
+	LT.Map.readImages();
+	LT.Tile.readImages();
+
 //	LT.refreshChatPanel(); // FIXME: don't do this until a campaign is loaded
 
 	// TODO: load a table by id if there's a cookie for it
-	// FIXME: campaign or map?
+	// FIXME: campaign or map? both? what other lists?
 	LT.refreshMaps();
 
 	LT.holdTimestamps = 0;
 	setInterval(LT.checkTimestamps, 2000);
 };
 
-LT.logout = function () {
-	LT.ajaxRequest("POST", "php/logout.php", {});
-	LT.userPanel.hide();
-	$("#loginForm").show();
-	$("#userButton").hide();
-	LT.alert("You have logged out.");
-	LT.currentUser = 0; // FIXME: null? delete?
-};
 
