@@ -32,7 +32,8 @@
 	</head>
 	<body>
 
-		<!-- installer, should be hidden when Live Tabletop is installed -->
+		<!-- INSTALLER, should be hidden when Live Tabletop is installed -->
+
 		<form id="installBox">
 			<p>
 				Live Tabletop needs to be configured to complete installation.
@@ -61,49 +62,65 @@
 			<input type="button" value="Configure Live Tabletop"/>
 		</form>
 
-		<!-- welcome screen -->
+		<!-- WELCOME SCREEN -->
+
 		<div id="welcome">
 			<h1>Welcome to Live Tabletop!</h1>
 			<p>
-				Play tabletop roleplaying games online with your friends.
-				Live Tabletop provides the game boards, pieces and dice.
-				You supply the imagination, stories, rules and snacks.
+				Play tabletop roleplaying games online with your friends.<br/>
+				Live Tabletop provides the game boards, pieces and dice.<br/>
+				You supply the imagination, stories, rules and snacks.<br/>
 				Live Tabletop is free to use and open source.
 			</p>
-			<p class="video">
-				<iframe width="400" height="225" src="//www.youtube-nocookie.com/embed/BWAK0J8Uhzk?rel=0" frameborder="0" allowfullscreen></iframe>
-			</p>
-			<table>
-				<tr>
-					<td>
-						<div class="box">
-						<table id="loginForm">
-							<tr><th colspan="2">Login to Your Account</th></tr>
-							<tr><td>login name</td><td><input type="text" name="login"/></td></tr>
-							<tr><td>password</td><td><input type="password" name="password"/></td></tr>
-							<tr><th colspan="2"><input type="button" value="log in"/></th></tr>
-						</table>
-						</div>
-					</td>
-					<td>
-						<div class="box">
-						<table id="signupForm">
-							<tr><th colspan="2">Create a New Account</th></tr>
-							<tr><td>login name</td><td><input type="text" name="login"/></td></tr>
-							<tr><td>password</td><td><input type="password" name="password"/></td></tr>
-							<tr><td>retype password</td><td><input type="password" name="retype_password"/></td></tr>
-							<tr><td>e-mail address</td><td><input type="text" name="email"/></td></tr>
-							<tr><td colspan="2"><input type="checkbox" checked="checked" name="subscribed" id="subscribe"/>
-								<label for="subscribe">receive e-mail about Live Tabletop</label></td></tr>
-							<tr><th colspan="2"><input type="button" value="create account"/></th></tr>
-						</table>
-						</div>
-					</td>
-				</tr>
-			</table>
+			<iframe width="320" height="180" src="//www.youtube-nocookie.com/embed/BWAK0J8Uhzk?rel=0" frameborder="0" allowfullscreen></iframe>
+			<div class="box" id="loginForm">
+				<h2>Log in to Your Account</h2>
+				<table>
+					<tr><td>e-mail address</td><td><input type="text" name="email"/></td></tr>
+					<tr><td>password</td><td><input type="password" name="password"/></td></tr>
+				</table>
+				<input type="button" value="log in"/>
+			</div>
+			or
+			<div class="box collapsed" id="signupForm">
+				<h2>Create a New Account</h2>
+				<div>e-mail address <input type="text" name="email"/></div>
+				<div>
+					<input type="checkbox" checked="checked" name="subscribed" id="subscribe"/>
+					<label for="subscribe">receive e-mail about Live Tabletop</label>
+				</div>
+				<div><input type="button" value="create account"/></div>
+			</div>
+			<a href="#" id="resetPasswordLink">forgot your password?</a>
+			<div class="box" id="resetPasswordForm">
+				<h2>Reset Password</h2>
+				<p>Enter your e-mail address and we will send you a link to change your password.</p>
+				<div><input type="text" name="email"/></div>
+				<div><input type="button" value="send me the link"/></div>
+			</div>
 		</div>
 
-		<!-- displays the campaign's current map -->
+		<div class="box" id="passwordForm">
+			<h2>New Password</h2>
+			<table>
+				<tr><td>password</td><td><input type="password" name="password"/></td></tr>
+				<tr><td>retype password</td><td><input type="password" name="retype_password"/></td></tr>
+			</table>
+			<input type="hidden" name="resetCode"/>
+			<input type="button" value="set password and log in"/>
+		</div>
+
+		<div class="box" id="unsubscribeForm">
+			<h2>Unsubscribed</h2>
+			<p>
+				<span>foo@bar.com</span> will no longer receive Live Tabletop e-mail updates
+				unless you re-enable this option in your account settings.
+			</p>
+			<a href="#">Live Tabletop</a>
+		</div>
+
+		<!-- MAP (the campaign's current map) -->
+
 		<div id="map">
 			<div id="tileLayer"></div>
 			<div id="wallLayer"></div>
@@ -116,7 +133,9 @@
 			</div>
 		</div>
 
-		<!-- panels -->
+		<!-- PANELS -->
+
+		<!-- User Panel -->
 		<div class="panel" data-panel="user">
 			<div class="title">
 				<div class="resizeTL"></div>
@@ -140,6 +159,7 @@
 			</div>
 		</div>
 
+		<!-- Campaign Panel -->
 		<div class="panel" data-panel="campaign">
 			<div class="title">
 				<div class="resizeTL"></div>
@@ -199,7 +219,7 @@
 			</div>
 		</div>
 
-
+		<!-- Map Panel -->
 		<div class="panel" data-panel="map">
 			<div class="title">
 				<div class="resizeTL"></div>
@@ -378,6 +398,7 @@
 			</div>
 		</div>
 
+		<!-- Character Panel -->
 		<div class="panel" data-panel="character">
 			<div class="title">
 				<div class="resizeTL"></div>
@@ -414,7 +435,8 @@
 		</div>
 
 
-		<!-- permanent controls at the top of the page -->
+		<!-- PAGE BAR (permanent controls at the top of the page) -->
+
 		<div id="pageBar">
 			<div id="logo"></div>
 			<div id="panelButtons">

@@ -14,11 +14,10 @@ if (!isset($_SESSION['user'])) {
 $user = intval($_SESSION['user']);
 $name = $LT_SQL->real_escape_string($_REQUEST['name']);
 $color = $LT_SQL->real_escape_string($_REQUEST['color']);
-$email = $LT_SQL->real_escape_string($_REQUEST['email']);
 $subscribed = intval($_REQUEST['subscribed']);
 
 // Query the Database
 
-LT_call('update_user', $user, $name, $color, $email, $subscribed);
+LT_call('update_user', $user, $subscribed, $name, $color);
 
 ?>

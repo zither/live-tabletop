@@ -1,12 +1,5 @@
 $(function () { // This anonymous function runs after the page loads.
 
-	// create account
-	$("#signupForm input[type=button]").click(function () {
-		$.post("php/User.create.php", LT.formValues("#signupForm"), function (theData) {
-			LT.login(new LT.User(theData));
-		}, "json");
-	});
-
 	// login form
 	$("#loginForm input[type=button]").click(function () {
 		$.post("php/User.login.php", LT.formValues("#loginForm"), function (theData) {
@@ -14,6 +7,53 @@ $(function () { // This anonymous function runs after the page loads.
 		}, "json").fail(function () {
 			alert("Incorrect username or password.");
 		});
+	});
+	$("#loginForm h2").click(function () {
+		$("#loginForm").removeClass("collapsed");
+		$("#signupForm").addClass("collapsed");
+		$("#resetPasswordForm").hide();
+		$("#resetPasswordLink").show();
+	});
+
+	// create account
+	$("#signupForm input[type=button]").click(function () {
+		$.post("php/User.create.php", LT.formValues("#signupForm"), function (theData) {
+			alert("A confirmation e-mail has been sent to foo@bar.com. " // FIXME: your e-mail address
+				+ "Click on the link in that e-mail to activate the account and set your password.");
+		}, "json");
+	});
+	$("#signupForm h2").click(function () {
+		$("#signupForm").removeClass("collapsed");
+		$("#loginForm").addClass("collapsed");
+		$("#resetPasswordForm").hide();
+		$("#resetPasswordLink").show();
+	});
+
+	// send link to reset password
+	$("#resetPasswordForm input[type=button]").click(function () {
+		$.post("php/User.resetPassword.php", LT.formValues("#resetPasswordForm"), function (theData) {
+			alert("An e-mail has been sent to foo@bar.com. " // FIXME: your e-mail address
+				+ "Click on the link in that e-mail to reset your password.");
+		}, "json");
+	});
+	$("#resetPasswordLink").click(function () {
+		$("#loginForm, #signupForm").addClass("collapsed");
+		$("#resetPasswordLink").hide();
+		$("#resetPasswordForm").show();
+	});
+
+	// create or change password
+	$("#passwordForm input[type=button]").click(function () {
+		$.post("php/User.password.php", LT.formValues("#passwordForm"), function (theData) {
+			LT.login(new LT.User(theData));
+		}, "json");
+	});
+
+	// unsubscribe from e-mail announcements
+	$("#unsubscribeForm a").click(function () {
+		$("#unsubscribeForm").hide();
+		$("#welcome").show();
+		return false;
 	});
 
 });

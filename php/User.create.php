@@ -8,31 +8,34 @@ include('include/output.php');
 session_start();
 
 // Interpret the Request
-
-$login = $LT_SQL->real_escape_string($_REQUEST['login']);
-$password = $LT_SQL->real_escape_string($_REQUEST['password']);
 $email = $LT_SQL->real_escape_string($_REQUEST['email']);
 $subscribed = intval($_REQUEST['subscribed']); // 0 or 1
 
-$salt = LT_random_salt();
-$hash = LT_hash_password($password, $salt);
-
 // Query the Database
+if ($rows = LT_call_silent('read_user_login', $email)) {
 
-// don't create a new user if one with this login already exists
-if ($rows = LT_call_silent('read_user_login', $login)) {
+	// don't create a new user if one with this email already exists
 	header('HTTP/1.1 401 Unauthorized', true, 401);
-	exit("Invalid username or password.");
-}
-// otherwise create a new user and login immediately
-else {
-	$rows = LT_call('create_user', $login, $hash, $salt, $email, $subscribed);
-	// the server associates the user with this session
-	$_SESSION['user'] = $rows[0]['id'];
-	// return the user as a json object
-	LT_output_object($rows[0], array(
-		'boolean' => array('subscribed'),
-		'integer' => array('id', 'last_action')));
+	exit("You may not create an account with this e-mail address.");
+
+} else {
+
+	// create a new user and return the user id
+	$reset_code = LT_random_salt();
+	$unsubscribe_code = LT_random_salt();
+	$rows = LT_call('create_user',
+		$email, $reset_code, $subscribed, $unsubscribe_code);
+	LT_output_object($rows[0], array('integer' => array('id')));
+
+	// compose and send the confirmation e-mail
+	$subject = "Welcome to Live Tabletop";
+	$message =
+		wordwrap("Click on this link to activate your Live Tabletop account.", 70)
+		. "\r\nhttp://{$_SERVER['HTTP_HOST']}"
+		. str_replace("/php/User.create.php", "", $_SERVER['REQUEST_URI'])
+		. "?resetCode=$reset_code&email=$email";
+	mail($email, $subject, $message);
+
 }
 
 ?>

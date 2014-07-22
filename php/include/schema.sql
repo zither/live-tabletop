@@ -8,13 +8,15 @@ DROP PROCEDURE IF EXISTS update_admin_password;
 DROP PROCEDURE IF EXISTS delete_admin;
 
 DROP PROCEDURE IF EXISTS create_user;
-DROP PROCEDURE IF EXISTS read_user_login;
 DROP PROCEDURE IF EXISTS read_user;
+DROP PROCEDURE IF EXISTS read_user_login;
+DROP PROCEDURE IF EXISTS read_user_reset_code;
 DROP PROCEDURE IF EXISTS read_users;
+DROP PROCEDURE IF EXISTS update_user;
 DROP PROCEDURE IF EXISTS update_user_logged_in;
 DROP PROCEDURE IF EXISTS update_user_password;
-DROP PROCEDURE IF EXISTS update_user;
 DROP PROCEDURE IF EXISTS update_user_timestamp;
+DROP PROCEDURE IF EXISTS update_user_unsubscribe;
 DROP PROCEDURE IF EXISTS delete_user;
 DROP PROCEDURE IF EXISTS create_friend;
 DROP PROCEDURE IF EXISTS read_friends;
@@ -110,31 +112,33 @@ CREATE TABLE admins (
 	makes dictionary attacks harder: the attacker has to guess passwords
 	for each user separately because the users have different salts.
 
-	login: user login name, must be unique, visible to everyone, unchangeable
-		It is VARCHAR(200) because MYSQL can only index finite length strings.
-		Other references to the user (like cross-references between tables)
-		use the auto-incrementing id.
+	email: users are identified by their e-mail address, which must be unique
+		It is VARCHAR(200) instead of TEXT because unique fields must be hashable.
 	hash: hashed password, visible to PHP logic but not HTTP requests
 	salt: random password salt, visible to PHP logic but not HTTP requests
+	reset_code: a temporary code for changing password through an e-mail link
+	reset_time: the expiration timer for the temporary reset_code
+	subscribed: 1 if the user wants to receive Live Tabletop announcements
+	unsubscribe_code: a random code for unsubscribing with an e-mail link
 	last_action: indicates whether the user has been active recently
 	logged_in: 0 if the user has logged out since his last login
 	name: preferred form of address, not unique, can be changed at any time
 	color: ???
-	email: the user's e-mail address for contact and password reset
-	subscribed: 1 if the user wants to receive Live Tabletop announcements
 */
 
 CREATE TABLE users (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
-	`login` VARCHAR(200) NOT NULL UNIQUE,
-	`hash` TEXT NOT NULL,
-	`salt` TEXT NOT NULL,
+	`email` VARCHAR(200) NOT NULL UNIQUE,
+	`hash` TEXT,
+	`salt` TEXT,
+	`reset_code` TEXT,
+	`reset_time` DATETIME,
+	`subscribed` TINYINT NOT NULL DEFAULT 1,
+	`unsubscribe_code` TEXT NOT NULL,
 	`last_action` TIMESTAMP,
 	`logged_in` TINYINT NOT NULL DEFAULT 1,
 	`name` TEXT,
-	`color` TEXT,
-	`email` TEXT,
-	`subscribed` TINYINT NOT NULL DEFAULT 0);
+	`color` TEXT);
 
 
 /* FRIENDS TABLE
@@ -412,41 +416,55 @@ END;
 /*** USERS PROCEDURES ***/
 
 /* User creates his own account */
-CREATE PROCEDURE create_user (IN the_login VARCHAR(200), IN the_hash TEXT,
-	IN the_salt TEXT, IN the_email TEXT, IN the_subscribed TINYINT)
+CREATE PROCEDURE create_user (
+	IN the_email VARCHAR(200), IN the_reset_code TEXT,
+	IN the_subscribed TINYINT, IN the_unsubscribe_code TEXT)
 BEGIN
 	START TRANSACTION;
-	INSERT INTO users (login, hash, salt, last_action, email, subscribed)
-		VALUES 
-			(the_login, the_hash, the_salt, NOW(), the_email, the_subscribed);
-	SELECT id, login, UNIX_TIMESTAMP(last_action) AS last_action, name, color,
-		email, subscribed
-		FROM users WHERE id = LAST_INSERT_ID();
+	INSERT INTO users (email, reset_code, reset_time,
+			subscribed, unsubscribe_code, last_action)
+		VALUES (the_email, the_reset_code, DATE_ADD(NOW(), INTERVAL 24 HOUR),
+			the_subscribed, the_unsubscribe_code, NOW());
+	SELECT LAST_INSERT_ID() AS id;
 	COMMIT;
 END;
 
-/* User must validates his password to log in */
-CREATE PROCEDURE read_user_login (IN the_login VARCHAR(200))
-BEGIN
-	SELECT id, login, hash, salt, UNIX_TIMESTAMP(last_action) AS last_action,
-		logged_in, name, color, email, subscribed
-		FROM users WHERE login = the_login;
-END;
-
 /* User views his own account info
-or User views another user's id, login, logged_in, name and color */
+or User views another user's id, logged_in, name and color */
 CREATE PROCEDURE read_user (IN the_user INT)
 BEGIN
-	SELECT id, login, logged_in, name, color, email, subscribed
+	SELECT id, email, subscribed, logged_in, name, color
 		FROM users WHERE id = the_user;
+END;
+
+/* User must validate his password to log in
+or User creates an account if this email is available */
+CREATE PROCEDURE read_user_login (IN the_email VARCHAR(200))
+BEGIN
+	SELECT id, email, hash, salt, subscribed, name, color
+		FROM users WHERE email = the_email;
+END;
+
+/* User must provide a secret code to reset their password */
+CREATE PROCEDURE read_user_reset_code (IN the_email VARCHAR(200))
+BEGIN
+	SELECT id, reset_code FROM users
+		WHERE email = the_email AND reset_time < NOW();
 END;
 
 /* Admin views all users */
 CREATE PROCEDURE read_users ()
 BEGIN
-	SELECT id, login, UNIX_TIMESTAMP(last_action) AS last_action,
-		logged_in, name, color, email, subscribed
-		FROM users ORDER BY name, login, id;
+	SELECT id, email, subscribed, UNIX_TIMESTAMP(last_action) AS last_action,
+		logged_in, name, color FROM users ORDER BY name, email, id;
+END;
+
+/* User updates his account information */
+CREATE PROCEDURE update_user (IN the_user INT, IN the_subscribed TINYINT,
+	IN the_name VARCHAR(200), IN the_color TEXT)
+BEGIN
+	UPDATE users SET subscribed = the_subscribed, name = the_name,
+		color = the_color, last_action = NOW() WHERE id = the_user;
 END;
 
 /* User has logged in or logged out */
@@ -461,16 +479,19 @@ or Admin resets his password */
 CREATE PROCEDURE update_user_password
 	(IN the_user INT, IN the_hash TEXT, IN the_salt TEXT)
 BEGIN
-	UPDATE users SET hash = the_hash, salt = the_salt, last_action = NOW()
-	WHERE id = the_user;
+	UPDATE users SET hash = the_hash, salt = the_salt, last_action = NOW(),
+		reset_code = NULL, reset_time = NULL WHERE id = the_user;
 END;
 
-/* User updates his account information */
-CREATE PROCEDURE update_user (IN the_user INT, IN the_name VARCHAR(200),
-	IN the_color TEXT, IN the_email TEXT, IN the_subscribed TINYINT)
+/* User clicks an unsubscribe link in their e-mail */
+CREATE PROCEDURE update_user_unsubscribe
+	(IN the_email VARCHAR(200), IN the_unsubscribe_code TEXT)
 BEGIN
-	UPDATE users SET name = the_name, color = the_color, last_action = NOW(),
-		email = the_email, subscribed = the_subscribed WHERE id = the_user;
+	START TRANSACTION;
+	UPDATE users SET subscribed = 0
+		WHERE email = the_email AND unsubscribe_code = the_unsubscribe_code;
+	SELECT ROW_COUNT() AS success;
+	COMMIT;
 END;
 
 /* User sent a message or changed something */
@@ -645,13 +666,13 @@ CREATE PROCEDURE read_campaign_user_campaigns (IN the_user INT)
 BEGIN
 	SELECT `campaign`, `name`, `permission` FROM campaign_users
 		WHERE `user` = the_user AND `permission` IN ('owner', 'member')
-		ORDER BY name, `campaign`;
+		ORDER BY `name`, `campaign`;
 END;
 
 /* User views the owners, members, viewers and blacklist of this campaign */
 CREATE PROCEDURE read_campaign_users (IN the_campaign INT)
 BEGIN
-	SELECT `user`, `permission`, `viewing`, `avatar`, `login`, users.name AS name
+	SELECT `user`, `permission`, `viewing`, `avatar`, users.name AS `name`
 		FROM campaign_users JOIN users ON `id` = `user`
 		WHERE `campaign` = the_campaign;
 END;
@@ -847,7 +868,7 @@ CREATE PROCEDURE update_map_tiles
 BEGIN
 	UPDATE maps SET `tile_changes` = `tile_changes` + 1,
 		`tiles` = the_tiles, `flags` = the_flags
-		WHERE id = the_map;
+		WHERE `id` = the_map;
 END;
 
 /* User resizes a map */
@@ -900,7 +921,7 @@ END;
 /* User opens a map and sees the map's owners */
 CREATE PROCEDURE read_map_owners (IN the_map INT)
 BEGIN
-	SELECT `id`, `login`, `logged_in`, `name`, `color`
+	SELECT `id`, `logged_in`, `name`, `color`
 		FROM map_owners JOIN users ON `id` = `user` WHERE `map` = the_map;
 END;
 
@@ -1044,7 +1065,7 @@ END;
 /* User views a list of this character's owners */
 CREATE PROCEDURE read_character_owners (IN the_character INT)
 BEGIN
-	SELECT `id`, `login`, `logged_in`, `name`, `color`
+	SELECT `id`, `logged_in`, `name`, `color`
 		FROM character_owners JOIN users ON `id` = `user`
 		WHERE `character` = the_character;
 END;
