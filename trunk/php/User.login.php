@@ -9,12 +9,12 @@ session_start();
 
 // Interpret the Request
 
-$login = $LT_SQL->real_escape_string($_REQUEST['login']);
+$email = $LT_SQL->real_escape_string($_REQUEST['email']);
 $password = $LT_SQL->real_escape_string($_REQUEST['password']);
 
 // Query the Database and Generate Output
 
-if ($rows = LT_call_silent('read_user_login', $login)) {
+if ($rows = LT_call_silent('read_user_login', $email)) {
   $hash = LT_hash_password($password, $rows[0]['salt']);
   if (strcmp($hash, $rows[0]['hash']) == 0) {
 		// the server associates the user with this session
@@ -24,8 +24,8 @@ if ($rows = LT_call_silent('read_user_login', $login)) {
 		// return the user as a json object
 		LT_output_object($rows[0], array(
 			'boolean' => array('subscribed'),
-			'integer' => array('id', 'last_action'),
-			'blocked' => array('hash', 'salt', 'logged_in')));
+			'integer' => array('id'),
+			'blocked' => array('hash', 'salt')));
 		exit();
   }
 }

@@ -412,31 +412,53 @@ th, td {padding: 0;}
 /* WELCOME */
 
 #welcome {
-	margin: 0 auto;
-	width: 600px;
 	display: none;
+	text-align: center;
+}
+#welcome h1 {margin: 14px 0 0 0;} 
+#welcome p {
+	text-align: left;
+	margin: 7px auto;
+	padding: 0 0 0 45px;
+	width: 400px;
 }
 
-#welcome .video {text-align: center}
-
-#welcome table {
-	width: 100%;
-}
-
-#welcome td, #welcome th {
-	vertical-align: top;
-	padding: 3px 0;
-}
-
-#welcome .box {
+.box {
 	border: solid black 1px;
 	background: white;
 	border-radius: 10px;
-	margin: 3px;
-	padding: 0 7px;
+	padding: 7px 0;
+	margin: 7px auto;
+	width: 300px;
+	text-align: center;
 }
+.box h2 {margin: 0;}
+.box td {
+	text-align: left;
+	vertical-align: top;
+	padding: 3px 0;
+}
+.box td+td {text-align: right;}
 
-#welcome table table td+td {text-align: right;}
+.box.collapsed * {display: none;}
+.box.collapsed h2 {display: block;}
+
+#loginForm table {
+	margin: 0 auto;
+	width: 275px;
+}
+#passwordForm table {
+	margin: 0 auto;
+	width: 285px;
+}
+#resetPasswordForm p {
+	text-align: left;
+	padding: 0 14px;
+	width: auto;
+}
+#passwordForm {display: none;}
+#unsubscribeForm {display: none;}
+#resetPasswordForm {display: none;}
 
 /* INSTALL BOX */
 
