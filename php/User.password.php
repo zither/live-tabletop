@@ -5,6 +5,7 @@ include('include/query.php');
 include('include/password.php');
 
 session_start();
+
 if (isset($_SESSION['user'])) {
 	// if you are logged in, use the current session's user id
 	$user = intval($_SESSION['user']);
@@ -15,9 +16,12 @@ if (isset($_SESSION['user'])) {
 	$rows = LT_call('read_user_reset_code', $email);
 	if ($rows and $rows[0]['reset_code'] == $resetCode)
 		$user = intval($rows[0]['id']);
-}
-
-if (!isset($user)) {
+	else {
+		// you are not logged in and did not provide a valid reset code
+		header('HTTP/1.1 401 Unauthorized', true, 401);
+		exit('Invalid reset code.');
+	}
+} else {
 	// you are not logged in and did not provide a valid reset code
 	header('HTTP/1.1 401 Unauthorized', true, 401);
 	exit('You are not logged in.');
