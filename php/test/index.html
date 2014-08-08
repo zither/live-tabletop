@@ -147,8 +147,15 @@ TEST.tests = [
 		return "PASS";}},
 	{action: "../User.login.php", args: TEST.USER2, result: TEST.unauthorized},
 	{action: "../Admin.login.php", args: TEST.ADMIN1, result: TEST.blank},
-	{action: "../Admin.userPassword.php", args: function () {return TEST.USER2;}, result: TEST.blank},
+	{action: "../Admin.users.php", args: function () {return TEST.USER2;}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		for (var i = 0; i < data.length; i++)
+			if (data[i].id = TEST.USER2.user)
+				TEST.USER2.resetCode = data[i].reset_code;
+		return "PASS";}},
 	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
+	{action: "../User.password.php", args: function () {return TEST.USER2;}, result: TEST.blank},
 	{action: "../User.login.php", args: TEST.USER2, result: TEST.exists},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
@@ -225,6 +232,26 @@ TEST.tests = [
 	{action: "../User.password.php", args: {password: TEST.USER2.password}, result: TEST.blank},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
+	{group: "USER RESET PASSWORD"},
+	{action: "../User.resetPassword.php", args: {email: TEST.USER2.email}, result: TEST.blank},
+	{action: "../User.login.php", args: TEST.USER2, result: TEST.unauthorized},
+	{action: "../Admin.login.php", args: TEST.ADMIN1, result: TEST.blank},
+	{action: "../Admin.users.php", args: function () {return TEST.USER2;}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		for (var i = 0; i < data.length; i++)
+			if (data[i].id = TEST.USER2.user)
+				TEST.USER2.resetCode = data[i].reset_code;
+		TEST.USER2.password += "_new";
+		return "PASS";}},
+	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
+	{action: "../User.password.php", args: function() {return TEST.USER2;}, result: TEST.blank},
+	{action: "../User.login.php", args: function () {return TEST.USER2;}, result: TEST.exists},
+	{action: "../User.password.php", args: function () {
+		TEST.USER2.password = TEST.USER2.password.slice(0, -("_new".length));
+		return {password: TEST.USER2.password};}, result: TEST.blank},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
+
 	{group: "USER.FRIENDS"},
 	{action: "../User.friends.php", args: {}, result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER2, result: TEST.exists},
@@ -244,8 +271,15 @@ TEST.tests = [
 		return "PASS";}},
 	{action: "../User.login.php", args: TEST.USER3, result: TEST.unauthorized},
 	{action: "../Admin.login.php", args: TEST.ADMIN1, result: TEST.blank},
-	{action: "../Admin.userPassword.php", args: function () {return TEST.USER3;}, result: TEST.blank},
+	{action: "../Admin.users.php", args: {}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		for (var i = 0; i < data.length; i++)
+			if (data[i].id == TEST.USER3.user)
+				TEST.USER3.resetCode = data[i].reset_code;
+		return "PASS";}},
 	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
+	{action: "../User.password.php", args: function () {return TEST.USER3;}, result: TEST.blank},
 	{action: "../User.login.php", args: TEST.USER3, result: TEST.exists},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 	{action: "../User.login.php", args: TEST.USER2, result: TEST.exists},

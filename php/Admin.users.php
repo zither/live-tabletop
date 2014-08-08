@@ -14,7 +14,7 @@ if (!isset($_SESSION['admin'])) {
 
 if (is_array($rows = LT_call('read_users')))
 	LT_output_array($rows, array(
-		'integer' => array('id', 'last_action'),
+		'integer' => array('id', 'reset_time', 'last_action'),
 		'boolean' => array('logged_in', 'subscribed')));
 
 ?>
