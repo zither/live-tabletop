@@ -34,6 +34,10 @@ $(function () { // This anonymous function runs after the page loads.
 		$.post("php/User.resetPassword.php", LT.formValues("#resetPasswordForm"), function (theData) {
 			alert("An e-mail has been sent to foo@bar.com. " // FIXME: your e-mail address
 				+ "Click on the link in that e-mail to reset your password.");
+			$("#loginForm, #signupForm").removeClass("collapsed");
+			$("#signupForm").addClass("collapsed");
+			$("#resetPasswordLink").show();
+			$("#resetPasswordForm").hide();
 		}, "json");
 	});
 	$("#resetPasswordLink").click(function () {
