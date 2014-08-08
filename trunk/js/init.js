@@ -16,6 +16,7 @@ $(function () { // This anonymous function runs after the page loads.
 	} else if (args.resetCode) {
 		// TODO: reset password immediately or only after filling out form?
 		$("#passwordForm input[name=resetCode]").val(args.resetCode);
+		$("#passwordForm input[name=email]").val(args.email);
 		$("#passwordForm").show();
 	} else {
 		$.post("php/db_config.php", function () {

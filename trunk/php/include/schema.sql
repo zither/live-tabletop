@@ -15,6 +15,7 @@ DROP PROCEDURE IF EXISTS read_users;
 DROP PROCEDURE IF EXISTS update_user;
 DROP PROCEDURE IF EXISTS update_user_logged_in;
 DROP PROCEDURE IF EXISTS update_user_password;
+DROP PROCEDURE IF EXISTS update_user_reset_password;
 DROP PROCEDURE IF EXISTS update_user_timestamp;
 DROP PROCEDURE IF EXISTS update_user_unsubscribe;
 DROP PROCEDURE IF EXISTS delete_user;
@@ -449,13 +450,14 @@ END;
 CREATE PROCEDURE read_user_reset_code (IN the_email VARCHAR(200))
 BEGIN
 	SELECT id, reset_code FROM users
-		WHERE email = the_email AND reset_time < NOW();
+		WHERE email = the_email AND reset_time > NOW();
 END;
 
 /* Admin views all users */
 CREATE PROCEDURE read_users ()
 BEGIN
-	SELECT id, email, subscribed, UNIX_TIMESTAMP(last_action) AS last_action,
+	SELECT id, email, reset_code, UNIX_TIMESTAMP(reset_time) as reset_time,
+		subscribed, unsubscribe_code, UNIX_TIMESTAMP(last_action) AS last_action,
 		logged_in, name, color FROM users ORDER BY name, email, id;
 END;
 
@@ -474,13 +476,21 @@ BEGIN
 	UPDATE users SET logged_in = the_status WHERE id = the_user;
 END;
 
-/* User changes his password
-or Admin resets his password */
+/* User changes his password */
 CREATE PROCEDURE update_user_password
 	(IN the_user INT, IN the_hash TEXT, IN the_salt TEXT)
 BEGIN
 	UPDATE users SET hash = the_hash, salt = the_salt, last_action = NOW(),
 		reset_code = NULL, reset_time = NULL WHERE id = the_user;
+END;
+
+/* User resets his password */
+CREATE PROCEDURE update_user_reset_password
+	(IN the_email TEXT, IN the_reset_code TEXT)
+BEGIN
+	UPDATE users SET hash = NULL, salt = NULL, last_action = NOW(),
+		reset_code = the_reset_code, reset_time = DATE_ADD(NOW(), INTERVAL 24 HOUR)
+		WHERE email = the_email;
 END;
 
 /* User clicks an unsubscribe link in their e-mail */

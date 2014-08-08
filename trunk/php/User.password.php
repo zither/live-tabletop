@@ -10,10 +10,10 @@ if (isset($_SESSION['user'])) {
 	$user = intval($_SESSION['user']);
 } else if (isset($_REQUEST['resetCode']) and isset($_REQUEST['email'])) {
 	// if you are not logged in, check for a valid password reset code
-	$reset_code = $LT_SQL->real_escape_string($_REQUEST['resetCode']);
+	$resetCode = $LT_SQL->real_escape_string($_REQUEST['resetCode']);
 	$email = $LT_SQL->real_escape_string($_REQUEST['email']);
 	$rows = LT_call('read_user_reset_code', $email);
-	if ($rows and $rows[0]['reset_code'] == $reset_code)
+	if ($rows and $rows[0]['reset_code'] == $resetCode)
 		$user = intval($rows[0]['id']);
 }
 
