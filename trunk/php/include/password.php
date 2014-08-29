@@ -22,4 +22,3 @@ function LT_hash_password($password, $salt) {
 	return md5($salt . $password);
 }
 
-?>

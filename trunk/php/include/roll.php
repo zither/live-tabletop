@@ -46,4 +46,3 @@ function LT_expand_rolls($string) {
   return $output;
 }
 
-?>

@@ -142,4 +142,3 @@ function LT_can_edit_character($character) {
 	return FALSE; // a FALSE result could also mean an SQL error or bad id
 }
 
-?>

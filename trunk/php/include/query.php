@@ -88,4 +88,3 @@ function LT_request($variable, $default) {
 		return $LT_SQL->real_escape_string($default);
 }
 
-?>
