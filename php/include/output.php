@@ -25,5 +25,3 @@ function LT_output_array(&$data, $fields) {
 	echo json_encode($data);
 }
 
-?>
-

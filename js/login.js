@@ -40,7 +40,7 @@ $(function () { // This anonymous function runs after the page loads.
 			$("#resetPasswordForm").hide();
 		}, "json");
 	});
-	$("#resetPasswordLink").click(function () {
+	$("#resetPasswordLink").click(function () {LT.formValues("#passwordForm")
 		$("#loginForm, #signupForm").addClass("collapsed");
 		$("#resetPasswordLink").hide();
 		$("#resetPasswordForm").show();
@@ -48,9 +48,20 @@ $(function () { // This anonymous function runs after the page loads.
 
 	// create or change password
 	$("#passwordForm input[type=button]").click(function () {
-		$.post("php/User.password.php", LT.formValues("#passwordForm"), function (theData) {
-			LT.login(new LT.User(theData));
-		}, "json");
+		var form = LT.formValues("#passwordForm");
+		if (form.password != form.retype_password)
+			alert("Passwords do not match.");
+		else {
+			delete form.retype_password;
+			$.post("php/User.password.php", form, function (theData) {
+				delete form.resetCode;
+				$.post("php/User.login.php", form, function (theData) {
+					LT.login(new LT.User(theData));
+				}, "json").fail(function () {
+					alert("Incorrect username or password.");
+				});
+			}, "json");
+		}
 	});
 
 	// unsubscribe from e-mail announcements
