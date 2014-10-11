@@ -17,9 +17,10 @@ $(function () { // This anonymous function runs after the page loads.
 
 	// create account
 	$("#signupForm input[type=button]").click(function () {
-		$.post("php/User.create.php", LT.formValues("#signupForm"), function (theData) {
-			alert("A confirmation e-mail has been sent to foo@bar.com. " // FIXME: your e-mail address
-				+ "Click on the link in that e-mail to activate the account and set your password.");
+		var form = LT.formValues("#signupForm");
+		$.post("php/User.create.php", form, function (theData) {
+			alert("A confirmation e-mail has been sent to " + form.email
+				+ ". Click on the link in that e-mail to activate the account and set your password.");
 		}, "json");
 	});
 	$("#signupForm h2").click(function () {
@@ -31,19 +32,21 @@ $(function () { // This anonymous function runs after the page loads.
 
 	// send link to reset password
 	$("#resetPasswordForm input[type=button]").click(function () {
-		$.post("php/User.resetPassword.php", LT.formValues("#resetPasswordForm"), function (theData) {
-			alert("An e-mail has been sent to foo@bar.com. " // FIXME: your e-mail address
-				+ "Click on the link in that e-mail to reset your password.");
+		var form = LT.formValues("#resetPasswordForm");
+		$.post("php/User.resetPassword.php", form, function (theData) {
+			alert("An e-mail has been sent to " + form.email
+				+ ". Click on the link in that e-mail to reset your password.");
 			$("#loginForm, #signupForm").removeClass("collapsed");
 			$("#signupForm").addClass("collapsed");
 			$("#resetPasswordLink").show();
 			$("#resetPasswordForm").hide();
-		}, "json");
+		});
 	});
 	$("#resetPasswordLink").click(function () {LT.formValues("#passwordForm")
 		$("#loginForm, #signupForm").addClass("collapsed");
 		$("#resetPasswordLink").hide();
 		$("#resetPasswordForm").show();
+		return false; // do not follow link
 	});
 
 	// create or change password
@@ -56,18 +59,19 @@ $(function () { // This anonymous function runs after the page loads.
 			$.post("php/User.password.php", form, function (theData) {
 				delete form.resetCode;
 				$.post("php/User.login.php", form, function (theData) {
-					LT.login(new LT.User(theData));
+					location.href = location.href.split("?")[0]; // remove ?resetCode=
 				}, "json").fail(function () {
 					alert("Incorrect username or password.");
 				});
-			}, "json");
+			});
 		}
 	});
 
 	// unsubscribe from e-mail announcements
 	$("#unsubscribeForm a").click(function () {
-		$("#unsubscribeForm").hide();
-		$("#welcome").show();
+		// TODO: implement unsubscribe
+
+		location.href = location.href.split("?")[0]; // remove ?unsubscribeCode=
 		return false;
 	});
 
@@ -84,6 +88,7 @@ LT.login = function (theUser) {
 		LT.User.populateSelectors();
 	}, "json");
 
+	$("#passwordForm").hide();
 	$("#welcome").hide();
 	$("#map, #pageBar").show();
 	$("#userButtonCaption").text(LT.currentUser.name);
