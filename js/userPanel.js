@@ -3,7 +3,7 @@ $(function () { // This anonymous function runs after the page loads.
 	
 	// options tab
 	$("#logout").click(function () {
-		$.post("php/logout.php");
+		$.post("php/User.logout.php");
 		$("#map, #pageBar, .panel").hide();
 		$("#welcome").show();
 	});
