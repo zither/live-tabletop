@@ -145,14 +145,62 @@
 				<div class="close"></div>
 			</div>
 			<div class="tabBar">
-				<div class="tab" data-tab="user list">Friends</div>
 				<div class="tab active" data-tab="user info">My Account</div>
-			</div>
-			<div class="content" data-tab="user list">
+				<div class="tab" data-tab="user list">Friends</div>
+				<div class="tab" data-tab="user sent">Sent</div>
+				<div class="tab" data-tab="user recieved">Recieved</div>
 			</div>
 			<div class="content" data-tab="user info">
-				<a id="logout">Logout</a>
-				<a id="defaultPanels">Default Panels</a>
+				<div>
+					<input type="button" id="logout" value="Logout"/>
+					<input type="button" id="defaultPanels" value="Default Panels"/>
+				</div>
+				<div id="friendRequest">
+					<input type="text" name="user" value="friend4@A1.s"/>
+					<input type="button" value="send friend request"/>
+				</div>
+				<div id="changePassword">
+					<input type="password" name="password" placeholder="Old Password"/>
+					<input type="password" name="new_password" placeholder="New Password"/>
+					<input type="password" name="retype_password" placeholder="Re-type Password"/>
+					<input type="button" value="change password"/>
+				</div>
+			</div>
+			<div class="content" data-tab="user list">
+				<table id="friendsConfirmed">
+					<tbody>
+						<tr><td>FirstFriend@x.y</td><td><input type="button" value="remove"/></td></tr>
+						<tr><td>second_friend@abc.d</td><td><input type="button" value="remove"/></td></tr>
+						<tr><td>3rd.fRiEnD@123m.n</td><td><input type="button" value="remove"/></td></tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="content" data-tab="user sent">
+				<table id="friendsSent">
+					<tbody>
+						<tr><td>FirstFriend@x.y</td><td><input type="button" value="cancel"/></td></tr>
+						<tr><td>second_friend@abc.d</td><td><input type="button" value="cancel"/></td></tr>
+						<tr><td>3rd.fRiEnD@123m.n</td><td><input type="button" value="cancel"/></td></tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="content" data-tab="user recieved">
+				<table id="friendsReceived">
+					<tbody>
+						<tr>
+							<td>FirstFriend@x.y</td>
+							<td><input type="button" value="confirm"/><input type="button" value="reject"/></td>
+						</tr>
+						<tr>
+							<td>second_friend@abc.d</td>
+							<td><input type="button" value="confirm"/><input type="button" value="reject"/></td>
+						</tr>
+						<tr>
+							<td>3rd.fRiEnD@123m.n</td>
+							<td><input type="button" value="confirm"/><input type="button" value="reject"/></td>
+						</tr>
+					</tbody>
+				</table>
 			</div>
 			<div class="bottom">
 				<div class="resizeBL"></div>
@@ -418,14 +466,12 @@
 			<div class="content" data-tab="character info">
 			</div>
 			<div class="content" data-tab="character stats">
-					<form id="statCreator" style="display: none;">
-						<input name="name" type="text" value="Stat"/>
-						<input name="value" type="text" value="Value"/>
-						<div class="buttonDiv" id="addStat"><div>+</div></div>
-						<div class="clearBoth"></div>
-					</form>
-					<div class="separator"></div>
-					<input type="button" value="Apply Changes" id="submitStats"/>
+				<form id="statCreator">
+					<input name="name" type="text" placeholder="Stat"/>
+					<input name="value" type="text" placeholder="Value"/>
+					<input type="button" value="+"/>
+				</form>
+				<input type="button" value="Apply Changes" id="submitStats"/>
 			</div>
 			<div class="content" data-tab="character notes">
 			</div>

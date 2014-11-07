@@ -13,10 +13,10 @@ Table of Contents:
 		Panel Contents
 		Links on Panels
 		Forms on Panels
-		Brushes
 		Chat
-		Piece and Tile Images
-		Stats
+		Tiles and Brushes
+		Peice Images
+		Character Stats
 	MAP
 		Layers
 		Pieces
@@ -325,17 +325,7 @@ th, td {padding: 0;}
 	cursor: pointer;
 }
 
-/* Brushes: map painting tools (tables panel?) */
-#eraser, #fogTool, #wallTool, #pieceTool {
-	float: left;
-/* handled by swatch class now
-	border: 1px solid black;
-	margin: 1px 1px 1px 1px;
-*/
-	height: 30px;
-	width: 40px;
-	text-align: center;
-}
+#friendsConfirmed, #friendsSent, #friendsReceived {width: 100%;}
 
 /* Chat */
 
@@ -356,20 +346,28 @@ th, td {padding: 0;}
 	z-index: 1;
 }
 
-/* Piece and Tile Images */
+/* Tiles and Brushes */
 .swatch {
 	border: 1px solid black;
 	margin: 1px 1px 1px 1px;
 	max-width: 50px;
 }
 .swatch.selected {border: 1px solid #F00;}
+#eraser, #fogTool, #wallTool, #pieceTool {
+	float: left;
+	height: 30px;
+	width: 40px;
+	text-align: center;
+}
+
+/* Piece Images */
 #pieceCreatorImages img, #pieceEditorImages img {max-width: 200px;}
 #pieceCreatorImages, #pieceEditorImages {
 	clear: both;
 	overflow: none;
 }
 
-/* Stats */
+/* Character Stats */
 .statRow {clear: both;}
 .statName {float: left;}
 
