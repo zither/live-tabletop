@@ -308,7 +308,13 @@ th, td {padding: 0;}
 	min-height: 19px;
 }
 
-.panel .content[data-tab='piece list'] img {
+.panel .content table {float: left;}
+
+.panel .content td {padding-left: 5px;}
+
+
+/* tiny images no taller than a line of text */
+.inlineImage {
 	max-height: 19px;
 	vertical-align: middle;
 }
@@ -325,7 +331,7 @@ th, td {padding: 0;}
 	cursor: pointer;
 }
 
-#friendsConfirmed, #friendsSent, #friendsReceived {width: 100%;}
+/* #friendsConfirmed, #friendsSent, #friendsReceived {width: 100%;} */
 
 /* Chat */
 
@@ -366,10 +372,6 @@ th, td {padding: 0;}
 	clear: both;
 	overflow: none;
 }
-
-/* Character Stats */
-.statRow {clear: both;}
-.statName {float: left;}
 
 /* MAP */
 

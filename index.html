@@ -152,54 +152,48 @@
 			</div>
 			<div class="content" data-tab="user info">
 				<div>
-					<input type="button" id="logout" value="Logout"/>
-					<input type="button" id="defaultPanels" value="Default Panels"/>
+					<input type="button" id="logout" value="logout"/>
+					<input type="button" id="defaultPanels" value="default panels"/>
 				</div>
 				<div id="friendRequest">
 					<input type="text" name="user" value="friend4@A1.s"/>
 					<input type="button" value="send friend request"/>
 				</div>
 				<div id="changePassword">
-					<input type="password" name="password" placeholder="Old Password"/>
-					<input type="password" name="new_password" placeholder="New Password"/>
-					<input type="password" name="retype_password" placeholder="Re-type Password"/>
+					<input type="password" name="password" placeholder="old password"/>
+					<input type="password" name="new_password" placeholder="new password"/>
+					<input type="password" name="retype_password" placeholder="re-type password"/>
 					<input type="button" value="change password"/>
 				</div>
 			</div>
 			<div class="content" data-tab="user list">
 				<table id="friendsConfirmed">
-					<tbody>
-						<tr><td>FirstFriend@x.y</td><td><input type="button" value="remove"/></td></tr>
-						<tr><td>second_friend@abc.d</td><td><input type="button" value="remove"/></td></tr>
-						<tr><td>3rd.fRiEnD@123m.n</td><td><input type="button" value="remove"/></td></tr>
-					</tbody>
+					<tr><td>FirstFriend@x.y</td><td><input type="button" value="remove"/></td></tr>
+					<tr><td>second_friend@abc.d</td><td><input type="button" value="remove"/></td></tr>
+					<tr><td>3rd.fRiEnD@123m.n</td><td><input type="button" value="remove"/></td></tr>
 				</table>
 			</div>
 			<div class="content" data-tab="user sent">
 				<table id="friendsSent">
-					<tbody>
-						<tr><td>FirstFriend@x.y</td><td><input type="button" value="cancel"/></td></tr>
-						<tr><td>second_friend@abc.d</td><td><input type="button" value="cancel"/></td></tr>
-						<tr><td>3rd.fRiEnD@123m.n</td><td><input type="button" value="cancel"/></td></tr>
-					</tbody>
+					<tr><td>FirstFriend@x.y</td><td><input type="button" value="cancel"/></td></tr>
+					<tr><td>second_friend@abc.d</td><td><input type="button" value="cancel"/></td></tr>
+					<tr><td>3rd.fRiEnD@123m.n</td><td><input type="button" value="cancel"/></td></tr>
 				</table>
 			</div>
 			<div class="content" data-tab="user recieved">
 				<table id="friendsReceived">
-					<tbody>
-						<tr>
-							<td>FirstFriend@x.y</td>
-							<td><input type="button" value="confirm"/><input type="button" value="reject"/></td>
-						</tr>
-						<tr>
-							<td>second_friend@abc.d</td>
-							<td><input type="button" value="confirm"/><input type="button" value="reject"/></td>
-						</tr>
-						<tr>
-							<td>3rd.fRiEnD@123m.n</td>
-							<td><input type="button" value="confirm"/><input type="button" value="reject"/></td>
-						</tr>
-					</tbody>
+					<tr>
+						<td>FirstFriend@x.y</td>
+						<td><input type="button" value="confirm"/><input type="button" value="reject"/></td>
+					</tr>
+					<tr>
+						<td>second_friend@abc.d</td>
+						<td><input type="button" value="confirm"/><input type="button" value="reject"/></td>
+					</tr>
+					<tr>
+						<td>3rd.fRiEnD@123m.n</td>
+						<td><input type="button" value="confirm"/><input type="button" value="reject"/></td>
+					</tr>
 				</table>
 			</div>
 			<div class="bottom">
@@ -223,44 +217,46 @@
 			</div>
 			<div class="content" data-tab="campaign list">
 				<table>
-					<tbody>
-						<tr><td><a>My Campaign</a> (owned)</td><td><input type="button" value="disown"/></td></tr>
-						<tr><td><a>My Friend's Campaign</a></td><td></td></tr>
-					</tbody>
+					<tr><td><a>My Campaign</a> (owned)</td><td><input type="button" value="disown"/></td></tr>
+					<tr><td><a>My Friend's Campaign</a></td><td></td></tr>
 				</table>
 			</div>
 			<div class="content" data-tab="campaign info">
-				<span id="campaignName">My Campaign</span>
-				<input type="button" value="rename"/>
-				<input type="checkbox" value="private" id="private" checked="checked"/>
-				<label for="private">private</label>
+				<div>
+					<span id="campaignName">My Campaign</span>
+					<input type="button" value="rename"/>
+				</div>
+				<div>
+					<input type="checkbox" value="private" id="private" checked="checked"/>
+					<label for="private">private</label>
+				</div>
 				<table>
-					<tbody>
-						<tr>
-							<td><a>Myself</a></td>
-							<td>
-								<div><input type="checkbox" value="owner"/>owner</div>
-								<div><input type="checkbox" value="viewing"/>viewing</div>
-								<div><input type="button" value="remove"/><input type="button" value="ban"/></div>
-							</td>
-						</tr>
-						<tr>
-							<td><a>Someone Else</a></td>
-							<td>
-								<div><input type="checkbox" value="owner"/>owner</div>
-								<div><input type="checkbox" value="viewing"/>viewing</div>
-								<div><input type="button" value="remove"/><input type="button" value="ban"/></div>
-							</td>
-						</tr>
-					</tbody>
+					<tr>
+						<td><a>Myself</a></td>
+						<td>
+							<div><input type="checkbox" value="owner"/>owner</div>
+							<div><input type="checkbox" value="viewing"/>viewing</div>
+							<div><input type="button" value="remove"/><input type="button" value="ban"/></div>
+						</td>
+					</tr>
+					<tr>
+						<td><a>Someone Else</a></td>
+						<td>
+							<div><input type="checkbox" value="owner"/>owner</div>
+							<div><input type="checkbox" value="viewing"/>viewing</div>
+							<div><input type="button" value="remove"/><input type="button" value="ban"/></div>
+						</td>
+					</tr>
 				</table>
-				<select name="user"><option>My Friend</option></select>
-				<input type="button" value="invite to campaign"/>
-				<input type="button" value="share campaign"/>
+				<div>
+					<select name="user"><option>My Friend</option></select>
+					<input type="button" value="invite to campaign"/>
+					<input type="button" value="share campaign"/>
+				</div>
 			</div>
 			<div class="content" data-tab="chat">
 				<div id="chatOutput"><a id="chatBottom"> </a></div>
-				<form id="chatForm"><textarea id="chatInput"></textarea><input type="submit" value="Send"/></form>
+				<div id="chatForm"><textarea id="chatInput"></textarea><input type="submit" value="send"/></div>
 			</div>
 			<div class="bottom">
 				<div class="resizeBL"></div>
@@ -294,7 +290,7 @@
 					<!-- TODO: GUI image selector -->
 					<!-- TODO: url option -->
 					<!-- TODO: default tile option -->
-					<div>Background: <select name="image_id"><option value="-1">None</option></select></div>
+					<div>Background: <select name="image_id"><option value="-1">no background</option></select></div>
 					<div>
 						Tiles:
 						<input name="columns" type="text" size="2" value="25"/>
@@ -305,13 +301,13 @@
 							<option value="hex">hex</option>
 						</select>
 					</div>
-					<div><input type="button" value="Create Map" id="createMap"/></div>
+					<div><input type="button" value="create map" id="createMap"/></div>
 				</form>
 			</div>
 			<div class="content" data-tab="map info">
 				<form id="mapEditor">
-					<div>Name: <input name="name" type="text" placeholder="Map Name"/></div>
-					<div>Background: <select name="image_id"><option value="-1">None</option></select></div>
+					<div>Name: <input name="name" type="text" placeholder="map name"/></div>
+					<div>Background: <select name="image_id"><option value="-1">no background</option></select></div>
 					<div>
 						Tiles:
 						<input name="columns" type="text" size="2" value="25"/>
@@ -374,8 +370,8 @@
 						</select>
 					</div>
 					<div>
-						<input type="button" value="Apply Changes" id="applyMapChanges"/>
-						<input type="button" value="Delete Map" id="deleteMap"/>
+						<input type="button" value="apply changes" id="applyMapChanges"/>
+						<input type="button" value="delete map" id="deleteMap"/>
 					</div>
 				</form>
 			</div>
@@ -392,24 +388,24 @@
 			<div class="content" data-tab="piece list">
 				<table>
 					<tr>
-						<td><a><img src="images/upload/piece/rogue.png"/> rogue</a> at (1,3)</td>
+						<td><a><img class="inlineImage" src="images/upload/piece/rogue.png"/> rogue</a> at (1,3)</td>
 						<td><input type="button" value="delete"/></td>
 					</tr>
 					<tr>
-						<td><a><img src="images/upload/piece/priest.png"/> priest</a> at (7,4)</td>
+						<td><a><img class="inlineImage" src="images/upload/piece/priest.png"/> priest</a> at (7,4)</td>
 						<td><input type="button" value="delete"/></td>
 					</tr>
 				</table>
-				<form id="pieceCreator">
+				<div id="pieceCreator">
 					<input name="image_id" type="hidden" value=""/>
-					<input type="button" value="Create Piece" id="createPiece"/>
-					<div class="clearBoth"></div>
-				</form>
+					<input type="button" value="create piece" id="createPiece"/>
+				</div>
+				<!-- TODO: piece image selector -->
 			</div>
 			<div class="content" data-tab="piece info">
 				<form id="pieceEditor">
-					<div>Name: <input name="name" type="text" placeholder="Piece Name"/></div>
-					<div>Character: <select name="character_id"><option value="-1">None</option></select></div>
+					<div>Name: <input name="name" type="text" placeholder="piece name"/></div>
+					<div>Character: <select name="character_id"><option value="-1">no character</option></select></div>
 					<div>
 						Position:
 						<input name="x" type="text" size="1" value="0"/>
@@ -434,12 +430,12 @@
 					<div>Scale: <input name="scale" type="text" size="3" value="100"/>%</div>
 					<input name="image_id" type="hidden" value=""/>
 					<div>
-						<input type="button" value="Apply Changes" id="applyPieceChanges"/>
-						<input type="button" value="Delete Piece" id="deletePiece"/>
+						<input type="button" value="apply changes" id="applyPieceChanges"/>
+						<input type="button" value="delete piece" id="deletePiece"/>
 					</div>
-					<div class="clearBoth"></div>
 				</form>
-				<div id="pieceEditorImages"></div>
+				<div id="pieceImage">TODO: piece image</div>
+				<div id="pieceEditorImages">TODO: piece image selection</div>
 			</div>
 			<div class="bottom">
 				<div class="resizeBL"></div>
@@ -460,20 +456,92 @@
 				<div class="tab" data-tab="character info">Info</div>
 				<div class="tab" data-tab="character stats">Stats</div>
 				<div class="tab" data-tab="character notes">Notes</div>
+				<div class="tab" data-tab="character turns">Turns</div>
 			</div>
 			<div class="content" data-tab="character list">
+				<table>
+					<tr><td>Character 1</td><td><input type="button" value="remove"/></td></tr>
+					<tr><td>Character 2</td><td><input type="button" value="remove"/></td></tr>
+					<tr><td>Character 3</td><td><input type="button" value="remove"/></td></tr>
+				</table>
+				<div>
+					<input name="name" type="text" placeholder="character name"/>
+					<select><option value="-1">no system</option></select>
+					<input type="button" value="create character"/>
+				</div>
 			</div>
 			<div class="content" data-tab="character info">
+				<form>
+					<div>Name: <input name="name" type="text" placeholder="character name"/></div>
+					<div>System: <select><option value="-1">no system</option></select></div>
+					<div>
+						Owners:
+						<a>Player 1</a> <input type="button" value="remove"/>,
+						<a>Player 2</a> <input type="button" value="remove"/>
+						<select name="character_id"><option>Player 3</option></select><input type="button" value="add owner"/>
+					</div>
+					<div>
+						Peices:
+						<a><img class="inlineImage" src="images/upload/piece/rogue.png"/> rogue</a> at (1,3),
+						<a><img class="inlineImage" src="images/upload/piece/priest.png"/> priest</a> at (7,4)
+					</div>
+					<input name="image_id" type="hidden" value=""/>
+				</form>
+				<div id="portrait">TODO: character portrait</div>
+				<div id="selectPortrait">TODO: character portrait selection</div>
 			</div>
 			<div class="content" data-tab="character stats">
-				<form id="statCreator">
-					<input name="name" type="text" placeholder="Stat"/>
-					<input name="value" type="text" placeholder="Value"/>
-					<input type="button" value="+"/>
-				</form>
-				<input type="button" value="Apply Changes" id="submitStats"/>
+				<div><input type="text" class="statName" value="NumberStat"/> <input type="text" class="statValue" value="18"/> <input type="button" class="statRemove" value="remove"/></div>
+				<div><input type="text" class="statName" value="CodeStat"/> <input type="text" class="statValue" value="[&quot;apple&quot;, &quot;orange&quot;]"/> <input type="button" class="statRemove" value="remove"/></div>
+				<div>
+					<input type="button" value="add stat"/>
+					<input type="button" value="apply changes" id="submitStats"/>
+				</div>
 			</div>
 			<div class="content" data-tab="character notes">
+				<textarea name="notes"></textarea>
+				<input type="button" value="apply changes"/>
+			</div>
+			<div class="content" data-tab="character turns">
+				<table>
+					<tr>
+						<td>Character2's turn</td>
+						<td><input type="button" value="up"/></td>
+						<td><input type="button" value="down"/></td>
+						<td><input type="button" value="rename"/></td>
+						<td><input type="button" value="remove"/></td>
+					</tr>
+					<tr>
+						<td>Character1's turn</td>
+						<td><input type="button" value="up"/></td>
+						<td><input type="button" value="down"/></td>
+						<td><input type="button" value="rename"/></td>
+						<td><input type="button" value="remove"/></td>
+					</tr>
+					<tr>
+						<td>Character1's other turn</td>
+						<td><input type="button" value="up"/></td>
+						<td><input type="button" value="down"/></td>
+						<td><input type="button" value="rename"/></td>
+						<td><input type="button" value="remove"/></td>
+					</tr>
+					<tr>
+						<td>Character3's turn</td>
+						<td><input type="button" value="up"/></td>
+						<td><input type="button" value="down"/></td>
+						<td><input type="button" value="rename"/></td>
+						<td><input type="button" value="remove"/></td>
+					</tr>
+				</table>
+				<div>
+					<td><input type="button" value="rotate forward"/></td>
+					<td><input type="button" value="rotate backward"/></td>
+				</div>
+				<div>
+					<select><option value="-1">no character</option></select>
+					<input type="text" value="description" placeholder="description"/>
+					<input type="button" value="add turn"/>
+				</div>
 			</div>
 			<div class="bottom">
 				<div class="resizeBL"></div>
