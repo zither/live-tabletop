@@ -284,8 +284,8 @@ TEST.tests = [
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 	{action: "../User.login.php", args: TEST.USER2, result: TEST.exists},
 	// friending self should fail silently
-	{action: "../User.friend.php", args: function () {return {recipient: TEST.USER2.user};}, result: TEST.blank},
-	{action: "../User.friend.php", args: function () {return {recipient: TEST.USER3.user};}, result: TEST.blank},
+	{action: "../User.friend.php", args: {recipient: TEST.USER2.email}, result: TEST.blank},
+	{action: "../User.friend.php", args: {recipient: TEST.USER3.email}, result: TEST.blank},
 	{action: "../User.friends.php", args: {}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);}
 		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
@@ -296,19 +296,13 @@ TEST.tests = [
 	{group: "USER.UNFRIEND"},
 	{action: "../User.unfriend.php", args: {}, result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER2, result: TEST.exists},
-	{action: "../User.unfriend.php", args: function () {return {recipient: TEST.USER3.user};}, result: TEST.blank},
+	{action: "../User.unfriend.php", args: {recipient: TEST.USER3.email}, result: TEST.blank},
 	{action: "../User.friends.php", args: {}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);}
 		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
 		if (data.requested.length + data.recieved.length + data.confirmed.length == 0) return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
-
-/*
-	{group: "DELETE USER"},
-	{action: "../delete_user.php", args: function () {return {user: TEST.USER3.user};}, result: TEST.blank},
-	{action: "../read_users.php", args: {}, result: TEST.one},
-*/
 
 	// C A M P A I G N
 

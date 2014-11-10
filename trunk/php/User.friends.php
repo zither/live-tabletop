@@ -17,11 +17,11 @@ $user = intval($_SESSION['user']);
 
 $friends = array('recieved' => array(), 'requested' => array(), 'confirmed' => array());
 foreach (LT_call('read_friends_recieved', $user) as $row)
-	$friends['recieved'][] = intval($row['sender']);
+	$friends['recieved'][] = $row['email'];
 foreach (LT_call('read_friends_requested', $user) as $row)
-	$friends['requested'][] = intval($row['recipient']);
+	$friends['requested'][] = $row['email'];
 foreach (LT_call('read_friends_confirmed', $user) as $row)
-	$friends['confirmed'][] = intval($row['user']);
+	$friends['confirmed'][] = $row['email'];
 include('include/json_headers.php');
 echo json_encode($friends);
 

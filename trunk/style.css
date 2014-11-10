@@ -138,10 +138,10 @@ th, td {padding: 0;}
 
 /* Default Panel Sizes */
 
-.panel[data-panel=user]      {left: 185px; top: 26px;  width: 210px; height: 180px;}
-.panel[data-panel=table]     {left: 0;   top: 95px;  width: 355px; height: 210px;}
-.panel[data-panel=map]       {left: 0;   top: 49px;  width: 140px; height: 260px;}
-.panel[data-panel=character] {left: 0;   top: 72px;  width: 175px; height: 380px;}
+.panel[data-panel=user]      {left: 0; top: 26px;  width: 260px; height: 200px;}
+.panel[data-panel=campaign]  {left: 0; top: 49px;  width: 360px; height: 300px;}
+.panel[data-panel=map]       {left: 0; top: 72px;  width: 250px; height: 300px;}
+.panel[data-panel=character] {left: 0; top: 95px;  width: 370px; height: 300px;}
 
 
 /* Panel Resize Handles */
@@ -331,7 +331,7 @@ th, td {padding: 0;}
 	cursor: pointer;
 }
 
-/* #friendsConfirmed, #friendsSent, #friendsReceived {width: 100%;} */
+/* #friendsConfirmed, #friendsRequested, #friendsReceived {width: 100%;} */
 
 /* Chat */
 

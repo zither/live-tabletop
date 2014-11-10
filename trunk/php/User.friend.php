@@ -12,7 +12,7 @@ if (!isset($_SESSION['user'])) {
 // Interpret the Request
 
 $sender = intval($_SESSION['user']);
-$recipient = intval($_REQUEST['recipient']);
+$recipient = $LT_SQL->real_escape_string($_REQUEST['recipient']);
 
 // Query the Database
 
