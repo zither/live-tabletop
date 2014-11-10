@@ -156,42 +156,38 @@
 					<input type="button" id="defaultPanels" value="default panels"/>
 				</div>
 				<div id="friendRequest">
-					<input type="text" name="user" value="friend4@A1.s"/>
+					<input type="text" name="recipient" value="friend4@A1.s"/>
 					<input type="button" value="send friend request"/>
 				</div>
 				<div id="changePassword">
-					<input type="password" name="password" placeholder="old password"/>
-					<input type="password" name="new_password" placeholder="new password"/>
+<!-- TODO: should we require your old password? This would require additional code support in User.password
+					<input type="password" name="old_password" placeholder="old password"/>
+-->
+					<input type="password" name="password" placeholder="new password"/>
 					<input type="password" name="retype_password" placeholder="re-type password"/>
 					<input type="button" value="change password"/>
 				</div>
 			</div>
 			<div class="content" data-tab="user list">
 				<table id="friendsConfirmed">
-					<tr><td>FirstFriend@x.y</td><td><input type="button" value="remove"/></td></tr>
-					<tr><td>second_friend@abc.d</td><td><input type="button" value="remove"/></td></tr>
-					<tr><td>3rd.fRiEnD@123m.n</td><td><input type="button" value="remove"/></td></tr>
+					<tr class="template">
+						<td class="email">e-mail address</td>
+						<td><input type="button" value="remove"/></td>
+					</tr>
 				</table>
 			</div>
 			<div class="content" data-tab="user sent">
-				<table id="friendsSent">
-					<tr><td>FirstFriend@x.y</td><td><input type="button" value="cancel"/></td></tr>
-					<tr><td>second_friend@abc.d</td><td><input type="button" value="cancel"/></td></tr>
-					<tr><td>3rd.fRiEnD@123m.n</td><td><input type="button" value="cancel"/></td></tr>
+				<table id="friendsRequested">
+					<tr class="template">
+						<td class="email">e-mail address</td>
+						<td><input type="button" value="cancel"/></td>
+					</tr>
 				</table>
 			</div>
 			<div class="content" data-tab="user recieved">
 				<table id="friendsReceived">
-					<tr>
-						<td>FirstFriend@x.y</td>
-						<td><input type="button" value="confirm"/><input type="button" value="reject"/></td>
-					</tr>
-					<tr>
-						<td>second_friend@abc.d</td>
-						<td><input type="button" value="confirm"/><input type="button" value="reject"/></td>
-					</tr>
-					<tr>
-						<td>3rd.fRiEnD@123m.n</td>
+					<tr class="template">
+						<td class="email">e-mail address</td>
 						<td><input type="button" value="confirm"/><input type="button" value="reject"/></td>
 					</tr>
 				</table>

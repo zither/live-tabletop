@@ -546,13 +546,23 @@ END;
 
 /* User sends a friend request
 or User confirms a friend request */
-CREATE PROCEDURE create_friend (IN the_sender INT, IN the_recipient INT)
+CREATE PROCEDURE create_friend (IN the_sender INT, IN the_recipient TEXT)
 BEGIN
+/*
 	IF the_sender <> the_recipient
 	THEN
 		REPLACE INTO friends (sender, recipient)
 			VALUES (the_sender, the_recipient);
 	END IF;
+*/
+START TRANSACTION;
+	SELECT `id` INTO @recipient_id FROM users WHERE `email` = the_recipient;
+	IF @recipient_id IS NOT NULL AND @recipient_id <> the_sender
+	THEN
+		REPLACE INTO friends (`sender`, `recipient`)
+			VALUES (the_sender, @recipient_id);
+	END IF;
+COMMIT;
 END;
 
 /* Admin views all friend requests sent and received by the user */
@@ -565,29 +575,61 @@ END;
 /* User sees the friend requests he has recieved */
 CREATE PROCEDURE read_friends_recieved (IN the_user INT)
 BEGIN
+/*
 	SELECT sender FROM friends WHERE recipient = the_user ORDER BY time;
+*/
+/*
+	SELECT users.email FROM users, friends 
+		WHERE friends.sender = users.id AND friends.recipient = the_user
+		ORDER BY friends.time;
+*/
+	SELECT users.email AS email FROM users,
+		(SELECT * FROM friends WHERE recipient = the_user) AS received
+		WHERE received.sender = users.id ORDER BY received.time;
 END;
 
 /* User sees the friend requests he has sent */
 CREATE PROCEDURE read_friends_requested (IN the_user INT)
 BEGIN
+/*
 	SELECT recipient FROM friends WHERE sender = the_user ORDER BY time;
+*/
+/*
+	SELECT users.email FROM users, friends 
+		WHERE friends.recipient = users.id AND friends.sender = the_user
+		ORDER BY friends.time;
+*/
+	SELECT users.email AS email FROM users,
+		(SELECT * FROM friends WHERE sender = the_user) AS requested
+		WHERE requested.recipient = users.id ORDER BY requested.time;
 END;
 
 /* User views his list of confirmed friends */
 CREATE PROCEDURE read_friends_confirmed (IN the_user INT)
 BEGIN
+/*
 	SELECT requested.recipient AS `user` FROM
 		(SELECT * FROM friends WHERE `sender` = the_user) AS requested,
 		(SELECT * FROM friends WHERE `recipient` = the_user) AS received
 		WHERE received.sender = requested.recipient;
+*/
+	SELECT users.email AS email FROM users, 
+		(SELECT requested.recipient AS `friend_id` FROM
+			(SELECT * FROM friends WHERE `sender` = the_user) AS requested,
+			(SELECT * FROM friends WHERE `recipient` = the_user) AS received
+			WHERE received.sender = requested.recipient) AS confirmed
+		WHERE `friend_id` = users.id ORDER BY users.email;
 END;
 
 /* User stops being friends with the recipient
 or User cancels a friend request */
-CREATE PROCEDURE delete_friend (IN the_sender INT, IN the_recipient INT)
+CREATE PROCEDURE delete_friend (IN the_sender INT, IN the_recipient TEXT)
 BEGIN
+/*
 	DELETE FROM friends WHERE sender = the_sender AND recipient = the_recipient;
+*/
+	SELECT `id` INTO @recipient_id FROM users WHERE `email` = the_recipient;
+	DELETE FROM friends WHERE sender = the_sender AND recipient = @recipient_id;
 END;
 
 
