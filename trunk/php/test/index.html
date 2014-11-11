@@ -258,7 +258,7 @@ TEST.tests = [
 	{action: "../User.friends.php", args: {}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);}
 		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data.requested.length + data.recieved.length + data.confirmed.length == 0) return "PASS";
+		if (data.requested.length + data.received.length + data.confirmed.length == 0) return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
@@ -289,7 +289,7 @@ TEST.tests = [
 	{action: "../User.friends.php", args: {}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);}
 		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data.requested.length + data.recieved.length + data.confirmed.length == 1) return "PASS";
+		if (data.requested.length + data.received.length + data.confirmed.length == 1) return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
@@ -300,7 +300,7 @@ TEST.tests = [
 	{action: "../User.friends.php", args: {}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);}
 		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data.requested.length + data.recieved.length + data.confirmed.length == 0) return "PASS";
+		if (data.requested.length + data.received.length + data.confirmed.length == 0) return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 

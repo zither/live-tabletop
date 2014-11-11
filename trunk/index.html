@@ -148,16 +148,31 @@
 				<div class="tab active" data-tab="user info">My Account</div>
 				<div class="tab" data-tab="user list">Friends</div>
 				<div class="tab" data-tab="user sent">Sent</div>
-				<div class="tab" data-tab="user recieved">Recieved</div>
+				<div class="tab" data-tab="user received">Received</div>
 			</div>
 			<div class="content" data-tab="user info">
-				<div>
-					<input type="button" id="logout" value="logout"/>
-					<input type="button" id="defaultPanels" value="default panels"/>
+				<div id="userName">
+					<span>User Name</span>
+					<input type="button" value="rename"/>
 				</div>
-				<div id="friendRequest">
-					<input type="text" name="recipient" value="friend4@A1.s"/>
-					<input type="button" value="send friend request"/>
+				<div>
+					<select>
+						<option>red</option>
+						<option>orange</option>
+						<option>yellow</option>
+						<option>green</option>
+						<option>blue</option>
+						<option>purple</option>
+						<option>black</option>
+						<option>gray</option>
+						<option>white</option>
+						<option>brown</option>
+						<option>pink</option>
+					</select>
+				</div>
+				<div>
+					<input type="checkbox" id="subscribed"/>
+					<label for="subscribed">receive e-mail updates</label>
 				</div>
 				<div id="changePassword">
 <!-- TODO: should we require your old password? This would require additional code support in User.password
@@ -166,6 +181,14 @@
 					<input type="password" name="password" placeholder="new password"/>
 					<input type="password" name="retype_password" placeholder="re-type password"/>
 					<input type="button" value="change password"/>
+				</div>
+				<div id="friendRequest">
+					<input type="text" name="recipient" placeholder="email address"/>
+					<input type="button" value="send friend request"/>
+				</div>
+				<div>
+					<input type="button" id="logout" value="logout"/>
+					<input type="button" id="defaultPanels" value="default panels"/>
 				</div>
 			</div>
 			<div class="content" data-tab="user list">
@@ -184,7 +207,7 @@
 					</tr>
 				</table>
 			</div>
-			<div class="content" data-tab="user recieved">
+			<div class="content" data-tab="user received">
 				<table id="friendsReceived">
 					<tr class="template">
 						<td class="email">e-mail address</td>
@@ -223,7 +246,7 @@
 					<input type="button" value="rename"/>
 				</div>
 				<div>
-					<input type="checkbox" value="private" id="private" checked="checked"/>
+					<input type="checkbox" value="private" id="campaignPrivate" checked="checked"/>
 					<label for="private">private</label>
 				</div>
 				<table>

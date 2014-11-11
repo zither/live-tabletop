@@ -21,7 +21,7 @@ DROP PROCEDURE IF EXISTS update_user_unsubscribe;
 DROP PROCEDURE IF EXISTS delete_user;
 DROP PROCEDURE IF EXISTS create_friend;
 DROP PROCEDURE IF EXISTS read_friends;
-DROP PROCEDURE IF EXISTS read_friends_recieved;
+DROP PROCEDURE IF EXISTS read_friends_received;
 DROP PROCEDURE IF EXISTS read_friends_requested;
 DROP PROCEDURE IF EXISTS read_friends_confirmed;
 DROP PROCEDURE IF EXISTS delete_friend;
@@ -572,8 +572,8 @@ BEGIN
 	FROM friends WHERE sender = the_user OR recipient = the_user;
 END;
 
-/* User sees the friend requests he has recieved */
-CREATE PROCEDURE read_friends_recieved (IN the_user INT)
+/* User sees the friend requests he has received */
+CREATE PROCEDURE read_friends_received (IN the_user INT)
 BEGIN
 /*
 	SELECT sender FROM friends WHERE recipient = the_user ORDER BY time;

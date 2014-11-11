@@ -55,13 +55,15 @@ $(function () { // This anonymous function runs after the page loads.
 		if (form.password != form.retype_password)
 			alert("Passwords do not match.");
 		else {
-			delete form.retype_password;
-			$.post("php/User.password.php", form, function (theData) {
-				delete form.resetCode;
-				$.post("php/User.login.php", form, function (theData) {
-					location.href = location.href.split("?")[0]; // remove ?resetCode=
-				}, "json").fail(function () {
-					alert("Incorrect username or password.");
+			$.post("php/User.logout.php", function () {
+				delete form.retype_password;
+				$.post("php/User.password.php", form, function (theData) {
+					delete form.resetCode;
+					$.post("php/User.login.php", form, function (theData) {
+						location.href = location.href.split("?")[0]; // remove ?resetCode=
+					}, "json").fail(function () {
+						alert("Incorrect username or password.");
+					});
 				});
 			});
 		}
@@ -104,8 +106,9 @@ LT.login = function (theUser) {
 	// FIXME: campaign or map? both? what other lists?
 	LT.refreshMaps();
 
+	// start periodic user updates
 	LT.holdTimestamps = 0;
-	setInterval(LT.checkTimestamps, 2000);
+	LT.updateUser();
 };
 
 

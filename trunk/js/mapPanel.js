@@ -122,6 +122,9 @@ LT.loadMap = function (map) {
 	$("#mapEditor [name=grid_color]").val(map.grid_color);
 	$("#mapEditor [name=wall_color]").val(map.wall_color);
 	$("#mapEditor [name=door_color]").val(map.door_color);
+
+	// start periodic map updates
+	LT.updateMap();
 };
 
 LT.refreshMaps = function () {
@@ -144,6 +147,49 @@ LT.refreshMaps = function () {
 		});
 	}, "json");
 };
+
+LT.updateMap = function () {
+	if (LT.currentUser && LT.currentMap) {
+		if (!LT.holdTimestamps) {
+			$.post("php/Map.changes.php", {map: LT.currentMap.id}, function (data) {
+				var map = new LT.Map(data);
+
+				// TODO: update map name (string)
+				// TODO: update map type ("square" or "hex")
+				// TODO: update map rows
+				// TODO: update map columns
+				// TODO: update map background
+				// TODO: update map min_zoom
+				// TODO: update map max_zoom
+				// TODO: update map min_rotate
+				// TODO: update map max_rotate
+				// TODO: update map min_tilt
+				// TODO: update map max_tilt
+				// TODO: update map grid_thickness
+				// TODO: update map grid_color
+				// TODO: update map wall_thickness
+				// TODO: update map wall_color
+				// TODO: update map door_thickness
+				// TODO: update map door_color
+
+				// update pieces if they have changed
+				if (LT.currentMap.piece_changes < map.piece_changes) {
+					LT.loadPieces();
+				}
+
+				// update tiles if they have changed
+				if (LT.currentMap.tile_changes < map.tile_changes) {
+					LT.currentMap.loadTiles();
+				}
+
+				LT.currentMap = map;
+
+			}, "json");
+		}
+		setTimeout(LT.updateMap, 2000);
+	}
+}
+
 
 // Populate image selectors in the create piece and piece settings tabs
 // (called for each piece image after loading piece image data in Piece.js)

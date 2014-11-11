@@ -12,7 +12,48 @@ $(function () { // This anonymous function runs after the page loads.
 	});
 });
 
-// Reload chat messages.
+LT.updateCampaign = function () {
+	if (LT.currentUser && LT.currentCampaign) {
+		if (!LT.holdTimeStamps) {
+			var args = {campaign: LT.currentCampaign.id};
+			$.get("php/Campaign.read.php", args, function (data) {
+
+				// update campaign name
+				$("#campaignName").text(data.name);
+
+				// update campaign private/public toggle
+				$("#campaignPrivate").val(data.private);
+
+				// TODO: update users if users_modified timestamp has changed
+				// TODO: update turns (json object)
+				// TODO: update map (id number) - open map | change map | close map
+
+				// load new chat messages.
+				if (data.last_message > LT.lastMessageID) {
+					var args = {campaign: LT.currentCampaign.id, last_message: LT.lastMessageID};
+					$.post("php/Campaign.messages.php", args, function (data) {
+						//$("#chatOutput .message").remove();
+						for (var i = 0; i < data.length; i++) {
+							// TODO: generate from an HTML template?
+							$("<div>").insertBefore("#chatBottom").addClass("message").append([
+								$("<span>").text("[" + LT.formatTime(data[i].time) + "]"),
+								$("<span>").text(" " + LT.users[data[i].user_id].name + ": "),
+								$("<span>").html(data[i].text),
+							]);
+							LT.lastMessageID = data[i].id;
+						}
+						$("#chatBottom")[0].scrollIntoView(true);
+					});
+				}
+
+				LT.currentCampaign = new LT.Campaign(data);
+
+			});
+		}
+		setTimeout(LT.updateCampaign, 2000);
+	}
+}
+
 LT.refreshChatPanel = function () {
 	if (!LT.currentTable) return;
 	var args = {table_id: LT.currentTable.id, last_message: LT.lastMessageID};
