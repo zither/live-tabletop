@@ -63,26 +63,6 @@ LT.formValues = function (form) {
 	return object;
 };
 
-LT.checkTimestamps = function () {
-	if (LT.currentTable && !LT.holdTimestamps && LT.currentUser) {
-		$.post("php/read_table.php", {table_id: LT.currentTable.id}, function (data) {
-			var table = new LT.Table(data[0]);
-			if (LT.currentTable.piece_stamp < table.piece_stamp) {
-				LT.currentTable.piece_stamp = table.piece_stamp;
-				LT.loadPieces();
-			}
-			if (LT.currentTable.tile_stamp < table.tile_stamp) {
-				LT.currentTable.tile_stamp = table.tile_stamp;
-				LT.currentTable.loadTiles();
-			}
-			if (LT.currentTable.message_stamp < table.message_stamp) {
-				LT.currentTable.message_stamp = table.message_stamp;
-				LT.refreshChatPanel();
-			}
-		}, "json");
-	}
-}
-
 
 // DRAG AND DROP TO MOVE PIECES AND RESIZE PANELS
 

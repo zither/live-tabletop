@@ -61,6 +61,8 @@ input[type=text], input[type=password] {width: 170px;}
 table {border-collapse: collapse;}
 th, td {padding: 0;}
 
+.template {display: none;}
+
 /* PAGE BAR */
 
 #pageBar {

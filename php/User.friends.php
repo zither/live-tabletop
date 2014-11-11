@@ -15,9 +15,9 @@ $user = intval($_SESSION['user']);
 
 // Query the Database
 
-$friends = array('recieved' => array(), 'requested' => array(), 'confirmed' => array());
-foreach (LT_call('read_friends_recieved', $user) as $row)
-	$friends['recieved'][] = $row['email'];
+$friends = array('received' => array(), 'requested' => array(), 'confirmed' => array());
+foreach (LT_call('read_friends_received', $user) as $row)
+	$friends['received'][] = $row['email'];
 foreach (LT_call('read_friends_requested', $user) as $row)
 	$friends['requested'][] = $row['email'];
 foreach (LT_call('read_friends_confirmed', $user) as $row)
