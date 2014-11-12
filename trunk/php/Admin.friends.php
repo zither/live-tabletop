@@ -1,8 +1,7 @@
-<?php // Admin views all friend requests sent and received by the user
+<?php // Admin views all friends and requests sent or received by the user
 
 include('db_config.php');
 include('include/query.php');
-include('include/output.php');
 
 session_start();
 if (!isset($_SESSION['admin'])) {
@@ -10,7 +9,16 @@ if (!isset($_SESSION['admin'])) {
 	exit('You are not logged in.');
 }
 
-if (is_array($rows = LT_call('read_friends', intval($_REQUEST['user']))))
-	LT_output_array($rows, array('integer' => array('sender', 'recipient')));
+$user = intval($_REQUEST['user']);
+
+$friends = array('received' => array(), 'requested' => array(), 'confirmed' => array());
+foreach (LT_call('read_friends_received', $user) as $row)
+	$friends['received'][] = $row['email'];
+foreach (LT_call('read_friends_requested', $user) as $row)
+	$friends['requested'][] = $row['email'];
+foreach (LT_call('read_friends_confirmed', $user) as $row)
+	$friends['confirmed'][] = $row['email'];
+include('include/json_headers.php');
+echo json_encode($friends);
 
 ?>

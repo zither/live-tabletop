@@ -1,6 +1,6 @@
 /* we remove tables in bottom-up order to avoid foreign key issues */
-DROP TABLE IF EXISTS character_owners, characters, pieces, map_owners,
-	maps, messages, campaign_users, campaigns, friends, users, admins;
+DROP TABLE IF EXISTS character_owners, characters, pieces, map_owners, maps,
+	messages, campaign_users, campaigns, friends, friend_requests, users, admins;
 
 DROP PROCEDURE IF EXISTS create_admin;
 DROP PROCEDURE IF EXISTS read_admin;
@@ -20,7 +20,6 @@ DROP PROCEDURE IF EXISTS update_user_timestamp;
 DROP PROCEDURE IF EXISTS update_user_unsubscribe;
 DROP PROCEDURE IF EXISTS delete_user;
 DROP PROCEDURE IF EXISTS create_friend;
-DROP PROCEDURE IF EXISTS read_friends;
 DROP PROCEDURE IF EXISTS read_friends_received;
 DROP PROCEDURE IF EXISTS read_friends_requested;
 DROP PROCEDURE IF EXISTS read_friends_confirmed;
@@ -142,19 +141,37 @@ CREATE TABLE users (
 	`color` TEXT);
 
 
-/* FRIENDS TABLE
+/* FRIEND REQUESTS TABLE
 
-	Each entry in this table is either a friend request from sender to recipient
-	(both user ids) or sender's confirmation of a friend request from recipient.
+	Confirmed relationships between users and friend requests.
+
+	sender: sender id,
+	recipient: recipient id,
+	time: orders requests so most recent ones are displayed first
 */
 
-CREATE TABLE friends (
+CREATE TABLE friend_requests (
 	`sender` INT NOT NULL,
 	`recipient` INT NOT NULL,
-	`time` TIMESTAMP, /* TODO: do we need this? */
+	`time` TIMESTAMP,
 	FOREIGN KEY (`sender`) REFERENCES users(`id`) ON DELETE CASCADE,
 	FOREIGN KEY (`recipient`) REFERENCES users(`id`) ON DELETE CASCADE,
 	PRIMARY KEY (`sender`, `recipient`));
+
+/* FRIENDS TABLE
+
+	Confirmed relationships between users
+
+	first: id of whichever user has a lower id number
+	second: id of whichever user has a higher id number
+*/
+
+CREATE TABLE friends (
+	`first` INT NOT NULL,
+	`second` INT NOT NULL,
+	FOREIGN KEY (`first`) REFERENCES users(`id`) ON DELETE CASCADE,
+	FOREIGN KEY (`second`) REFERENCES users(`id`) ON DELETE CASCADE,
+	PRIMARY KEY (`first`, `second`));
 
 
 /* CAMPAIGNS TABLE
@@ -379,7 +396,9 @@ CREATE TABLE character_owners (
  /*************************** P R O C E D U R E S ***************************/
 /***************************************************************************/
 
-/* DELIMITER // /* MySQL Workbench speaks only MySQL command-line syntax */
+/*
+DELIMITER //
+/* MySQL Workbench speaks only MySQL command-line syntax */
 
 /*** ADMINS PROCEDURES ***/
 
@@ -407,7 +426,7 @@ BEGIN
 END;
 
 /* Admin deletes his own account
-or Admin deletes another admin's ac */
+or Admin deletes another admin's account */
 CREATE PROCEDURE delete_admin (IN the_login VARCHAR(200))
 BEGIN
 	DELETE FROM admins WHERE login = the_login;
@@ -529,7 +548,8 @@ BEGIN
 		(SELECT `character` FROM character_owners);
 /*
 handled by ON DELETE CASCADE when you delete the user:
-	DELETE FROM friends WHERE `sender` = the_user OR `recipient` = the_user;
+	DELETE FROM friend_requests WHERE `sender` = the_user OR `recipient` = the_user;
+	DELETE FROM friends WHERE `first` = the_user OR `second` = the_user;
 	DELETE FROM campaign_users WHERE `user` = the_user;
 	DELETE FROM messages WHERE `user` = the_user;
 	DELETE FROM map_owners WHERE `user` = the_user;
@@ -548,88 +568,66 @@ END;
 or User confirms a friend request */
 CREATE PROCEDURE create_friend (IN the_sender INT, IN the_recipient TEXT)
 BEGIN
-/*
-	IF the_sender <> the_recipient
-	THEN
-		REPLACE INTO friends (sender, recipient)
-			VALUES (the_sender, the_recipient);
-	END IF;
-*/
 START TRANSACTION;
 	SELECT `id` INTO @recipient_id FROM users WHERE `email` = the_recipient;
 	IF @recipient_id IS NOT NULL AND @recipient_id <> the_sender
 	THEN
-		REPLACE INTO friends (`sender`, `recipient`)
-			VALUES (the_sender, @recipient_id);
+		SET @first = LEAST(the_sender, @recipient_id);
+		SET @second = GREATEST(the_sender, @recipient_id);
+		IF EXISTS(SELECT 1 FROM friend_requests WHERE `sender` = @recipient_id AND `recipient` = the_sender)
+		THEN
+			DELETE FROM friend_requests WHERE `sender` = @recipient_id AND `recipient` = the_sender;
+			INSERT INTO friends(`first`, `second`) VALUES(@first, @second);
+		ELSEIF NOT EXISTS(SELECT 1 FROM friends WHERE `first` = @first AND `second` = @second)
+		THEN
+			INSERT INTO friend_requests(`sender`, `recipient`) VALUES (the_sender, @recipient_id);
+		END IF;
 	END IF;
 COMMIT;
 END;
 
-/* Admin views all friend requests sent and received by the user */
-CREATE PROCEDURE read_friends (IN the_user INT)
-BEGIN
-	SELECT sender, recipient, UNIX_TIMESTAMP(time) AS time
-	FROM friends WHERE sender = the_user OR recipient = the_user;
-END;
-
-/* User sees the friend requests he has received */
+/* Admin views friend requests received by the user
+or User sees the friend requests he has received */
 CREATE PROCEDURE read_friends_received (IN the_user INT)
 BEGIN
-/*
-	SELECT sender FROM friends WHERE recipient = the_user ORDER BY time;
-*/
-/*
-	SELECT users.email FROM users, friends 
-		WHERE friends.sender = users.id AND friends.recipient = the_user
-		ORDER BY friends.time;
-*/
 	SELECT users.email AS email FROM users,
-		(SELECT * FROM friends WHERE recipient = the_user) AS received
-		WHERE received.sender = users.id ORDER BY received.time;
+		(SELECT * FROM friend_requests WHERE recipient = the_user) AS requests
+		WHERE requests.sender = users.id ORDER BY requests.time;
 END;
 
-/* User sees the friend requests he has sent */
+/* Admin views friend requests sent by the user
+or User sees the friend requests he has sent */
 CREATE PROCEDURE read_friends_requested (IN the_user INT)
 BEGIN
-/*
-	SELECT recipient FROM friends WHERE sender = the_user ORDER BY time;
-*/
-/*
-	SELECT users.email FROM users, friends 
-		WHERE friends.recipient = users.id AND friends.sender = the_user
-		ORDER BY friends.time;
-*/
 	SELECT users.email AS email FROM users,
-		(SELECT * FROM friends WHERE sender = the_user) AS requested
-		WHERE requested.recipient = users.id ORDER BY requested.time;
+		(SELECT * FROM friend_requests WHERE sender = the_user) AS requests
+		WHERE requests.recipient = users.id ORDER BY requests.time;
 END;
 
-/* User views his list of confirmed friends */
+/* Admin views the user's confirmed friends
+or User views his list of confirmed friends */
 CREATE PROCEDURE read_friends_confirmed (IN the_user INT)
 BEGIN
-/*
-	SELECT requested.recipient AS `user` FROM
-		(SELECT * FROM friends WHERE `sender` = the_user) AS requested,
-		(SELECT * FROM friends WHERE `recipient` = the_user) AS received
-		WHERE received.sender = requested.recipient;
-*/
-	SELECT users.email AS email FROM users, 
-		(SELECT requested.recipient AS `friend_id` FROM
-			(SELECT * FROM friends WHERE `sender` = the_user) AS requested,
-			(SELECT * FROM friends WHERE `recipient` = the_user) AS received
-			WHERE received.sender = requested.recipient) AS confirmed
-		WHERE `friend_id` = users.id ORDER BY users.email;
+	SELECT `email` FROM users, 
+		(SELECT `second` AS `friend_id` FROM friends WHERE `first` = the_user
+		UNION SELECT `first` AS `friend_id` FROM friends WHERE `second` = the_user)
+		AS confirmed WHERE `friend_id` = `id` ORDER BY `email`;
 END;
 
 /* User stops being friends with the recipient
 or User cancels a friend request */
 CREATE PROCEDURE delete_friend (IN the_sender INT, IN the_recipient TEXT)
 BEGIN
-/*
-	DELETE FROM friends WHERE sender = the_sender AND recipient = the_recipient;
-*/
+START TRANSACTION;
 	SELECT `id` INTO @recipient_id FROM users WHERE `email` = the_recipient;
-	DELETE FROM friends WHERE sender = the_sender AND recipient = @recipient_id;
+	IF @recipient_id IS NOT NULL
+	THEN
+		DELETE FROM friend_requests
+			WHERE `sender` = the_sender AND `recipient` = @recipient_id;
+		DELETE FROM friends WHERE `first` = LEAST(the_sender, @recipient_id)
+			AND `second` = GREATEST(the_sender, @recipient_id);
+	END IF;
+COMMIT;
 END;
 
 

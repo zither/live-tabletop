@@ -9,11 +9,7 @@ if (!isset($_SESSION['user'])) {
 	exit('You are not logged in.');
 }
 
-// Interpret the Request
-
 $user = intval($_SESSION['user']);
-
-// Query the Database
 
 $friends = array('received' => array(), 'requested' => array(), 'confirmed' => array());
 foreach (LT_call('read_friends_received', $user) as $row)

@@ -85,7 +85,11 @@ TEST.tests = [
 	{group: "ADMIN.FRIENDS"},
 	{action: "../Admin.friends.php", args: {}, result: TEST.logged_out},
 	{action: "../Admin.login.php", args: TEST.ADMIN1, result: TEST.blank},
-	{action: "../Admin.friends.php", args: function () {return TEST.USER1;}, result: TEST.zero},
+	{action: "../Admin.friends.php", args: function () {return TEST.USER1;}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		if (data.requested.length + data.received.length + data.confirmed.length == 0) return "PASS";
+		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
 
 	{group: "ADMIN.USER PASSWORD"},
