@@ -6,10 +6,6 @@ LT.Campaign = function (data) {
 
 // GLOBAL VARIABLES
 LT.Campaign.PROPERTIES = ["id", "name", "map", "private", "turns", "last_message", "users_modified"];
-LT.Campaign.STRINGS = ["name", "turns"];
-
-// {campaign: 1, name: "My Campaign", permission: null}
-
 
 // METHODS OF TABLE OBJECTS
 LT.Campaign.prototype = {
@@ -51,7 +47,7 @@ LT.Campaign.prototype = {
 
 	// FIXME: is this supposed to be done in campaignPanel.js?
 	permission: function (theUser, thePermission) {
-		return $.post("php/Campaign.message.php", {campaign: this.id, user: theUser, permission: thePermission});
+		return $.post("php/Campaign.permission.php", {campaign: this.id, user: theUser, permission: thePermission});
 	},
 
 	getMap: function () {return this.map},

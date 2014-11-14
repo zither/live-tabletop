@@ -9,8 +9,6 @@ LT.Image.PROPERTIES = ["id", "file", "type", "user_id", "public",
 	"width", "height", "tile_width", "tile_height", "center_x", "center_y",
 	"tile_mode", "layer"];
 
-LT.Image.STRINGS = ["file", "type", "tile_mode"];
-
 // METHODS OF IMAGE OBJECTS
 LT.Image.prototype = {
 
@@ -21,7 +19,7 @@ LT.Image.prototype = {
 
 	// CLIENT-SERVER COMMUNICATION
 	update: function (mods) {
-		var args = LT.applyChanges(this, mods, LT.Image.PROPERTIES, LT.Image.STRINGS);
+		var args = LT.applyChanges(this, mods, LT.Image.PROPERTIES);
 		return $.post("php/update_image.php", args);
 	},
 	remove: function () {

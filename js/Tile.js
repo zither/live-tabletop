@@ -9,7 +9,6 @@ LT.Tile = function (data) {
 
 // GLOBAL VARIABLES
 LT.Tile.PROPERTIES = ["fog", "image_id", "x", "y", "table_id"];
-LT.Tile.STRINGS = [];
 LT.Tile.dragging = 0;
 LT.Tile.toggleFogValue = 1;
 LT.Tile.images = {};
@@ -45,7 +44,7 @@ LT.Tile.prototype = {
 
 	// CLIENT-SERVER COMMUNICATION
 	update: function (mods) {
-		var args = LT.applyChanges(this, mods, LT.Tile.PROPERTIES, LT.Tile.STRINGS);
+		var args = LT.applyChanges(this, mods, LT.Tile.PROPERTIES);
 		return $.post("php/update_tile.php", args);
 	},
 	remove: function () {

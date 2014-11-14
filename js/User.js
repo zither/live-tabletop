@@ -5,8 +5,7 @@ LT.User = function (data) {
 }
 
 // GLOBAL VARIABLES
-LT.User.PROPERTIES = ["color", "name", "permissions"];
-LT.User.STRINGS = ["color", "name", "permissions"];
+LT.User.PROPERTIES = ["color", "name", "subscribed"];
 
 // STATIC FUNCTIONS
 LT.User.populateSelectors = function () {
@@ -33,12 +32,13 @@ LT.User.prototype = {
 
 	// CLIENT-SERVER COMMUNICATION
 	update: function (mods) {
-		var args = LT.applyChanges(this, mods, LT.User.PROPERTIES, LT.User.STRINGS);
-		return $.post("php/update_user.php", args);
+		var args = LT.applyChanges(this, mods, LT.User.PROPERTIES);
+		return $.post("php/User.settings.php", args);
 	},
+/*
 	remove: function () {
 		return $.post("php/delete_user.php", {user_id: this.id});
 	},
-
+*/
 }
 

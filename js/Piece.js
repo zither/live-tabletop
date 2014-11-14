@@ -52,7 +52,7 @@ LT.Piece = function (data) {
 // GLOBAL VARIABLES
 LT.Piece.PROPERTIES = ["id", "user_id", "image_id", "table_id", "name",
 	"x", "y", "x_offset", "y_offset", "height", "width", "color"];
-LT.Piece.STRINGS = ["name", "color"];
+
 LT.Piece.placing = false;
 LT.Piece.moving = false;
 LT.Piece.selected = null;
@@ -92,11 +92,11 @@ LT.Piece.prototype = {
 	// CLIENT-SERVER COMMUNICATION
 
 	update: function (mods) {
-		var args = LT.applyChanges(this, mods, LT.Piece.PROPERTIES, LT.Piece.STRINGS);
-		return $.post("php/update_piece.php", args);
+		var args = LT.applyChanges(this, mods, LT.Piece.PROPERTIES);
+		return $.post("php/Piece.settings.php", args);
 	},
 	remove: function () {
-		return $.post("php/delete_piece.php", {piece_id: this.id});
+		return $.post("php/Piece.delete.php", {piece_id: this.id});
 	},
 
 	// PROPERTY ACCESSORS (GETTERS) AND MUTATORS (SETTERS)

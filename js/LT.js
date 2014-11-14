@@ -39,17 +39,18 @@ LT.sortObject = function (map, sortBy) {
 }
 
 // Set certain properties of object to properties of modifiers
-// and return those properties (used by object .update() methods.)
-// String properties not found in strings array convert to integers.
-LT.applyChanges = function (object, modifiers, properties, strings) {
+// and return those properties in a JQeury.get/post compatible object
+LT.applyChanges = function (object, modifiers, properties) {
 	var filteredObject = {}
 	for (var i = 0; i < properties.length; i++) {
 		var prop = properties[i];
 		var type = typeof(modifiers[prop]);
-		if (type == "string" && strings.indexOf(prop) == -1)
-			modifiers[prop] = parseInt(modifiers[prop]);
-		if (type != "undefined") object[prop] = modifiers[prop];
-		filteredObject[prop] = object[prop];
+		if (type != "undefined")
+			object[prop] = modifiers[prop];
+		if (type == "boolean")
+			filteredObject[prop] = object[prop] ? 1 : 0;
+		if (type == "string" || type == "number")
+			filteredObject[prop] = object[prop];
 	}
 	return filteredObject;
 };
