@@ -97,6 +97,9 @@ LT.login = function (theUser) {
 	$("#map, #pageBar").show();
 //	$("#userButtonCaption").text(LT.currentUser.name);
 	$("#userName span").text(LT.currentUser.name || LT.currentUser.email);
+	$("#subscribed").val(LT.currentUser.subscribed);
+	$("#userColor").val(LT.currentUser.color);
+	// TODO: Update user panel with subscribed state, color, etc.
 	LT.Panel.loadCookie();
 
 	// TODO: start this process before logging in?
