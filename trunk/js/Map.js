@@ -1,4 +1,4 @@
-// CAMPAIGN CONSTRUCTOR
+// MAP CONSTRUCTOR
 LT.Map = function (data) {
 	for (var i = 0; i < LT.Map.PROPERTIES.length; i++)
 		this[LT.Map.PROPERTIES[i]] = data[LT.Map.PROPERTIES[i]];
@@ -12,7 +12,6 @@ LT.Map.PROPERTIES = ["id", "user_id", "image_id", "name",
 	"grid_thickness", "grid_color", "wall_thickness", "wall_color",
 	"piece_stamp", "tile_stamp", "message_stamp", "tile_mode"
 ];
-LT.Map.STRINGS = ["name", "grid_color", "wall_color", "tile_mode"];
 
 LT.Map.images = {};
 
@@ -21,12 +20,13 @@ LT.Map.presets = [];
 
 // STATIC FUNCTIONS
 
+// TODO: load this from static config file
 LT.Map.readImages = function () {
 	$.post("php/read_images.php", {type: "background"}, function (data) {
 		LT.Map.images = {};
 		for (var i = 0; i < data.length; i++) {
 			LT.Map.images[data[i].id] = new LT.Image(data[i]);
-			$("#campaignEditor [name=image_id], #campaignCreator [name=image_id]")
+			$("#mapEditor [name=image_id], #mapCreator [name=image_id]")
 				.append($("<option>").attr("value", data[i].id)
 				.text(data[i].file.slice(0, -4))); // remove file extension
 		}
@@ -40,17 +40,18 @@ LT.Map.prototype = {
 	// CLIENT-SERVER COMMUNICATION
 
 	update: function (mods) {
-		var args = LT.applyChanges(this, mods, LT.Map.PROPERTIES, LT.Map.STRINGS);
-		return $.post("php/Campaign.settings.php", args);
+		var args = LT.applyChanges(this, mods, LT.Map.PROPERTIES);
+		return $.post("php/Map.settings.php", args);
 	},
 	
 	remove: function () {
-		return $.post("php/Campaign.disown.php", {campaign: this.id});
+		return $.post("php/Map.disown.php", {campaign: this.id});
 	},
 	
+	// TODO: Map.read reads more than just tiles
 	loadTiles: function () {
 		var self = this;
-		$.post("php/read_tiles.php", {table_id: this.id}, function (data) {
+		$.post("php/Map.read.php", {table_id: this.id}, function (data) {
 			$("#tileLayer, #clickTileLayer, #fogLayer").empty();
 			$("#map, #clickWallLayer").css({
 				width: self.tile_width * self.tile_columns + "px",

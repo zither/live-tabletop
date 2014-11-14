@@ -32,7 +32,18 @@ $(function () { // This anonymous function runs after the page loads.
 			});
 		}
 	});
-
+	$("#subscribed").change(function () {
+		var box = this;
+		box.disabled = true;
+		LT.currentUser.update({subscribed: box.checked ? 1 : 0}).done(function () {
+			if (box.checked) {
+				alert("You will now recieve Live Tabletop e-mail updates.");
+			} else {
+				alert("You will no longer recieve Live Tabletop e-mail updates.");
+			}
+			box.disabled = false;
+		});
+	});
 });
 
 LT.updateUser = function () {
