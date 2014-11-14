@@ -83,19 +83,23 @@ LT.login = function (theUser) {
 	LT.currentUser = theUser;
 	LT.alert("You have logged in.");
 
+/* TODO: do this in LT.updateUser
 	$.post("php/read_users.php", function (data) {
 		LT.users = {};
 		for (var i = 0; i < data.length; i++)
 			LT.users[data[i].id] = new LT.User(data[i]);
 		LT.User.populateSelectors();
 	}, "json");
+*/
 
 	$("#passwordForm").hide();
 	$("#welcome").hide();
 	$("#map, #pageBar").show();
-	$("#userButtonCaption").text(LT.currentUser.name);
+//	$("#userButtonCaption").text(LT.currentUser.name);
+	$("#userName span").text(LT.currentUser.name || LT.currentUser.email);
 	LT.Panel.loadCookie();
 
+	// TODO: start this process before logging in?
 	LT.Piece.readImages();
 	LT.Map.readImages();
 	LT.Tile.readImages();
