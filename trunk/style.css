@@ -307,7 +307,7 @@ th, td {padding: 0;}
 .panel .content div {
 	float: left;
 	margin: 1px 5px 0 5px;
-	min-height: 19px;
+	min-height: 21px;
 }
 
 .panel .content table {float: left;}

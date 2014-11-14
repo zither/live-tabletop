@@ -51,6 +51,11 @@ $(function () { // This anonymous function runs after the page loads.
 			});
 		}
 	});
+	$("#userColor").change(function () {
+		LT.currentUser.update({color: $(this).val()}).done(function () {
+			alert("Your color is now " + $("#userColor").val());
+		});
+	});
 });
 
 LT.updateUser = function () {
