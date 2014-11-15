@@ -166,15 +166,15 @@
 						<option>black</option>
 						<option>gray</option>
 						<option>white</option>
-						<option>brown</option>
 						<option>pink</option>
+						<option>brown</option>
 					</select>
 				</div>
 				<div>
-					<input type="checkbox" id="subscribed"/>
-					<label for="subscribed">receive e-mail updates</label>
+					<input type="checkbox" id="userSubscribed"/>
+					<label for="userSubscribed">receive e-mail updates</label>
 				</div>
-				<div id="changePassword">
+				<div id="userPassword">
 <!-- TODO: should we require your old password? This would require additional code support in User.password
 					<input type="password" name="old_password" placeholder="old password"/>
 -->
@@ -182,16 +182,16 @@
 					<input type="password" name="retype_password" placeholder="re-type password"/>
 					<input type="button" value="change password"/>
 				</div>
-				<div id="friendRequest">
-					<input type="text" name="recipient" placeholder="email address"/>
-					<input type="button" value="send friend request"/>
-				</div>
 				<div>
 					<input type="button" id="logout" value="logout"/>
 					<input type="button" id="defaultPanels" value="default panels"/>
 				</div>
 			</div>
 			<div class="content" data-tab="user list">
+				<div id="friendRequest">
+					<input type="text" name="recipient" placeholder="email address"/>
+					<input type="button" value="send friend request"/>
+				</div>
 				<table id="friendsConfirmed">
 					<tr class="template">
 						<td class="email">e-mail address</td>
@@ -215,10 +215,8 @@
 					</tr>
 				</table>
 			</div>
-			<div class="bottom">
-				<div class="resizeBL"></div>
-				<div class="resizeBR"></div>
-			</div>
+			<div class="resizeBL"></div>
+			<div class="resizeBR"></div>
 		</div>
 
 		<!-- Campaign Panel -->
@@ -235,9 +233,16 @@
 				<div class="tab" data-tab="chat">Chat & Roll</div>
 			</div>
 			<div class="content" data-tab="campaign list">
-				<table>
-					<tr><td><a>My Campaign</a> (owned)</td><td><input type="button" value="disown"/></td></tr>
-					<tr><td><a>My Friend's Campaign</a></td><td></td></tr>
+				<div id="createCampaign">
+					<input type="text" name="recipient" placeholder="campaign name"/>
+					<input type="button" value="create campaign"/>
+				</div>
+				<table id="campaignList">
+					<tr class="template">
+						<td><a class="campaignName">Campaign Name</a></td>
+						<td class="campaignPermission">owner</td>
+						<td><input type="button" value="disown"/></td>
+					</tr>
 				</table>
 			</div>
 			<div class="content" data-tab="campaign info">
@@ -277,10 +282,8 @@
 				<div id="chatOutput"><a id="chatBottom"> </a></div>
 				<div id="chatForm"><textarea id="chatInput"></textarea><input type="submit" value="send"/></div>
 			</div>
-			<div class="bottom">
-				<div class="resizeBL"></div>
-				<div class="resizeBR"></div>
-			</div>
+			<div class="resizeBL"></div>
+			<div class="resizeBR"></div>
 		</div>
 
 		<!-- Map Panel -->
@@ -456,10 +459,8 @@
 				<div id="pieceImage">TODO: piece image</div>
 				<div id="pieceEditorImages">TODO: piece image selection</div>
 			</div>
-			<div class="bottom">
-				<div class="resizeBL"></div>
-				<div class="resizeBR"></div>
-			</div>
+			<div class="resizeBL"></div>
+			<div class="resizeBR"></div>
 		</div>
 
 		<!-- Character Panel -->
@@ -562,10 +563,8 @@
 					<input type="button" value="add turn"/>
 				</div>
 			</div>
-			<div class="bottom">
-				<div class="resizeBL"></div>
-				<div class="resizeBR"></div>
-			</div>
+			<div class="resizeBL"></div>
+			<div class="resizeBR"></div>
 		</div>
 
 

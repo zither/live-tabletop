@@ -5,7 +5,7 @@ LT.User = function (data) {
 }
 
 // GLOBAL VARIABLES
-LT.User.PROPERTIES = ["color", "email", "name", "subscribed"];
+LT.User.PROPERTIES = ["color", "email", "id", "name", "subscribed"];
 
 // STATIC FUNCTIONS
 LT.User.populateSelectors = function () {

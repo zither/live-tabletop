@@ -12,6 +12,21 @@ $(function () { // This anonymous function runs after the page loads.
 	});
 });
 
+LT.refreshCampaignList = function () {
+	$.get("php/User.campaigns.php", function (data) {
+		$.each(data, function (i, campaign) {
+			var row = $("#campaignList .template").clone().removeClass("template");
+			row.find(".campaignName").text(campaign.name);
+			row.find(".campaignPermission").text(campaign.permission);
+ 			row.find("input[value=disown]").click(function () {
+				$.post("php/Campaign.permission.php", {recipient: friend}, function () {
+					row.remove();
+				});
+			});
+		});
+	});
+};
+
 LT.updateCampaign = function () {
 	if (LT.currentUser && LT.currentCampaign) {
 		if (!LT.holdTimeStamps) {

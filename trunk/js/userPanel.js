@@ -17,12 +17,13 @@ $(function () { // This anonymous function runs after the page loads.
 	$("#friendRequest input[type=button]").click(function () {
 		var email = $("#friendRequest input[name=recipient]").val();
 		$.post("php/User.friend.php", {"recipient": email}, function () {
+			LT.refreshUser();
 			alert("You have invited " + email + " to be your friend."
 				+ "They can see the request while they are using Live Tabletop.");
 		});
 	});
-	$("#changePassword input[type=button]").click(function () {
-		var args = LT.formValues("#changePassword");
+	$("#userPassword input[type=button]").click(function () {
+		var args = LT.formValues("#userPassword");
 		if (args.retype_password != args.password) {
 			alert("New passwords do not match.");
 		} else {
@@ -32,7 +33,7 @@ $(function () { // This anonymous function runs after the page loads.
 			});
 		}
 	});
-	$("#subscribed").change(function () {
+	$("#userSubscribed").change(function () {
 		var box = this;
 		box.disabled = true;
 		LT.currentUser.update({subscribed: box.checked ? 1 : 0}).done(function () {
@@ -58,47 +59,72 @@ $(function () { // This anonymous function runs after the page loads.
 	});
 });
 
-LT.updateUser = function () {
-	if (LT.currentUser) {
-		if (!LT.holdTimeStamps) {
+LT.refreshUser = function () {
+	// we only want one of these scheduled at a time
+	if (LT.refreshUserTimeout) clearTimeout(LT.refreshUserTimeout);
+
+	if (LT.currentUser) { // stop updating if no user is logged in
+		if (!LT.holdTimeStamps) { // do not update while dragging
 			// update friends lists
 			$.get("php/User.friends.php", function (data) {
 				$("#friendsConfirmed tr:not(.template)").remove();
 				$("#friendsRequested tr:not(.template)").remove();
 				$("#friendsReceived tr:not(.template)").remove();
+				// confirmed friends
 				$.each(data.confirmed, function (i, friend) {
-//					console.log(JSON.stringify(friend));
 					var row = $("#friendsConfirmed .template").clone().removeClass("template");
 					row.find(".email").text(friend);
+					row.find("input[value=remove]").click(function () {
+						if (confirm("Permanently delete " + friend + " from your friends list?"))
+							$.post("php/User.unfriend.php", {recipient: friend}, function () {
+								LT.refreshUser();
+//								row.remove();
+							});
+					});
 					row.appendTo("#friendsConfirmed tbody");
 				});
+				// friend requests sent by you
+				if (data.requested.length == 0) LT.userPanel.hideTab("user sent");
+				else LT.userPanel.showTab("user sent");
 				$.each(data.requested, function (i, friend) {
-//					console.log(JSON.stringify(friend));
 					var row = $("#friendsRequested .template").clone().removeClass("template");
 					row.find(".email").text(friend);
+					row.find("input[value=cancel]").click(function () {
+						$.post("php/User.unfriend.php", {recipient: friend}, function () {
+							LT.refreshUser();
+//							row.remove();
+						});
+					});
 					row.appendTo("#friendsRequested tbody");
 				});
+				// freind requests recieved by you
+				if (data.received.length == 0) LT.userPanel.hideTab("user received");
+				else LT.userPanel.showTab("user received");
 				$.each(data.received, function (i, friend) {
-//					console.log(JSON.stringify(friend));
 					var row = $("#friendsReceived .template").clone().removeClass("template");
 					row.find(".email").text(friend);
+					row.find("input[value=confirm]").click(function () {
+						$.post("php/User.friend.php", {recipient: friend}, function () {
+							LT.refreshUser();
+//							row.remove();
+						});
+					});
+					row.find("input[value=reject]").click(function () {
+						$.post("php/User.unfriend.php", {recipient: friend}, function () {
+							LT.refreshUser();
+//							row.remove();
+						});
+					});
 					row.appendTo("#friendsReceived tbody");
 				});
 			});
-			// update campaigns list
-			$.get("php/User.campaigns.php", function (data) {
-				// TODO: replace rows of campaigns table
-			});
-			// update maps list
-			$.get("php/User.maps.php", function (data) {
-				// TODO: replace rows of maps table
-			});
-			// update characters list
-			$.get("php/User.characters.php", function (data) {
-				// TODO: replace rows of characters table
-			});
-		}
-		setTimeout(LT.updateUser, 10000);
-	}
-}
+			// update user's campaign, map and character lists in other panels
+			LT.refreshCampaignList();
+			LT.refreshMapList();
+			LT.refreshCharacterList();
+		} // if (!LT.holdTimeStamps) { // do not update while dragging
+		LT.refreshUserTimeout = setTimeout(LT.refreshUser, 10000);
+	} // if (LT.currentUser) { // stop updating if no user is logged in
+};
+
 

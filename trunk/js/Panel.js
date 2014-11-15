@@ -80,7 +80,7 @@ LT.Panel.clickCornerX = 0; // horizontal position of corner being resized
 LT.Panel.clickCornerY = 0; // vertical position of corner being resized
 
 // TODO: explain each of these margins
-LT.Panel.MARGIN_TOP = 26;
+LT.Panel.PAGEBAR_HEIGHT = 26;
 LT.Panel.MIN_WIDTH = 140;
 
 // STATIC FUNCTIONS
@@ -141,7 +141,11 @@ LT.Panel.prototype = {
 
 	// Hide tab
 	hideTab: function (tabName) {
-		$(this.outside).find(".tab[data-tab='" + tabName + "']").hide();
+		var tab = $(this.outside).find(".tab[data-tab='" + tabName + "']");
+		tab.hide();
+		// TODO: limit this selection to visible (display: block instead of display: none) tabs
+		if (tab.hasClass("active"))
+			this.selectTab($(this.outside).find(".tab").data("tab"));
 	},
 	
 	// Show tab
@@ -242,7 +246,7 @@ Or maybe we should change how we do it.
 		LT.dragX = Math.min(LT.dragX - LT.clickX, maxX);
 		LT.dragY = Math.min(LT.dragY - LT.clickY, maxY);
 		LT.dragX = Math.max(LT.dragX, 0);
-		LT.dragY = Math.max(LT.dragY, LT.Panel.MARGIN_TOP);
+		LT.dragY = Math.max(LT.dragY, LT.Panel.PAGEBAR_HEIGHT);
 		this.setX(LT.dragX);
 		this.setY(LT.dragY);
 	},
@@ -272,7 +276,7 @@ Or maybe we should change how we do it.
 			LT.clickDragGap = 1;
 		}
 		LT.dragX = Math.max(LT.dragX, LT.clickX);
-		LT.dragY = Math.max(LT.dragY, LT.clickY + LT.Panel.MARGIN_TOP);
+		LT.dragY = Math.max(LT.dragY, LT.clickY + LT.Panel.PAGEBAR_HEIGHT);
 		LT.dragX = Math.min(LT.dragX, LT.Panel.clickCornerX - LT.Panel.MIN_WIDTH);
 		LT.dragY = Math.min(LT.dragY, LT.Panel.clickCornerY);
 		this.setX(LT.dragX - LT.clickX);
@@ -291,7 +295,7 @@ Or maybe we should change how we do it.
 			LT.clickT = this.getY();
 			LT.clickDragGap = 1;
 		}
-		LT.dragY = Math.max(LT.dragY, LT.clickY - LT.clickT + LT.Panel.MARGIN_TOP);
+		LT.dragY = Math.max(LT.dragY, LT.clickY - LT.clickT + LT.Panel.PAGEBAR_HEIGHT);
 		LT.dragY = Math.min(LT.dragY, LT.clickY + LT.clickH);
 		this.setHeight(LT.clickH + LT.clickY - LT.dragY);
 		this.setY(LT.clickT - LT.clickY + LT.dragY);
@@ -317,7 +321,7 @@ Or maybe we should change how we do it.
 		this.setX(LT.dragX - LT.clickX);
 		this.setWidth(LT.Panel.clickCornerX - LT.dragX);
 
-		LT.dragY = Math.max(LT.dragY, panelY + LT.Panel.MARGIN_TOP);
+		LT.dragY = Math.max(LT.dragY, panelY + LT.Panel.PAGEBAR_HEIGHT);
 		LT.dragY = Math.min(LT.dragY, window.innerHeight);
 		this.setHeight(LT.clickH - LT.clickY + LT.dragY);
 	},
@@ -328,8 +332,9 @@ Or maybe we should change how we do it.
 	setWidth: function (w) {$(this.outside).css({width: w + "px"});},
 	setHeight: function (h) {
 		$(this.outside).css({height: h + "px"});
+		// TODO: why is this 23 here?
 		$(this.outside).find(".content").css({
-			height: (h - $(this.outside).find(".tabBar").height() - 35) + "px"
+			height: (h - $(this.outside).find(".tabBar").height() - 23) + "px"
 		});
 	},
 
