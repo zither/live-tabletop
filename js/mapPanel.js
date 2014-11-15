@@ -127,6 +127,12 @@ LT.loadMap = function (map) {
 	LT.updateMap();
 };
 
+LT.refreshMapList = function () {
+	$.get("php/User.maps.php", function (data) {
+		// TODO: replace rows of maps table
+	});
+};
+
 LT.refreshMaps = function () {
 	$.post("php/User.maps.php", function (theData) {
 		var list = $(".content[data-tab='map list']");

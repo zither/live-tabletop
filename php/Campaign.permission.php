@@ -2,10 +2,7 @@
 or User shares the campaign with another user (who becomes an owner)
 or User changes an owner or blacklisted user's permission to member
 or User changes a member or blacklisted user's permission to owner
-or User adds a user to the campaign's blacklist
-or User removes a user from the campaign's blacklist (NULL permission)
-or User revokes a user's ownership or membership (NULL permission)
-or User disowns the campaign (NULL permission) */
+or User adds a user to the campaign's blacklist */
 
 include('db_config.php');
 include('include/query.php');

@@ -83,29 +83,23 @@ LT.login = function (theUser) {
 	LT.currentUser = theUser;
 	LT.alert("You have logged in.");
 
-/* TODO: do this in LT.updateUser
-	$.post("php/read_users.php", function (data) {
-		LT.users = {};
-		for (var i = 0; i < data.length; i++)
-			LT.users[data[i].id] = new LT.User(data[i]);
-		LT.User.populateSelectors();
-	}, "json");
-*/
-
-	$("#passwordForm").hide();
-	$("#welcome").hide();
-	$("#map, #pageBar").show();
-//	$("#userButtonCaption").text(LT.currentUser.name);
-	$("#userName span").text(LT.currentUser.name || LT.currentUser.email);
-	$("#subscribed").val(LT.currentUser.subscribed);
-	$("#userColor").val(LT.currentUser.color);
-	// TODO: Update user panel with subscribed state, color, etc.
-	LT.Panel.loadCookie();
-
 	// TODO: start this process before logging in?
 	LT.Piece.readImages();
 	LT.Map.readImages();
 	LT.Tile.readImages();
+
+	// hide welcome screen and show main UI
+	$("#passwordForm").hide();
+	$("#welcome").hide();
+	$("#map, #pageBar").show();
+
+	// fill user panel with current user settings
+	$("#userName span").text(LT.currentUser.name || LT.currentUser.email);
+	$("#userSubscribed")[0].checked = LT.currentUser.subscribed;
+	$("#userColor").val(LT.currentUser.color);
+
+	// restore panels from cookie
+	LT.Panel.loadCookie();
 
 //	LT.refreshChatPanel(); // FIXME: don't do this until a campaign is loaded
 
@@ -115,7 +109,16 @@ LT.login = function (theUser) {
 
 	// start periodic user updates
 	LT.holdTimestamps = 0;
-	LT.updateUser();
+	LT.refreshUser();
+
+/* TODO: do this in LT.updateUser
+	$.post("php/read_users.php", function (data) {
+		LT.users = {};
+		for (var i = 0; i < data.length; i++)
+			LT.users[data[i].id] = new LT.User(data[i]);
+		LT.User.populateSelectors();
+	}, "json");
+*/
 };
 
 

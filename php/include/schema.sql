@@ -623,7 +623,8 @@ START TRANSACTION;
 	IF @recipient_id IS NOT NULL
 	THEN
 		DELETE FROM friend_requests
-			WHERE `sender` = the_sender AND `recipient` = @recipient_id;
+			WHERE (`sender` = the_sender AND `recipient` = @recipient_id)
+			OR (`recipient` = the_sender AND `sender` = @recipient_id);
 		DELETE FROM friends WHERE `first` = LEAST(the_sender, @recipient_id)
 			AND `second` = GREATEST(the_sender, @recipient_id);
 	END IF;
@@ -731,10 +732,7 @@ END;
 or User shares the campaign with another user (who becomes an owner)
 or User changes an owner or blacklisted user's permission to member
 or User changes a member or blacklisted user's permission to owner
-or User adds a user to the campaign's blacklist
-or User removes a user from the campaign's blacklist (NULL permission)
-or User revokes a user's ownership or membership (NULL permission)
-or User disowns the campaign (NULL permission) */
+or User adds a user to the campaign's blacklist */
 CREATE PROCEDURE update_campaign_user_permission
 	(IN the_user INT, IN the_campaign INT, IN the_permission TEXT)
 BEGIN
@@ -750,9 +748,6 @@ BEGIN
 		UPDATE campaign_users SET `permission` = the_permission
 			WHERE `user` = the_user AND `campaign` = the_campaign;
 	END IF;
-/* delete guests (NULL permission) who are not viewing the campaign */
-	DELETE FROM campaign_users WHERE `user` = the_user AND `campaign` = the_campaign
-		AND `permission` = NULL AND `viewing` = 0;
 /* delete campaigns without owners */
 	IF the_campaign NOT IN
 		(SELECT `campaign` FROM campaign_users WHERE `permission` = 'owner')
@@ -783,13 +778,11 @@ END;
 CREATE PROCEDURE update_campaign_user_leave (IN the_user INT, IN the_campaign INT)
 BEGIN
 	START TRANSACTION;
-/* delete this campaign user if it was just a guest (NULL permission) */
-	DELETE FROM campaign_users 
-		WHERE `user` = the_user AND `campaign` = the_campaign 
-		AND `permission` = NULL;
-/* set this campaign user's viewing to 0 if the user is a member or owner */
 	UPDATE campaign_users SET `viewing` = 0
 		WHERE `user` = the_user AND `campaign` = the_campaign;
+/* delete ALL guests who are not viewing the campaign including this user
+if it is a guest and any others who did not log out properly. */
+	DELETE FROM campaign_users WHERE `permission` IS NULL AND `viewing` = 0;
 	COMMIT;
 END;
 
@@ -801,6 +794,26 @@ BEGIN
 		WHERE `user` = the_user AND `campaign` = the_campaign;
 END;
 
+/* User disowns the campaign
+or User revokes a user's ownership or membership
+or User removes a user from the campaign's blacklist */
+CREATE PROCEDURE delete_campaign_user (IN the_user INT, IN the_campaign INT)
+BEGIN
+	START TRANSACTION;
+/* remove the user from this campaign if they are not viewing it */
+	DELETE FROM campaign_users
+		WHERE `user` = the_user AND `campaign` = the_campaign AND viewing = 0;
+/* if the user is still viewing the campaign, just set permission to NULL */
+	UPDATE campaign_users SET `permission` = NULL
+		WHERE `user` = the_user AND `campaign` = the_campaign;
+/* delete campaigns without owners */
+	IF the_campaign NOT IN
+		(SELECT `campaign` FROM campaign_users WHERE `permission` = 'owner')
+	THEN
+		DELETE FROM campaigns WHERE `id` = the_campaign;
+	END IF;
+	COMMIT;
+END;
 
 /*** MESSAGES PROCEDURES ***/
 
