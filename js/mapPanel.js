@@ -130,6 +130,24 @@ LT.loadMap = function (map) {
 LT.refreshMapList = function () {
 	$.get("php/User.maps.php", function (data) {
 		// TODO: replace rows of maps table
+		$("#mapList tr:not(.template)").remove();
+		$.each(data, function (i, map) {
+			var row = $("#mapList .template").clone().removeClass("template");
+			row.find(".name").text(map.name).click(function () {
+				$.get("php/Map.read.php", {"map": map.id}, function (theData) {
+					LT.loadMap(new LT.Map(theData));
+				});
+			});
+			row.find(".columns").text(map.columns);
+			row.find(".rows").text(map.rows);
+			row.find(".type").text(map.type);
+ 			row.find(".disown").click(function () {
+				$.post("php/Map.deleteOwner.php",
+					{"user": LT.currentUser.id, "map": map.id},
+					function () {LT.refreshMapList();});
+			});
+			row.appendTo("#mapList tbody");
+		});
 	});
 };
 

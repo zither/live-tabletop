@@ -40,6 +40,7 @@ DROP PROCEDURE IF EXISTS update_campaign_user_permission;
 DROP PROCEDURE IF EXISTS update_campaign_user_arrive;
 DROP PROCEDURE IF EXISTS update_campaign_user_leave;
 DROP PROCEDURE IF EXISTS update_campaign_user_avatar;
+DROP PROCEDURE IF EXISTS delete_campaign_user;
 DROP PROCEDURE IF EXISTS create_message;
 DROP PROCEDURE IF EXISTS read_messages;
 DROP PROCEDURE IF EXISTS delete_messages_expired;
