@@ -14,15 +14,20 @@ $(function () { // This anonymous function runs after the page loads.
 
 LT.refreshCampaignList = function () {
 	$.get("php/User.campaigns.php", function (data) {
+		$("#campaignList tr:not(.template)").remove();
 		$.each(data, function (i, campaign) {
 			var row = $("#campaignList .template").clone().removeClass("template");
-			row.find(".campaignName").text(campaign.name);
-			row.find(".campaignPermission").text(campaign.permission);
- 			row.find("input[value=disown]").click(function () {
-				$.post("php/Campaign.permission.php", {recipient: friend}, function () {
-					row.remove();
-				});
+			row.find(".name").text(campaign.name).click(function () {
+				$.get("php/Campaign.read.php", {"campaign": campaign.campaign},
+					function (theData) {LT.loadCampaign(new LT.Campaign(theData));});
 			});
+			row.find(".permission").text(campaign.permission);
+ 			row.find(".disown").click(function () {
+				$.post("php/Campaign.deleteUser.php",
+					{"user": LT.currentUser.id, "campaign": campaign.campaign},
+					function () {LT.refreshCampaignList();});
+			});
+			row.appendTo("#campaignList tbody");
 		});
 	});
 };

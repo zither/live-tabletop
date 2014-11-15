@@ -239,9 +239,9 @@
 				</div>
 				<table id="campaignList">
 					<tr class="template">
-						<td><a class="campaignName">Campaign Name</a></td>
-						<td class="campaignPermission">owner</td>
-						<td><input type="button" value="disown"/></td>
+						<td><a class="name">Campaign Name</a></td>
+						<td class="permission">owner</td>
+						<td><input type="button" value="disown" class="disown"/></td>
 					</tr>
 				</table>
 			</div>
@@ -302,12 +302,6 @@
 				<div class="tab" data-tab="piece info">Piece Info</div>
 			</div>
 			<div class="content" data-tab="map list">
-				<table>
-					<tr class="mapRow template">
-						<td><a class="load">Map Name</a> <span class="info">(25 &times; 25 square)</span></td>
-						<td><input type="button" value="disown" class="disown"/></td>
-					</tr>
-				</table>
 				<form id="mapCreator">
 					<!-- TODO: GUI image selector -->
 					<!-- TODO: url option -->
@@ -325,6 +319,13 @@
 					</div>
 					<div><input type="button" value="create map" id="createMap"/></div>
 				</form>
+				<table id="mapList">
+					<tr class="template">
+						<td><a class="name">Map Name</a> (<span class="columns">25</span> &times;
+							<span class="rows">25</span> <span class="type">square</span>)</td>
+						<td><input type="button" value="disown" class="disown"/></td>
+					</tr>
+				</table>
 			</div>
 			<div class="content" data-tab="map info">
 				<form id="mapEditor">
@@ -479,16 +480,17 @@
 				<div class="tab" data-tab="character turns">Turns</div>
 			</div>
 			<div class="content" data-tab="character list">
-				<table>
-					<tr><td>Character 1</td><td><input type="button" value="remove"/></td></tr>
-					<tr><td>Character 2</td><td><input type="button" value="remove"/></td></tr>
-					<tr><td>Character 3</td><td><input type="button" value="remove"/></td></tr>
-				</table>
 				<div>
 					<input name="name" type="text" placeholder="character name"/>
 					<select><option value="-1">no system</option></select>
 					<input type="button" value="create character"/>
 				</div>
+				<table>
+					<tr class="template">
+						<td><a class="name">character name</a></td>
+						<td><input type="button" value="disown" class="disown"/></td>
+					</tr>
+				</table>
 			</div>
 			<div class="content" data-tab="character info">
 				<form>
