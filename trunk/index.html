@@ -246,28 +246,20 @@
 				</table>
 			</div>
 			<div class="content" data-tab="campaign info">
-				<div>
-					<span id="campaignName">My Campaign</span>
+				<div id="campaignName">
+					<span>campaign name</span>
 					<input type="button" value="rename"/>
 				</div>
 				<div>
 					<input type="checkbox" value="private" id="campaignPrivate" checked="checked"/>
-					<label for="private">private</label>
+					<label for="campaignPrivate">private</label>
 				</div>
-				<table>
-					<tr>
-						<td><a>Myself</a></td>
+				<table id="campaignUsers">
+					<tr class="template">
+						<td><a class="name">user name</a></td>
 						<td>
-							<div><input type="checkbox" value="owner"/>owner</div>
-							<div><input type="checkbox" value="viewing"/>viewing</div>
-							<div><input type="button" value="remove"/><input type="button" value="ban"/></div>
-						</td>
-					</tr>
-					<tr>
-						<td><a>Someone Else</a></td>
-						<td>
-							<div><input type="checkbox" value="owner"/>owner</div>
-							<div><input type="checkbox" value="viewing"/>viewing</div>
+							<div class="owner"><input type="checkbox" value="owner"/><label>owner</label></div>
+							<div class="viewing"><input type="checkbox" value="viewing"/><label>viewing</label></div>
 							<div><input type="button" value="remove"/><input type="button" value="ban"/></div>
 						</td>
 					</tr>
