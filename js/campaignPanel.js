@@ -1,6 +1,15 @@
 $(function () { // This anonymous function runs after the page loads.
 	LT.campaignPanel = new LT.Panel("campaign");
+	LT.campaignPanel.hideTab("campaign info");
+	LT.campaignPanel.hideTab("chat");
 
+	$("#createCampaign input[type=button]").click(function () {
+		var args = LT.formValues("#createCampaign");
+		$.post("php/Campaign.create.php", args, function (theData) {
+			LT.refreshCampaignList();
+			LT.loadCampaign(theData.id);
+		});
+	});
 	$("#chatForm").submit(function () {
 		if (!LT.currentTable) return false;
 		var args = {table_id: LT.currentTable.id, text: $("#chatInput").val()};
@@ -12,14 +21,24 @@ $(function () { // This anonymous function runs after the page loads.
 	});
 });
 
+LT.loadCampaign = function (id) {
+	$.get("php/Campaign.read.php", {"campaign": id}, function (theData) {
+		LT.currentCampaign = new LT.Campaign(theData);
+		LT.campaignPanel.showTab("campaign info");
+		LT.campaignPanel.showTab("chat");
+		// TODO: populate campaign panel info tab
+		// TODO: populate campaign panel chat tab
+		// TODO: load campaign map if it has one
+	});
+};
+
 LT.refreshCampaignList = function () {
 	$.get("php/User.campaigns.php", function (data) {
 		$("#campaignList tr:not(.template)").remove();
 		$.each(data, function (i, campaign) {
 			var row = $("#campaignList .template").clone().removeClass("template");
-			row.find(".name").text(campaign.name).click(function () {
-				$.get("php/Campaign.read.php", {"campaign": campaign.campaign},
-					function (theData) {LT.loadCampaign(new LT.Campaign(theData));});
+			row.find(".name").text(campaign.name || "[unnamed campaign]").click(function () {
+				LT.loadCampaign(campaign.campaign);
 			});
 			row.find(".permission").text(campaign.permission);
  			row.find(".disown").click(function () {
