@@ -34,7 +34,8 @@ if ($rows = LT_call_silent('read_user_login', $email)) {
 		. "\r\nhttp://{$_SERVER['HTTP_HOST']}"
 		. str_replace("/php/User.create.php", "", $_SERVER['REQUEST_URI'])
 		. "?resetCode=$reset_code&email=$email";
-	mail($email, $subject, $message);
+	$headers = 'From: Live Tabletop <noreply@gameartsguild.com>';
+	mail($email, $subject, $message, $headers);
 
 }
 
