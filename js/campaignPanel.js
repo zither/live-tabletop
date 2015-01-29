@@ -1,6 +1,7 @@
 $(function () { // This anonymous function runs after the page loads.
 	LT.campaignPanel = new LT.Panel("campaign");
 	LT.campaignPanel.hideTab("campaign info");
+	LT.campaignPanel.hideTab("blacklist");
 	LT.campaignPanel.hideTab("chat");
 
 	$("#createCampaign input[type=button]").click(function () {
@@ -30,8 +31,7 @@ LT.loadCampaign = function (id) {
 	$("#chatOutput .message:not(.template)").remove();
 
 	// let the server know you are no longer viewing the previous campaign
-	if (LT.currentCampaign)
-		$.post("php/Campaign.leave.php", {campaign: LT.currentCampaign.id});
+	if (LT.currentCampaign) LT.leaveCampaign();
 
 	// let the server know you are viewing the campaign
 	$.post("php/Campaign.arrive.php", {campaign: id});
@@ -82,7 +82,7 @@ LT.refreshCampaign = function (id) {
 			}, function (data) {
 
 				// update campaign name
-				$("#campaignName").text(data.name);
+				$("#campaignName").text(data.name || "[unnamed campaign]");
 
 				// update campaign private/public toggle
 				$("#campaignPrivate").val(data.private);
@@ -94,30 +94,37 @@ LT.refreshCampaign = function (id) {
 					$.get("php/Campaign.users.php", {
 						campaign: LT.currentCampaign.id
 					}, function (theUsers) {
+						// add campaign owners, members and guests to LT.users
+						LT.players = theUsers;
+						LT.indexUsers();
+						// add campaign owners members and guests to campaign info tab
 						$("#campaignUsers tr:not(.template)").remove();
 						$.each(theUsers, function (i, user) {
 							$copy = $("#campaignUsers .template").clone().removeClass("template");
 							$copy.find(".name").text(user.name);
-							// TODO: convert owner checkbox, remove and ban buttons to select ( owner | member | guest | banned )
-							$copy.find("[value=owner]").click(function () {
-								alert("TODO: do something when you click on owner in #campaignUsers?");
-							})[0].checked = user.permission == "owner";
-							$copy.find("[value=viewing]").click(function () {
-								alert("TODO: do something when you click on viewing in #campaignUsers?");
-							})[0].checked = user.viewing;
-							$copy.find("[value=remove]").click(function () {
-								alert("TODO: do something when you click on remove in #campaignUsers");
-							});
-							$copy.find("[value=ban]").click(function () {
-								alert("TODO: do something when you click on ban in #campaignUsers");
-							});
+							$copy.find(".permission").change(function () {
+								var before = user.permission;
+								var after = $(this).val();
+								if (before != "owner" || confirm("Are you sure you want to revoke"
+									+ user.name + "'s ownership of this campaign?")) {
+									if (after == "owner" || after == "member" || after == "banned" && confirm(
+									"Are you sure you want to ban " + user.name + " from this campaign?")) {
+										$.post("php/Campaign.permission.php", {
+											"campaign": LT.currentCampaign.id,
+											"user": user.id,
+											"permission": after
+										}, function () {LT.refreshCampaign();});
+									}
+									if (after == "guest") {
+										$.post("php/Campaign.deleteUser.php", {
+											"campaign": LT.currentCampaign.id,
+											"user": user.id
+										}, function () {LT.refreshCampaign();});
+									}
+								}
+							}).val(user.permission || "guest");
+							$copy.find("[value=viewing]")[0].checked = user.viewing;
 							$copy.appendTo("#campaignUsers");
-							if (user.id in LT.users) {
-								LT.users[user.id].name = user.name;
-								LT.users[user.id].avatar = user.avatar;
-								LT.users[user.id].permission = user.permission;
-								LT.users[user.id].color = user.color;
-							} else LT.users[user.id] = user;
 						});
 					});
 				}
@@ -216,4 +223,17 @@ LT.formatTime = function (seconds) {
 			+ time.getDate() + " " + time.getHours() + ":" + minutes;
 };
 
+LT.leaveCampaign = function () {
+	// Let the server know that you aren't viewing the campaign anymore
+	$.post("php/Campaign.leave.php", {campaign: this.id});
+	// remove the campaign owners, members and guests from LT.users
+	LT.players = [];
+	LT.indexUsers();
+	// hide campaign-specific tabs
+	LT.campaignPanel.hideTab("campaign info");
+	LT.campaignPanel.hideTab("blacklist");
+	LT.campaignPanel.hideTab("chat");
+	// drop campaign info
+	delete LT.currentCampaign;
+}
 

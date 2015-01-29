@@ -7,9 +7,7 @@ $(function () { // This anonymous function runs after the page loads.
 		$("#map, #pageBar, .panel").hide();
 		$("#welcome").show();
 		delete LT.currentUser;
-		// leave the campaign
-		$.post("php/Campaign.leave.php", {campaign: this.id});
-		delete LT.currentCampaign;
+		LT.leaveCampaign();
 	});
 	$("#defaultPanels").click(function () {
 		LT.userPanel.reset();      LT.userPanel.show();
@@ -73,6 +71,9 @@ LT.refreshUser = function () {
 		if (!LT.holdTimeStamps) { // do not update while dragging
 			// update friends lists
 			$.get("php/User.friends.php", function (data) {
+				// add confirmed friends and received friend requests to LT.users
+				LT.friends = data.confirmed.concat(data.received);
+				LT.indexUsers();
 				// confirmed friends
 				$("#friendsConfirmed tr:not(.template)").remove();
 				$.each(data.confirmed, function (i, friend) {
@@ -136,5 +137,18 @@ LT.refreshUser = function () {
 		LT.refreshUserTimeout = setTimeout(LT.refreshUser, 10000);
 	} // if (LT.currentUser) { // stop updating if no user is logged in
 };
+
+// keep an index of user info by id
+LT.friends = [];
+LT.players = [];
+LT.users = {};
+LT.indexUsers = function () {
+	$.each(LT.friends.concat(LT.players), function (i, user) {
+		if (user.id in LT.users) {
+			for (propertyName in user)
+				LT.users[user.id][propertyName] = user[propertyName];
+		} else LT.users[user.id] = user;
+	});
+}
 
 

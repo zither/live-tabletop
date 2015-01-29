@@ -263,9 +263,15 @@
 					<tr class="template">
 						<td><a class="name">user name</a></td>
 						<td>
-							<div class="owner"><input type="checkbox" value="owner"/><label>owner</label></div>
-							<div class="viewing"><input type="checkbox" value="viewing"/><label>viewing</label></div>
-							<div><input type="button" value="remove"/><input type="button" value="ban"/></div>
+							<div>
+								<select class="permission">
+									<option value="owner">owner</option>
+									<option value="member">member</option>
+									<option value="guest">guest</option>
+									<option value="banned">banned</option>
+								</select>
+							</div>
+							<div><input type="checkbox" value="viewing" readonly="readonly"/><label>viewing</label></div>
 						</td>
 					</tr>
 				</table>
@@ -511,7 +517,7 @@
 						<select name="character_id"><option>Player 3</option></select><input type="button" value="add owner"/>
 					</div>
 					<div>
-						Peices:
+						Pieces:
 						<a><img class="inlineImage" src="images/upload/piece/rogue.png"/> rogue</a> at (1,3),
 						<a><img class="inlineImage" src="images/upload/piece/priest.png"/> priest</a> at (7,4)
 					</div>
