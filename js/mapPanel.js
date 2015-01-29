@@ -92,14 +92,6 @@ LT.loadMap = function (map) {
 
 	LT.refreshMaps(); // TODO: should we do this here?
 
-	// FIXME: this is a campaign thing
-	LT.alert();
-	LT.alert("Loading chat log for " + table.name + "...");
-	LT.lastMessageID = 0;
-	LT.refreshChatPanel();
-	LT.alert("Arriving at " + table.name);
-	LT.alert();
-
 	map.createGrid();
 	map.loadTiles();
 	LT.loadPieces();

@@ -1,4 +1,4 @@
-<?php // User views the owners, members and guests of this campaign
+<?php // User views the blacklist of this campaign
 
 include('db_config.php');
 include('include/query.php');
@@ -13,8 +13,6 @@ if (!isset($_SESSION['user'])) {
 
 $campaign = intval($_REQUEST['campaign']);
 if (LT_can_view_campaign($campaign))
-	if (is_array($rows = LT_call('read_campaign_users', $campaign)))
-		LT_output_array($rows, array(
-			'integer' => array('id', 'avatar'),
-			'boolean' => array('viewing')));
+	if (is_array($rows = LT_call('read_campaign_user_blacklist', $campaign)))
+		LT_output_array($rows);
 ?>

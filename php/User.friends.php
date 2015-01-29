@@ -13,11 +13,11 @@ $user = intval($_SESSION['user']);
 
 $friends = array('received' => array(), 'requested' => array(), 'confirmed' => array());
 foreach (LT_call('read_friends_received', $user) as $row)
-	$friends['received'][] = $row['email'];
+	$friends['received'][] = LT_format_object($row, array('integer' => array('id')));
 foreach (LT_call('read_friends_requested', $user) as $row)
-	$friends['requested'][] = $row['email'];
+	$friends['requested'][] = array('email' => $row['email']);
 foreach (LT_call('read_friends_confirmed', $user) as $row)
-	$friends['confirmed'][] = $row['email'];
+	$friends['confirmed'][] = LT_format_object($row, array('integer' => array('id')));
 include('include/json_headers.php');
 echo json_encode($friends);
 

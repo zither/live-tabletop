@@ -7,6 +7,9 @@ $(function () { // This anonymous function runs after the page loads.
 		$("#map, #pageBar, .panel").hide();
 		$("#welcome").show();
 		delete LT.currentUser;
+		// leave the campaign
+		$.post("php/Campaign.leave.php", {campaign: this.id});
+		delete LT.currentCampaign;
 	});
 	$("#defaultPanels").click(function () {
 		LT.userPanel.reset();      LT.userPanel.show();
@@ -36,7 +39,8 @@ $(function () { // This anonymous function runs after the page loads.
 	$("#userSubscribed").change(function () {
 		var box = this;
 		box.disabled = true;
-		LT.currentUser.update({subscribed: box.checked ? 1 : 0}).done(function () {
+		LT.currentUser.subscribed = box.checked ? 1 : 0;
+		$.post("php/User.settings.php", LT.currentUser, function () {
 			if (box.checked)
 				alert("You will now recieve Live Tabletop e-mail updates.");
 			else
@@ -47,13 +51,15 @@ $(function () { // This anonymous function runs after the page loads.
 	$("#userName input[type=button]").click(function () {
 		var newName = prompt("new user name", LT.currentUser.name);
 		if (newName != null && newName != LT.currentUser.name) {
-			LT.currentUser.update({name: newName}).done(function () {
+			LT.currentUser.name = newName;
+			$.post("php/User.settings.php", LT.currentUser, function () {
 				$("#userName span").text(LT.currentUser.name || LT.currentUser.email);
 			});
 		}
 	});
 	$("#userColor").change(function () {
-		LT.currentUser.update({color: $(this).val()}).done(function () {
+		LT.currentUser.color = $(this).val();
+		$.post("php/User.settings.php", LT.currentUser, function () {
 			alert("Your color is now " + $("#userColor").val());
 		});
 	});
@@ -71,14 +77,18 @@ LT.refreshUser = function () {
 				$("#friendsConfirmed tr:not(.template)").remove();
 				$.each(data.confirmed, function (i, friend) {
 					var row = $("#friendsConfirmed .template").clone().removeClass("template");
-					row.find(".email").text(friend);
+					row.find(".email").text(friend.email);
 					row.find("input[value=remove]").click(function () {
-						if (confirm("Permanently delete " + friend + " from your friends list?"))
-							$.post("php/User.unfriend.php", {recipient: friend}, function () {
+						if (confirm("Permanently delete " + friend.email + " from your friends list?"))
+							$.post("php/User.unfriend.php", {recipient: friend.email}, function () {
 								LT.refreshUser();
 							});
 					});
 					row.appendTo("#friendsConfirmed tbody");
+					if (friend.id in LT.users) {
+						LT.users[user.id].name = friend.name;
+						LT.users[user.id].color = friend.color;
+					} else LT.users[friend.id] = friend;
 				});
 				// friend requests sent by you
 				if (data.requested.length == 0) LT.userPanel.hideTab("user sent");
@@ -86,9 +96,9 @@ LT.refreshUser = function () {
 				$("#friendsRequested tr:not(.template)").remove();
 				$.each(data.requested, function (i, friend) {
 					var row = $("#friendsRequested .template").clone().removeClass("template");
-					row.find(".email").text(friend);
+					row.find(".email").text(friend.email);
 					row.find("input[value=cancel]").click(function () {
-						$.post("php/User.unfriend.php", {recipient: friend}, function () {
+						$.post("php/User.unfriend.php", {recipient: friend.email}, function () {
 							LT.refreshUser();
 						});
 					});
@@ -100,18 +110,22 @@ LT.refreshUser = function () {
 				$("#friendsReceived tr:not(.template)").remove();
 				$.each(data.received, function (i, friend) {
 					var row = $("#friendsReceived .template").clone().removeClass("template");
-					row.find(".email").text(friend);
+					row.find(".email").text(friend.email);
 					row.find("input[value=confirm]").click(function () {
-						$.post("php/User.friend.php", {recipient: friend}, function () {
+						$.post("php/User.friend.php", {recipient: friend.email}, function () {
 							LT.refreshUser();
 						});
 					});
 					row.find("input[value=reject]").click(function () {
-						$.post("php/User.unfriend.php", {recipient: friend}, function () {
+						$.post("php/User.unfriend.php", {recipient: friend.email}, function () {
 							LT.refreshUser();
 						});
 					});
 					row.appendTo("#friendsReceived tbody");
+					if (friend.id in LT.users) {
+						LT.users[user.id].name = friend.name;
+						LT.users[user.id].color = friend.color;
+					} else LT.users[friend.id] = friend;
 				});
 			});
 			// update user's campaign, map and character lists in other panels

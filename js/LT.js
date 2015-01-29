@@ -3,7 +3,6 @@ var LT = {};
 LT.brush = null; // paint "tile", "wall" or "fog"
 LT.selectedImage = "";
 LT.selectedImageID = -1;
-LT.lastMessageID = 0;
 
 // Store data as JSON in the browser's cookie
 LT.setCookie = function (name, value) {

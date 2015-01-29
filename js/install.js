@@ -7,7 +7,7 @@ $(function () { // This anonymous function runs after the page loads.
 			alert("Admin passwords do not match.");
 			return false;
 		}
-		$.post("php/User.logout.php", function () {
+//		$.post("php/User.logout.php", function () {
 			$.post("php/install.php", formData, function () {
 				$.post("php/db_config.php", function () {
 					$("#installBox").hide();
@@ -16,7 +16,7 @@ $(function () { // This anonymous function runs after the page loads.
 					alert("Database was not properly installed. Try again.");		
 				});
 			});
-		});
+//		});
 	});
 
 	// automatic install
