@@ -20,8 +20,8 @@ $(function () { // This anonymous function runs after the page loads.
 		$("#passwordForm").show();
 	} else {
 		$.post("php/db_config.php", function () {
-			$.post("php/User.check.php", function (theData) {
-				LT.login(new LT.User(theData));
+			$.post("php/User.check.php", function (theUser) {
+				LT.login(theUser);
 			}, "json").fail(function () {
 				$("#welcome").show();
 			});

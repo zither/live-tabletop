@@ -10,26 +10,45 @@ $(function () { // This anonymous function runs after the page loads.
 			LT.loadCampaign(theData.id);
 		});
 	});
-	$("#chatForm").submit(function () {
-		if (!LT.currentTable) return false;
-		var args = {table_id: LT.currentTable.id, text: $("#chatInput").val()};
-		$.post("php/create_message.php", args, function () {
+	$("#chatForm input[value=send]").click(function () {
+//		if (!LT.currentCampaign) return false;
+		var args = {campaign: LT.currentCampaign.id, text: $("#chatInput").val()};
+		$.post("php/Campaign.message.php", args, function () {
 			$("#chatInput").val("").focus();
-			LT.refreshChatPanel();
+//			LT.refreshChatPanel();
 		});
 		return false;
 	});
 });
 
 LT.loadCampaign = function (id) {
-	$.get("php/Campaign.read.php", {"campaign": id}, function (theData) {
-		LT.currentCampaign = new LT.Campaign(theData);
-		LT.campaignPanel.showTab("campaign info");
-		LT.campaignPanel.showTab("chat");
-		// TODO: populate campaign panel info tab
-		// TODO: populate campaign panel chat tab
-		// TODO: load campaign map if it has one
-	});
+	// show campaign panel tabs that only apply to a loaded campaign
+	LT.campaignPanel.showTab("campaign info");
+	LT.campaignPanel.showTab("chat");
+
+	// clear chat tab
+	$("#chatOutput .message:not(.template)").remove();
+
+	// let the server know you are no longer viewing the previous campaign
+	if (LT.currentCampaign)
+		$.post("php/Campaign.leave.php", {campaign: LT.currentCampaign.id});
+
+	// let the server know you are viewing the campaign
+	$.post("php/Campaign.arrive.php", {campaign: id});
+
+	// create a default campaign object
+	LT.currentCampaign = {
+		"id": id,
+		"name": "",
+		"private": true,
+		"turns": [],
+		"users_modified": 0,
+		"last_messsage": 0,
+		"map": null
+	};
+
+	// start periodic campaign updates
+	LT.refreshCampaign();
 };
 
 LT.refreshCampaignList = function () {
@@ -51,11 +70,16 @@ LT.refreshCampaignList = function () {
 	});
 };
 
-LT.updateCampaign = function () {
-	if (LT.currentUser && LT.currentCampaign) {
-		if (!LT.holdTimeStamps) {
-			var args = {campaign: LT.currentCampaign.id};
-			$.get("php/Campaign.read.php", args, function (data) {
+LT.refreshCampaign = function (id) {
+	// we only want one of these scheduled at a time
+	if (LT.refreshCampaignTimeout) clearTimeout(LT.refreshCampaignTimeout);
+
+	if (id || LT.currentUser && LT.currentCampaign) { // stop updating if no campaign is loaded
+		if (!LT.holdTimeStamps) { // do not update while dragging
+
+			$.get("php/Campaign.read.php", {
+				campaign: LT.currentCampaign.id
+			}, function (data) {
 
 				// update campaign name
 				$("#campaignName").text(data.name);
@@ -63,53 +87,121 @@ LT.updateCampaign = function () {
 				// update campaign private/public toggle
 				$("#campaignPrivate").val(data.private);
 
-				// TODO: update users if users_modified timestamp has changed
-				// TODO: update turns (json object)
-				// TODO: update map (id number) - open map | change map | close map
+				// update users if users_modified timestamp has changed
+				// FIXME: users_modified not affected when users change their names
+				// TODO: list of blacklisted users
+				if (data.users_modified > LT.currentCampaign.users_modified) {
+					$.get("php/Campaign.users.php", {
+						campaign: LT.currentCampaign.id
+					}, function (theUsers) {
+						$("#campaignUsers tr:not(.template)").remove();
+						$.each(theUsers, function (i, user) {
+							$copy = $("#campaignUsers .template").clone().removeClass("template");
+							$copy.find(".name").text(user.name);
+							// TODO: convert owner checkbox, remove and ban buttons to select ( owner | member | guest | banned )
+							$copy.find("[value=owner]").click(function () {
+								alert("TODO: do something when you click on owner in #campaignUsers?");
+							})[0].checked = user.permission == "owner";
+							$copy.find("[value=viewing]").click(function () {
+								alert("TODO: do something when you click on viewing in #campaignUsers?");
+							})[0].checked = user.viewing;
+							$copy.find("[value=remove]").click(function () {
+								alert("TODO: do something when you click on remove in #campaignUsers");
+							});
+							$copy.find("[value=ban]").click(function () {
+								alert("TODO: do something when you click on ban in #campaignUsers");
+							});
+							$copy.appendTo("#campaignUsers");
+							if (user.id in LT.users) {
+								LT.users[user.id].name = user.name;
+								LT.users[user.id].avatar = user.avatar;
+								LT.users[user.id].permission = user.permission;
+								LT.users[user.id].color = user.color;
+							} else LT.users[user.id] = user;
+						});
+					});
+				}
+						
+				// update blacklist
+				if (data.users_modified > LT.currentCampaign.users_modified) {
+					$.get("php/Campaign.blacklist.php", {
+						campaign: LT.currentCampaign.id
+					}, function (theUsers) {
+						$("#blacklist tr:not(.template)").remove();
+						$.each(theUsers, function (i, user) {
+							$copy = $("#blacklist .template").clone().removeClass("template");
+							$copy.find(".email").text(user.email);
+							$copy.find("[value=remove]").click(function () {
+								if (confirm("Are you sue you want to remove " + user.email + " from the blacklist?")) {
+									$.post("php/Campaign.permission.php", {
+										user: user.email,
+										campaign:  LT.currentCampaign.id,
+										permission: "banned"
+									}, function () {LT.refreshCampaignList();});
+								}
+							});
+							$copy.appendTo("#blacklist");
+						});						
+					});
+				}
+
+				// update turns (json object)
+				// TODO: should this be in characterPanel.js?
+				$.each(data.turns, function (i, turn) {
+					$("#turns tr:not(.template)").remove();
+					var copy = $("#turns .template").clone().removeClass("template");
+					copy.find(".name").text(turn.name);
+					copy.find("input[value=up]").click(function () {
+						alert("TODO: do something when you click up button in turns list.");
+					});
+					copy.find("input[value=down]").click(function () {
+						alert("TODO: do something when you click down button in turns list.");
+					});
+					copy.find("input[value=rename]").click(function () {
+						alert("TODO: do something when you click rename button in turns list.");
+					});
+					copy.find("input[value=remove]").click(function () {
+						alert("TODO: do something when you click remove button in turns list.");
+					});
+					copy.appendTo("#turns");
+				});
+
+				// update map (id number)
+				if (LT.currentCampaign.map != data.map) {
+					// TODO: close map
+					LT.currentCampaign.map = null;
+				}
+				if (data.map && !(LT.currentCampaign.map)) {
+					// TODO: open map
+				}
 
 				// load new chat messages.
-				if (data.last_message > LT.lastMessageID) {
-					var args = {campaign: LT.currentCampaign.id, last_message: LT.lastMessageID};
-					$.post("php/Campaign.messages.php", args, function (data) {
-						//$("#chatOutput .message").remove();
-						for (var i = 0; i < data.length; i++) {
-							// TODO: generate from an HTML template?
-							$("<div>").insertBefore("#chatBottom").addClass("message").append([
-								$("<span>").text("[" + LT.formatTime(data[i].time) + "]"),
-								$("<span>").text(" " + LT.users[data[i].user_id].name + ": "),
-								$("<span>").html(data[i].text),
-							]);
-							LT.lastMessageID = data[i].id;
-						}
+				if (data.last_message > LT.currentCampaign.last_message) {
+					$.post("php/Campaign.messages.php", {
+						campaign: LT.currentCampaign.id,
+						last_message: LT.currentCampaign.last_message
+					}, function (theMessages) {
+						$.each(theMessages, function (i, message) {
+							var name = "[unknown user]";
+							if (message.user in LT.users)
+								name = LT.users[message.user].name;
+							copy = $("#chatOutput .template").clone().removeClass("template");
+							copy.find(".time").text("[" + LT.formatTime(message.time) + "]");
+							copy.find(".user").text(" " + name + ": ");
+							copy.find(".text").html(message.text);
+							copy.insertBefore("#chatBottom");
+							LT.currentCampaign.last_message = message.id;
+						});
 						$("#chatBottom")[0].scrollIntoView(true);
 					});
 				}
 
-				LT.currentCampaign = new LT.Campaign(data);
-
+				LT.currentCampaign = data; //new LT.Campaign(data);
 			});
-		}
-		setTimeout(LT.updateCampaign, 2000);
-	}
+		} // if (!LT.holdTimeStamps) { // do not update while dragging
+		LT.refreshCampaignTimeout = setTimeout(LT.refreshCampaign, 10000);
+	} // if (id || LT.currentUser && LT.currentCampaign) { // stop updating if no campaign is loaded
 }
-
-LT.refreshChatPanel = function () {
-	if (!LT.currentTable) return;
-	var args = {table_id: LT.currentTable.id, last_message: LT.lastMessageID};
-	$.post("php/read_messages.php", args, function (data) {
-//		$("#chatOutput .message").remove();
-		for (var i = 0; i < data.length; i++) {
-			// TODO: generate from an HTML template?
-			$("<div>").insertBefore("#chatBottom").addClass("message").append([
-				$("<span>").text("[" + LT.formatTime(data[i].time) + "]"),
-				$("<span>").text(" " + LT.users[data[i].user_id].name + ": "),
-				$("<span>").html(data[i].text),
-			]);
-			LT.lastMessageID = data[i].id;
-		}
-		$("#chatBottom")[0].scrollIntoView(true);
-	});
-};
 
 // Format time as year.month.day hour:minute (or just hour:minute if today.)
 LT.formatTime = function (seconds) {
@@ -124,11 +216,4 @@ LT.formatTime = function (seconds) {
 			+ time.getDate() + " " + time.getHours() + ":" + minutes;
 };
 
-// Add a client-side message to the chat window.
-// TODO: not bound to tables, separate from chat? new notification system?
-LT.alert = function (text) {
-	$("#chatBottom").before(
-		text ? $("<div>").addClass("alert").text(text) : $("<br>")
-	)[0].scrollIntoView(true)
-};
 

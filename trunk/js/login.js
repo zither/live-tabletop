@@ -2,8 +2,8 @@ $(function () { // This anonymous function runs after the page loads.
 
 	// login form
 	$("#loginForm input[type=button]").click(function () {
-		$.post("php/User.login.php", LT.formValues("#loginForm"), function (theData) {
-			LT.login(new LT.User(theData));
+		$.post("php/User.login.php", LT.formValues("#loginForm"), function (the_user) {
+			LT.login(theUser);
 		}, "json").fail(function () {
 			alert("Incorrect username or password.");
 		});
@@ -81,7 +81,8 @@ $(function () { // This anonymous function runs after the page loads.
 
 LT.login = function (theUser) {
 	LT.currentUser = theUser;
-	LT.alert("You have logged in.");
+	LT.users = {};
+	LT.users[theUser.id] = theUser;
 
 	// TODO: start this process before logging in?
 	LT.Piece.readImages();
@@ -101,15 +102,14 @@ LT.login = function (theUser) {
 	// restore panels from cookie
 	LT.Panel.loadCookie();
 
-//	LT.refreshChatPanel(); // FIXME: don't do this until a campaign is loaded
-
-	// TODO: load a table by id if there's a cookie for it
-	// FIXME: campaign or map? both? what other lists?
+	// TODO: load a campaign by id if there's a cookie for it
 	LT.refreshMaps();
 
 	// start periodic user updates
 	LT.holdTimestamps = 0;
 	LT.refreshUser();
+
+	
 
 /* TODO: do this in LT.updateUser
 	$.post("php/read_users.php", function (data) {

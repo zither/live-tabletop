@@ -35,6 +35,7 @@ DROP PROCEDURE IF EXISTS update_campaign_turns;
 DROP PROCEDURE IF EXISTS delete_campaign;
 DROP PROCEDURE IF EXISTS read_campaign_user_permission;
 DROP PROCEDURE IF EXISTS read_campaign_user_campaigns;
+DROP PROCEDURE IF EXISTS read_campaign_user_blacklist;
 DROP PROCEDURE IF EXISTS read_campaign_users;
 DROP PROCEDURE IF EXISTS update_campaign_user_permission;
 DROP PROCEDURE IF EXISTS update_campaign_user_arrive;
@@ -591,7 +592,7 @@ END;
 or User sees the friend requests he has received */
 CREATE PROCEDURE read_friends_received (IN the_user INT)
 BEGIN
-	SELECT users.email AS email FROM users,
+	SELECT `id`, `email`, `name`, `color` FROM users,
 		(SELECT * FROM friend_requests WHERE recipient = the_user) AS requests
 		WHERE requests.sender = users.id ORDER BY requests.time;
 END;
@@ -600,7 +601,7 @@ END;
 or User sees the friend requests he has sent */
 CREATE PROCEDURE read_friends_requested (IN the_user INT)
 BEGIN
-	SELECT users.email AS email FROM users,
+	SELECT `email` FROM users,
 		(SELECT * FROM friend_requests WHERE sender = the_user) AS requests
 		WHERE requests.recipient = users.id ORDER BY requests.time;
 END;
@@ -609,7 +610,7 @@ END;
 or User views his list of confirmed friends */
 CREATE PROCEDURE read_friends_confirmed (IN the_user INT)
 BEGIN
-	SELECT `email` FROM users, 
+	SELECT `id`, `email`, `name`, `color` FROM users, 
 		(SELECT `second` AS `friend_id` FROM friends WHERE `first` = the_user
 		UNION SELECT `first` AS `friend_id` FROM friends WHERE `second` = the_user)
 		AS confirmed WHERE `friend_id` = `id` ORDER BY `email`;
@@ -721,12 +722,19 @@ BEGIN
 		ORDER BY `name`, `campaign`;
 END;
 
-/* User views the owners, members, viewers and blacklist of this campaign */
+/* User views the blacklist of this campaign */
+CREATE PROCEDURE read_campaign_user_blacklist (IN the_campaign INT)
+BEGIN
+	SELECT `email` FROM campaign_users JOIN users ON `id` = `user`
+		WHERE `campaign` = the_campaign AND `permission` = 'banned';
+END;
+
+/* User views the owners, members and guests of this campaign */
 CREATE PROCEDURE read_campaign_users (IN the_campaign INT)
 BEGIN
-	SELECT `user`, `permission`, `viewing`, `avatar`, users.name AS `name`
+	SELECT `id`, `permission`, `viewing`, `avatar`, `color`, `email`, users.name AS `name`
 		FROM campaign_users JOIN users ON `id` = `user`
-		WHERE `campaign` = the_campaign;
+		WHERE `campaign` = the_campaign AND `permission` <> 'banned';
 END;
 
 /* User invites another user to play at the campaign (who becomes a member)
