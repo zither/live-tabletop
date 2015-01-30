@@ -220,10 +220,10 @@ LT.Panel.prototype = {
 		this.setHeight(data.height);
 		if (data.visible) this.show(); else this.hide();
 		this.selectTab(data.tab);
-		// select a different tab if the saved tab is hidden
-		// TODO: won't work if panel is hidden? keep an internal list of visible tabs?
-		if ($(this.outside).find(".tab[data-tab='" + data.tab + "']").is(":hidden"))
-			this.selectTab($(this.outside).find(".tab:visible").data("tab"));
+		// select the first tab if the saved tab is hidden
+		var tabs = $(this.outside).find(".tab");
+		if (tabs.filter("[data-tab='" + data.tab + "']").css("display") == "none")
+			this.selectTab($(tabs[0]).data("tab"));
 	},
 
 /*

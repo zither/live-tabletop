@@ -25,6 +25,7 @@ $(function () { // This anonymous function runs after the page loads.
 LT.loadCampaign = function (id) {
 	// show campaign panel tabs that only apply to a loaded campaign
 	LT.campaignPanel.showTab("campaign info");
+	LT.campaignPanel.showTab("blacklist");
 	LT.campaignPanel.showTab("chat");
 
 	// clear chat tab
@@ -105,24 +106,33 @@ LT.refreshCampaign = function (id) {
 							$copy.find(".permission").change(function () {
 								var before = user.permission;
 								var after = $(this).val();
-								if (before != "owner" || confirm("Are you sure you want to revoke"
-									+ user.name + "'s ownership of this campaign?")) {
-									if (after == "owner" || after == "member" || after == "banned" && confirm(
-									"Are you sure you want to ban " + user.name + " from this campaign?")) {
-										$.post("php/Campaign.permission.php", {
-											"campaign": LT.currentCampaign.id,
-											"user": user.id,
-											"permission": after
-										}, function () {LT.refreshCampaign();});
-									}
-									if (after == "guest") {
-										$.post("php/Campaign.deleteUser.php", {
-											"campaign": LT.currentCampaign.id,
-											"user": user.id
-										}, function () {LT.refreshCampaign();});
+								var questions = [];
+								if (before == after) return;
+								if (user.id == LT.currentUser.id) {
+									if (before == "owner") questions.push(
+										"Are you sure you want to give up ownership of this campaign?");
+								} else {
+									if (before == "owner") questions.push("Are you sure you want to revoke"
+										+ user.name + "'s ownership of this campaign?");
+									if (after == "banned") questions.push("Are you sure you want to ban "
+										+ user.name + " from this campaign?");
+								}
+								while (questions.length > 0) {
+									if (!confirm(questions.shift())) {
+										$(this).val(before);
+										return;
 									}
 								}
+								if (after == "guest") $.post("php/Campaign.permission.php", {
+									"campaign": LT.currentCampaign.id,
+									"permission": after,
+									"user": user.id}, function () {LT.refreshCampaign();});
+								else $.post("php/Campaign.deleteUser.php", {
+									"campaign": LT.currentCampaign.id,
+									"user": user.id}, function () {LT.refreshCampaign();});
 							}).val(user.permission || "guest");
+							if (user.id == LT.currentUser.id)
+								$copy.find(".permission option[value=banned]").remove();
 							$copy.find("[value=viewing]")[0].checked = user.viewing;
 							$copy.appendTo("#campaignUsers");
 						});
