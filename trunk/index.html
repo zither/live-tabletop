@@ -259,27 +259,25 @@
 					<input type="checkbox" value="private" id="campaignPrivate" checked="checked"/>
 					<label for="campaignPrivate">private</label>
 				</div>
-				<table id="campaignUsers">
-					<tr class="template">
-						<td><a class="name">user name</a></td>
-						<td>
-							<div>
-								<select class="permission">
-									<option value="owner">owner</option>
-									<option value="member">member</option>
-									<option value="guest">guest</option>
-									<option value="banned">banned</option>
-								</select>
-							</div>
-							<div><input type="checkbox" value="viewing" readonly="readonly"/><label>viewing</label></div>
-						</td>
-					</tr>
-				</table>
 				<div>
 					<select name="user"><option>My Friend</option></select>
 					<input type="button" value="invite to campaign"/>
 					<input type="button" value="share campaign"/>
 				</div>
+				<table id="campaignUsers">
+					<tr class="template">
+						<td><a class="name">user name</a></td>
+						<td>
+							<select class="permission">
+								<option value="owner">owner</option>
+								<option value="member">member</option>
+								<option value="guest">guest</option>
+								<option value="banned">banned</option>
+							</select>
+							<input type="checkbox" value="viewing" readonly="readonly"/><label>viewing</label>
+						</td>
+					</tr>
+				</table>
 			</div>
 			<div class="content" data-tab="blacklist">
 				<table id="blacklist">
