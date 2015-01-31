@@ -22,7 +22,30 @@ $(function () { // This anonymous function runs after the page loads.
 	});
 });
 
+LT.refreshCampaignList = function () {
+	$.get("php/User.campaigns.php", function (data) {
+		$("#campaignList tr:not(.template)").remove();
+		$.each(data, function (i, campaign) {
+			var row = $("#campaignList .template").clone().removeClass("template");
+			row.find(".name").text(campaign.name || "[unnamed campaign]").click(function () {
+				LT.loadCampaign(campaign.campaign);
+			});
+			row.find(".permission").text(campaign.permission);
+ 			row.find(".disown").click(function () {
+				$.post("php/Campaign.deleteUser.php",
+					{"user": LT.currentUser.id, "campaign": campaign.campaign},
+					function () {LT.refreshCampaignList();});
+			});
+			row.appendTo("#campaignList tbody");
+		});
+	});
+};
+
 LT.loadCampaign = function (id) {
+
+	// remember the current campaign when you reload
+	LT.setCookie("campaign", id);
+
 	// show campaign panel tabs that only apply to a loaded campaign
 	LT.campaignPanel.showTab("campaign info");
 	LT.campaignPanel.showTab("blacklist");
@@ -52,30 +75,11 @@ LT.loadCampaign = function (id) {
 	LT.refreshCampaign();
 };
 
-LT.refreshCampaignList = function () {
-	$.get("php/User.campaigns.php", function (data) {
-		$("#campaignList tr:not(.template)").remove();
-		$.each(data, function (i, campaign) {
-			var row = $("#campaignList .template").clone().removeClass("template");
-			row.find(".name").text(campaign.name || "[unnamed campaign]").click(function () {
-				LT.loadCampaign(campaign.campaign);
-			});
-			row.find(".permission").text(campaign.permission);
- 			row.find(".disown").click(function () {
-				$.post("php/Campaign.deleteUser.php",
-					{"user": LT.currentUser.id, "campaign": campaign.campaign},
-					function () {LT.refreshCampaignList();});
-			});
-			row.appendTo("#campaignList tbody");
-		});
-	});
-};
-
-LT.refreshCampaign = function (id) {
+LT.refreshCampaign = function () {
 	// we only want one of these scheduled at a time
 	if (LT.refreshCampaignTimeout) clearTimeout(LT.refreshCampaignTimeout);
 
-	if (id || LT.currentUser && LT.currentCampaign) { // stop updating if no campaign is loaded
+	if (LT.currentUser && LT.currentCampaign) { // stop updating if no campaign is loaded
 		if (!LT.holdTimeStamps) { // do not update while dragging
 
 			$.get("php/Campaign.read.php", {
@@ -144,6 +148,8 @@ LT.refreshCampaign = function (id) {
 					$.get("php/Campaign.blacklist.php", {
 						campaign: LT.currentCampaign.id
 					}, function (theUsers) {
+						if (theUsers.length == 0) LT.campaignPanel.hideTab("blacklist");
+						else LT.campaignPanel.showTab("blackList");
 						$("#blacklist tr:not(.template)").remove();
 						$.each(theUsers, function (i, user) {
 							$copy = $("#blacklist .template").clone().removeClass("template");
@@ -217,7 +223,7 @@ LT.refreshCampaign = function (id) {
 			});
 		} // if (!LT.holdTimeStamps) { // do not update while dragging
 		LT.refreshCampaignTimeout = setTimeout(LT.refreshCampaign, 10000);
-	} // if (id || LT.currentUser && LT.currentCampaign) { // stop updating if no campaign is loaded
+	} // if (LT.currentUser && LT.currentCampaign) { // stop updating if no campaign is loaded
 }
 
 // Format time as year.month.day hour:minute (or just hour:minute if today.)

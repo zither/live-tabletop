@@ -85,9 +85,7 @@ LT.login = function (theUser) {
 	LT.users[theUser.id] = theUser;
 
 	// TODO: start this process before logging in?
-	LT.Piece.readImages();
-	LT.Map.readImages();
-	LT.Tile.readImages();
+	LT.loadImages();
 
 	// hide welcome screen and show main UI
 	$("#passwordForm").hide();
@@ -103,7 +101,8 @@ LT.login = function (theUser) {
 	LT.Panel.loadCookie();
 
 	// TODO: load a campaign by id if there's a cookie for it
-	LT.refreshMaps();
+
+//	LT.refreshMapList();
 
 	// start periodic user updates
 	LT.holdTimestamps = 0;

@@ -143,11 +143,17 @@ LT.friends = [];
 LT.players = [];
 LT.users = {};
 LT.indexUsers = function () {
+	// add friends and campaign users to LT.users index
 	$.each(LT.friends.concat(LT.players), function (i, user) {
 		if (user.id in LT.users) {
 			for (propertyName in user)
 				LT.users[user.id][propertyName] = user[propertyName];
 		} else LT.users[user.id] = user;
+	});
+	// add user to select boxes
+	$("select[name=user] option").remove();
+	$.each(LT.sortObject(LT.users, "name"), function (i, user) {
+		$("select[name=user]").append($("<option>").val(user.id).text(user.name));
 	});
 }
 
