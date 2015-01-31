@@ -3,20 +3,18 @@ $(function () { // This anonymous function runs after the page loads.
 
 	// refresh map list
 	// TODO: automatically refresh this list as needed (user timestamps?) 
-	$("#refreshMaps").click(function () {LT.refreshMaps();});
-
-	// submit map settings form
-	$("#applyMapChanges").click(function () {
-		LT.currentMap.update(LT.formValues("#mapEditor")).done(function () {
-			LT.loadMap(LT.currentMap);
-		});
-	});
+//	$("#refreshMaps").click(function () {LT.refreshMapList();});
 
 	// submit map creation form
 	$("#createMap").click(function () {
 		$.post("php/Map.create.php", LT.formValues("#mapCreator"), function (data) {
-			LT.loadMap(new LT.Map(data[0]));
+			LT.loadMap(data.id);
 		});
+	});
+
+	// submit map settings form
+	$("#applyMapChanges").click(function () {
+		$.post("php/Map.settings.php", LT.formValues("#mapEditor"), LT.refreshMap);
 	});
 
 	// TODO: UI for choosing presets
@@ -68,142 +66,119 @@ LT.chooseTool = function (swatch, name, layer) {
 	$(layer).show();
 };
 
-LT.loadMap = function (map) {
-	LT.currentMap = map;
-	LT.setCookie("map", map.id);
-	// FIXME: maps can have multiple owners
-	// TODO: do you also need campaign ownership?
-	if (map.user_id == LT.currentUser.id) {
-		// show tabs only visible to owners
-		LT.mapPanel.showTab("piece list");
-		LT.mapPanel.showTab("piece info");
-		LT.mapPanel.showTab("map info");
-		LT.mapPanel.showTab("map tools");
-	} else {
-		// hide tabs only visible to owners
-		LT.mapPanel.hideTab("piece list");
-		LT.mapPanel.hideTab("piece info");
-		LT.mapPanel.hideTab("map info");
-		LT.mapPanel.hideTab("map tools");
-		LT.mapPanel.selectTab("map list");
-		$(".clickLayer").hide();
-		$("#clickPieceLayer").show();
-	}
-
-	LT.refreshMaps(); // TODO: should we do this here?
-
-	map.createGrid();
-	map.loadTiles();
-	LT.loadPieces();
-
-	// load background image
-	// FIXME: new background system
-	if (map.image_id != -1)
-		$("#map").css({background: "url('images/upload/background/"
-			+ LT.Map.images[map.image_id].file + "')"});
-
-	// populate map info form
-	$("#mapEditor [name=name]").val(map.name);
-	$("#mapEditor [name=type]").val(map.type);
-	$("#mapEditor [name=background]").val(map.background);
-	$("#mapEditor [name=columns]").val(map.tile_columns);
-	$("#mapEditor [name=rows]").val(map.tile_rows);
-	$("#mapEditor [name=grid_thickness]").val(map.grid_thickness);
-	$("#mapEditor [name=wall_thickness]").val(map.wall_thickness);
-	$("#mapEditor [name=door_thickness]").val(map.door_thickness);
-	$("#mapEditor [name=grid_color]").val(map.grid_color);
-	$("#mapEditor [name=wall_color]").val(map.wall_color);
-	$("#mapEditor [name=door_color]").val(map.door_color);
-
+LT.loadMap = function (id) {
+	// remember the current map when you reload
+	LT.setCookie("map", id);
+	// create default map object
+	LT.currentMap = {"id": id, "piece_changes": 0, "tile_changes": 0};
 	// start periodic map updates
-	LT.updateMap();
+	LT.refreshMap();
 };
 
 LT.refreshMapList = function () {
-	$.get("php/User.maps.php", function (data) {
-		// TODO: replace rows of maps table
-		$("#mapList tr:not(.template)").remove();
-		$.each(data, function (i, map) {
-			var row = $("#mapList .template").clone().removeClass("template");
-			row.find(".name").text(map.name).click(function () {
-				$.get("php/Map.read.php", {"map": map.id}, function (theData) {
-					LT.loadMap(new LT.Map(theData));
-				});
-			});
-			row.find(".columns").text(map.columns);
-			row.find(".rows").text(map.rows);
-			row.find(".type").text(map.type);
- 			row.find(".disown").click(function () {
-				$.post("php/Map.deleteOwner.php",
-					{"user": LT.currentUser.id, "map": map.id},
-					function () {LT.refreshMapList();});
-			});
-			row.appendTo("#mapList tbody");
-		});
-	});
-};
-
-LT.refreshMaps = function () {
 	$.post("php/User.maps.php", function (theData) {
 		var list = $(".content[data-tab='map list']");
-		list.find(".mapRow:not(.template)").remove();
+		$("#mapList tr:not(.template)").remove();
 		$.each(theData, function (i, theMap) {
-			var row = list.find(".mapRow.template").clone().removeClass("template").appendTo(list);
-			row.find(".load").text(theMap.name)
-				.click(function () {LT.loadMap(new LT.Map(theMap));});
-			row.find(".info").text(theMap.columns + " &times; " + theMap.rows);
-			row.find(".disown").click(function () {
-				if (confirm("Are you sure you want to disown "
-					+ (theMap.name === null || theMap.name == "" ? "this map" : theMap.name)
-					+ "? The map will be deleted if it has no other owners.")) {
-					if (theMap.id == LT.currentMap.id) LT.unloadMap();
-					$.post("php/Map.disown.php", {"map": theMap.id}, LT.refreshMaps);
-				}
+			var copy = $("#mapList .template").clone().removeClass("template");
+			copy.find(".name").text(theMap.name || "[unnamed map]").click(function () {
+				LT.loadMap(theMap.id);
 			});
+			copy.find(".columns").text(theMap.columns);
+			copy.find(".rows").text(theMap.rows);
+			copy.find(".type").text(theMap.type);
+			copy.find(".disown").click(function () {
+				if (!confirm("Are you sure you want to disown "
+					+ (theMap.name || "[unnamed map]")
+					+ "? The map will be deleted if it has no other owners.")) return;
+				if (LT.currentMap && theMap.id == LT.currentMap.id) LT.unloadMap();
+				$.post("php/Map.deleteOwner.php", 
+					{"map": theMap.id, "user": LT.currentUser.id}, LT.refreshMapList);
+			});
+			copy.appendTo("#mapList");
 		});
 	}, "json");
 };
 
-LT.updateMap = function () {
-	if (LT.currentUser && LT.currentMap) {
-		if (!LT.holdTimestamps) {
-			$.post("php/Map.changes.php", {map: LT.currentMap.id}, function (data) {
-				var map = new LT.Map(data);
+LT.refreshMap = function () {
+	// we only want one of these scheduled at a time
+	if (LT.refreshMapTimeout) clearTimeout(LT.refreshMapTimeout);
 
-				// TODO: update map name (string)
-				// TODO: update map type ("square" or "hex")
-				// TODO: update map rows
-				// TODO: update map columns
-				// TODO: update map background
-				// TODO: update map min_zoom
-				// TODO: update map max_zoom
-				// TODO: update map min_rotate
-				// TODO: update map max_rotate
-				// TODO: update map min_tilt
-				// TODO: update map max_tilt
-				// TODO: update map grid_thickness
-				// TODO: update map grid_color
-				// TODO: update map wall_thickness
-				// TODO: update map wall_color
-				// TODO: update map door_thickness
-				// TODO: update map door_color
+	if (LT.currentUser && LT.currentMap) { // stop updating if no map is loaded
+		if (!LT.holdTimestamps) { // do not update while dragging
+			$.get("php/Map.changes.php", {map: LT.currentMap.id}, function (map) {
+
+				// populate map info form
+				$("#mapEditor [name=name]").val(map.name);
+				$("#mapEditor [name=type]").val(map.type);
+				$("#mapEditor [name=background]").val(map.background);
+				// TODO: what is the structure of the background object?
+				$("#map").css({background: "url('images/upload/" + map.background + "')"});
+				$("#mapEditor [name=columns]").val(map.columns);
+				$("#mapEditor [name=rows]").val(map.rows);
+				$("#mapEditor [name=min_rotate]").val(map.min_rotate);
+				$("#mapEditor [name=max_rotate]").val(map.max_rotate);
+				$("#mapEditor [name=min_tilt]").val(map.min_tilt);
+				$("#mapEditor [name=max_tilt]").val(map.max_tilt);
+				$("#mapEditor [name=min_zoom]").val(map.min_zoom);
+				$("#mapEditor [name=max_zoom]").val(map.max_zoom);
+				$("#mapEditor [name=grid_thickness]").val(map.grid_thickness);
+				$("#mapEditor [name=wall_thickness]").val(map.wall_thickness);
+				$("#mapEditor [name=door_thickness]").val(map.door_thickness);
+				$("#mapEditor [name=grid_color]").val(map.grid_color);
+				$("#mapEditor [name=wall_color]").val(map.wall_color);
+				$("#mapEditor [name=door_color]").val(map.door_color);
 
 				// update pieces if they have changed
 				if (LT.currentMap.piece_changes < map.piece_changes) {
-					LT.loadPieces();
+					$.post("php/Map.pieces.php", {map: LT.currentMap.id}, function (data) {
+						$("#pieceLayer").empty();
+						$("#clickPieceLayer").empty();
+						LT.pieces = [];
+						for (var i = 0; i < data.length; i++)
+							LT.pieces.push(new LT.Piece(data[i]));
+					});
 				}
 
 				// update tiles if they have changed
 				if (LT.currentMap.tile_changes < map.tile_changes) {
 					LT.currentMap.loadTiles();
+					LT.currentMap.createGrid();
 				}
 
 				LT.currentMap = map;
+			});
 
-			}, "json");
-		}
-		setTimeout(LT.updateMap, 2000);
-	}
+			// load map owners
+			$.get("php/Map.owners.php", {map: LT.currentMap.id}, function (owners) {
+				var currentUserCanEditThisMap = false;
+				$.each(owners, function (i, owner) {
+					// TODO: do you also need campaign ownership?
+					if (owner.id == LT.currentUser.id)
+						currentUserCanEditThisMap = true;
+					// TODO: populate map owner list
+				});
+				if (currentUserCanEditThisMap) {
+					// show tabs only visible to owners
+					LT.mapPanel.showTab("piece list");
+					LT.mapPanel.showTab("piece info");
+					LT.mapPanel.showTab("map info");
+					LT.mapPanel.showTab("map tools");
+				} else {
+					// hide tabs only visible to owners
+					LT.mapPanel.hideTab("piece list");
+					LT.mapPanel.hideTab("piece info");
+					LT.mapPanel.hideTab("map info");
+					LT.mapPanel.hideTab("map tools");
+					LT.mapPanel.selectTab("map list");
+					$(".clickLayer").hide();
+					$("#clickPieceLayer").show();
+				}
+			});
+
+		} // if (!LT.holdTimeStamps) { // do not update while dragging
+		LT.refreshMapTimeout = setTimeout(LT.refreshMap, 10000);
+	} // if (LT.currentUser && LT.currentMap) { // stop updating if no map is loaded
 }
 
 
@@ -237,16 +212,6 @@ LT.createPieceImageSwatch = function (image) {
 	});
 };
 
-LT.loadPieces = function () {
-	$("#pieceLayer").empty();
-	$("#clickPieceLayer").empty();
-	$.post("php/Map.pieces.php", {map: LT.currentMap.id}, function (data) {
-		LT.pieces = [];
-		for (var i = 0; i < data.length; i++)
-			LT.pieces.push(new LT.Piece(data[i]));
-	}, "json");
-};
-
 LT.createPiece = function () {
 	var args = LT.formValues("#pieceCreator");
 	args.map = LT.currentMap.id;
@@ -254,7 +219,7 @@ LT.createPiece = function () {
 		alert("Cannot create piece. No piece image selected.");
 		return;
 	}
-	$.post("php/create_piece.php", args, function () {LT.loadPieces();});
+	$.post("php/create_piece.php", args, function () {LT.refreshMap();});
 };
 
 /*
@@ -293,3 +258,14 @@ LT.Piece.addStat = function () {
 	LT.Piece.readStats();
 };
 
+LT.loadImages = function () {
+	$.get("images/upload/images.json", function (data) {
+		$.each(data.backgrounds, function (i, background) {
+			$("#mapCreator select[name=background]").append($("<option>").text(background.file));
+		});
+		$.each(data.pieces, function (i, background) {
+		});
+		$.each(data.tiles, function (i, background) {
+		});
+	});
+}
