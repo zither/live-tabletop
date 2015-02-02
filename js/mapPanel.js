@@ -5,8 +5,8 @@ $(function () { // This anonymous function runs after the page loads.
 	LT.mapPanel.hideTab("piece list");
 	LT.mapPanel.hideTab("piece info");
 
-	// hide map panel button until a campaign is loaded
-	$(".panelButton[data-panel=map]").hide();
+	// disable map panel button until a campaign is loaded
+	LT.mapPanel.disable();
 
 	// submit map creation form
 	$("#createMap").click(function () {

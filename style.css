@@ -143,6 +143,13 @@ th, td {padding: 0;}
 }
 .panel > * {margin: -1px;}
 
+.panel.disabled {display: none !important;}
+.panelButton.disabled {opacity: 0.5;}
+.panelButton.disabled:hover {
+	cursor: default;
+	color: #CCC;
+}
+
 /* Default Panel Sizes */
 
 .panel[data-panel=user]      {left: 0; top: 26px;  width: 260px; height: 200px;}

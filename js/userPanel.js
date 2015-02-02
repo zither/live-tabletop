@@ -8,8 +8,7 @@ $(function () { // This anonymous function runs after the page loads.
 			$("#map, #pageBar, .panel").hide();
 			$("#welcome").show();
 			delete LT.currentUser;
-			$(".panelButton[data-panel=map]").hide();
-			LT.mapPanel.hide();
+			LT.mapPanel.disable();
 		};
 		if (LT.currentCampaign) LT.leaveCampaign().done(logout);
 		else logout();
