@@ -15,7 +15,7 @@ $map = intval($_REQUEST['map']);
 if (LT_can_view_map($map))
 	if ($rows = LT_call('read_map_changes', $map))
 		LT_output_object($rows[0], array(
-			'integer' => array('rows', 'columns',
+			'integer' => array('id', 'rows', 'columns',
 				'min_rotate', 'max_rotate', 'min_tilt', 'max_tilt',
 				'grid_thickness', 'wall_thickness', 'door_thickness',
 				'piece_changes', 'tile_changes'),

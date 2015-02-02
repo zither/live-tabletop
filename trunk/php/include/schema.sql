@@ -891,7 +891,7 @@ END;
 /* User polls for changes to the map, its pieces and tiles */
 CREATE PROCEDURE read_map_changes (IN the_map INT)
 BEGIN
-	SELECT `name`, `type`, `rows`, `columns`, `background`,
+	SELECT `id`, `name`, `type`, `rows`, `columns`, `background`,
 		`min_zoom`, `max_zoom`, `min_rotate`, `max_rotate`, `min_tilt`, `max_tilt`,
 		`grid_thickness`, `grid_color`, `wall_thickness`, `wall_color`, 
 		`door_thickness`, `door_color`, `piece_changes`, `tile_changes`

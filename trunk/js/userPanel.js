@@ -3,11 +3,16 @@ $(function () { // This anonymous function runs after the page loads.
 	
 	// My Account tab
 	$("#logout").click(function () {
-		$.post("php/User.logout.php");
-		$("#map, #pageBar, .panel").hide();
-		$("#welcome").show();
-		delete LT.currentUser;
-		LT.leaveCampaign();
+		var logout = function () {
+			$.post("php/User.logout.php");
+			$("#map, #pageBar, .panel").hide();
+			$("#welcome").show();
+			delete LT.currentUser;
+			$(".panelButton[data-panel=map]").hide();
+			LT.mapPanel.hide();
+		};
+		if (LT.currentCampaign) LT.leaveCampaign().done(logout);
+		else logout();
 	});
 	$("#defaultPanels").click(function () {
 		LT.userPanel.reset();      LT.userPanel.show();
@@ -144,7 +149,7 @@ LT.players = [];
 LT.users = {};
 LT.indexUsers = function () {
 	// add friends and campaign users to LT.users index
-	$.each(LT.friends.concat(LT.players), function (i, user) {
+	$.each(LT.friends.concat(LT.players, [LT.currentUser]), function (i, user) {
 		if (user.id in LT.users) {
 			for (propertyName in user)
 				LT.users[user.id][propertyName] = user[propertyName];
