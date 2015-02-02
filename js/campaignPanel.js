@@ -43,19 +43,25 @@ LT.refreshCampaignList = function () {
 
 LT.loadCampaign = function (id) {
 
+	// let the server know you are no longer viewing the previous campaign
+	if (LT.currentCampaign) LT.leaveCampaign();
+
 	// remember the current campaign when you reload
 	LT.setCookie("campaign", id);
 
 	// show campaign panel tabs that only apply to a loaded campaign
 	LT.campaignPanel.showTab("campaign info");
-	LT.campaignPanel.showTab("blacklist");
 	LT.campaignPanel.showTab("chat");
+	LT.campaignPanel.selectTab("campaign info");
+
+	// show map panel button
+	if (!LT.currentCampaign) {
+		$(".panelButton[data-panel=map]").show();
+		LT.mapPanel.show();
+	}
 
 	// clear chat tab
 	$("#chatOutput .message:not(.template)").remove();
-
-	// let the server know you are no longer viewing the previous campaign
-	if (LT.currentCampaign) LT.leaveCampaign();
 
 	// let the server know you are viewing the campaign
 	$.post("php/Campaign.arrive.php", {campaign: id});
@@ -241,15 +247,19 @@ LT.formatTime = function (seconds) {
 
 LT.leaveCampaign = function () {
 	// Let the server know that you aren't viewing the campaign anymore
-	$.post("php/Campaign.leave.php", {campaign: this.id});
-	// remove the campaign owners, members and guests from LT.users
-	LT.players = [];
-	LT.indexUsers();
-	// hide campaign-specific tabs
-	LT.campaignPanel.hideTab("campaign info");
-	LT.campaignPanel.hideTab("blacklist");
-	LT.campaignPanel.hideTab("chat");
-	// drop campaign info
-	delete LT.currentCampaign;
-}
+	// return a chainable object so you can schedule stuff when this is done
+	return $.post("php/Campaign.leave.php", {campaign: LT.currentCampaign.id}, function () {
+		// remove the campaign owners, members and guests from LT.users
+		LT.players = [];
+		LT.indexUsers();
+		// hide campaign-specific tabs
+		LT.campaignPanel.hideTab("campaign info");
+		LT.campaignPanel.hideTab("blacklist");
+		LT.campaignPanel.hideTab("chat");
+		// drop campaign info
+		delete LT.currentCampaign;
+		// cannot view maps without a campaign
+		if (LT.currentMap) LT.leaveMap();
+	});
+};
 

@@ -1,9 +1,12 @@
 $(function () { // This anonymous function runs after the page loads.
 	LT.mapPanel = new LT.Panel("map");
+	LT.mapPanel.hideTab("map info");
+	LT.mapPanel.hideTab("map tools");
+	LT.mapPanel.hideTab("piece list");
+	LT.mapPanel.hideTab("piece info");
 
-	// refresh map list
-	// TODO: automatically refresh this list as needed (user timestamps?) 
-//	$("#refreshMaps").click(function () {LT.refreshMapList();});
+	// hide map panel button until a campaign is loaded
+	$(".panelButton[data-panel=map]").hide();
 
 	// submit map creation form
 	$("#createMap").click(function () {
@@ -16,10 +19,6 @@ $(function () { // This anonymous function runs after the page loads.
 	$("#applyMapChanges").click(function () {
 		$.post("php/Map.settings.php", LT.formValues("#mapEditor"), LT.refreshMap);
 	});
-
-	// TODO: UI for choosing presets
-	// TODO: does the new design need presets?
-	$.get("presets.json", function (data) {LT.Map.presets = data;});
 
 	// tools tab
 	$("#toolsTab").click(function () {
@@ -67,12 +66,34 @@ LT.chooseTool = function (swatch, name, layer) {
 };
 
 LT.loadMap = function (id) {
-	// remember the current map when you reload
-	LT.setCookie("map", id);
-	// create default map object
-	LT.currentMap = {"id": id, "piece_changes": 0, "tile_changes": 0};
-	// start periodic map updates
-	LT.refreshMap();
+	var load = function () {
+		// show map panel tabs that only apply when a map is loaded
+		LT.mapPanel.showTab("map info");
+		LT.mapPanel.showTab("map tools");
+		LT.mapPanel.showTab("piece list");
+		LT.mapPanel.showTab("piece info");
+		LT.mapPanel.selectTab("map info");
+		// remember the current map when you reload
+		LT.setCookie("map", id);
+		// create default map object
+		LT.currentMap = {"id": id, "piece_changes": 0, "tile_changes": 0};
+		// start periodic map updates
+		LT.refreshMap();
+	};
+	// the campaign must be displaying this map to view it
+	if (!LT.currentCampaign) alert("Cannot load a map outside a campaign.");
+	else if (LT.currentCampaign.map != id)
+		$.post("php/Campaign.map.php", {campaign: LT.currentCampaign.id, map: id}, load);
+	else load();
+};
+
+LT.leaveMap = function () {
+	// hide map panel tabs that only apply when a map is loaded
+	LT.mapPanel.hideTab("map info");
+	LT.mapPanel.hideTab("map tools");
+	LT.mapPanel.hideTab("piece list");
+	LT.mapPanel.hideTab("piece info");
+	delete LT.currentMap;
 };
 
 LT.refreshMapList = function () {
@@ -91,7 +112,7 @@ LT.refreshMapList = function () {
 				if (!confirm("Are you sure you want to disown "
 					+ (theMap.name || "[unnamed map]")
 					+ "? The map will be deleted if it has no other owners.")) return;
-				if (LT.currentMap && theMap.id == LT.currentMap.id) LT.unloadMap();
+				if (LT.currentMap && theMap.id == LT.currentMap.id) LT.leaveMap();
 				$.post("php/Map.deleteOwner.php", 
 					{"map": theMap.id, "user": LT.currentUser.id}, LT.refreshMapList);
 			});
@@ -142,7 +163,25 @@ LT.refreshMap = function () {
 
 				// update tiles if they have changed
 				if (LT.currentMap.tile_changes < map.tile_changes) {
-					LT.currentMap.loadTiles();
+					// load tiles
+//					LT.currentMap.loadTiles();
+					// TODO: Map.read reads more than just tiles
+					$.get("php/Map.read.php", {map: LT.currentMap.id}, function (data) {
+						$("#tileLayer, #clickTileLayer, #fogLayer").empty();
+						$("#map, #clickWallLayer").css({
+							width: LT.TILE_WIDTH * data.tile_columns + "px",
+							height: LT.TILE_HEIGHT * data.tile_rows + "px",
+						});
+						LT.tiles = [];
+						$.each(data.images, function (i, image) {
+							LT.tiles.push(new LT.Tile({
+								x: i % data.tile_columns,
+								y: Math.floor(i / data.tile_columns),
+								image_id: image,
+								fog: parseInt(data.fog[i]),
+							}));
+						});
+					});
 					LT.currentMap.createGrid();
 				}
 
@@ -269,3 +308,4 @@ LT.loadImages = function () {
 		});
 	});
 }
+

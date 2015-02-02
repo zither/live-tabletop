@@ -2,7 +2,7 @@ $(function () { // This anonymous function runs after the page loads.
 
 	// login form
 	$("#loginForm input[type=button]").click(function () {
-		$.post("php/User.login.php", LT.formValues("#loginForm"), function (the_user) {
+		$.post("php/User.login.php", LT.formValues("#loginForm"), function (theUser) {
 			LT.login(theUser);
 		}, "json").fail(function () {
 			alert("Incorrect username or password.");
@@ -81,8 +81,8 @@ $(function () { // This anonymous function runs after the page loads.
 
 LT.login = function (theUser) {
 	LT.currentUser = theUser;
-	LT.users = {};
-	LT.users[theUser.id] = theUser;
+//	LT.users = {};
+//	LT.users[theUser.id] = theUser;
 
 	// TODO: start this process before logging in?
 	LT.loadImages();
@@ -100,24 +100,18 @@ LT.login = function (theUser) {
 	// restore panels from cookie
 	LT.Panel.loadCookie();
 
-	// TODO: load a campaign by id if there's a cookie for it
+	// restore campaign
+	var campaign = LT.getCookie("campaign");
+	if (campaign) LT.loadCampaign(campaign);
 
-//	LT.refreshMapList();
+	// restore map
+	var map = LT.getCookie("map");
+	if (map) LT.loadMap(map);
 
 	// start periodic user updates
 	LT.holdTimestamps = 0;
 	LT.refreshUser();
 
-	
-
-/* TODO: do this in LT.updateUser
-	$.post("php/read_users.php", function (data) {
-		LT.users = {};
-		for (var i = 0; i < data.length; i++)
-			LT.users[data[i].id] = new LT.User(data[i]);
-		LT.User.populateSelectors();
-	}, "json");
-*/
 };
 
 
