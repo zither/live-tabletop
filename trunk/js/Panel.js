@@ -28,6 +28,7 @@ LT.Panel = function (name) {
 
 	var self = this; // remember the current "this" during event handlers
 	$(this.button).click(function () {
+		if ($(this).hasClass("disabled")) return;
 		if ($(self.outside).css("display") == "none") self.show();
 		else self.hide();
 		LT.Panel.saveCookie();
@@ -183,6 +184,19 @@ LT.Panel.prototype = {
 
 	// Hide this panel's button
 	hideButton: function () {$(this.button).hide();},
+
+	// re-enable the panel and it's button after disabling them
+	enable: function () {
+		$(this.button).removeClass("disabled");
+		$(this.outside).removeClass("disabled");
+	},
+
+	// disable the panel's button and hide the panel
+	// without hiding the button or closing the panel
+	disable: function () {
+		$(this.button).addClass("disabled");
+		$(this.outside).addClass("disabled");
+	},
 
 	// Move this panel to the top of the stack
 	bringToFront: function () {
