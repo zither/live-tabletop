@@ -1,6 +1,6 @@
 // GRID CONSTRUCTOR
-LT.Grid = function (columns, rows, width, height, thickness, color, wall_thickness, wall_color, mode, parent) {
-	this._mode = mode;
+LT.Grid = function (columns, rows, width, height, thickness, color, wall_thickness, wall_color, type, parent) {
+	this._type = type;
 	this._width = width;
 	this._height = height;
 	this._thickness = thickness;
@@ -21,24 +21,10 @@ LT.Grid.prototype = {
 	// CONSTANTS
 
 	SHAPES: {
-		"rectangle": {
-			shift: {x: 0, y: 0},
-			margins: {right: 0, bottom: 0},
+		"square": {
 			directions: {n: 0, e: 1, s: 2, w: 3},
 			points: [[0, 0], [1, 0], [1, 1], [0, 1]]},
-		"isometric": {
-			shift: {x: 0.5, y: 0},
-			margins: {right: 1/2, bottom: 1},
-			directions: {ne: 0, se: 1, sw: 2, ne: 3},
-			points: [[1/2, 0], [1, 1], [1/2, 2], [0, 1]]},
-		"hex rows": {
-			shift: {x: 0.5, y: 0},
-			margins: {right: 1/2, bottom: 1/3},
-			directions: {nw: 0, ne: 1, e: 2, se: 3, sw: 4, w: 5},
-			points: [[0, 1/3], [1/2, 0], [1, 1/3], [1, 1], [1/2, 4/3], [0, 1]]},
-		"hex columns": {
-			shift: {x: 0, y: 0.5},
-			margins: {right: 1/3, bottom: 1/2},
+		"hex": {
 			directions: {n: 0, ne: 1, se: 2, s: 3, sw: 4, nw: 5},
 			points: [[1/3, 0], [1, 0], [4/3, 1/2], [1, 1], [1/3, 1], [0, 1/2]]}},
 
@@ -48,14 +34,12 @@ LT.Grid.prototype = {
 //		if (this._thickness == 0) return;
 
 		var context = this.canvas.getContext("2d");
-		var margins = this.SHAPES[this._mode].margins;
-		var points = this.SHAPES[this._mode].points;
-		var shift = this.SHAPES[this._mode].shift;
+		var points = this.SHAPES[this._type].points;
 
-		this.canvas.width =
-			(this.getColumns() + margins.right) * this._width + this._thickness;
-		this.canvas.height =
-			(this.getRows() + margins.bottom) * this._height + this._thickness;
+		this.canvas.width = (this.getColumns() + (this._type == "hex" ? 1/3 : 0))
+			* this._width + this._thickness;
+		this.canvas.height = (this.getRows() + (this._type == "hex" ? 1/2 : 0))
+			* this._height + this._thickness;
 
 		context.translate(this._thickness / 2, this._thickness / 2);
 
@@ -66,8 +50,8 @@ LT.Grid.prototype = {
 			context.beginPath();
 			for (var row = 0; row < this.getRows(); row++) {
 				for (var column = 0; column < this.getColumns(); column++) {
-					var x = shift.x * (row % 2);
-					var y = shift.y * (column % 2);
+					var x = 0;
+					var y = this._type == "hex" ? 0.5 * (column % 2): 0;
 					context.moveTo(
 						(points[0][0] + x + column) * this._width,
 						(points[0][1] + y + row) * this._height);
@@ -88,11 +72,11 @@ LT.Grid.prototype = {
 				for (var column = 0; column < this.getColumns(); column++) {
 					for (var direction in this.walls[row][column]) {
 						if (this.walls[row][column][direction] == "wall") {
-							var i = this.SHAPES[this._mode].directions[direction];
+							var i = this.SHAPES[this._type].directions[direction];
 							if (typeof(i) == "undefined") continue;
 							var j = (i + 1) % points.length;
-							var x = shift.x * (row % 2);
-							var y = shift.y * (column % 2);
+							var x = 0;
+							var y = this._type == "hex" ? 0.5 * (column % 2) : 0;
 							var x1 = (points[i][0] + x + column) * this._width;
 							var y1 = (points[i][1] + y + row) * this._height;
 							var x2 = (points[j][0] + x + column) * this._width;
@@ -113,11 +97,11 @@ LT.Grid.prototype = {
 				for (var column = 0; column < this.getColumns(); column++) {
 					for (var direction in this.walls[row][column]) {
 						if (this.walls[row][column][direction] == "door") {
-							var i = this.SHAPES[this._mode].directions[direction];
+							var i = this.SHAPES[this._type].directions[direction];
 							if (typeof(i) == "undefined") continue;
 							var j = (i + 1) % points.length;
-							var x = shift.x * (row % 2);
-							var y = shift.y * (column % 2);
+							var x = 0;
+							var y = this._type == "hex" ? 0.5 * (column % 2) : 0;
 							var x1 = (points[i][0] + x + column) * this._width;
 							var y1 = (points[i][1] + y + row) * this._height;
 							var x2 = (points[j][0] + x + column) * this._width;
@@ -182,10 +166,10 @@ LT.Grid.prototype = {
 		this.resize(this.getColumns(), rows);
 	},
 
-	getMode: function () {return this._mode;},
+	getType: function () {return this._type;},
 
-	setMode: function (mode) {
-		this._mode = mode;
+	setType: function (type) {
+		this._type = type;
 		var rows = this.getRows();
 		var columns = this.getColumns();
 		this.walls = [];
@@ -206,90 +190,15 @@ LT.Grid.prototype = {
 	setWidth: function (value) {this._width = value; this.repaint();},
 	setHeight: function (value) {this._height = value; this.repaint();},
 
-	// normalize interior walls to avoid redundancy
+	// normalize walls to avoid redundancy
 	normalize: function (column, row, direction) {
-
-		// avoid interior walls to the north of any space
-
-		if (this._mode == "rectangle" || this._mode == "hex columns") {
-			// change interior north walls to south walls of the neighboring space
-			if (direction == "n" && row != 0) {
-				direction = "s";
-				row--;
-			}
+		switch (direction) {
+			case "n": direction = "s"; row--; break;
+			case "w": direction = "e"; column--; break;
+			case "nw": direction = "se"; column--; row--; break;
+			case "ne": direction = "sw"; column--; break;
 		}
-		if (this._mode == "isometric" || this._mode == "hex rows") {
-			// rows with even indices (0, 2, 4 ...) touch the left side of the grid
-			if (row % 2 == 0) {
-				// change interior nw walls to se walls of the neighboring space
-				if (direction == "nw" && row != 0 && column != 0) {
-					direction = "se";
-					column--;
-					row--;
-				}
-				// change interior ne walls to sw walls of the neighboring space
-				if (direction == "ne" && row != 0) {
-					direction = "sw";
-					row--;
-				}
-			}
-			// rows with odd indices (1, 3, 5 ...) touch the right side of the grid
-			else {
-				// change interior nw walls to se walls of the neighboring space
-				if (direction == "nw" && row != 0) {
-					direction = "se";
-					row--;
-				}
-				// change interior ne walls to sw walls of the neighboring space
-				if (direction == "ne" && row != 0 && column != this.columns - 1) {
-					direction = "sw";
-					column++;
-					row--;
-				}
-			}
-		}
-
-		// avoid interior walls to the west of any space
-
-		if (this._mode == "rectangle" || this._mode == "hex rows") {
-			// change interior west walls to east walls of the neighboring space
-			if (direction == "w" && column != 0) {
-				direction = "e";
-				column--;
-			}
-		}
-		if (this._mode == "hex columns") {
-			// columns with even indices (0, 2, 4 ...) touch the top of the grid
-			if (column % 2 == 0) {
-				// change interior nw walls to se walls of the neighboring space
-				if (direction == "nw" && column != 0 && row != 0) {
-					direction = "se";
-					column--;
-					row--;
-				}
-				// change interior sw walls to ne walls of the neighboring space
-				if (direction == "sw" && column != 0) {
-					direction = "ne";
-					column--;
-				}
-			}
-			// columns with odd indices (1, 3, 5 ...) touch the bottom of the grid
-			else {
-				// change interior nw walls to se walls of the neighboring space
-				if (direction == "nw" && column != 0) {
-					direction = "se";
-					column--;
-				}
-				// change interior sw walls to ne walls of the neighboring space
-				if (direction == "sw" && column != 0 && row != this.rows - 1) {
-					direction = "ne";
-					column--;
-					row++;
-				}
-			}
-		}
-
-		// return the new column, row and direction
+		if (column % 2 && (direction == "se" || direction == "sw")) row++;
 		return {column: column, row: row, direction: direction};
 	},
 

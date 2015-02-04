@@ -89,6 +89,8 @@ LT.refreshCampaign = function () {
 				campaign: LT.currentCampaign.id
 			}, function (data) {
 
+				// TODO: what if current campaign is closed or changes before receiving the result?
+
 				// update campaign name
 				$("#campaignName").text(data.name || "[unnamed campaign]");
 

@@ -227,6 +227,7 @@ LT.Panel.prototype = {
 
 	// Load this panel's dimensions from a string saved in a cookie
 	restoreFromCookie: function (data) {
+		if (typeof(data) == "undefined") return;
 		if (typeof(data.x) == "undefined") return;
 		this.setX(data.x);
 		this.setY(data.y);
