@@ -84,8 +84,28 @@ LT.login = function (theUser) {
 //	LT.users = {};
 //	LT.users[theUser.id] = theUser;
 
+	// load images
 	// TODO: start this process before logging in?
-	LT.loadImages();
+	LT.images = {};
+	$.get("images/upload/images.json", function (data) {
+		$.each(data.backgrounds, function (i, image) {
+			$("#mapCreator select[name=background]").append($("<option>").text(image.file));
+			LT.images[image.id] = image;
+		});
+		$.each(data.pieces, function (i, image) {
+			LT.images[image.id] = image;
+		});
+		$.each(data.tiles, function (i, image) {
+			LT.images[image.id] = image;
+			$("<img>").appendTo("#tileBrushes").attr({
+				title: image.file,
+				src: "images/upload/" + image.file,
+			}).addClass("swatch").click(function () {
+				LT.selectedImageID = image.id;
+				LT.chooseTool(this, "tile", "#clickTileLayer");
+			});
+		});
+	});
 
 	// hide welcome screen and show main UI
 	$("#passwordForm").hide();

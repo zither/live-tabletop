@@ -1,3 +1,11 @@
+LT.SQUARE_SIZE = 48;
+LT.HEX_WIDTH = 54;
+LT.HEX_HEIGHT = 72;
+
+LT.toggleFog = 0;
+LT.dragging = 0;
+LT.dropHandlers.push(function () {LT.dragging = 0;});
+
 $(function () { // This anonymous function runs after the page loads.
 	LT.mapPanel = new LT.Panel("map");
 	LT.mapPanel.hideTab("map info");
@@ -66,7 +74,15 @@ LT.chooseTool = function (swatch, name, layer) {
 };
 
 LT.loadMap = function (id) {
-	var load = function () {
+alert("trying to load map " + id);
+	if (LT.currentMap && LT.currentMap.id == id) return;
+alert("setting campaign " + LT.currentCampaign.id + " map to " + id);
+	if (!LT.currentCampaign) alert("Cannot load a map outside a campaign.");
+	else $.post("php/Campaign.map.php", {
+		campaign: LT.currentCampaign.id,
+		map: id
+	}, function () {
+alert("loading map " + id);
 		// show map panel tabs that only apply when a map is loaded
 		LT.mapPanel.showTab("map info");
 		LT.mapPanel.showTab("map tools");
@@ -76,15 +92,11 @@ LT.loadMap = function (id) {
 		// remember the current map when you reload
 		LT.setCookie("map", id);
 		// create default map object
-		LT.currentMap = {"id": id, "piece_changes": 0, "tile_changes": 0};
+		// tile_changes initialized to -1 to force loading of new map tiles
+		LT.currentMap = {"id": id, "piece_changes": -1, "tile_changes": -1};
 		// start periodic map updates
 		LT.refreshMap();
-	};
-	// the campaign must be displaying this map to view it
-	if (!LT.currentCampaign) alert("Cannot load a map outside a campaign.");
-	else if (LT.currentCampaign.map != id)
-		$.post("php/Campaign.map.php", {campaign: LT.currentCampaign.id, map: id}, load);
-	else load();
+	});
 };
 
 LT.leaveMap = function () {
@@ -93,6 +105,8 @@ LT.leaveMap = function () {
 	LT.mapPanel.hideTab("map tools");
 	LT.mapPanel.hideTab("piece list");
 	LT.mapPanel.hideTab("piece info");
+	$("#tileLayer, #clickTileLayer, #clickWallLayer, #wallLayer, #fogLayer").empty();
+	$("#map, #clickWallLayer, #clickTileLayer").css({"width": 0, "height": 0});
 	delete LT.currentMap;
 };
 
@@ -127,6 +141,7 @@ LT.refreshMap = function () {
 
 	if (LT.currentUser && LT.currentMap) { // stop updating if no map is loaded
 		if (!LT.holdTimestamps) { // do not update while dragging
+
 			$.get("php/Map.changes.php", {map: LT.currentMap.id}, function (map) {
 
 				// populate map info form
@@ -162,31 +177,11 @@ LT.refreshMap = function () {
 				}
 
 				// update tiles if they have changed
-				if (LT.currentMap.tile_changes < map.tile_changes) {
-					// load tiles
-//					LT.currentMap.loadTiles();
-					// TODO: Map.read reads more than just tiles
-					$.get("php/Map.read.php", {map: LT.currentMap.id}, function (data) {
-						$("#tileLayer, #clickTileLayer, #fogLayer").empty();
-						$("#map, #clickWallLayer").css({
-							width: LT.TILE_WIDTH * data.tile_columns + "px",
-							height: LT.TILE_HEIGHT * data.tile_rows + "px",
-						});
-						LT.tiles = [];
-						$.each(data.images, function (i, image) {
-							LT.tiles.push(new LT.Tile({
-								x: i % data.tile_columns,
-								y: Math.floor(i / data.tile_columns),
-								image_id: image,
-								fog: parseInt(data.fog[i]),
-							}));
-						});
-					});
-					LT.currentMap.createGrid();
-				}
+				if (LT.currentMap.tile_changes < map.tile_changes) LT.loadTiles();
 
 				LT.currentMap = map;
-			});
+
+			}); // $.get("php/Map.changes.php", {map: LT.currentMap.id}, function (map) {
 
 			// load map owners
 			$.get("php/Map.owners.php", {map: LT.currentMap.id}, function (owners) {
@@ -220,6 +215,162 @@ LT.refreshMap = function () {
 	} // if (LT.currentUser && LT.currentMap) { // stop updating if no map is loaded
 }
 
+LT.loadTiles = function () {
+	$.get("php/Map.read.php", {map: LT.currentMap.id}, function (map) {
+
+		var height = map.type == "hex" ? LT.HEX_HEIGHT : LT.SQUARE_SIZE;
+		var width  = map.type == "hex" ? LT.HEX_WIDTH  : LT.SQUARE_SIZE;
+
+		// empty and resize layers
+		$("#tileLayer, #clickTileLayer, #clickWallLayer, #wallLayer, #fogLayer").empty();
+		$("#map, #clickWallLayer, #clickTileLayer").css({
+			"width": width * map.columns + "px",
+			"height": height * map.rows + "px",
+		});
+
+		// Add a new grid to the wall layer.
+		var grid = new LT.Grid(map.columns, map.rows, width, height,
+			map.grid_thickness, map.grid_color,
+			map.wall_thickness, map.wall_color, map.type, $("#wallLayer")[0]);
+
+		$.each(map.flags.split(""), function (i, flag) {
+			// flag    0ABCDEFGHIJKLMNOPQRSTUVWXYZ1abcdefghijklmnopqrstuvwxyz
+			// fog                                ***************************
+			// S wall           *********                  *********
+			// S door                    *********                  *********
+			// E wall     ***      ***      ***      ***      ***      ***   
+			// E door        ***      ***      ***      ***      ***      ***
+			// SE wall    ***      ***      ***      ***      ***      ***   
+			// SE door       ***      ***      ***      ***      ***      ***
+			// NE wall  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * 
+			// NE door   *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
+			var x = i % (map.columns + 1);
+			var y = Math.floor(i / (map.columns + 1));
+			var stagger = map.type == "hex" ? (x % 2) * 0.5 : 0;
+			var tile = x == 0 || y == 0 ? 0 : map.tiles[(x - 1) + (y - 1) * map.columns];
+			var fog = "1abcdefghijklmnopqrstuvwxyz".indexOf(flag) != -1 ? 1 : 0;
+			var fogElement, tileElement;
+
+			// create fog elements
+			var createFogElement = function (newFogValue) {
+				fog = newFogValue;
+				if (fogElement) fogElement.remove();
+				if (fog) fogElement = $("<img>").css({
+					"left": width * (x - 0.5) + "px",
+					"top": height * (y - 0.5 + stagger) + "px",
+					"width": width * 2 + "px",
+					"height": height * 2 + "px",
+				}).attr("src", "images/fog.png").appendTo("#fogLayer");
+			};
+			createFogElement(fog);
+
+			// if the tile is not empty, create a new image
+			var createTileElement = function (newTileIndex) {
+				tile = newTileIndex;
+				if (tileElement) tileElement.remove();
+				if (tile == 0) return;
+				var image = LT.images[tile];
+				var scale = height / image.scale;
+				// create the new image element
+				tileElement = $("<img>").css({
+					position: "absolute", // TODO: put this in style.css?
+					left: Math.round((x + 0.5) * width) + "px",
+					top: Math.round((y + 0.5 + stagger) * height) + "px",
+					width:  Math.round(image.size[0] * scale) + "px",
+					height: Math.round(image.size[1] * scale) + "px",
+					marginLeft: -Math.round(image.center[0] * scale) + "px",
+					marginTop:  -Math.round(image.center[1] * scale) + "px",
+				}).attr("src", "images/upload/" + image.file);
+				// create as many new sub-layers as needed
+				for (var i = $("#tileLayer *").length; i < image.layer + 1; i++)
+					$("#tileLayer").append($("<div>"));
+				// add the new image to the appropriate sub-layer
+				// insert tile image in left-to-right, top-to-bottom order
+				// find the correct place for this tile using binary search
+				var left = parseInt(tileElement.css("left"));
+				var top = parseInt(tileElement.css("top"));
+				var sublayer = $("#tileLayer *")[image.layer];
+				var images = $(sublayer).children();
+				var start = 0;
+				var end = images.length;
+				while (start < end) {
+					var middle = Math.floor((start + end) / 2);
+					var midTop = parseInt($(images[middle]).css("top"));
+					var midLeft = parseInt($(images[middle]).css("left"));
+					if (midTop > top || (midTop == top && midLeft > left))
+						end = middle;
+					else
+						start = middle + 1;
+				}
+				if (end == images.length) tileElement.appendTo(sublayer);
+				else if (end == 0) tileElement.prependTo(sublayer);
+				else tileElement.insertBefore($(images[end]));
+			};
+			createTileElement(tile);
+
+			// create click detectors for walls
+			var createWallClickDetector = function (column, row, direction, l, t, w, h) {
+				$("<div>").appendTo($("#clickWallLayer")).css({
+					"left": width	* (column + l) + "px",
+					"top": height * (row + t) + "px",
+					"width": width * w + "px",
+					"height": height * h + "px",
+				}).click(function () {
+					// TODO: depending on which tool is selected set newType to "door" or "clear"?
+					var oldType = grid.getWall(column, row, direction);
+					var newType = oldType == "wall" ? "door" : oldType == "door" ? "none" : "wall";								
+					grid.setWall(column, row, direction, newType);
+					var args = {"map": map.id, "x": column, "y": row};
+					args[direction] = newType;
+					$.post("php/Map.tile.php", args);
+				});
+			};
+			if (map.type == "square") {
+				if (x > 0) createWallClickDetector(x, y, "s",  1/4,  3/4, 1/2, 1/2);
+				if (y > 0) createWallClickDetector(x, y, "e",  3/4,  1/4, 1/2, 1/2);
+			}
+			if (map.type == "hex") {
+				if (x > 0) createWallClickDetector(x, y, "s",  1/3, stagger + 3/4, 2/3, 1/2);
+				if (y > 0) createWallClickDetector(x, y, "se",  1,  stagger + 1/2, 1/3, 1/2);
+				if (y > 0) createWallClickDetector(x, y, "ne",  1,  stagger,       1/3, 1/2);
+			}
+
+			// create walls and doors
+			var side = map.type == "hex" ? "se" : "e";
+			if ("IJKLMNOPQijklmnopq".indexOf(flag) != -1) grid.wall(x, y, "s");
+			if ("RSTUVWXYZrstuvwxyz".indexOf(flag) != -1) grid.door(x, y, "s");
+			if ("CDELMNUVWcdelmnuvw".indexOf(flag) != -1) grid.wall(x, y, side);
+			if ("FGHOPQXYZfghopqxyz".indexOf(flag) != -1) grid.door(x, y, side);
+			if ("ADGJMPSVYadgjmpsvy".indexOf(flag) != -1) grid.wall(x, y, "ne");
+			if ("BEHKNQTWZbehknqtwz".indexOf(flag) != -1) grid.door(x, y, "ne");
+
+			// create the tile click detector
+			var updateTile = function () {
+				var args = {"map": map.id, "x": x, "y": y};
+				if (LT.brush == "tile") {
+					args.tile = LT.selectedImageID;
+					createTileElement(LT.selectedImageID); // immediate feedback
+				} else if (LT.brush == "fog") {
+					args.fog = LT.toggleFog;
+					createFogElement(LT.toggleFog); // immediate feedback
+				} else return; // brush is not fog or tile?
+				$.post("php/Map.tile.php", args);
+			};
+			$("<div>").appendTo("#clickTileLayer").css({
+				"left": width * x + "px",
+				"top": height * (y + stagger) + "px",
+				"width": width + "px",
+				"height": height + "px",
+			}).mousedown(function () {
+				LT.dragging = 1;
+				if (LT.brush == "fog") LT.toggleFog = 1 - fog;
+				updateTile();
+			}).mouseover(function () {if (LT.dragging) updateTile();});
+
+		}); // $.each(map.flags.split(""), function (i, flag) {
+
+	}); // $.get("php/Map.read.php", {map: LT.currentMap.id}, function (data) {
+};
 
 // Populate image selectors in the create piece and piece settings tabs
 // (called for each piece image after loading piece image data in Piece.js)
@@ -297,15 +448,4 @@ LT.Piece.addStat = function () {
 	LT.Piece.readStats();
 };
 
-LT.loadImages = function () {
-	$.get("images/upload/images.json", function (data) {
-		$.each(data.backgrounds, function (i, background) {
-			$("#mapCreator select[name=background]").append($("<option>").text(background.file));
-		});
-		$.each(data.pieces, function (i, background) {
-		});
-		$.each(data.tiles, function (i, background) {
-		});
-	});
-}
 
