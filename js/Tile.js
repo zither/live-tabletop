@@ -28,7 +28,7 @@ LT.Tile.readImages = function () {
 LT.Tile.createBrush = function (image) {
 	$("<img>").appendTo(".panelContent .toolsTab").attr({
 		title: image.file,
-		src: "images/upload/tile/" + image.file,
+		src: "images/tile/" + image.file,
 	}).addClass("swatch").click(function () {
 		LT.selectedImageID = image.id;
 		LT.chooseTool(this, "tile", "#clickTileLayer");

@@ -149,7 +149,7 @@ LT.refreshMap = function () {
 				$("#mapEditor [name=type]").val(map.type);
 				$("#mapEditor [name=background]").val(map.background);
 				// TODO: what is the structure of the background object?
-				$("#map").css({background: "url('images/upload/" + map.background + "')"});
+				$("#map").css({background: "url('images/" + map.background + "')"});
 				$("#mapEditor [name=columns]").val(map.columns);
 				$("#mapEditor [name=rows]").val(map.rows);
 				$("#mapEditor [name=min_rotate]").val(map.min_rotate);
@@ -280,7 +280,7 @@ LT.loadTiles = function () {
 					height: Math.round(image.size[1] * scale) + "px",
 					marginLeft: -Math.round(image.center[0] * scale) + "px",
 					marginTop:  -Math.round(image.center[1] * scale) + "px",
-				}).attr("src", "images/upload/" + image.file);
+				}).attr("src", "images/" + image.file);
 				// create as many new sub-layers as needed
 				for (var i = $("#tileLayer *").length; i < image.layer + 1; i++)
 					$("#tileLayer").append($("<div>"));
@@ -378,7 +378,7 @@ LT.createPieceImageSwatch = function (image) {
 	// Create an image for the create piece tab
 	$("<img>").appendTo($("#pieceCreatorImages")).addClass("swatch").attr({
 		title: image.file,
-		src: "images/upload/piece/" + image.file
+		src: "images/piece/" + image.file
 	}).click(function () {
 		var pieceWidth = parseInt($("#pieceCreator [name=width]").val());
 		var pieceHeight = parseInt($("#pieceCreator [name=height]").val());
@@ -392,7 +392,7 @@ LT.createPieceImageSwatch = function (image) {
 	// Create an image for the piece settings tab
 	$("<img>").appendTo($("#pieceEditorImages")).addClass("swatch").attr({
 		title: image.file,
-		src: "images/upload/piece/" + image.file,
+		src: "images/piece/" + image.file,
 	}).click(function () {
 		$("#pieceEditor [name=image_id]").val(image.id);
 		$("#pieceEditor [name=x_offset]").val((image.width - LT.Piece.selected.width) / -2);

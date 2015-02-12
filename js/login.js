@@ -87,7 +87,7 @@ LT.login = function (theUser) {
 	// load images
 	// TODO: start this process before logging in?
 	LT.images = {};
-	$.get("images/upload/images.json", function (data) {
+	$.get("images/images.json", function (data) {
 		$.each(data.backgrounds, function (i, image) {
 			$("#mapCreator select[name=background]").append($("<option>").text(image.file));
 			LT.images[image.id] = image;
@@ -99,7 +99,7 @@ LT.login = function (theUser) {
 			LT.images[image.id] = image;
 			$("<img>").appendTo("#tileBrushes").attr({
 				title: image.file,
-				src: "images/upload/" + image.file,
+				src: "images/" + image.file,
 			}).addClass("swatch").click(function () {
 				LT.selectedImageID = image.id;
 				LT.chooseTool(this, "tile", "#clickTileLayer");

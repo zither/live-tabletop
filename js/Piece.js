@@ -12,7 +12,7 @@ LT.Piece = function (data) {
 		$("<img>").css({
 			marginTop:  this.y_offset + "px",
 			marginLeft: this.x_offset + "px",
-		}).attr("src", "images/upload/piece/" + LT.Piece.images[this.image_id].file)
+		}).attr("src", "images/piece/" + LT.Piece.images[this.image_id].file)
 	);
 
 	this.mover = $("<div>").appendTo("#clickPieceLayer").css({
