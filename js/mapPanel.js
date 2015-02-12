@@ -1,6 +1,4 @@
-LT.SQUARE_SIZE = 48;
-LT.HEX_WIDTH = 54;
-LT.HEX_HEIGHT = 72;
+LT.RESOLUTION = 72;
 
 LT.toggleFog = 0;
 LT.dragging = 0;
@@ -74,15 +72,15 @@ LT.chooseTool = function (swatch, name, layer) {
 };
 
 LT.loadMap = function (id) {
-alert("trying to load map " + id);
+console.log("trying to load map " + id);
 	if (LT.currentMap && LT.currentMap.id == id) return;
-alert("setting campaign " + LT.currentCampaign.id + " map to " + id);
+console.log("setting campaign " + LT.currentCampaign.id + " map to " + id);
 	if (!LT.currentCampaign) alert("Cannot load a map outside a campaign.");
 	else $.post("php/Campaign.map.php", {
 		campaign: LT.currentCampaign.id,
 		map: id
 	}, function () {
-alert("loading map " + id);
+console.log("loading map " + id);
 		// show map panel tabs that only apply when a map is loaded
 		LT.mapPanel.showTab("map info");
 		LT.mapPanel.showTab("map tools");
@@ -218,8 +216,8 @@ LT.refreshMap = function () {
 LT.loadTiles = function () {
 	$.get("php/Map.read.php", {map: LT.currentMap.id}, function (map) {
 
-		var height = map.type == "hex" ? LT.HEX_HEIGHT : LT.SQUARE_SIZE;
-		var width  = map.type == "hex" ? LT.HEX_WIDTH  : LT.SQUARE_SIZE;
+		var height = LT.RESOLUTION, width = LT.RESOLUTION;
+		if (map.type == "hex") width = Math.round(width * 1.5 / Math.sqrt(3));
 
 		// empty and resize layers
 		$("#tileLayer, #clickTileLayer, #clickWallLayer, #wallLayer, #fogLayer").empty();
@@ -270,16 +268,17 @@ LT.loadTiles = function () {
 				if (tileElement) tileElement.remove();
 				if (tile == 0) return;
 				var image = LT.images[tile];
-				var scale = height / image.scale;
+				var scaleX = height / image[map.type][0];
+				var scaleY = width / image[map.type][1];
 				// create the new image element
 				tileElement = $("<img>").css({
 					position: "absolute", // TODO: put this in style.css?
 					left: Math.round((x + 0.5) * width) + "px",
 					top: Math.round((y + 0.5 + stagger) * height) + "px",
-					width:  Math.round(image.size[0] * scale) + "px",
-					height: Math.round(image.size[1] * scale) + "px",
-					marginLeft: -Math.round(image.center[0] * scale) + "px",
-					marginTop:  -Math.round(image.center[1] * scale) + "px",
+					width:  Math.round(image.size[0] * scaleX) + "px",
+					height: Math.round(image.size[1] * scaleY) + "px",
+					marginLeft: -Math.round(image.center[0] * scaleX) + "px",
+					marginTop:  -Math.round(image.center[1] * scaleY) + "px",
 				}).attr("src", "images/" + image.file);
 				// create as many new sub-layers as needed
 				for (var i = $("#tileLayer *").length; i < image.layer + 1; i++)
