@@ -72,15 +72,12 @@ LT.chooseTool = function (swatch, name, layer) {
 };
 
 LT.loadMap = function (id) {
-console.log("trying to load map " + id);
 	if (LT.currentMap && LT.currentMap.id == id) return;
-console.log("setting campaign " + LT.currentCampaign.id + " map to " + id);
 	if (!LT.currentCampaign) alert("Cannot load a map outside a campaign.");
 	else $.post("php/Campaign.map.php", {
 		campaign: LT.currentCampaign.id,
 		map: id
 	}, function () {
-console.log("loading map " + id);
 		// show map panel tabs that only apply when a map is loaded
 		LT.mapPanel.showTab("map info");
 		LT.mapPanel.showTab("map tools");
@@ -232,6 +229,13 @@ LT.loadTiles = function () {
 			map.wall_thickness, map.wall_color, map.type, $("#wallLayer")[0]);
 
 		$.each(map.flags.split(""), function (i, flag) {
+			var x = i % (map.columns + 1);
+			var y = Math.floor(i / (map.columns + 1));
+			var stagger = map.type == "hex" ? (x % 2) * 0.5 : 0;
+			var tile = x == 0 || y == 0 ? 0 : map.tiles[(x - 1) + (y - 1) * map.columns];
+			var fog = "1abcdefghijklmnopqrstuvwxyz".indexOf(flag) != -1 ? 1 : 0;
+			var fogElement, tileElement;
+
 			// flag    0ABCDEFGHIJKLMNOPQRSTUVWXYZ1abcdefghijklmnopqrstuvwxyz
 			// fog                                ***************************
 			// S wall           *********                  *********
@@ -242,14 +246,51 @@ LT.loadTiles = function () {
 			// SE door       ***      ***      ***      ***      ***      ***
 			// NE wall  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * 
 			// NE door   *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
-			var x = i % (map.columns + 1);
-			var y = Math.floor(i / (map.columns + 1));
-			var stagger = map.type == "hex" ? (x % 2) * 0.5 : 0;
-			var tile = x == 0 || y == 0 ? 0 : map.tiles[(x - 1) + (y - 1) * map.columns];
-			var fog = "1abcdefghijklmnopqrstuvwxyz".indexOf(flag) != -1 ? 1 : 0;
-			var fogElement, tileElement;
 
-			// create fog elements
+			// create walls and doors
+			var side = map.type == "hex" ? "se" : "e";
+			if ("IJKLMNOPQijklmnopq".indexOf(flag) != -1) grid.wall(x, y, "s");
+			if ("RSTUVWXYZrstuvwxyz".indexOf(flag) != -1) grid.door(x, y, "s");
+			if ("CDELMNUVWcdelmnuvw".indexOf(flag) != -1) grid.wall(x, y, side);
+			if ("FGHOPQXYZfghopqxyz".indexOf(flag) != -1) grid.door(x, y, side);
+			if ("ADGJMPSVYadgjmpsvy".indexOf(flag) != -1) grid.wall(x, y, "ne");
+			if ("BEHKNQTWZbehknqtwz".indexOf(flag) != -1) grid.door(x, y, "ne");
+
+			// create click detectors for walls
+			var createWallClickDetector = function (column, row, direction, l, t, w, h) {
+				$("<div>").appendTo($("#clickWallLayer")).css({
+					"left": width	* (column + l) + "px",
+					"top": height * (row + t) + "px",
+					"width": width * w + "px",
+					"height": height * h + "px",
+				}).click(function () {
+					// TODO: depending on which tool is selected set newType to "door" or "clear"?
+					var oldType = grid.getWall(column, row, direction);
+					var newType = oldType == "wall" ? "door" : oldType == "door" ? "none" : "wall";								
+					grid.setWall(column, row, direction, newType);
+					var args = {"map": map.id, "x": column - 1, "y": (row - 1) % map.rows};
+					args[direction] = newType;
+					$.post("php/Map.tile.php", args);
+				});
+			};
+			if (map.type == "square") {
+				if (x > 0) createWallClickDetector(x, y, "s",  1/4,  3/4, 1/2, 1/2);
+				if (y > 0) createWallClickDetector(x, y, "e",  3/4,  1/4, 1/2, 1/2);
+			}
+			if (map.type == "hex") {
+				var ne = true, se = true;
+				if (!stagger && y == 0) se = false; // top uphill stray edges
+				if (y == 0) ne = false; // top downhill stray edges
+				if (x == 0 && y == 1) ne = false; // top left stray edge
+				if (x == map.columns && stagger && y == 0) se = false; // top right stray edge
+				if (x > 0) createWallClickDetector(x, y, "s", 1/3, stagger + 3/4, 2/3, 1/2);
+				if (se) createWallClickDetector(x, y, "se", 1, stagger + 1/2, 1/3, 1/2);
+				if (ne) createWallClickDetector(x, y, "ne", 1, stagger,       1/3, 1/2);
+				if (!stagger && y == map.rows && x != map.columns)
+					createWallClickDetector(x, y + 1, "ne",  1,  stagger,       1/3, 1/2);
+			}
+
+			// function to create fog elements
 			var createFogElement = function (newFogValue) {
 				fog = newFogValue;
 				if (fogElement) fogElement.remove();
@@ -260,7 +301,6 @@ LT.loadTiles = function () {
 					"height": height * 2 + "px",
 				}).attr("src", "images/fog.png").appendTo("#fogLayer");
 			};
-			createFogElement(fog);
 
 			// if the tile is not empty, create a new image
 			var createTileElement = function (newTileIndex) {
@@ -305,47 +345,10 @@ LT.loadTiles = function () {
 				else if (end == 0) tileElement.prependTo(sublayer);
 				else tileElement.insertBefore($(images[end]));
 			};
-			createTileElement(tile);
-
-			// create click detectors for walls
-			var createWallClickDetector = function (column, row, direction, l, t, w, h) {
-				$("<div>").appendTo($("#clickWallLayer")).css({
-					"left": width	* (column + l) + "px",
-					"top": height * (row + t) + "px",
-					"width": width * w + "px",
-					"height": height * h + "px",
-				}).click(function () {
-					// TODO: depending on which tool is selected set newType to "door" or "clear"?
-					var oldType = grid.getWall(column, row, direction);
-					var newType = oldType == "wall" ? "door" : oldType == "door" ? "none" : "wall";								
-					grid.setWall(column, row, direction, newType);
-					var args = {"map": map.id, "x": column, "y": row};
-					args[direction] = newType;
-					$.post("php/Map.tile.php", args);
-				});
-			};
-			if (map.type == "square") {
-				if (x > 0) createWallClickDetector(x, y, "s",  1/4,  3/4, 1/2, 1/2);
-				if (y > 0) createWallClickDetector(x, y, "e",  3/4,  1/4, 1/2, 1/2);
-			}
-			if (map.type == "hex") {
-				if (x > 0) createWallClickDetector(x, y, "s",  1/3, stagger + 3/4, 2/3, 1/2);
-				if (y > 0) createWallClickDetector(x, y, "se",  1,  stagger + 1/2, 1/3, 1/2);
-				if (y > 0) createWallClickDetector(x, y, "ne",  1,  stagger,       1/3, 1/2);
-			}
-
-			// create walls and doors
-			var side = map.type == "hex" ? "se" : "e";
-			if ("IJKLMNOPQijklmnopq".indexOf(flag) != -1) grid.wall(x, y, "s");
-			if ("RSTUVWXYZrstuvwxyz".indexOf(flag) != -1) grid.door(x, y, "s");
-			if ("CDELMNUVWcdelmnuvw".indexOf(flag) != -1) grid.wall(x, y, side);
-			if ("FGHOPQXYZfghopqxyz".indexOf(flag) != -1) grid.door(x, y, side);
-			if ("ADGJMPSVYadgjmpsvy".indexOf(flag) != -1) grid.wall(x, y, "ne");
-			if ("BEHKNQTWZbehknqtwz".indexOf(flag) != -1) grid.door(x, y, "ne");
 
 			// create the tile click detector
 			var updateTile = function () {
-				var args = {"map": map.id, "x": x, "y": y};
+				var args = {"map": map.id, "x": x - 1, "y": y - 1};
 				if (LT.brush == "tile") {
 					args.tile = LT.selectedImageID;
 					createTileElement(LT.selectedImageID); // immediate feedback
@@ -355,16 +358,25 @@ LT.loadTiles = function () {
 				} else return; // brush is not fog or tile?
 				$.post("php/Map.tile.php", args);
 			};
-			$("<div>").appendTo("#clickTileLayer").css({
-				"left": width * x + "px",
-				"top": height * (y + stagger) + "px",
-				"width": width + "px",
-				"height": height + "px",
-			}).mousedown(function () {
-				LT.dragging = 1;
-				if (LT.brush == "fog") LT.toggleFog = 1 - fog;
-				updateTile();
-			}).mouseover(function () {if (LT.dragging) updateTile();});
+			var createTileClickDetector = function () {
+				$("<div>").appendTo("#clickTileLayer").css({
+					"left": width * x + "px",
+					"top": height * (y + stagger) + "px",
+					"width": width + "px",
+					"height": height + "px",
+				}).mousedown(function () {
+					LT.dragging = 1;
+					if (LT.brush == "fog") LT.toggleFog = 1 - fog;
+					updateTile();
+				}).mouseover(function () {if (LT.dragging) updateTile();});
+			};
+
+			// create tiles unless this is the first row or column
+			if (x > 0 && y > 0) {
+				createFogElement(fog);
+				createTileElement(tile);
+				createTileClickDetector();
+			}
 
 		}); // $.each(map.flags.split(""), function (i, flag) {
 

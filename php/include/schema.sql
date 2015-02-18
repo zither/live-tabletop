@@ -925,7 +925,7 @@ BEGIN
 		FROM (SELECT `id`, `private` FROM campaigns WHERE `map` = the_map) AS c
 			LEFT JOIN campaign_users ON `id` = `campaign`
 		WHERE `private` = 0
-			OR (`id` = `user` AND `permission` IN ('member', 'owner'));
+			OR (`user` = the_user AND `permission` IN ('member', 'owner'));
 /*
 	SELECT * FROM (SELECT id FROM campaigns WHERE map = the_map AND private = 1)
 		JOIN (SELECT `campaign` FROM campaign_users WHERE `user` = the_user
