@@ -36,9 +36,9 @@ LT.Grid.prototype = {
 		var context = this.canvas.getContext("2d");
 		var points = this.SHAPES[this._type].points;
 
-		this.canvas.width = (this.getColumns() + (this._type == "hex" ? 1/3 : 0))
+		this.canvas.width = (this.getColumns() + (this._type == "hex" ? 1/3 : 0) + 1)
 			* this._width + this._thickness;
-		this.canvas.height = (this.getRows() + (this._type == "hex" ? 1/2 : 0))
+		this.canvas.height = (this.getRows() + (this._type == "hex" ? 1/2 : 0) + 1)
 			* this._height + this._thickness;
 
 		context.translate(this._thickness / 2, this._thickness / 2);
@@ -48,17 +48,16 @@ LT.Grid.prototype = {
 			context.strokeStyle = this._color;
 			context.lineWidth = this._thickness;
 			context.beginPath();
-			for (var row = 0; row < this.getRows(); row++) {
-				for (var column = 0; column < this.getColumns(); column++) {
-					var x = 0;
-					var y = this._type == "hex" ? 0.5 * (column % 2): 0;
+			for (var column = 1; column <= this.getColumns(); column++) {
+				var stagger = this._type == "hex" ? 0.5 * (column % 2) : 0;
+				for (var row = 1; row <= this.getRows(); row++) {
 					context.moveTo(
-						(points[0][0] + x + column) * this._width,
-						(points[0][1] + y + row) * this._height);
+						(points[0][0] + column) * this._width,
+						(points[0][1] + row + stagger) * this._height);
 					for (var i = 1; i < points.length; i++) {
 						context.lineTo(
-							(points[i][0] + x + column) * this._width,
-							(points[i][1] + y + row) * this._height);
+							(points[i][0] + column) * this._width,
+							(points[i][1] + row + stagger) * this._height);
 					}
 					context.closePath();
 				}
@@ -68,19 +67,22 @@ LT.Grid.prototype = {
 
 		if (this._wall_thickness) {
 			// draw walls
-			for (var row = 0; row < this.getRows(); row++) {
-				for (var column = 0; column < this.getColumns(); column++) {
+			for (var column = 0; column < this.getColumns(); column++) {
+				var stagger = this._type == "hex" ? 0.5 * (column % 2) : 0;
+				for (var row = 0; row < this.getRows(); row++) {
 					for (var direction in this.walls[row][column]) {
 						if (this.walls[row][column][direction] == "wall") {
 							var i = this.SHAPES[this._type].directions[direction];
 							if (typeof(i) == "undefined") continue;
 							var j = (i + 1) % points.length;
-							var x = 0;
-							var y = this._type == "hex" ? 0.5 * (column % 2) : 0;
-							var x1 = (points[i][0] + x + column) * this._width;
-							var y1 = (points[i][1] + y + row) * this._height;
-							var x2 = (points[j][0] + x + column) * this._width;
-							var y2 = (points[j][1] + y + row) * this._height;
+							var x1 = (points[i][0] + column) * this._width;
+							var y1 = (points[i][1] + row + stagger) * this._height;
+							var x2 = (points[j][0] + column) * this._width;
+							var y2 = (points[j][1] + row + stagger) * this._height;
+							if (row == 0 && direction == "ne") { // vertical wrap
+								y1 += (this.rows - 1) * this._height;
+								y2 += (this.rows - 1) * this._height;
+							}
 							context.lineCap = "round";
 							context.strokeStyle = this._wall_color;
 							context.lineWidth = this._wall_thickness;
@@ -93,19 +95,22 @@ LT.Grid.prototype = {
 				}
 			}
 			// draw doors
-			for (var row = 0; row < this.getRows(); row++) {
-				for (var column = 0; column < this.getColumns(); column++) {
+			for (var column = 0; column < this.getColumns(); column++) {
+				var stagger = this._type == "hex" ? 0.5 * (column % 2) : 0;
+				for (var row = 0; row < this.getRows(); row++) {
 					for (var direction in this.walls[row][column]) {
 						if (this.walls[row][column][direction] == "door") {
 							var i = this.SHAPES[this._type].directions[direction];
 							if (typeof(i) == "undefined") continue;
 							var j = (i + 1) % points.length;
-							var x = 0;
-							var y = this._type == "hex" ? 0.5 * (column % 2) : 0;
-							var x1 = (points[i][0] + x + column) * this._width;
-							var y1 = (points[i][1] + y + row) * this._height;
-							var x2 = (points[j][0] + x + column) * this._width;
-							var y2 = (points[j][1] + y + row) * this._height;
+							var x1 = (points[i][0] + column) * this._width;
+							var y1 = (points[i][1] + row + stagger) * this._height;
+							var x2 = (points[j][0] + column) * this._width;
+							var y2 = (points[j][1] + row + stagger) * this._height;
+							if (row == 0 && direction == "ne") { // vertical wrap
+								y1 += (this.rows - 1) * this._height;
+								y2 += (this.rows - 1) * this._height;
+							}
 							context.lineCap = "butt";
 							context.strokeStyle = this._wall_color;
 							context.lineWidth = this._wall_thickness * 2;
@@ -129,7 +134,7 @@ LT.Grid.prototype = {
 					}
 				}
 			}
-		}
+		} // if (this._wall_thickness) {
 	},
 
 	resize: function (columns, rows) {
