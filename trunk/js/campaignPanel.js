@@ -55,7 +55,11 @@ LT.loadCampaign = function (id) {
 	LT.campaignPanel.selectTab("campaign info");
 
 	// enable map panel button
-	if (!LT.currentCampaign) LT.mapPanel.enable();
+	if (!LT.currentCampaign) {
+		LT.mapPanel.enable();
+		if (LT.mapPanel.isVisible())
+			LT.mapPanel.bringToFront();
+	}
 
 	// clear chat tab
 	$("#chatOutput .message:not(.template)").remove();
