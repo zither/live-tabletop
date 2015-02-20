@@ -1,5 +1,5 @@
 // GRID CONSTRUCTOR
-LT.Grid = function (columns, rows, width, height, thickness, color, wall_thickness, wall_color, type, parent) {
+LT.Grid = function (columns, rows, width, height, thickness, color, wall_thickness, wall_color, door_thickness, door_color, type, parent) {
 	this._type = type;
 	this._width = width;
 	this._height = height;
@@ -7,6 +7,8 @@ LT.Grid = function (columns, rows, width, height, thickness, color, wall_thickne
 	this._color = color || "black";
 	this._wall_thickness = wall_thickness;
 	this._wall_color = wall_color || "black";
+	this._door_thickness = door_thickness;
+	this._door_color = door_color || "black";
 	this.canvas = document.createElement("canvas");
 	if (parent) {
 		parent.appendChild(this.canvas);
@@ -31,12 +33,11 @@ LT.Grid.prototype = {
 	// METHODS OF GRID OBJECTS
 
 	repaint: function () {
-//		if (this._thickness == 0) return;
 
 		var context = this.canvas.getContext("2d");
 		var points = this.SHAPES[this._type].points;
-		var thickness = this._thickness; // make room for grid lines
-		if (this._wall_thickness) thickness = 2 * this._wall_thickness; // and doors
+		var thickness = Math.max(this._thickness, this._wall_thickness,
+			this._door_thickness + 2 * Math.max(1, this._thickness));
 
 		// resize canvas to fit grid lines, walls and doors
 		this.canvas.width = (this.getColumns() + (this._type == "hex" ? 1/3 : 0) - 1)
@@ -86,7 +87,6 @@ LT.Grid.prototype = {
 							if (row == 0 && direction == "ne") { // vertical wrap
 								y1 += this.walls.length * this._height;
 								y2 += this.walls.length * this._height;
-//console.log("wall: " + [column, row, direction, y1].join(", "));
 							}
 							context.lineCap = "round";
 							context.strokeStyle = this._wall_color;
@@ -118,7 +118,7 @@ LT.Grid.prototype = {
 							}
 							context.lineCap = "butt";
 							context.strokeStyle = this._wall_color;
-							context.lineWidth = this._wall_thickness * 2;
+							context.lineWidth = this._door_thickness + 2 * Math.max(1, this._thickness);
 							context.beginPath();
 							context.moveTo(x1, y1);
 							context.lineTo(x2, y2);
@@ -129,8 +129,8 @@ LT.Grid.prototype = {
 							var y3 = (y1 + t * y2) / (1 + t);
 							var x4 = (t * x1 + x2) / (1 + t);
 							var y4 = (t * y1 + y2) / (1 + t);
-							context.strokeStyle = "white";
-							context.lineWidth = this._wall_thickness;
+							context.strokeStyle = this._door_color;
+							context.lineWidth = this._door_thickness;
 							context.beginPath();
 							context.moveTo(x3, y3);
 							context.lineTo(x4, y4);
@@ -182,6 +182,8 @@ LT.Grid.prototype = {
 	getThickness: function () {return this._thickness;},
 	getWallColor: function () {return this._wall_color;},
 	getWallThickness: function () {return this._wall_thickness;},
+	getDoorColor: function () {return this._door_color;},
+	getDoorThickness: function () {return this._door_thickness;},
 	getWidth: function () {return this._width;},
 	getHeight: function () {return this._height;},
 
@@ -189,6 +191,8 @@ LT.Grid.prototype = {
 	setThickness: function (value) {this._thickness = value; this.repaint();},
 	setWallColor: function (value) {this._wall_color = value; this.repaint();},
 	setWallThickness: function (value) {this._wall_thickness = value; this.repaint();},
+	setDoorColor: function (value) {this._door_color = value; this.repaint();},
+	setDoorThickness: function (value) {this._door_thickness = value; this.repaint();},
 	setWidth: function (value) {this._width = value; this.repaint();},
 	setHeight: function (value) {this._height = value; this.repaint();},
 
@@ -205,7 +209,6 @@ LT.Grid.prototype = {
 
 	getWall: function (column, row, direction) {
 		var c = this.normalize(column, row, direction);
-//console.log("LT.Grid.getWall: " + [column, row, direction, c.column, c.row, c.direction].join(", "));
 		return this.walls[c.row][c.column][c.direction];
 	},
 

@@ -402,6 +402,11 @@ th, td {padding: 0;}
 
 /* Layers */
 
+#tileLayer {
+	position: relative;
+	z-index: -1;
+}
+
 .clickLayer {
 	position: absolute;
 	top: 0;
