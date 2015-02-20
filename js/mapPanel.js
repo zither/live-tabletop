@@ -1,4 +1,5 @@
 LT.RESOLUTION = 72;
+LT.FOG_IMAGE = 44;
 
 LT.toggleFog = 0;
 LT.dragging = 0;
@@ -23,7 +24,18 @@ $(function () { // This anonymous function runs after the page loads.
 
 	// submit map settings form
 	$("#applyMapChanges").click(function () {
-		$.post("php/Map.settings.php", LT.formValues("#mapEditor"), LT.refreshMap);
+		var args = LT.formValues("#mapEditor");
+		args.map = LT.currentMap.id;
+		// convert tilt selection into minimum and maximum angles
+		var tilt = JSON.parse(args.tilt);
+		args.min_tilt = tilt[0];
+		args.max_tilt = tilt[1];
+		delete args.tilt;
+		// convert zoom from percentage to fraction
+		args.min_zoom /= 100;
+		args.max_zoom /= 100;
+		// submit changes
+		$.post("php/Map.settings.php", args, LT.refreshMap);
 	});
 
 	// tools
@@ -136,25 +148,31 @@ LT.refreshMap = function () {
 			$.get("php/Map.changes.php", {map: LT.currentMap.id}, function (map) {
 
 				// populate map info form
-				$("#mapEditor [name=name]").val(map.name);
-				$("#mapEditor [name=type]").val(map.type);
-				$("#mapEditor [name=background]").val(map.background);
+				// do this when loading a new map and while the map info tab is hidden
+				if (!("name" in LT.currentMap) || LT.mapPanel.getTab() != "map info") {
+					$("#mapEditor [name=name]").val(map.name);
+					$("#mapEditor [name=type]").val(map.type);
+					$("#mapEditor [name=background]").val(map.background);
+					$("#mapEditor [name=columns]").val(map.columns);
+					$("#mapEditor [name=rows]").val(map.rows);
+					$("#mapEditor [name=min_rotate]").val(map.min_rotate);
+					$("#mapEditor [name=max_rotate]").val(map.max_rotate);
+					$("#mapEditor [name=tilt]").val("[" + map.min_tilt + "," + map.max_tilt + "]");
+					$("#mapEditor [name=min_zoom]").val(Math.round(map.min_zoom * 100));
+					$("#mapEditor [name=max_zoom]").val(Math.round(map.max_zoom * 100));
+					$("#mapEditor [name=grid_thickness]").val(map.grid_thickness);
+					$("#mapEditor [name=wall_thickness]").val(map.wall_thickness);
+					$("#mapEditor [name=door_thickness]").val(map.door_thickness);
+					$("#mapEditor [name=grid_color]").val(map.grid_color);
+					$("#mapEditor [name=wall_color]").val(map.wall_color);
+					$("#mapEditor [name=door_color]").val(map.door_color);
+				}
+
+				// update map background
 				// TODO: what is the structure of the background object?
 				$("#map").css({background: "url('images/" + map.background + "')"});
-				$("#mapEditor [name=columns]").val(map.columns);
-				$("#mapEditor [name=rows]").val(map.rows);
-				$("#mapEditor [name=min_rotate]").val(map.min_rotate);
-				$("#mapEditor [name=max_rotate]").val(map.max_rotate);
-				$("#mapEditor [name=min_tilt]").val(map.min_tilt);
-				$("#mapEditor [name=max_tilt]").val(map.max_tilt);
-				$("#mapEditor [name=min_zoom]").val(map.min_zoom);
-				$("#mapEditor [name=max_zoom]").val(map.max_zoom);
-				$("#mapEditor [name=grid_thickness]").val(map.grid_thickness);
-				$("#mapEditor [name=wall_thickness]").val(map.wall_thickness);
-				$("#mapEditor [name=door_thickness]").val(map.door_thickness);
-				$("#mapEditor [name=grid_color]").val(map.grid_color);
-				$("#mapEditor [name=wall_color]").val(map.wall_color);
-				$("#mapEditor [name=door_color]").val(map.door_color);
+
+				// TODO: repaint grid in case the color or thickness have changed.
 
 				// update pieces if they have changed
 				if (LT.currentMap.piece_changes < map.piece_changes) {
@@ -209,6 +227,8 @@ LT.refreshMap = function () {
 LT.loadTiles = function () {
 	$.get("php/Map.read.php", {map: LT.currentMap.id}, function (map) {
 
+		// TODO: loading a map is really slow, investigate why
+
 		var height = LT.RESOLUTION, width = LT.RESOLUTION;
 		if (map.type == "hex") width = Math.round(width * 1.5 / Math.sqrt(3));
 
@@ -223,7 +243,8 @@ LT.loadTiles = function () {
 		// Add a new grid to the wall layer
 		var grid = new LT.Grid(map.columns, map.rows, width, height,
 			map.grid_thickness, map.grid_color,
-			map.wall_thickness, map.wall_color, map.type, $("#wallLayer")[0]);
+			map.wall_thickness, map.wall_color,
+			map.door_thickness, map.door_color, map.type, $("#wallLayer")[0]);
 
 		$.each(map.flags.split(""), function (i, flag) {
 			var x = i % (map.columns + 1);
@@ -232,7 +253,6 @@ LT.loadTiles = function () {
 			var stagger = map.type == "hex" ? (x % 2) * 0.5 : 0;
 			var tile = x == 0 || y == 0 ? 0 : map.tiles[(x - 1) + (y - 1) * map.columns];
 			var fog = "1abcdefghijklmnopqrstuvwxyz".indexOf(flag) != -1 ? 1 : 0;
-			var fogElement, tileElement;
 
 			// flag    0ABCDEFGHIJKLMNOPQRSTUVWXYZ1abcdefghijklmnopqrstuvwxyz
 			// fog                                ***************************
@@ -254,7 +274,7 @@ LT.loadTiles = function () {
 			if ("ADGJMPSVYadgjmpsvy".indexOf(flag) != -1) grid.wall(x, y, "ne");
 			if ("BEHKNQTWZbehknqtwz".indexOf(flag) != -1) grid.door(x, y, "ne");
 
-			// create click detectors for walls
+			// function to create click detectors for walls
 			var createWallClickDetector = function (column, row, direction, l, t, w, h) {
 				$("<div>").appendTo($("#clickWallLayer")).css({
 					"left": width	* (column + l - 1) + "px",
@@ -272,6 +292,8 @@ LT.loadTiles = function () {
 					$.post("php/Map.tile.php", args);
 				});
 			};
+
+			// create the wall click detectors now
 			if (map.type == "square") {
 				if (x > 0) createWallClickDetector(x, y, "s",  1/4,  3/4, 1/2, 1/2);
 				if (y > 0) createWallClickDetector(x, y, "e",  3/4,  1/4, 1/2, 1/2);
@@ -290,28 +312,13 @@ LT.loadTiles = function () {
 					createWallClickDetector(x, y + 1, "ne",  1,  stagger,       1/3, 1/2);
 			}
 
-			// function to create fog elements
-			var createFogElement = function (newFogValue) {
-				fog = newFogValue;
-				if (fogElement) fogElement.remove();
-				if (fog) fogElement = $("<img>").css({
-					"left": width * (x - 1.5) + "px",
-					"top": height * (y - 1.5 + stagger) + "px",
-					"width": width * 2 + "px",
-					"height": height * 2 + "px",
-				}).attr("src", "images/fog.png").appendTo("#fogLayer");
-			};
-
-			// if the tile is not empty, create a new image
-			var createTileElement = function (newTileIndex) {
-				tile = newTileIndex;
-				if (tileElement) tileElement.remove();
-				if (tile == 0) return;
-				var image = LT.images[tile];
+			// function to create or update the fog or tile image element
+			var updateImageElement = function (element, index) {
+				if (index == 0) {element.hide(); return;}
+				var image = LT.images[index];
 				var scaleX = height / image[map.type][0];
 				var scaleY = width / image[map.type][1];
-				// create the new image element
-				tileElement = $("<img>").css({
+				element.show().attr("src", "images/" + image.file).css({
 					position: "absolute", // TODO: put this in style.css?
 					left: Math.round((x - 0.5 + offset) * width) + "px",
 					top: Math.round((y - 0.5 + stagger) * height) + "px",
@@ -319,63 +326,45 @@ LT.loadTiles = function () {
 					height: Math.round(image.size[1] * scaleY) + "px",
 					marginLeft: -Math.round(image.center[0] * scaleX) + "px",
 					marginTop:  -Math.round(image.center[1] * scaleY) + "px",
-				}).attr("src", "images/" + image.file);
-				// create as many new sub-layers as needed
-				for (var i = $("#tileLayer *").length; i < image.layer + 1; i++)
-					$("#tileLayer").append($("<div>"));
-				// add the new image to the appropriate sub-layer
-				// insert tile image in left-to-right, top-to-bottom order
-				// find the correct place for this tile using binary search
-				var left = parseInt(tileElement.css("left"));
-				var top = parseInt(tileElement.css("top"));
-				var sublayer = $("#tileLayer *")[image.layer];
-				var images = $(sublayer).children();
-				var start = 0;
-				var end = images.length;
-				while (start < end) {
-					var middle = Math.floor((start + end) / 2);
-					var midTop = parseInt($(images[middle]).css("top"));
-					var midLeft = parseInt($(images[middle]).css("left"));
-					if (midTop > top || (midTop == top && midLeft > left))
-						end = middle;
-					else
-						start = middle + 1;
-				}
-				if (end == images.length) tileElement.appendTo(sublayer);
-				else if (end == 0) tileElement.prependTo(sublayer);
-				else tileElement.insertBefore($(images[end]));
+					zIndex: image.layer,
+				});
 			};
 
-			// create the tile click detector
+			// function called when clicking or dragging over the tile
 			var updateTile = function () {
 				var args = {"map": map.id, "x": x - 1, "y": y - 1};
 				if (LT.brush == "tile") {
-					args.tile = LT.selectedImageID;
-					createTileElement(LT.selectedImageID); // immediate feedback
+					tile = args.tile = LT.selectedImageID;
+					updateImageElement(tileElement, tile);
 				} else if (LT.brush == "fog") {
-					args.fog = LT.toggleFog;
-					createFogElement(LT.toggleFog); // immediate feedback
+					fog = args.fog = LT.toggleFog;
+					fogElement.toggle(fog == 1);
 				} else return; // brush is not fog or tile?
 				$.post("php/Map.tile.php", args);
 			};
-			var createTileClickDetector = function () {
+
+			// create tile and fog now unless this is the first row or column
+			if (x > 0 && y > 0) {
+				// create tile image
+				var tileElement = $("<img>").appendTo("#tileLayer");
+				updateImageElement(tileElement, tile);
+				// create fog image
+				var fogElement = $("<img>").appendTo("#fogLayer");
+				updateImageElement(fogElement, LT.FOG_IMAGE);
+				fogElement.toggle(fog == 1);
+				// create tile click and drag detector
 				$("<div>").appendTo("#clickTileLayer").css({
 					"left": width * (x - 1 + offset) + "px",
 					"top": height * (y - 1 + stagger) + "px",
 					"width": width + "px",
 					"height": height + "px",
-				}).mousedown(function () {
+				}).mousedown(function () { // click
 					LT.dragging = 1;
 					if (LT.brush == "fog") LT.toggleFog = 1 - fog;
 					updateTile();
-				}).mouseover(function () {if (LT.dragging) updateTile();});
-			};
-
-			// create tiles unless this is the first row or column
-			if (x > 0 && y > 0) {
-				createFogElement(fog);
-				createTileElement(tile);
-				createTileClickDetector();
+				}).mouseover(function () { // drag
+					if (LT.dragging) updateTile();
+				});
 			}
 
 		}); // $.each(map.flags.split(""), function (i, flag) {

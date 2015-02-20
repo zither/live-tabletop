@@ -869,10 +869,10 @@ CREATE PROCEDURE create_map (IN the_user INT, IN the_type TEXT,
 BEGIN
 	START TRANSACTION;
 /* create the map */
-	INSERT INTO maps 
-		(type, `rows`, `columns`, `background`, `name`, `tiles`, `flags`)
+	INSERT INTO maps (type, `rows`, `columns`, `background`, `name`,
+		`tiles`, `flags`, `grid_color`, `wall_color`, `door_color`)
 	VALUES (the_type, the_rows, the_columns, the_background, the_name,
-		the_tiles, the_flags);
+		the_tiles, the_flags, 'black', 'black', 'white');
 	SET @id = LAST_INSERT_ID();
 /* make the user an owner */
 	INSERT INTO map_owners (`user`, `map`) VALUES (the_user, @id);

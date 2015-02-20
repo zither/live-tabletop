@@ -345,7 +345,7 @@
 			<div class="content" data-tab="map info">
 				<form id="mapEditor">
 					<div>Name: <input name="name" type="text" placeholder="map name"/></div>
-					<div>Background: <select name="image_id"><option value="-1">no background</option></select></div>
+					<div>Background: <select name="background"><option value="-1">no background</option></select></div>
 					<div>
 						Tiles:
 						<input name="columns" type="text" size="2" value="25"/>
@@ -364,13 +364,13 @@
 					</div>
 					<div>
 						Rotate:
-						<input name="min_zoom" type="text" size="3" value="-180"/>&deg;
+						<input name="min_rotate" type="text" size="3" value="-180"/>&deg;
 						-
-						<input name="max_zoom" type="text" size="3" value="180"/>&deg;
+						<input name="max_rotate" type="text" size="3" value="180"/>&deg;
 						<select name="tilt">
 							<option value="[30,90]" selected="selected">free tilt</option>
-							<option value="[30]">side view</option>
-							<option value="[90]">top view</option>
+							<option value="[30,30]">side view</option>
+							<option value="[90,90]">top view</option>
 						</select>
 					</div>
 					<div>
@@ -381,35 +381,64 @@
 							<option value="2">thick</option>
 						</select>
 						<select name="grid_color">
-							<option value="#000" selected="selected">black</option>
-							<option value="#FFF">white</option>
+							<option>red</option>
+							<option>orange</option>
+							<option>yellow</option>
+							<option>green</option>
+							<option>blue</option>
+							<option>purple</option>
+							<option>black</option>
+							<option>gray</option>
+							<option>white</option>
+							<option>pink</option>
+							<option>brown</option>
 						</select>
 					</div>
 					<div>
 						Wall:
 						<select name="wall_thickness">
-							<option value="2" selected="selected">thin</option>
-							<option value="4">thick</option>
+							<option value="3" selected="selected">thin</option>
+							<option value="6">thick</option>
 						</select>
 						<select name="wall_color">
-							<option value="#000" selected="selected">black</option>
-							<option value="#FFF">white</option>
+							<option>red</option>
+							<option>orange</option>
+							<option>yellow</option>
+							<option>green</option>
+							<option>blue</option>
+							<option>purple</option>
+							<option>black</option>
+							<option>gray</option>
+							<option>white</option>
+							<option>pink</option>
+							<option>brown</option>
 						</select>
 					</div>
 					<div>
 						Door:
 						<select name="door_thickness">
-							<option value="2" selected="selected">thin</option>
-							<option value="4">thick</option>
+							<option value="3" selected="selected">thin</option>
+							<option value="6">thick</option>
 						</select>
 						<select name="door_color">
-							<option value="#000">black</option>
-							<option value="#FFF" selected="selected">white</option>
+							<option>red</option>
+							<option>orange</option>
+							<option>yellow</option>
+							<option>green</option>
+							<option>blue</option>
+							<option>purple</option>
+							<option>black</option>
+							<option>gray</option>
+							<option>white</option>
+							<option>pink</option>
+							<option>brown</option>
 						</select>
 					</div>
 					<div>
 						<input type="button" value="apply changes" id="applyMapChanges"/>
-						<input type="button" value="delete map" id="deleteMap"/>
+<!-- TODO: do we need this if we can disown maps in the map list?
+						<input type="button" value="disown map" id="disownMap"/>
+-->
 					</div>
 				</form>
 			</div>
