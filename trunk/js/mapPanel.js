@@ -223,7 +223,8 @@ LT.loadTiles = function () {
 			"height": height * map.rows + "px",
 		});
 
-		// Add a new grid to the wall layer.
+		// TODO: update grid instead of recreating it each time
+		// Add a new grid to the wall layer
 		var grid = new LT.Grid(map.columns, map.rows, width, height,
 			map.grid_thickness, map.grid_color,
 			map.wall_thickness, map.wall_color, map.type, $("#wallLayer")[0]);
@@ -231,6 +232,7 @@ LT.loadTiles = function () {
 		$.each(map.flags.split(""), function (i, flag) {
 			var x = i % (map.columns + 1);
 			var y = Math.floor(i / (map.columns + 1));
+			var offset = map.type == "hex" ? 1 / 6 : 0;
 			var stagger = map.type == "hex" ? (x % 2) * 0.5 : 0;
 			var tile = x == 0 || y == 0 ? 0 : map.tiles[(x - 1) + (y - 1) * map.columns];
 			var fog = "1abcdefghijklmnopqrstuvwxyz".indexOf(flag) != -1 ? 1 : 0;
@@ -259,16 +261,17 @@ LT.loadTiles = function () {
 			// create click detectors for walls
 			var createWallClickDetector = function (column, row, direction, l, t, w, h) {
 				$("<div>").appendTo($("#clickWallLayer")).css({
-					"left": width	* (column + l) + "px",
-					"top": height * (row + t) + "px",
+					"left": width	* (column + l - 1) + "px",
+					"top": height * (row + t - 1) + "px",
 					"width": width * w + "px",
 					"height": height * h + "px",
 				}).click(function () {
+					if (row > map.rows) row = 0; // wrap rows for bottom left staggered edges
 					// TODO: depending on which tool is selected set newType to "door" or "clear"?
 					var oldType = grid.getWall(column, row, direction);
-					var newType = oldType == "wall" ? "door" : oldType == "door" ? "none" : "wall";								
+					var newType = oldType == "wall" ? "door" : oldType == "door" ? "none" : "wall";
 					grid.setWall(column, row, direction, newType);
-					var args = {"map": map.id, "x": column - 1, "y": (row - 1) % map.rows};
+					var args = {"map": map.id, "x": column - 1, "y": row - 1};
 					args[direction] = newType;
 					$.post("php/Map.tile.php", args);
 				});
@@ -286,6 +289,7 @@ LT.loadTiles = function () {
 				if (x > 0) createWallClickDetector(x, y, "s", 1/3, stagger + 3/4, 2/3, 1/2);
 				if (se) createWallClickDetector(x, y, "se", 1, stagger + 1/2, 1/3, 1/2);
 				if (ne) createWallClickDetector(x, y, "ne", 1, stagger,       1/3, 1/2);
+				// wrap rows for bottom left staggered edges
 				if (!stagger && y == map.rows && x != map.columns)
 					createWallClickDetector(x, y + 1, "ne",  1,  stagger,       1/3, 1/2);
 			}
@@ -295,8 +299,8 @@ LT.loadTiles = function () {
 				fog = newFogValue;
 				if (fogElement) fogElement.remove();
 				if (fog) fogElement = $("<img>").css({
-					"left": width * (x - 0.5) + "px",
-					"top": height * (y - 0.5 + stagger) + "px",
+					"left": width * (x - 1.5) + "px",
+					"top": height * (y - 1.5 + stagger) + "px",
 					"width": width * 2 + "px",
 					"height": height * 2 + "px",
 				}).attr("src", "images/fog.png").appendTo("#fogLayer");
@@ -313,8 +317,8 @@ LT.loadTiles = function () {
 				// create the new image element
 				tileElement = $("<img>").css({
 					position: "absolute", // TODO: put this in style.css?
-					left: Math.round((x + 0.5) * width) + "px",
-					top: Math.round((y + 0.5 + stagger) * height) + "px",
+					left: Math.round((x - 0.5 + offset) * width) + "px",
+					top: Math.round((y - 0.5 + stagger) * height) + "px",
 					width:  Math.round(image.size[0] * scaleX) + "px",
 					height: Math.round(image.size[1] * scaleY) + "px",
 					marginLeft: -Math.round(image.center[0] * scaleX) + "px",
@@ -360,8 +364,8 @@ LT.loadTiles = function () {
 			};
 			var createTileClickDetector = function () {
 				$("<div>").appendTo("#clickTileLayer").css({
-					"left": width * x + "px",
-					"top": height * (y + stagger) + "px",
+					"left": width * (x - 1 + offset) + "px",
+					"top": height * (y - 1 + stagger) + "px",
 					"width": width + "px",
 					"height": height + "px",
 				}).mousedown(function () {
