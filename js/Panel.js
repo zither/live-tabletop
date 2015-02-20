@@ -29,7 +29,7 @@ LT.Panel = function (name) {
 	var self = this; // remember the current "this" during event handlers
 	$(this.button).click(function () {
 		if ($(this).hasClass("disabled")) return;
-		if ($(self.outside).css("display") == "none") self.show();
+		if (!self.isVisible()) self.show();
 		else self.hide();
 		LT.Panel.saveCookie();
 		return false;
@@ -63,7 +63,7 @@ LT.Panel = function (name) {
 		});
 	});
 	// show contents of the initially selected tab
-	this.selectTab($(this.outside).find(".tab.active").data("tab"));
+	this.selectTab(this.getTab());
 }
 
 
@@ -166,6 +166,11 @@ LT.Panel.prototype = {
 		this.setHeight(this.defaultHeight);
 	},
 
+	// Returns true if the panel is visible, false if it is hidden
+	isVisible: function () {
+		return $(this.outside).css("display") != "none";
+	},
+
 	// Show this panel
 	show: function () {
 		this.bringToFront();
@@ -220,8 +225,8 @@ LT.Panel.prototype = {
 			y: this.getY(),
 			width: this.getWidth(),
 			height: this.getHeight(),
-			visible: $(this.outside).css("display") == "none" ? false : true,
-			tab: $(this.outside).find(".tab.active").data("tab")
+			visible: this.isVisible(),
+			tab: this.getTab(),
 		};
 	},
 
