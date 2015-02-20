@@ -13,7 +13,7 @@ LT.Grid = function (columns, rows, width, height, thickness, color, wall_thickne
 	}
 	this.canvas.className = "grid";
 	this.walls = [];
-	this.resize(columns, rows);
+	this.resize(columns + 1, rows + 1);
 };
 
 LT.Grid.prototype = {
@@ -35,22 +35,26 @@ LT.Grid.prototype = {
 
 		var context = this.canvas.getContext("2d");
 		var points = this.SHAPES[this._type].points;
+		var thickness = this._thickness; // make room for grid lines
+		if (this._wall_thickness) thickness = 2 * this._wall_thickness; // and doors
 
-		this.canvas.width = (this.getColumns() + (this._type == "hex" ? 1/3 : 0) + 1)
-			* this._width + this._thickness;
-		this.canvas.height = (this.getRows() + (this._type == "hex" ? 1/2 : 0) + 1)
-			* this._height + this._thickness;
+		// resize canvas to fit grid lines, walls and doors
+		this.canvas.width = (this.getColumns() + (this._type == "hex" ? 1/3 : 0) - 1)
+			* this._width + thickness;
+		this.canvas.height = (this.getRows() + (this._type == "hex" ? 1/2 : 0) - 1)
+			* this._height + thickness;
 
-		context.translate(this._thickness / 2, this._thickness / 2);
+		// offset coordinate system to center of grid lines
+		context.translate(thickness / 2 - this._width, thickness / 2 - this._height);
 
 		// draw grid
 		if (this._thickness) {
 			context.strokeStyle = this._color;
 			context.lineWidth = this._thickness;
 			context.beginPath();
-			for (var column = 1; column <= this.getColumns(); column++) {
+			for (var column = 1; column < this.getColumns(); column++) {
 				var stagger = this._type == "hex" ? 0.5 * (column % 2) : 0;
-				for (var row = 1; row <= this.getRows(); row++) {
+				for (var row = 1; row < this.getRows(); row++) {
 					context.moveTo(
 						(points[0][0] + column) * this._width,
 						(points[0][1] + row + stagger) * this._height);
@@ -80,8 +84,9 @@ LT.Grid.prototype = {
 							var x2 = (points[j][0] + column) * this._width;
 							var y2 = (points[j][1] + row + stagger) * this._height;
 							if (row == 0 && direction == "ne") { // vertical wrap
-								y1 += (this.rows - 1) * this._height;
-								y2 += (this.rows - 1) * this._height;
+								y1 += this.walls.length * this._height;
+								y2 += this.walls.length * this._height;
+//console.log("wall: " + [column, row, direction, y1].join(", "));
 							}
 							context.lineCap = "round";
 							context.strokeStyle = this._wall_color;
@@ -108,8 +113,8 @@ LT.Grid.prototype = {
 							var x2 = (points[j][0] + column) * this._width;
 							var y2 = (points[j][1] + row + stagger) * this._height;
 							if (row == 0 && direction == "ne") { // vertical wrap
-								y1 += (this.rows - 1) * this._height;
-								y2 += (this.rows - 1) * this._height;
+								y1 += this.walls.length * this._height;
+								y2 += this.walls.length * this._height;
 							}
 							context.lineCap = "butt";
 							context.strokeStyle = this._wall_color;
@@ -138,19 +143,11 @@ LT.Grid.prototype = {
 	},
 
 	resize: function (columns, rows) {
-		while (this.walls.length < rows) {
-			this.walls.push([]);
-		}
-		while (this.walls.length > rows) {
-			this.walls.pop([]);
-		}
+		while (this.walls.length < rows) this.walls.push([]);
+		while (this.walls.length > rows) this.walls.pop();
 		for (var row = 0; row < rows; row++) {
-			while (this.walls[row].length < columns) {
-				this.walls[row].push({});
-			}
-			while (this.walls[row].length > columns) {
-				this.walls[row].pop({});
-			}
+			while (this.walls[row].length < columns) this.walls[row].push({});
+			while (this.walls[row].length > columns) this.walls[row].pop();
 		}
 		this.repaint();
 	},
@@ -200,15 +197,15 @@ LT.Grid.prototype = {
 		switch (direction) {
 			case "n": direction = "s"; row--; break;
 			case "w": direction = "e"; column--; break;
-			case "nw": direction = "se"; column--; row--; break;
-			case "ne": direction = "sw"; column--; break;
+			case "nw": direction = "se"; column--; row += column % 2; row++; break;
+			case "sw": direction = "ne"; column--; row += column % 2; break;
 		}
-		if (column % 2 && (direction == "se" || direction == "sw")) row++;
 		return {column: column, row: row, direction: direction};
 	},
 
 	getWall: function (column, row, direction) {
 		var c = this.normalize(column, row, direction);
+//console.log("LT.Grid.getWall: " + [column, row, direction, c.column, c.row, c.direction].join(", "));
 		return this.walls[c.row][c.column][c.direction];
 	},
 
