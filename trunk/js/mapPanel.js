@@ -26,11 +26,6 @@ $(function () { // This anonymous function runs after the page loads.
 		$.post("php/Map.settings.php", LT.formValues("#mapEditor"), LT.refreshMap);
 	});
 
-	// tools tab
-	$("#toolsTab").click(function () {
-		LT.chooseTool("#pieceTool", "piece", "#clickPieceLayer");
-	});
-
 	// tools
 	$("#eraser").click(function () {
 		LT.selectedImageID = -1;
@@ -46,6 +41,7 @@ $(function () { // This anonymous function runs after the page loads.
 	$("#pieceTool").click(function () {
 		LT.chooseTool(this, "piece", "#clickPieceLayer");
 	});
+	LT.chooseTool($("#wallTool"), "wall", "#clickWallLayer"); // default tool
 
 	// pieces
 
@@ -62,7 +58,7 @@ $(function () { // This anonymous function runs after the page loads.
 
 LT.chooseTool = function (swatch, name, layer) {
 	// select this tool icon
-	$(".toolsTab .swatch").removeClass("selected");
+	$(".swatch").removeClass("selected");
 	$(swatch).addClass("selected");
 	// set the tool type for click handlers
 	LT.brush = name;
@@ -223,7 +219,7 @@ LT.loadTiles = function () {
 			"height": height * map.rows + "px",
 		});
 
-		// TODO: update grid instead of recreating it each time
+		// TODO: update grid instead of recreating it each time?
 		// Add a new grid to the wall layer
 		var grid = new LT.Grid(map.columns, map.rows, width, height,
 			map.grid_thickness, map.grid_color,
