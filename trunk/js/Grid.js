@@ -10,9 +10,7 @@ LT.Grid = function (columns, rows, width, height, thickness, color, wall_thickne
 	this._door_thickness = door_thickness;
 	this._door_color = door_color || "black";
 	this.canvas = document.createElement("canvas");
-	if (parent) {
-		parent.appendChild(this.canvas);
-	}
+	if (parent) parent.appendChild(this.canvas);
 	this.canvas.className = "grid";
 	this.walls = [];
 	this.resize(columns + 1, rows + 1);
@@ -47,6 +45,8 @@ LT.Grid.prototype = {
 
 		// offset coordinate system to center of grid lines
 		context.translate(thickness / 2 - this._width, thickness / 2 - this._height);
+		this.canvas.style.marginLeft = -thickness / 2 + "px";
+		this.canvas.style.marginTop = -thickness / 2 + "px";
 
 		// draw grid
 		if (this._thickness) {

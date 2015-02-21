@@ -11,18 +11,9 @@ LT.setCookie = function (name, value) {
 
 // Get JSON data stored in the browser's cookie
 LT.getCookie = function (name) {
-	var re = new RegExp("(?:(?:^|.*;\s*)" + name + "\s*\=\s*([^;]*).*$)|^.*$");
-	var cookie = decodeURIComponent(document.cookie.replace(re, "$1"));
-	if (cookie != "") return JSON.parse(cookie);
-/*
-	var cookieArray = document.cookie.split(";");
-	for (var i = 0; i < cookieArray.length; i++) {
-		var cookieString = cookieArray[i].replace(/^\s+|\s+$/g, ""); // trim white space
-		if (cookieString.indexOf(name + "=") == 0) {
-			return JSON.parse(cookieString.substr(name.length + 1, cookieString.length));
-		}
-	}
-*/
+	var re = new RegExp('[; ]' + name + '=([^\\s;]*)');
+	var cookie = (' ' + document.cookie).match(re);
+	if (cookie) return JSON.parse(decodeURIComponent(cookie[1]));
 };
 
 // Creates an array from an object

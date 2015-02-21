@@ -7,10 +7,7 @@ LT.dropHandlers.push(function () {LT.dragging = 0;});
 
 $(function () { // This anonymous function runs after the page loads.
 	LT.mapPanel = new LT.Panel("map");
-	LT.mapPanel.hideTab("map info");
-	LT.mapPanel.hideTab("map tools");
-	LT.mapPanel.hideTab("piece list");
-	LT.mapPanel.hideTab("piece info");
+	LT.hideMapTabs();
 
 	// disable map panel button until a campaign is loaded
 	LT.mapPanel.disable();
@@ -68,6 +65,22 @@ $(function () { // This anonymous function runs after the page loads.
 	$("#addStat").click(function () {LT.Piece.addStat();});
 });
 
+LT.hideMapTabs = function () {
+	LT.mapPanel.hideTab("map info");
+	LT.mapPanel.hideTab("map tools");
+	LT.mapPanel.hideTab("piece menu");
+	LT.mapPanel.hideTab("piece list");
+	LT.mapPanel.hideTab("piece info");
+};
+
+LT.showMapTabs = function () {
+	LT.mapPanel.showTab("map info");
+	LT.mapPanel.showTab("map tools");
+	LT.mapPanel.showTab("piece menu");
+	LT.mapPanel.showTab("piece list");
+	LT.mapPanel.showTab("piece info");
+};
+
 LT.chooseTool = function (swatch, name, layer) {
 	// select this tool icon
 	$(".swatch").removeClass("selected");
@@ -86,28 +99,18 @@ LT.loadMap = function (id) {
 		campaign: LT.currentCampaign.id,
 		map: id
 	}, function () {
-		// show map panel tabs that only apply when a map is loaded
-		LT.mapPanel.showTab("map info");
-		LT.mapPanel.showTab("map tools");
-		LT.mapPanel.showTab("piece list");
-		LT.mapPanel.showTab("piece info");
+		LT.showMapTabs(); // show tabs that only apply when a map is loaded
 		LT.mapPanel.selectTab("map info");
-		// remember the current map when you reload
-		LT.setCookie("map", id);
-		// create default map object
-		// tile_changes initialized to -1 to force loading of new map tiles
+//		LT.setCookie("map", id); // remember the current map when you reload
+		// create default map object; tile_changes -1 forces loading new map tiles
 		LT.currentMap = {"id": id, "piece_changes": -1, "tile_changes": -1};
-		// start periodic map updates
-		LT.refreshMap();
+		LT.refreshMap(); // start periodic map updates
 	});
 };
 
 LT.leaveMap = function () {
 	// hide map panel tabs that only apply when a map is loaded
-	LT.mapPanel.hideTab("map info");
-	LT.mapPanel.hideTab("map tools");
-	LT.mapPanel.hideTab("piece list");
-	LT.mapPanel.hideTab("piece info");
+	LT.hideMapTabs();
 	$("#tileLayer, #clickTileLayer, #clickWallLayer, #wallLayer, #fogLayer").empty();
 	$("#map, #clickWallLayer, #clickTileLayer").css({"width": 0, "height": 0});
 	delete LT.currentMap;
@@ -202,17 +205,9 @@ LT.refreshMap = function () {
 					// TODO: populate map owner list
 				});
 				if (currentUserCanEditThisMap) {
-					// show tabs only visible to owners
-					LT.mapPanel.showTab("piece list");
-					LT.mapPanel.showTab("piece info");
-					LT.mapPanel.showTab("map info");
-					LT.mapPanel.showTab("map tools");
+					LT.showMapTabs(); // show tabs only visible to owners
 				} else {
-					// hide tabs only visible to owners
-					LT.mapPanel.hideTab("piece list");
-					LT.mapPanel.hideTab("piece info");
-					LT.mapPanel.hideTab("map info");
-					LT.mapPanel.hideTab("map tools");
+					LT.hideMapTabs(); // hide tabs only visible to owners
 					LT.mapPanel.selectTab("map list");
 					$(".clickLayer").hide();
 					$("#clickPieceLayer").show();

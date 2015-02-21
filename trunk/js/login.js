@@ -125,10 +125,6 @@ LT.login = function (theUser) {
 	var campaign = LT.getCookie("campaign");
 	if (campaign) LT.loadCampaign(campaign);
 
-	// restore map
-	var map = LT.getCookie("map");
-	if (map) LT.loadMap(map);
-
 	// start periodic user updates
 	LT.holdTimestamps = 0;
 	LT.refreshUser();
