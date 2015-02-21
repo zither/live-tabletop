@@ -4,6 +4,7 @@ $(function () { // This anonymous function runs after the page loads.
 	LT.campaignPanel.hideTab("blacklist");
 	LT.campaignPanel.hideTab("chat");
 
+	// create campaign button
 	$("#createCampaign input[type=button]").click(function () {
 		var args = LT.formValues("#createCampaign");
 		$.post("php/Campaign.create.php", args, function (theData) {
@@ -11,6 +12,24 @@ $(function () { // This anonymous function runs after the page loads.
 			LT.loadCampaign(theData.id);
 		});
 	});
+
+	// campaign info form
+	$("#campaignName input").click(function () {
+		var newName = prompt("new campaign name", LT.currentCampaign.name);
+		if (newName != null && newName != LT.currentCampaign.name) {
+			$.post("php/Campaign.name.php", {
+				campaign: LT.currentCampaign.id,
+				name: LT.currentCampaign.name = newName
+			}, function () {$("#campaignName span").text(newName);});
+		}
+	});
+	// TODO: campaign private checkbox
+	// TODO: invite to campaign
+	// TODO: share campaign
+	// TODO: campaign user list
+
+
+	// chat
 	$("#chatForm input[value=send]").click(function () {
 //		if (!LT.currentCampaign) return false;
 		var args = {campaign: LT.currentCampaign.id, text: $("#chatInput").val()};
@@ -93,17 +112,17 @@ LT.refreshCampaign = function () {
 				campaign: LT.currentCampaign.id
 			}, function (data) {
 
-				// TODO: what if current campaign is closed or changes before receiving the result?
+				// cancel this if there is no current campaign
+				if (!LT.currentCampaign) return;
 
 				// update campaign name
-				$("#campaignName").text(data.name || "[unnamed campaign]");
+				$("#campaignName span").text(data.name || "[unnamed campaign]");
 
 				// update campaign private/public toggle
 				$("#campaignPrivate").val(data.private);
 
 				// update users if users_modified timestamp has changed
 				// FIXME: users_modified not affected when users change their names
-				// TODO: list of blacklisted users
 				if (data.users_modified > LT.currentCampaign.users_modified) {
 					$.get("php/Campaign.users.php", {
 						campaign: LT.currentCampaign.id
@@ -200,11 +219,11 @@ LT.refreshCampaign = function () {
 
 				// update map (id number)
 				if (LT.currentCampaign.map != data.map) {
-					// TODO: close map
 					LT.currentCampaign.map = null;
+					LT.leaveMap();
 				}
 				if (data.map && !(LT.currentCampaign.map)) {
-					// TODO: open map
+					LT.loadMap(data.map);
 				}
 
 				// load new chat messages.
@@ -249,20 +268,20 @@ LT.formatTime = function (seconds) {
 };
 
 LT.leaveCampaign = function () {
+	// remove the campaign owners, members and guests from LT.users
+	LT.players = [];
+	LT.indexUsers();
+	// hide campaign-specific tabs
+	LT.campaignPanel.hideTab("campaign info");
+	LT.campaignPanel.hideTab("blacklist");
+	LT.campaignPanel.hideTab("chat");
+	// cannot view maps without a campaign
+	if (LT.currentMap) LT.leaveMap();
+	// drop campaign info after temporarily storing the campaign id
+	var args = {campaign: LT.currentCampaign.id};
+	delete LT.currentCampaign;
 	// Let the server know that you aren't viewing the campaign anymore
 	// return a chainable object so you can schedule stuff when this is done
-	return $.post("php/Campaign.leave.php", {campaign: LT.currentCampaign.id}, function () {
-		// remove the campaign owners, members and guests from LT.users
-		LT.players = [];
-		LT.indexUsers();
-		// hide campaign-specific tabs
-		LT.campaignPanel.hideTab("campaign info");
-		LT.campaignPanel.hideTab("blacklist");
-		LT.campaignPanel.hideTab("chat");
-		// drop campaign info
-		delete LT.currentCampaign;
-		// cannot view maps without a campaign
-		if (LT.currentMap) LT.leaveMap();
-	});
+	return $.post("php/Campaign.leave.php", args);
 };
 

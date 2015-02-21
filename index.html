@@ -19,6 +19,7 @@
 		<script type="text/javascript" src="js/Palette.js"></script>
 		<script type="text/javascript" src="js/Panel.js"></script>
 		<script type="text/javascript" src="js/Piece.js"></script>
+<!--
 		<script type="text/javascript" src="js/Tile.js"></script>
 <!--
 		<script type="text/javascript" src="js/User.js"></script>
@@ -310,6 +311,7 @@
 				<div class="tab" data-tab="map list">List</div>
 				<div class="tab" data-tab="map info">Info</div>
 				<div class="tab active" data-tab="map tools">Tools</div>
+				<div class="tab" data-tab="piece menu">New Piece</div>
 				<div class="tab" data-tab="piece list">Pieces</div>
 				<div class="tab" data-tab="piece info">Piece Info</div>
 			</div>
@@ -454,20 +456,20 @@
 			</div>
 			<div class="content" data-tab="piece list">
 				<table>
-					<tr>
-						<td><a><img class="inlineImage" src="images/piece/rogue.png"/> rogue</a> at (1,3)</td>
-						<td><input type="button" value="delete"/></td>
-					</tr>
-					<tr>
-						<td><a><img class="inlineImage" src="images/piece/priest.png"/> priest</a> at (7,4)</td>
+					<tr class="template">
+						<td>
+							<a>
+								<img class="inlineImage" src="images/piece/rogue.png"/>
+								<span class="name">rogue</span>
+							</a>
+							at (<span class="column">1</span>,<span class="row">3</span>)
+						</td>
 						<td><input type="button" value="delete"/></td>
 					</tr>
 				</table>
-				<div id="pieceCreator">
-					<input name="image_id" type="hidden" value=""/>
-					<input type="button" value="create piece" id="createPiece"/>
-				</div>
-				<!-- TODO: piece image selector -->
+			</div>
+			<div class="content" data-tab="piece menu">
+				<div id="pieceCreator"></div>
 			</div>
 			<div class="content" data-tab="piece info">
 				<form id="pieceEditor">
