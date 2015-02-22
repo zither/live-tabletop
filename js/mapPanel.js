@@ -35,6 +35,12 @@ $(function () { // This anonymous function runs after the page loads.
 		$.post("php/Map.settings.php", args, LT.refreshMap);
 	});
 
+	// close map
+	$("#mapClose").click(function () {
+		LT.leaveMap();
+		$.post("php/Campaign.map.php", {campaign: LT.currentCampaign.id, map: 0});
+	});
+
 	// tools
 	$("#eraser").click(function () {
 		LT.selectedImageID = -1;

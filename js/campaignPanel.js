@@ -23,11 +23,28 @@ $(function () { // This anonymous function runs after the page loads.
 			}, function () {$("#campaignName span").text(newName);});
 		}
 	});
-	// TODO: campaign private checkbox
-	// TODO: invite to campaign
-	// TODO: share campaign
-	// TODO: campaign user list
-
+	$("#campaignPrivate").click(function () {
+		LT.currentCampaign.private = this.checked ? 1 : 0;
+		$.post("php/Campaign.private.php", {
+			campaign: LT.currentCampaign.id,
+			private: LT.currentCampaign.private,
+		});
+	});
+	$("#campaignClose").click(LT.leaveCampaign);
+	$("#campaignInvite").click(function () {
+		$.post("php/Campaign.permission.php", {
+			user: $("#campaignFriend").val(),
+			campaign: LT.currentCampaign.id,
+			permission: "member",
+		}, LT.refreshCampaign);
+	});
+	$("#campaignShare").click(function () {
+		$.post("php/Campaign.permission.php", {
+			user: $("#campaignFriend").val(),
+			campaign: LT.currentCampaign.id,
+			permission: "owner",
+		}, LT.refreshCampaign);
+	});
 
 	// chat
 	$("#chatForm input[value=send]").click(function () {

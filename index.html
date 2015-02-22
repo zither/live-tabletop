@@ -261,9 +261,12 @@
 					<label for="campaignPrivate">private</label>
 				</div>
 				<div>
-					<select name="user"><option>My Friend</option></select>
-					<input type="button" value="invite to campaign"/>
-					<input type="button" value="share campaign"/>
+					<input type="button" value="close campaign" id="campaignClose"/>
+				</div>
+				<div>
+					<select name="user" id="campaignFriend"><option>My Friend</option></select>
+					<input type="button" value="invite to campaign" id="campaignInvite"/>
+					<input type="button" value="share campaign" id="campaignShare"/>
 				</div>
 				<table id="campaignUsers">
 					<tr class="template">
@@ -443,6 +446,10 @@
 -->
 					</div>
 				</form>
+				<div>
+					<input type="button" value="close map" id="mapClose"/>
+				</div>
+				<!-- TODO: map owner list -->
 			</div>
 			<div class="content" data-tab="map tools">
 				<div>
