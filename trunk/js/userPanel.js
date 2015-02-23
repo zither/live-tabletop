@@ -91,8 +91,8 @@ LT.refreshUser = function () {
 					});
 					row.appendTo("#friendsConfirmed tbody");
 					if (friend.id in LT.users) {
-						LT.users[user.id].name = friend.name;
-						LT.users[user.id].color = friend.color;
+						LT.users[friend.id].name = friend.name;
+						LT.users[friend.id].color = friend.color;
 					} else LT.users[friend.id] = friend;
 				});
 				// friend requests sent by you
@@ -109,7 +109,7 @@ LT.refreshUser = function () {
 					});
 					row.appendTo("#friendsRequested tbody");
 				});
-				// freind requests recieved by you
+				// friend requests recieved by you
 				if (data.received.length == 0) LT.userPanel.hideTab("user received");
 				else LT.userPanel.showTab("user received");
 				$("#friendsReceived tr:not(.template)").remove();
@@ -128,8 +128,8 @@ LT.refreshUser = function () {
 					});
 					row.appendTo("#friendsReceived tbody");
 					if (friend.id in LT.users) {
-						LT.users[user.id].name = friend.name;
-						LT.users[user.id].color = friend.color;
+						LT.users[friend.id].name = friend.name;
+						LT.users[friend.id].color = friend.color;
 					} else LT.users[friend.id] = friend;
 				});
 			});
@@ -157,7 +157,8 @@ LT.indexUsers = function () {
 	// add user to select boxes
 	$("select[name=user] option").remove();
 	$.each(LT.sortObject(LT.users, "name"), function (i, user) {
-		$("select[name=user]").append($("<option>").val(user.id).text(user.name));
+		if (user.id == LT.currentUser.id) return; // TODO: disable controls that require other users
+		$("select[name=user]").append($("<option>").val(user.id).text(user.name || user.email));
 	});
 }
 

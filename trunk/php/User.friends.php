@@ -2,6 +2,7 @@
 
 include('db_config.php');
 include('include/query.php');
+include('include/output.php');
 
 session_start();
 if (!isset($_SESSION['user'])) {
@@ -11,14 +12,12 @@ if (!isset($_SESSION['user'])) {
 
 $user = intval($_SESSION['user']);
 
-$friends = array('received' => array(), 'requested' => array(), 'confirmed' => array());
-foreach (LT_call('read_friends_received', $user) as $row)
-	$friends['received'][] = LT_format_object($row, array('integer' => array('id')));
-foreach (LT_call('read_friends_requested', $user) as $row)
-	$friends['requested'][] = array('email' => $row['email']);
-foreach (LT_call('read_friends_confirmed', $user) as $row)
-	$friends['confirmed'][] = LT_format_object($row, array('integer' => array('id')));
+$recieved = LT_call('read_friends_received', $user);
+$requested = LT_call('read_friends_requested', $user);
+$confirmed = LT_call('read_friends_confirmed', $user);
+foreach ($recieved as $row) LT_format_object($row, array('integer' => array('id')));
+foreach ($confirmed as $row) LT_format_object($row, array('integer' => array('id')));
 include('include/json_headers.php');
-echo json_encode($friends);
+echo json_encode(array('received' => $recieved, 'requested' => $requested, 'confirmed' => $confirmed));
 
 ?>
