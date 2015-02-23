@@ -1,6 +1,6 @@
 <?php
 
-function LT_format_object(&$data, &$fields) {
+function LT_format_object(&$data, $fields) {
 	if (isset($fields['integer'])) foreach ($fields['integer'] as $key)
 		$data[$key] = $data[$key] === NULL ? NULL : intval($data[$key]);
 	if (isset($fields['boolean'])) foreach ($fields['boolean'] as $key)

@@ -140,19 +140,18 @@ LT.refreshCampaign = function () {
 
 				// update users if users_modified timestamp has changed
 				// FIXME: users_modified not affected when users change their names
+				// FIXME: this wasn't triggered when I invited a user to the campaign
 				if (data.users_modified > LT.currentCampaign.users_modified) {
 					$.get("php/Campaign.users.php", {
 						campaign: LT.currentCampaign.id
 					}, function (theUsers) {
-						// add campaign owners, members and guests to LT.users
-						LT.players = theUsers;
-						LT.indexUsers();
-						// add campaign owners members and guests to campaign info tab
+
+						// add campaign owners, members and guests to campaign info tab
 						$("#campaignUsers tr:not(.template)").remove();
 						$.each(theUsers, function (i, user) {
-							$copy = $("#campaignUsers .template").clone().removeClass("template");
-							$copy.find(".name").text(user.name);
-							$copy.find(".permission").change(function () {
+							var copy = $("#campaignUsers .template").clone().removeClass("template");
+							copy.find(".name").text(user.name || user.email);
+							copy.find(".permission").change(function () {
 								var before = user.permission;
 								var after = $(this).val();
 								var questions = [];
@@ -181,13 +180,19 @@ LT.refreshCampaign = function () {
 									"user": user.id}, function () {LT.refreshCampaign();});
 							}).val(user.permission || "guest");
 							if (user.id == LT.currentUser.id)
-								$copy.find(".permission option[value=banned]").remove();
-							$copy.find("[value=viewing]")[0].checked = user.viewing;
-							$copy.appendTo("#campaignUsers");
-						});
-					});
-				}
-						
+								copy.find(".permission option[value=banned]").remove();
+							copy.find("[value=viewing]")[0].checked = user.viewing;
+							copy.find("[value=friend]").toggle(!(user.id in LT.users));
+							copy.appendTo("#campaignUsers");
+						}); // $.each(theUsers, function (i, user) {
+
+						// add campaign owners, members and guests to LT.users
+						LT.players = theUsers;
+						LT.indexUsers();
+
+					}); // $.get("php/Campaign.users.php", {
+				} // if (data.users_modified > LT.currentCampaign.users_modified) {
+
 				// update blacklist
 				if (data.users_modified > LT.currentCampaign.users_modified) {
 					$.get("php/Campaign.blacklist.php", {
@@ -197,9 +202,9 @@ LT.refreshCampaign = function () {
 						else LT.campaignPanel.showTab("blackList");
 						$("#blacklist tr:not(.template)").remove();
 						$.each(theUsers, function (i, user) {
-							$copy = $("#blacklist .template").clone().removeClass("template");
-							$copy.find(".email").text(user.email);
-							$copy.find("[value=remove]").click(function () {
+							var copy = $("#blacklist .template").clone().removeClass("template");
+							copy.find(".email").text(user.email);
+							copy.find("[value=remove]").click(function () {
 								if (confirm("Are you sue you want to remove " + user.email + " from the blacklist?")) {
 									$.post("php/Campaign.permission.php", {
 										user: user.email,
@@ -208,7 +213,7 @@ LT.refreshCampaign = function () {
 									}, function () {LT.refreshCampaignList();});
 								}
 							});
-							$copy.appendTo("#blacklist");
+							copy.appendTo("#blacklist");
 						});						
 					});
 				}

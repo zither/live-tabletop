@@ -407,14 +407,20 @@ th, td {padding: 0;}
 	z-index: -1;
 }
 
+#tileLayer > img, #fogLyer > img {
+	position: absolute;
+	left: 0;
+	top: 0;
+	display: none;
+}
+
+
 .clickLayer {
 	position: absolute;
 	top: 0;
 	left: 0;
 }
 .clickLayer > div {position: absolute;}
-
-#fogLayer > img {position: absolute;}
 
 .grid {
 	position: absolute;
