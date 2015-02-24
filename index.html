@@ -442,15 +442,22 @@
 					</div>
 					<div>
 						<input type="button" value="apply changes" id="applyMapChanges"/>
-<!-- TODO: do we need this if we can disown maps in the map list?
-						<input type="button" value="disown map" id="disownMap"/>
--->
 					</div>
 				</form>
 				<div>
 					<input type="button" value="close map" id="mapClose"/>
 				</div>
-				<!-- TODO: map owner list -->
+				<div>
+					Owners:
+					<select name="user" id="mapOwner"><option>My Friend</option></select>
+					<input type="button" value="share map" id="mapShare"/>
+				</div>
+				<table id="mapOwners">
+					<tr class="template">
+						<td class="name">user name</td>
+						<td><input type="button" value="remove"/></td>
+					</tr>
+				</table>
 			</div>
 			<div class="content" data-tab="map tools">
 				<div>

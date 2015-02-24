@@ -41,6 +41,14 @@ $(function () { // This anonymous function runs after the page loads.
 		$.post("php/Campaign.map.php", {campaign: LT.currentCampaign.id, map: 0});
 	});
 
+	// share map ownership
+	$("#mapShare").click(function () {
+		$.post("php/Map.share.php", {
+			map: LT.currentMap.id,
+			user: $("#mapOwner").val(),
+		}, LT.refreshMap);
+	});
+
 	// tools
 	$("#eraser").click(function () {
 		LT.selectedImageID = -1;
@@ -204,11 +212,20 @@ LT.refreshMap = function () {
 			// load map owners
 			$.get("php/Map.owners.php", {map: LT.currentMap.id}, function (owners) {
 				var currentUserCanEditThisMap = false;
+				$("#mapOwners tr:not(.template)").remove();
 				$.each(owners, function (i, owner) {
+					var copy = $("#mapOwners .template").clone().removeClass("template");
+					copy.find(".name").text(owner.name || owner.email);
+					copy.find("input[value=remove]").click(function () {
+						$.post("php/Map.deleteOwner.php", {
+							map: LT.currentMap.id,
+							user: owner.id
+						}, LT.refreshMap);
+					});
+					copy.appendTo("#mapOwners");
 					// TODO: do you also need campaign ownership?
 					if (owner.id == LT.currentUser.id)
 						currentUserCanEditThisMap = true;
-					// TODO: populate map owner list
 				});
 				if (currentUserCanEditThisMap) {
 					LT.showMapTabs(); // show tabs only visible to owners
