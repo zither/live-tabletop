@@ -249,13 +249,12 @@ CREATE TABLE messages (
 
 /* MAPS TABLE
 
-	Maps are graphical things with pieces, background images and tiles.
+	Maps are graphical things with pieces, tiles, walls and doors.
 
 	name: an optional name to help identify the map
 		(only visible to map and campaign owners?)
 	type: 'hex' or 'square'
 	rows/columns: height and width of the map, in grid units
-	background: image JSON data. See piece.image. No base; Probably no view.
 	min/max zoom, rotate and tilt: allowed viewing options
 	grid/wall/door thickness and color: style for grid and wall overlay
 	tiles: JSON array containing the image ids of each tile in the map
@@ -278,7 +277,6 @@ CREATE TABLE maps (
 	`type` TEXT NOT NULL,
 	`rows` SMALLINT NOT NULL,
 	`columns` SMALLINT NOT NULL,
-	`background` TEXT,
 	`min_zoom` FLOAT NOT NULL DEFAULT 0.25,
 	`max_zoom` FLOAT NOT NULL DEFAULT 4.0,
 	`min_rotate` SMALLINT NOT NULL DEFAULT -180,
@@ -864,14 +862,14 @@ END;
 
 /* User creates a new map */
 CREATE PROCEDURE create_map (IN the_user INT, IN the_type TEXT,
-	IN the_rows SMALLINT, IN the_columns SMALLINT, IN the_background TEXT,
+	IN the_rows SMALLINT, IN the_columns SMALLINT,
 	IN the_name TEXT, IN the_tiles TEXT, IN the_flags TEXT)
 BEGIN
 	START TRANSACTION;
 /* create the map */
-	INSERT INTO maps (type, `rows`, `columns`, `background`, `name`,
+	INSERT INTO maps (type, `rows`, `columns`, `name`,
 		`tiles`, `flags`, `grid_color`, `wall_color`, `door_color`)
-	VALUES (the_type, the_rows, the_columns, the_background, the_name,
+	VALUES (the_type, the_rows, the_columns, the_name,
 		the_tiles, the_flags, 'black', 'black', 'white');
 	SET @id = LAST_INSERT_ID();
 /* make the user an owner */
@@ -891,7 +889,7 @@ END;
 /* User polls for changes to the map, its pieces and tiles */
 CREATE PROCEDURE read_map_changes (IN the_map INT)
 BEGIN
-	SELECT `id`, `name`, `type`, `rows`, `columns`, `background`,
+	SELECT `id`, `name`, `type`, `rows`, `columns`,
 		`min_zoom`, `max_zoom`, `min_rotate`, `max_rotate`, `min_tilt`, `max_tilt`,
 		`grid_thickness`, `grid_color`, `wall_thickness`, `wall_color`, 
 		`door_thickness`, `door_color`, `piece_changes`, `tile_changes`
@@ -962,7 +960,7 @@ END;
 
 /* User changes map settings */
 CREATE PROCEDURE update_map (IN the_map INT,
-	IN the_name TEXT, IN the_type TEXT, IN the_background TEXT,
+	IN the_name TEXT, IN the_type TEXT,
 	IN the_min_zoom FLOAT,      IN the_max_zoom FLOAT,
 	IN the_min_rotate SMALLINT, IN the_max_rotate SMALLINT,
 	IN the_min_tilt SMALLINT,   IN the_max_tilt SMALLINT,
@@ -971,7 +969,7 @@ CREATE PROCEDURE update_map (IN the_map INT,
 	IN the_door_thickness TINYINT, IN the_door_color TEXT)
 BEGIN
 	UPDATE maps SET
-		`name` = the_name, `type` = the_type, `background` = the_background,
+		`name` = the_name, `type` = the_type,
 		`min_zoom`   = the_min_zoom,   `max_zoom`   = the_max_zoom,
 		`min_rotate` = the_min_rotate, `max_rotate` = the_max_rotate,
 		`min_tilt`   = the_min_tilt,   `max_tilt`   = the_max_tilt,

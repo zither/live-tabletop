@@ -19,7 +19,6 @@ if (LT_can_view_map($map))
 				'min_rotate', 'max_rotate', 'min_tilt', 'max_tilt',
 				'grid_thickness', 'wall_thickness', 'door_thickness',
 				'piece_changes', 'tile_changes'),
-			'float' => array('min_zoom', 'max_zoom'),
-			'json' => array('background')));
+			'float' => array('min_zoom', 'max_zoom')));
 
 ?>

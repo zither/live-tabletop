@@ -169,7 +169,6 @@ LT.refreshMap = function () {
 				if (!("name" in LT.currentMap) || LT.mapPanel.getTab() != "map info") {
 					$("#mapEditor [name=name]").val(map.name);
 					$("#mapEditor [name=type]").val(map.type);
-					$("#mapEditor [name=background]").val(map.background);
 					$("#mapEditor [name=columns]").val(map.columns);
 					$("#mapEditor [name=rows]").val(map.rows);
 					$("#mapEditor [name=min_rotate]").val(map.min_rotate);
@@ -184,10 +183,6 @@ LT.refreshMap = function () {
 					$("#mapEditor [name=wall_color]").val(map.wall_color);
 					$("#mapEditor [name=door_color]").val(map.door_color);
 				}
-
-				// update map background
-				// TODO: what is the structure of the background object?
-				$("#map").css({background: "url('images/" + map.background + "')"});
 
 				// TODO: repaint grid in case the color or thickness have changed.
 

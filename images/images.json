@@ -1,8 +1,6 @@
 {
-"backgrounds": [
-	{"id": 1, "size": [945, 945], "file": "background/abaddon45.png"}
-],
 "pieces": [
+	{"id": 1, "size": [945, 945], "center": [472.5, 472.5], "file": "background/abaddon45.png"},
 	{"id": 2, "size": [55, 63], "center": [24, 58], "file": "piece/priest.png"},
 	{"id": 3, "size": [50, 56], "center": [21, 51], "file": "piece/rogue.png"}
 ],
