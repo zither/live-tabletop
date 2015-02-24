@@ -66,6 +66,48 @@ $(function () { // This anonymous function runs after the page loads.
 	});
 	LT.chooseTool($("#wallTool"), "wall", "#clickWallLayer"); // default tool
 
+	// load images
+	LT.images = {};
+	$.get("images/images.json", function (data) {
+		$.each(data.pieces, function (name, group) {
+			$.each(group, function (i, image) {
+				LT.images[image.id] = image;
+				// Create an image for the create piece tab
+				$("<img>").appendTo($("#pieceCreatorImages")).addClass("swatch").attr({
+					title: image.file,
+					src: "images/" + image.file
+				}).click(function () {
+					$.post("php/Piece.create.php", {
+						"map": LT.currentMap.id,
+						"image": image.id
+					}, LT.refreshMap);
+				});
+				// Create an image for the piece settings tab
+				$("<img>").appendTo($("#pieceEditorImages")).addClass("swatch").attr({
+					title: image.file,
+					src: "images/" + image.file,
+				}).click(function () {
+					// TODO: change piece image
+					$("#pieceEditorImages *").removeClass("selected");
+					$(this).addClass("selected");
+				});
+			});
+		});
+		$.each(data.tiles, function (name, group) {
+			$.each(group, function (i, image) {
+				LT.images[image.id] = image;
+				$("<img>").appendTo("#tileBrushes").attr({
+					title: image.file,
+					src: "images/" + image.file,
+				}).addClass("swatch").click(function () {
+					LT.selectedImageID = image.id;
+					LT.chooseTool(this, "tile", "#clickTileLayer");
+				});
+			});
+		});
+	});
+
+
 	// pieces
 
 	$("#submitStats").click(function () {LT.Piece.updateStats();});
@@ -385,45 +427,6 @@ LT.loadTiles = function () {
 	}); // $.get("php/Map.read.php", {map: LT.currentMap.id}, function (data) {
 };
 
-// Populate image selectors in the create piece and piece settings tabs
-// (called for each piece image after loading piece image data in Piece.js)
-LT.createPieceImageSwatch = function (image) {
-	// Create an image for the create piece tab
-	$("<img>").appendTo($("#pieceCreatorImages")).addClass("swatch").attr({
-		title: image.file,
-		src: "images/piece/" + image.file
-	}).click(function () {
-		var pieceWidth = parseInt($("#pieceCreator [name=width]").val());
-		var pieceHeight = parseInt($("#pieceCreator [name=height]").val());
-		$("#pieceCreator [name=x_offset]").val((image.width - pieceWidth) / -2);
-		$("#pieceCreator [name=y_offset]").val((image.height - pieceHeight) * -1);
-		$("#pieceCreator [name=name]").val(image.file.slice(0, -4)); // i.e. .jpg
-		$("#pieceCreator [name=image_id]").val(image.id);
-		$("#pieceCreatorImages *").removeClass("selected");
-		$(this).addClass("selected");
-	});
-	// Create an image for the piece settings tab
-	$("<img>").appendTo($("#pieceEditorImages")).addClass("swatch").attr({
-		title: image.file,
-		src: "images/piece/" + image.file,
-	}).click(function () {
-		$("#pieceEditor [name=image_id]").val(image.id);
-		$("#pieceEditor [name=x_offset]").val((image.width - LT.Piece.selected.width) / -2);
-		$("#pieceEditor [name=y_offset]").val((image.height - LT.Piece.selected.height) * -1);
-		$("#pieceEditorImages *").removeClass("selected");
-		$(this).addClass("selected");
-	});
-};
-
-LT.createPiece = function () {
-	var args = LT.formValues("#pieceCreator");
-	args.map = LT.currentMap.id;
-	if (args.image_id == "") {
-		alert("Cannot create piece. No piece image selected.");
-		return;
-	}
-	$.post("php/create_piece.php", args, function () {LT.refreshMap();});
-};
 
 /*
 <div class="statRow">
