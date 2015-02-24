@@ -993,7 +993,7 @@ END;
 /* User opens a map and sees the map's owners */
 CREATE PROCEDURE read_map_owners (IN the_map INT)
 BEGIN
-	SELECT `id`, `logged_in`, `name`, `color`
+	SELECT `id`, `logged_in`, `name`, `email`, `color`
 		FROM map_owners JOIN users ON `id` = `user` WHERE `map` = the_map;
 END;
 

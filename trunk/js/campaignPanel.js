@@ -181,6 +181,7 @@ LT.refreshCampaign = function () {
 							}).val(user.permission || "guest");
 							if (user.id == LT.currentUser.id)
 								copy.find(".permission option[value=banned]").remove();
+							// TODO: replace viewing boolean with time the user last viewed the campaign
 							copy.find("[value=viewing]")[0].checked = user.viewing;
 							copy.find("[value=friend]").toggle(!(user.id in LT.users));
 							copy.appendTo("#campaignUsers");
