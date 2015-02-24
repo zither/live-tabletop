@@ -84,25 +84,6 @@ LT.login = function (theUser) {
 //	LT.users = {};
 //	LT.users[theUser.id] = theUser;
 
-	// load images
-	// TODO: start this process before logging in?
-	LT.images = {};
-	$.get("images/images.json", function (data) {
-		$.each(data.pieces, function (i, image) {
-			LT.images[image.id] = image;
-		});
-		$.each(data.tiles, function (i, image) {
-			LT.images[image.id] = image;
-			$("<img>").appendTo("#tileBrushes").attr({
-				title: image.file,
-				src: "images/" + image.file,
-			}).addClass("swatch").click(function () {
-				LT.selectedImageID = image.id;
-				LT.chooseTool(this, "tile", "#clickTileLayer");
-			});
-		});
-	});
-
 	// hide welcome screen and show main UI
 	$("#passwordForm").hide();
 	$("#welcome").hide();
