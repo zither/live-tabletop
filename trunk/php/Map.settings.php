@@ -15,7 +15,6 @@ if (!isset($_SESSION['user'])) {
 $map = intval($_REQUEST['map']);
 $name = $LT_SQL->real_escape_string($_REQUEST['name']);
 $type = $LT_SQL->real_escape_string($_REQUEST['type']);
-$background = $LT_SQL->real_escape_string($_REQUEST['background']);
 $min_zoom = floatval($_REQUEST['min_zoom']);
 $max_zoom = floatval($_REQUEST['max_zoom']);
 $min_rotate = intval($_REQUEST['min_rotate']);
@@ -32,7 +31,7 @@ $door_color = $LT_SQL->real_escape_string($_REQUEST['door_color']);
 // Query the Database
 
 if (LT_can_edit_map($map)) 
-	LT_call('update_map', $map, $name, $type, $background, $min_zoom, $max_zoom,
+	LT_call('update_map', $map, $name, $type, $min_zoom, $max_zoom,
 		$min_rotate, $max_rotate, $min_tilt, $max_tilt, $grid_thickness,
 		$grid_color, $wall_thickness, $wall_color, $door_thickness, $door_color);
 

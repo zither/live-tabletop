@@ -88,11 +88,6 @@ LT.login = function (theUser) {
 	// TODO: start this process before logging in?
 	LT.images = {};
 	$.get("images/images.json", function (data) {
-		// TODO: make backgrounds into pieces?
-		$.each(data.backgrounds, function (i, image) {
-			$("select[name=background]").append($("<option>").text(image.file));
-			LT.images[image.id] = image;
-		});
 		$.each(data.pieces, function (i, image) {
 			LT.images[image.id] = image;
 		});

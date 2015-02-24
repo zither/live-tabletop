@@ -20,6 +20,6 @@ if (LT_can_view_map($map))
 				'grid_thickness', 'wall_thickness', 'door_thickness',
 				'piece_changes', 'tile_changes'),
 			'float' => array('min_zoom', 'max_zoom'),
-			'json' => array('background', 'tiles')));
+			'json' => array('tiles')));
 
 ?>

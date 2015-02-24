@@ -398,7 +398,7 @@ TEST.tests = [
 	{action: "../Campaign.users.php", args: function () {return {campaign: TEST.campaign};}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);}
 		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data[0].user == 2
+		if (data[0].id == 2
 			&& data[0].permission == "owner"
 			&& data[0].viewing === false
 			&& data[0].avatar === null
@@ -413,7 +413,7 @@ TEST.tests = [
 	{action: "../Campaign.users.php", args: function () {return {campaign: TEST.campaign};}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);}
 		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data[0].user == 2
+		if (data[0].id == 2
 			&& data[0].permission == "owner"
 			&& data[0].viewing === true
 			&& data[0].avatar === null
@@ -449,7 +449,7 @@ TEST.tests = [
 	{action: "../Campaign.users.php", args: function () {return {campaign: TEST.campaign};}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);}
 		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data[0].user == 2
+		if (data[0].id == 2
 			&& data[0].permission == "owner"
 			&& data[0].viewing === true
 			&& data[0].avatar === 1
@@ -464,7 +464,7 @@ TEST.tests = [
 	{action: "../Campaign.users.php", args: function () {return {campaign: TEST.campaign};}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);}
 		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data[0].user == 2
+		if (data[0].id == 2
 			&& data[0].permission == "owner"
 			&& data[0].viewing === false
 			&& data[0].avatar === 1
@@ -484,7 +484,7 @@ TEST.tests = [
 		try {var data = JSON.parse(ajax.responseText);}
 		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
 		for (var i = 0; i < data.length; i++)
-			if (data[i].user == TEST.USER3.user
+			if (data[i].id == TEST.USER3.user
 				&& data[i].permission == "member"
 				&& data[i].viewing === false
 				&& data[i].avatar === null
@@ -519,10 +519,10 @@ TEST.tests = [
 	// M A P
 
 	{group: "MAP.CREATE"},
-	{action: "../Map.create.php", args: {type: "square", rows: 30, columns: 40, tile: 1, background: "{}", name: "My Map"},
+	{action: "../Map.create.php", args: {type: "square", rows: 30, columns: 40, tile: 1, name: "My Map"},
 		result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER2, result: TEST.exists},
-	{action: "../Map.create.php", args: {type: "square", rows: 30, columns: 40, tile: 1, background: "{}", name: "My Map"},
+	{action: "../Map.create.php", args: {type: "square", rows: 30, columns: 40, tile: 1, name: "My Map"},
 		result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);}
 		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
@@ -540,7 +540,6 @@ TEST.tests = [
 			&& data.type == "square"
 			&& data.rows == 30
 			&& data.columns == 40
-			&& JSON.stringify(data.background) == JSON.stringify({})
 			&& data.min_zoom == 0.25
 			&& data.max_zoom == 4
 			&& data.min_rotate == -180
@@ -550,9 +549,9 @@ TEST.tests = [
 			&& data.grid_thickness == 1
 			&& data.wall_thickness == 3
 			&& data.door_thickness == 3
-			&& data.grid_color === null
-			&& data.wall_color === null
-			&& data.door_color === null
+			&& data.grid_color == "black"
+			&& data.wall_color == "black"
+			&& data.door_color == "white"
 			&& typeof(data.piece_changes) == "number"
 			&& typeof(data.tile_changes) == "number"
 			&& JSON.stringify(data.tiles) == JSON.stringify(Array(30 * 40 + 1).join().split('').map(function () {return 1;}))
@@ -567,12 +566,12 @@ TEST.tests = [
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.SETTINGS"},
-	{action: "../Map.settings.php", args: function () {return {map: TEST.map, name: "Still My Map", type: "hex", background: "{}",
+	{action: "../Map.settings.php", args: function () {return {map: TEST.map, name: "Still My Map", type: "hex",
 		min_zoom: 0.5, max_zoom: 2, min_rotate: -45, max_rotate: 45, min_tilt: 15, max_tilt: 45,
 		grid_thickness: 0, grid_color: "orange", wall_thickness: 1, wall_color: "brown", door_thickness: 9, door_color: "green"};},
 		result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER2, result: TEST.exists},
-	{action: "../Map.settings.php", args: function () {return {map: TEST.map, name: "Still My Map", type: "hex", background: "{}",
+	{action: "../Map.settings.php", args: function () {return {map: TEST.map, name: "Still My Map", type: "hex",
 		min_zoom: 0.5, max_zoom: 2, min_rotate: -45, max_rotate: 45, min_tilt: 15, max_tilt: 45,
 		grid_thickness: 0, grid_color: "orange", wall_thickness: 1, wall_color: "brown", door_thickness: 9, door_color: "green"};},
 		result: TEST.blank},
@@ -583,7 +582,6 @@ TEST.tests = [
 			&& data.type == "hex"
 			&& data.rows == 30
 			&& data.columns == 40
-			&& JSON.stringify(data.background) == JSON.stringify({})
 			&& data.min_zoom == 0.5
 			&& data.max_zoom == 2
 			&& data.min_rotate == -45
@@ -618,7 +616,6 @@ TEST.tests = [
 			&& data.type == "hex"
 			&& data.rows == 40
 			&& data.columns == 50
-			&& JSON.stringify(data.background) == JSON.stringify({})
 			&& data.min_zoom == 0.5
 			&& data.max_zoom == 2
 			&& data.min_rotate == -45
