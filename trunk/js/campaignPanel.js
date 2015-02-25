@@ -90,13 +90,6 @@ LT.loadCampaign = function (id) {
 	LT.campaignPanel.showTab("chat");
 	LT.campaignPanel.selectTab("campaign info");
 
-	// enable map panel button
-	if (!LT.currentCampaign) {
-		LT.mapPanel.enable();
-		if (LT.mapPanel.isVisible())
-			LT.mapPanel.bringToFront();
-	}
-
 	// clear chat tab
 	$("#chatOutput .message:not(.template)").remove();
 
@@ -240,13 +233,14 @@ LT.refreshCampaign = function () {
 					copy.appendTo("#turns");
 				});
 
-				// update map (id number)
-				if (LT.currentCampaign.map != data.map) {
-					LT.currentCampaign.map = null;
-					LT.leaveMap();
-				}
-				if (data.map && !(LT.currentCampaign.map)) {
-					LT.loadMap(data.map);
+				// enable map panel button and load or unload maps
+				LT.mapPanel.enable();
+				if (data.map) {
+					LT.showMapTabs();
+					if (LT.currentCampaign.map != data.map) LT.loadMap(data.map);
+				} else {
+					LT.hideMapTabs();
+					if (LT.currentCampaign.map) LT.leaveMap();
 				}
 
 				// load new chat messages.
