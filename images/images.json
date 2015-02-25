@@ -1,11 +1,12 @@
 {
 	"pieces": {
+
 		"background": [
-			{"id": 1, "type": "top", "size": [945, 945], "center": [472.5, 472.5], "tiles": [21, 21], "file": "background/abaddon45.png"}
+			{"id": 1, "view": "top", "size": [945, 945], "center": [472.5, 472.5], "base": [21, 21], "file": "background/abaddon45.png"}
 		],
 		"character": [
-			{"id": 2, "type": "side", "size": [55, 63], "center": [24, 58], "tiles": [1, 1], "file": "piece/priest.png"},
-			{"id": 3, "type": "side", "size": [50, 56], "center": [21, 51], "tiles": [1, 1], "file": "piece/rogue.png"}
+			{"id": 2, "view": "side", "size": [55, 63], "center": [24, 58], "base": [1, 1], "file": "piece/priest.png"},
+			{"id": 3, "view": "side", "size": [50, 56], "center": [21, 51], "base": [1, 1], "file": "piece/rogue.png"}
 		]
 	},
 	"tiles": {

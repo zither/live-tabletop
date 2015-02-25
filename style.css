@@ -407,13 +407,18 @@ th, td {padding: 0;}
 	z-index: -1;
 }
 
-#tileLayer > img, #fogLyer > img {
+#tileLayer > img, #fogLayer > img {
 	position: absolute;
 	left: 0;
 	top: 0;
 	display: none;
 }
 
+#pieceLayer > img {
+	position: absolute;
+	left: 0;
+	top: 0;
+}
 
 .clickLayer {
 	position: absolute;
@@ -430,14 +435,14 @@ th, td {padding: 0;}
 
 /* Pieces */
 
-.piece {position: absolute;}
-.piece.selected {background: #FFF}
-.pieceMover {
+#pieceLayer > * {position: absolute;}
+#pieceLayer > .selected {background: rgba(255, 255, 255, 0.5);}
+#clickPieceLayer > * {
 	position: absolute;
 	border: 1px dashed transparent;
 	opacity: 0.8;
 }
-.pieceMover.selected {border: black;}
+#clickPieceLayer > .selected {border-color: black;}
 
 /* WELCOME */
 

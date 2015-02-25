@@ -2,7 +2,7 @@
 LT.Piece = function (data) {
 	for (var i = 0; i < LT.Piece.PROPERTIES.length; i++)
 		this[LT.Piece.PROPERTIES[i]] = data[LT.Piece.PROPERTIES[i]];
-	this.stats = data.stats;
+
 	this.element = $("<div>").appendTo($("#pieceLayer")).css({
 		height: this.height + "px",
 		width: this.width + "px",
@@ -50,8 +50,7 @@ LT.Piece = function (data) {
 };
 
 // GLOBAL VARIABLES
-LT.Piece.PROPERTIES = ["id", "user_id", "image_id", "table_id", "name",
-	"x", "y", "x_offset", "y_offset", "height", "width", "color"];
+LT.Piece.PROPERTIES = ["id", "map", "image", "name", "x", "y", "character", "locked", "markers", "color"];
 
 LT.Piece.placing = false;
 LT.Piece.moving = false;
