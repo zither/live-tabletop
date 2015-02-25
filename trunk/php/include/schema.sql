@@ -316,11 +316,11 @@ CREATE TABLE map_owners (
 	image: JSON data {
 		"id": id of an image from our library
 		"url": web address of an image linked from another site
-		"center.x/y": center of the piece image in pixels
+		"center[x,y]": center of the piece image in pixels
 			the middle bottom of a 100 x 100 image is 50, 100
 			this position is based on the unscaled image
-		"base.x/y": tile columns and rows occupied by this piece
-		"scale.x/y": decrease or increase the apparent size of the piece
+		"base[x,y]": tile columns and rows occupied by this piece
+		"scale[x,y]": decrease or increase the apparent size of the piece
 			100% scale shows the image at 1:1 image to screen pixel ratio
 			when viewing the map at 100% zoom from the top view
 		"angle": degrees to rotate the image
