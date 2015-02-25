@@ -333,6 +333,7 @@ LT.loadTiles = function () {
 			var y = Math.floor(i / (map.columns + 1));
 			var offset = map.type == "hex" ? 1 / 6 : 0;
 			var stagger = map.type == "hex" ? (x % 2) * 0.5 : 0;
+			var tileElement = null, fogElement = null;
 			var tile = x == 0 || y == 0 ? 0 : map.tiles[(x - 1) + (y - 1) * map.columns];
 			var fog = "1abcdefghijklmnopqrstuvwxyz".indexOf(flag) != -1 ? 1 : 0;
 
@@ -395,12 +396,18 @@ LT.loadTiles = function () {
 			}
 
 			// function to create or update the fog or tile image element
-			var updateImageElement = function (element, index) {
-				if (index == 0) {element.hide(); return;}
+			var updateImageElement = function (element, index, parent) {
+				if (index <= 0) {
+					if (element) element.remove();
+					return null;
+				}
+				// TODO: new tile will not be in correct order until refresh
+				if (element === null) element = $("<img>").appendTo(parent);
+
 				var image = LT.images[index];
 				var scaleX = height / image[map.type][0];
 				var scaleY = width / image[map.type][1];
-				element.show().attr("src", "images/" + image.file).css({
+				return element.attr("src", "images/" + image.file).css({
 					position: "absolute", // TODO: put this in style.css?
 					left: Math.round((x - 0.5 + offset) * width) + "px",
 					top: Math.round((y - 0.5 + stagger) * height) + "px",
@@ -417,24 +424,18 @@ LT.loadTiles = function () {
 				var args = {"map": map.id, "x": x - 1, "y": y - 1};
 				if (LT.brush == "tile") {
 					tile = args.tile = LT.selectedImageID;
-					updateImageElement(tileElement, tile);
+					tileElement = updateImageElement(tileElement, tile, "#tileLayer");
 				} else if (LT.brush == "fog") {
 					fog = args.fog = LT.toggleFog;
-					fogElement.toggle(fog == 1);
+					fogElement = updateImageElement(fogElement, fog ? LT.FOG_IMAGE : 0, "#fogLayer");
 				} else return; // brush is not fog or tile?
 				$.post("php/Map.tile.php", args);
 			};
 
 			// create tile and fog now unless this is the first row or column
 			if (x > 0 && y > 0) {
-				// create tile image
-				var tileElement = $("<img>").appendTo("#tileLayer");
-				updateImageElement(tileElement, tile);
-				// create fog image
-				var fogElement = $("<img>").appendTo("#fogLayer");
-				updateImageElement(fogElement, LT.FOG_IMAGE);
-				fogElement.toggle(fog == 1);
-				// create tile click and drag detector
+				if (tile) tileElement = updateImageElement(null, tile, "#tileLayer");
+				if (fog) fogElement = updateImageElement(null, LT.FOG_IMAGE, "#fogLayer");
 				$("<div>").appendTo("#clickTileLayer").css({
 					"left": width * (x - 1 + offset) + "px",
 					"top": height * (y - 1 + stagger) + "px",
