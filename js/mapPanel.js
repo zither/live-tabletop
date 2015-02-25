@@ -8,11 +8,13 @@ LT.dropHandlers.push(function () {
 	LT.dragging = 0;
 	if (LT.pieceMoving) {
 		LT.pieceMoving = false;
+		// TODO: freeze piece movement until map refreshes?
+		// TODO: freeze map piece refreshes while moving pieces?
 		$.post("php/Piece.move.php", {
 			"piece": LT.pieceSelected.id,
 			"x": LT.pieceElement.position().left / LT.RESOLUTION,
 			"y": LT.pieceElement.position().top  / LT.RESOLUTION,
-		});
+		}, LT.refreshMap);
 	}
 });
 LT.dragHandlers.push(function () {
@@ -25,6 +27,7 @@ LT.dragHandlers.push(function () {
 		var x = Math.max(0, Math.min(LT.dragX - LT.clickX, $("#map").width()));
 		var y = Math.max(0, Math.min(LT.dragY - LT.clickY, $("#map").height()));
 /*
+		// TODO: snap settings
 		// snap to centers of tiles
 		x = LT.RESOLUTION * (Math.floor(x / LT.RESOLUTION) + 0.5);
 		y = LT.RESOLUTION * (Math.floor(y / LT.RESOLUTION) + 0.5);
@@ -36,7 +39,7 @@ LT.dragHandlers.push(function () {
 
 $(function () { // This anonymous function runs after the page loads.
 	LT.mapPanel = new LT.Panel("map");
-	LT.hideMapTabs();
+//	LT.hideMapTabs();
 
 	// disable map panel button until a campaign is loaded
 	LT.mapPanel.disable();
@@ -190,8 +193,7 @@ LT.loadMap = function (id) {
 		campaign: LT.currentCampaign.id,
 		map: id
 	}, function () {
-		LT.showMapTabs(); // show tabs that only apply when a map is loaded
-		LT.mapPanel.selectTab("map info");
+//		LT.showMapTabs(); // show tabs that only apply when a map is loaded
 		// create default map object; tile_changes -1 forces loading new map tiles
 		LT.currentMap = {"id": id, "piece_changes": -1, "tile_changes": -1};
 		LT.refreshMap(); // start periodic map updates
@@ -199,7 +201,7 @@ LT.loadMap = function (id) {
 };
 
 LT.leaveMap = function () {
-	LT.hideMapTabs(); // hide map panel tabs that only apply when a map is loaded
+	LT.hideMapTabs();
 	$("#tileLayer, #clickTileLayer, #clickWallLayer, #wallLayer, #fogLayer").empty();
 	$("#map, #clickWallLayer, #clickTileLayer").css({"width": 0, "height": 0});
 	delete LT.currentMap;
@@ -213,6 +215,8 @@ LT.refreshMapList = function () {
 			var copy = $("#mapList .template").clone().removeClass("template");
 			copy.find(".name").text(theMap.name || "[unnamed map]").click(function () {
 				LT.loadMap(theMap.id);
+				LT.showMapTabs();
+				LT.mapPanel.selectTab("map info");
 			});
 			copy.find(".columns").text(theMap.columns);
 			copy.find(".rows").text(theMap.rows);
