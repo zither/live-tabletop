@@ -1,9 +1,5 @@
 var LT = {};
 
-LT.brush = null; // paint "tile", "wall" or "fog"
-LT.selectedImage = "";
-LT.selectedImageID = -1;
-
 // Store data as JSON in the browser's cookie
 LT.setCookie = function (name, value) {
 	document.cookie = name + "=" + encodeURIComponent(JSON.stringify(value)) + ";";

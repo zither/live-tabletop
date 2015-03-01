@@ -136,21 +136,20 @@ $(function () { // This anonymous function runs after the page loads.
 	});
 
 	// tools
-	$("#eraser").click(function () {
-		LT.selectedImageID = -1;
-		LT.selectedImage = "";
-		LT.chooseTool(this, "tile", "#clickTileLayer");
+	$("#tools .swatch").click(function () {
+		var tool = $(this).data("tool");
+		// select the tool icon
+		$("#tools .swatch").removeClass("selected");
+		$(this).addClass("selected");
+		// show the tool options
+		$("#toolOptions > div").hide();
+		$("#toolOptions > div[data-tool=" + tool + "]").show();
+		// activate the hidden clickable element layer
+		$(".clickLayer").hide();
+		if (tool == "piece") $("#clickPieceLayer").show();
+		else if (tool == "wall") $("#clickWallLayer").show();
+	 	else $("#clickTileLayer").show();
 	});
-	$("#fogTool").click(function () {
-		LT.chooseTool(this, "fog", "#clickTileLayer");
-	});
-	$("#wallTool").click(function () {
-		LT.chooseTool(this, "wall", "#clickWallLayer");
-	});
-	$("#pieceTool").click(function () {
-		LT.chooseTool(this, "piece", "#clickPieceLayer");
-	});
-	LT.chooseTool($("#wallTool"), "wall", "#clickWallLayer"); // default tool
 
 	// load images
 	LT.images = {};
@@ -186,15 +185,17 @@ $(function () { // This anonymous function runs after the page loads.
 		$.each(data.tiles, function (name, group) {
 			$.each(group, function (i, image) {
 				LT.images[image.id] = image;
-				$("<img>").appendTo("#tileBrushes").attr({
+				$("<img>").appendTo("#toolOptions [data-tool=tile]").attr({
 					title: image.file,
 					src: "images/" + image.file,
 				}).addClass("swatch").click(function () {
-					LT.selectedImageID = image.id;
-					LT.chooseTool(this, "tile", "#clickTileLayer");
+					$("#toolOptions [data-tool=tile] .swatch").removeClass("selected");
+					$(this).addClass("selected");
+					LT.tile = image.id;
 				});
 			});
 		});
+		$("#toolOptions [data-tool=tile] .swatch:first-child").click();
 
 	}); // $.get("images/images.json", function (data) {
 
@@ -216,7 +217,6 @@ $(function () { // This anonymous function runs after the page loads.
 LT.hideMapTabs = function () {
 	LT.mapPanel.hideTab("map info");
 	LT.mapPanel.hideTab("map tools");
-	LT.mapPanel.hideTab("piece menu");
 	LT.mapPanel.hideTab("piece list");
 	LT.mapPanel.hideTab("piece info");
 };
@@ -224,20 +224,8 @@ LT.hideMapTabs = function () {
 LT.showMapTabs = function () {
 	LT.mapPanel.showTab("map info");
 	LT.mapPanel.showTab("map tools");
-	LT.mapPanel.showTab("piece menu");
 	LT.mapPanel.showTab("piece list");
 	LT.mapPanel.showTab("piece info");
-};
-
-LT.chooseTool = function (swatch, name, layer) {
-	// select this tool icon
-	$(".swatch").removeClass("selected");
-	$(swatch).addClass("selected");
-	// set the tool type for click handlers
-	LT.brush = name;
-	// activate the hidden clickable element layer
-	$(".clickLayer").hide();
-	$(layer).show();
 };
 
 LT.loadMap = function (id) {
@@ -476,13 +464,20 @@ LT.loadTiles = function () {
 			// function called when clicking or dragging over the tile
 			var updateTile = function () {
 				var args = {"map": map.id, "x": x - 1, "y": y - 1};
-				if (LT.brush == "tile") {
-					tile = args.tile = LT.selectedImageID;
-					tileElement = updateImageElement(tileElement, tile, "#tileLayer");
-				} else if (LT.brush == "fog") {
-					fog = args.fog = LT.toggleFog;
-					fogElement = updateImageElement(fogElement, fog ? LT.FOG_IMAGE : 0, "#fogLayer");
-				} else return; // brush is not fog or tile?
+				switch ($("#tools .swatch.selected").data("tool")) {
+					case "tile":
+						tile = args.tile = LT.tile;
+						tileElement = updateImageElement(tileElement, tile, "#tileLayer");
+						break;
+					case "erase":
+						tile = args.tile = 0;
+						tileElement = updateImageElement(tileElement, tile, "#tileLayer");
+						break;
+					case "fog":
+						fog = args.fog = LT.toggleFog;
+						fogElement = updateImageElement(fogElement, fog ? LT.FOG_IMAGE : 0, "#fogLayer");
+						break;
+				}
 				$.post("php/Map.tile.php", args);
 			};
 
@@ -497,7 +492,7 @@ LT.loadTiles = function () {
 					"height": height + "px",
 				}).mousedown(function () { // click
 					LT.dragging = 1;
-					if (LT.brush == "fog") LT.toggleFog = 1 - fog;
+					LT.toggleFog = 1 - fog; // TODO: make sure this doesn't do anything bad to the tile or erase tool
 					updateTile();
 				}).mouseover(function () { // drag
 					if (LT.dragging) updateTile();
