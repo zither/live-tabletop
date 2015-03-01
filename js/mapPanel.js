@@ -1,5 +1,59 @@
 LT.RESOLUTION = 72;
 LT.FOG_IMAGE = 44;
+LT.PALETTES = {
+	"wesnoth": [     [ 63,   0,  22],  [ 85,   0,  42],  [105,   0,  57],
+	[123,   0,  69], [140,   0,  81],  [158,   0,  93],  [177,   0, 105],
+	[195,   0, 116], [214,   0, 127],  [236,   0, 140],  [238,  61, 150],
+	[239,  91, 161], [241, 114, 172],  [242, 135, 182],  [244, 154, 193],
+	[246, 173, 205], [248, 193, 217],  [250, 213, 229],  [253, 233, 241]],
+};
+LT.COLORS = [
+	{"name": "black",  "hue":   0, "saturation": 0.0, "luminosity": 0.1},
+	{"name": "white",  "hue":   0, "saturation": 0.0, "luminosity": 0.9},
+	{"name": "gray",   "hue":   0, "saturation": 0.0, "luminosity": 0.5},
+	{"name": "brown",  "hue":  30, "saturation": 0.5, "luminosity": 0.5},
+	{"name": "pink",   "hue":   0, "saturation": 1.0, "luminosity": 0.8},
+	{"name": "red",    "hue":   0, "saturation": 1.0, "luminosity": 0.5},
+	{"name": "orange", "hue":  30, "saturation": 1.0, "luminosity": 0.5},
+	{"name": "yellow", "hue":  60, "saturation": 1.0, "luminosity": 0.5},
+	{"name": "green",  "hue": 120, "saturation": 1.0, "luminosity": 0.5},
+	{"name": "blue",   "hue": 240, "saturation": 1.0, "luminosity": 0.5},
+	{"name": "purple", "hue": 300, "saturation": 1.0, "luminosity": 0.5}];
+
+LT.colorMaps = {};
+
+$.each(LT.PALETTES, function (name, palette) {
+	LT.colorMaps[name] = {};
+	$.each(LT.COLORS, function (colorIndex, color) {
+		LT.colorMaps[name][color.name] = {};
+		$.each(palette, function (paletteIndex, rgb) {
+			var h, s, l, c; // hue, saturation, luminosity, output RGB channels
+			h = color.hue / 360;
+			s = color.saturation;
+			// blend half the colors to black and the other half to white
+			var blend = 2 * (paletteIndex + 1) / palette.length;
+			if (blend < 1) l = color.luminosity * blend;
+			else l = color.luminosity * (2 - blend) + (blend - 1);
+			// convert HSL to RGB
+			if (s == 0) {
+				l = Math.round(l * 255);
+				c = [l, l, l];
+			} else {
+				var t1 = l < 0.5 ? l * (1 + s) : l + s - l * s;
+				var t2 = 2 * l - t1;
+				c = [(h + 1/3) % 1, h, (h + 2/3) % 1];
+				$.each(c, function (i, x) {
+					if (x * 6 < 1) c[i] = t2 + (t1 - t2) * 6 * x;
+					else if (x * 2 < 1) c[i] = t1;
+					else if (x * 3 < 2) c[i] = t2 + (t1 - t2) * (2/3 - x) * 6;
+					else c[i] = t2;
+					c[i] = Math.round (c[i] * 255);
+				});
+			}
+			LT.colorMaps[name][color.name][rgb[0] * 65536 + rgb[1] * 256 + rgb[2]] = c;
+		});
+	});
+});
 
 LT.toggleFog = 0;
 LT.dragging = 0;
@@ -460,23 +514,49 @@ LT.loadPieces = function () {
 		$("#clickPieceLayer").empty();
 		$.each(data, function (i, piece) {
 
-			// visual piece element
-			var element = $("<img>").appendTo("#pieceLayer").css({
-				left: piece.x * LT.RESOLUTION + "px",
-				top:  piece.y * LT.RESOLUTION + "px",
-				marginLeft: -piece.image.center[0] + "px",
-				marginTop:  -piece.image.center[1] + "px",
-			}).attr("src", piece.image.url || "images/" + piece.image.file);
-
-			// clickable piece element
-			var mover = $("<div>").appendTo("#clickPieceLayer").css({
+			var style = {
 				width:  piece.image.size[0] + "px",
 				height: piece.image.size[1] + "px",
 				left: piece.x * LT.RESOLUTION + "px",
 				top:  piece.y * LT.RESOLUTION + "px",
 				marginLeft: (-piece.image.center[0] - 1) + "px",
 				marginTop:  (-piece.image.center[1] - 1) + "px",
-			}).attr("title", piece.name).mousedown(function () {
+			};
+
+			// visual piece element
+			var image = new Image();
+			image.src = piece.image.url || "images/" + piece.image.file;
+			image.onload = function () {
+				if (!piece.image.palette) return;
+				// convert image into canvas
+				var canvas = $("<canvas>").attr({
+					width: piece.image.size[0],
+					height: piece.image.size[1],
+				}).appendTo("#pieceLayer").css(style);
+				var context = canvas[0].getContext("2d");
+				context.drawImage(image, 0, 0);
+				image.remove();
+				element = canvas;
+				// remap colors
+				var map = LT.colorMaps[piece.image.palette][piece.color];
+				var buffer = context.getImageData(0, 0, piece.image.size[0], piece.image.size[1]);
+				var bytes = buffer.data;
+				for (var n = 0; n < bytes.length; n += 4) {
+					if (bytes[n + 3] == 0) continue; // ignore transparent pixels
+					var key = bytes[n] * 65536 + bytes[n + 1] * 256 + bytes[n + 2];
+					if (key in map) {
+						var rgb = map[key];
+						bytes[n] = rgb[0];
+						bytes[n + 1] = rgb[1];
+						bytes[n + 2] = rgb[2];
+					}
+				}
+				context.putImageData(buffer, 0, 0);
+			};
+			var element = $(image).appendTo("#pieceLayer").css(style);
+
+			// clickable piece element
+			var mover = $("<div>").attr("title", piece.name).mousedown(function () {
 				LT.pieceSelected = piece;
 				LT.pieceElement = element;
 				LT.pieceMover = mover;
@@ -492,7 +572,7 @@ LT.loadPieces = function () {
 			}).mouseout(function () {
 				element.removeClass("selected");
 				return false;
-			});
+			}).appendTo("#clickPieceLayer").css(style);
 
 		}); // $.each(data, function (i, piece) {
 	}); // $.post("php/Map.pieces.php", {map: LT.currentMap.id}, function (data) {

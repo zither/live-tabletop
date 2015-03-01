@@ -334,6 +334,7 @@ CREATE TABLE map_owners (
 	character: an optional character associated with this piece
 	locked: only campaign+map owners & character owners can move the piece if 1
 	markers: status icons with metadata attached to the piece
+	color: base palette-swap color
 */
 
 CREATE TABLE pieces (
@@ -346,7 +347,7 @@ CREATE TABLE pieces (
 	`character` INT,
 	`locked` TINYINT NOT NULL DEFAULT 1,
 	`markers` TEXT NOT NULL,
-	`color` TEXT, /* TODO: do we need this? */
+	`color` TEXT NOT NULL,
 	FOREIGN KEY (`map`) REFERENCES maps(`id`) ON DELETE CASCADE
 );
 
@@ -1024,8 +1025,8 @@ CREATE PROCEDURE create_piece (IN the_map INT, IN the_image TEXT)
 BEGIN
 	START TRANSACTION;
 	UPDATE maps SET `piece_changes` = `piece_changes` + 1 WHERE `id` = the_map;
-	INSERT INTO pieces (`map`, `image`, `markers`)
-		VALUES (the_map, the_image, '[]');
+	INSERT INTO pieces (`map`, `image`, `markers`, `color`)
+		VALUES (the_map, the_image, '[]', 'gray');
 	SELECT LAST_INSERT_ID() AS id;
 	COMMIT;
 END;
