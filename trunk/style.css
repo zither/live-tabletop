@@ -321,7 +321,7 @@ th, td {padding: 0;}
 	background: #FFF;
 }
 
-.panel .content div {
+.panel .content > div {
 	float: left;
 	margin: 1px 5px 0 5px;
 	min-height: 21px;
@@ -377,13 +377,20 @@ th, td {padding: 0;}
 	margin: 1px 1px 1px 1px;
 	max-width: 50px;
 }
-.swatch.selected {border: 1px solid #F00;}
-#eraser, #fogTool, #wallTool, #pieceTool {
-	float: left;
-	height: 30px;
-	width: 40px;
-	text-align: center;
+img.swatch {
+	border-color: transparent;
+	border-radius: 5px;
 }
+.swatch.selected {border: 1px solid #F00;}
+#tools .swatch {
+	float: left;
+	width: 50px;
+	height: 30px;
+	line-height: 30px;
+	text-align: center;
+	margin: 1px;
+}
+#toolOptions > div:not([data-tool=piece]) {display: none;}
 
 /* Piece Images */
 #pieceCreatorImages img, #pieceEditorImages img {max-width: 200px;}
@@ -404,15 +411,20 @@ th, td {padding: 0;}
 
 #tileLayer {
 	position: relative;
-	z-index: -1;
+	z-index: -1; /* subcontext for z-layered image tiles */
 }
-
+#fogLayer {
+	position: relative;
+	z-index: 0; /* subcontext for z-layered fog files */
+}
 #fogLayer > *, #pieceLayer > *, #tileLayer > *,
 .clickLayer, .clickLayer > div, .grid {
 	position: absolute;
 	left: 0;
 	top: 0;
 }
+
+
 
 /* Pieces */
 

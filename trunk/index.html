@@ -312,7 +312,6 @@
 				<div class="tab" data-tab="map list">List</div>
 				<div class="tab" data-tab="map info">Info</div>
 				<div class="tab active" data-tab="map tools">Tools</div>
-				<div class="tab" data-tab="piece menu">New Piece</div>
 				<div class="tab" data-tab="piece list">Pieces</div>
 				<div class="tab" data-tab="piece info">Piece Info</div>
 			</div>
@@ -453,14 +452,37 @@
 				</table>
 			</div>
 			<div class="content" data-tab="map tools">
-				<div>
-					<div class="swatch" id="eraser">erase</div>
-					<div class="swatch" id="fogTool">fog</div>
-					<div class="swatch" id="wallTool">wall</div>
-					<div class="swatch" id="pieceTool">piece</div>
-					<div class="clearBoth"></div><!-- TODO: parent div overflow:auto instead of this div? -->
+				<div id="tools">
+					<div class="swatch" data-tool="tile">tile</div>
+					<div class="swatch" data-tool="erase">erase</div>
+					<div class="swatch" data-tool="fog">fog</div>
+					<div class="swatch" data-tool="wall">wall</div>
+					<div class="swatch selected" data-tool="piece">piece</div>
 				</div>
-				<div id="tileBrushes"></div>
+				<div id="toolOptions">
+					<div data-tool="tile"></div>
+					<div data-tool="erase">
+						Click and drag on the map to erase tile images.
+					</div>
+					<div data-tool="fog">
+						<div>Click to toggle fog of war on map tiles. Drag to paint or erase.</div>
+						<div>
+							<input type="button" value="cover map with fog"/>
+							<input type="button" value="remove all fog"/>
+						</div>
+					</div>
+					<div data-tool="wall">
+						Click on grid lines to create or remove walls and doors.
+					</div>
+					<div data-tool="piece">
+						<div>
+							Click on a piece on the map to see its properties.
+							Drag a piece on the map to move it.
+							Click on an image below to create a new piece.
+						</div>
+						<div id="pieceCreatorImages"></div>
+					</div>
+				</div>
 			</div>
 			<div class="content" data-tab="piece list">
 				<table>
@@ -475,9 +497,6 @@
 						<td><input type="button" value="delete"/></td>
 					</tr>
 				</table>
-			</div>
-			<div class="content" data-tab="piece menu">
-				<div id="pieceCreatorImages"></div>
 			</div>
 			<div class="content" data-tab="piece info">
 				<form id="pieceEditor">
