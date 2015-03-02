@@ -528,9 +528,12 @@ LT.loadPieces = function () {
 				// piece info tab
 				LT.mapPanel.showTab("piece info");
 				LT.mapPanel.selectTab("piece info");
-				$("#pieceImage").attr("src", source);
+				var canvas = $("#pieceImage")[0];
+				canvas.width = element.width();
+				canvas.height = element.height();
+				canvas.getContext("2d").drawImage(element[0], 0, 0);
 				$("#pieceName").text(piece.name || "[unnamed piece]");
-				$("#renamePiece").click(function () {
+				$("#renamePiece").off("click").click(function () {
 					var newName = prompt("new piece name", piece.name);
 					if (newName != null && newName != piece.name) {
 						piece.name = newName;
@@ -538,7 +541,7 @@ LT.loadPieces = function () {
 						$.post("php/Piece.settings.php", piece);
 					}
 				});
-				$("#deletePiece").click(deletePiece);
+				$("#deletePiece").off("click").click(deletePiece);
 				// TODO: piece color
 				// TODO: character selector
 				// TODO: external url
