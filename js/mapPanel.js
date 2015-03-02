@@ -1,4 +1,4 @@
-LT.RESOLUTION = 72;
+LT.RESOLUTION = 62;
 LT.FOG_IMAGE = 44;
 LT.PALETTES = {
 	"wesnoth": [     [ 63,   0,  22],  [ 85,   0,  42],  [105,   0,  57],
@@ -204,12 +204,6 @@ $(function () { // This anonymous function runs after the page loads.
 
 	$("#submitStats").click(function () {LT.Piece.updateStats();});
 	$("#applyPieceChanges").click(function () {LT.Piece.selected.edit();});
-	$("#deletePiece").click(function () {
-		// TODO: what about unnamed peices?
-		if (confirm("Are you sure you want to delete "
-			+ LT.Piece.selected.name + "?")) LT.Piece.selected.remove({});
-	});
-	$("#createPiece").click(function () {LT.createPiece();});
 	$("#addStat").click(function () {LT.Piece.addStat();});
 
 });
@@ -507,8 +501,9 @@ LT.loadPieces = function () {
 	$.post("php/Map.pieces.php", {map: LT.currentMap.id}, function (data) {
 		$("#pieceLayer").empty();
 		$("#clickPieceLayer").empty();
+		$("#pieceList tr:not(.template)").remove();
 		$.each(data, function (i, piece) {
-
+			var source = piece.image.url || "images/" + piece.image.file;
 			var style = {
 				width:  piece.image.size[0] + "px",
 				height: piece.image.size[1] + "px",
@@ -517,10 +512,47 @@ LT.loadPieces = function () {
 				marginLeft: (-piece.image.center[0] - 1) + "px",
 				marginTop:  (-piece.image.center[1] - 1) + "px",
 			};
+			var deletePiece = function () {
+				var name = "this piece"
+				if (piece.name) name = "the piece named " + piece.name;
+				if (confirm("Are you sure you want to delete " + name + "?"))
+					$.post("php/Piece.delete.php", {piece: piece.id}, LT.refreshMap);
+			};
+			var select = function () {
+				// TODO: remember selected piece when you refresh the pieces
+				// TODO: select linked character in character panel
+				$("#clickPieceLayer > *").removeClass("selected");
+				$("#pieceLayer > *").removeClass("selected");
+				element.addClass("selected");
+				mover.addClass("selected");
+				// piece info tab
+				LT.mapPanel.showTab("piece info");
+				LT.mapPanel.selectTab("piece info");
+				$("#pieceImage").attr("src", source);
+				$("#pieceName").text(piece.name || "[unnamed piece]");
+				$("#renamePiece").click(function () {
+					var newName = prompt("new piece name", piece.name);
+					if (newName != null && newName != piece.name) {
+						piece.name = newName;
+						$("#pieceName").text(piece.name || "[unnamed piece]");
+						$.post("php/Piece.settings.php", piece);
+					}
+				});
+				$("#deletePiece").click(deletePiece);
+				// TODO: piece color
+				// TODO: character selector
+				// TODO: external url
+				// TODO: center piece
+				// TODO: edit base
+				// TODO: scale
+				// TODO: apply changes
+				// TODO: select piece image
+				return false;
+			};
 
 			// visual piece element
 			var image = new Image();
-			image.src = piece.image.url || "images/" + piece.image.file;
+			image.src = source;
 			image.onload = function () {
 				if (!piece.image.palette) return;
 				// convert image into canvas
@@ -556,10 +588,7 @@ LT.loadPieces = function () {
 				LT.pieceElement = element;
 				LT.pieceMover = mover;
 				LT.pieceMoving = true;
-				// LT.readStats(); // TODO: select linked character in character panel
-				$("#clickPieceLayer > *").removeClass("selected");
-				element.addClass("selected");
-				mover.addClass("selected");
+				select();
 				return false;
 			}).mouseover(function () {
 				element.addClass("selected");
@@ -568,6 +597,22 @@ LT.loadPieces = function () {
 				element.removeClass("selected");
 				return false;
 			}).appendTo("#clickPieceLayer").css(style);
+
+			// piece list
+			var copy = $("#pieceList .template").clone().removeClass("template");
+			copy.find(".link").click(function () {
+				window.scrollTo( // scroll map to center on piece
+					element.offset().left - window.innerWidth / 2,
+					element.offset().top - window.innerHeight / 2);
+				select();
+				return false;
+			});
+			copy.find(".inlineImage").attr("src", source);
+			copy.find(".name").text(piece.name || "");
+			copy.find(".column").text(Math.round(piece.x));
+			copy.find(".row").text(Math.round(piece.y));
+			copy.find("input[value=delete]").click(deletePiece);
+			copy.appendTo("#pieceList");
 
 		}); // $.each(data, function (i, piece) {
 	}); // $.post("php/Map.pieces.php", {map: LT.currentMap.id}, function (data) {
