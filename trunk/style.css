@@ -433,7 +433,15 @@ img.swatch {
 	border: 1px dashed transparent;
 }
 #clickPieceLayer > .selected {border-color: black;}
+/*
 #pieceLayer > .selected {background: rgba(255, 255, 255, 0.5);}
+*/
+#pieceLayer > .selected {
+	background-image: url(images/ui/glow.png);
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	background-position: center;
+}
 
 /* WELCOME */
 

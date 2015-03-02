@@ -485,10 +485,10 @@
 				</div>
 			</div>
 			<div class="content" data-tab="piece list">
-				<table>
+				<table id="pieceList">
 					<tr class="template">
 						<td>
-							<a>
+							<a class="link">
 								<img class="inlineImage" src="images/piece/rogue.png"/>
 								<span class="name">rogue</span>
 							</a>
@@ -499,38 +499,45 @@
 				</table>
 			</div>
 			<div class="content" data-tab="piece info">
+				<div><img id="pieceImage"/></div>
+				<div>
+					<span id="pieceName"></span>
+					<input id="renamePiece" type="button" value="rename piece"/>
+				</div>
+				<div>Character: <select name="character"><option value="-1">no character</option></select></div>
+				<div>
+					<select id="pieceColor">
+						<option>red</option>
+						<option>orange</option>
+						<option>yellow</option>
+						<option>green</option>
+						<option>blue</option>
+						<option>purple</option>
+						<option>black</option>
+						<option>gray</option>
+						<option>white</option>
+						<option>pink</option>
+						<option>brown</option>
+					</select>
+				</div>
+				<div><input id="deletePiece" type="button" value="delete piece"/></div>
 				<form id="pieceEditor">
-					<div>Name: <input name="name" type="text" placeholder="piece name"/></div>
-					<div>Character: <select name="character_id"><option value="-1">no character</option></select></div>
-					<div>
-						Position:
-						<input name="x" type="text" size="1" value="0"/>
-						,
-						<input name="y" type="text" size="1" value="0"/>
-					</div>
+					<!-- TODO: replace input with button and prompt -->
+					<div><input type="text" name="url" placeholder="external image URL"/></div>
 					<!-- TODO: GUI for centering piece -->
 					<div>
 						Center:
-						<input name="x_center" type="text" size="2" value="0"/>
-						px,
-						<input name="y_center" type="text" size="2" value="0"/>
-						px
+						<input name="centerY" type="text" size="2" value="0"/> px,
+						<input name="centerX" type="text" size="2" value="0"/> px
 					</div>
 					<div>
 						Base:
-						<input name="x_tiles" type="text" size="1" value="0"/>
-						&times;
-						<input name="y_tiles" type="text" size="1" value="0"/>
-						tiles
+						<input name="baseX" type="text" size="1" value="0"/> &times;
+						<input name="baseY" type="text" size="1" value="0"/> tiles
 					</div>
 					<div>Scale: <input name="scale" type="text" size="3" value="100"/>%</div>
-					<input name="image_id" type="hidden" value=""/>
-					<div>
-						<input type="button" value="apply changes" id="applyPieceChanges"/>
-						<input type="button" value="delete piece" id="deletePiece"/>
-					</div>
+					<div><input type="button" value="apply changes" id="applyPieceChanges"/></div>
 				</form>
-				<div id="pieceImage">TODO: piece image</div>
 				<div id="pieceEditorImages">TODO: piece image selection</div>
 			</div>
 			<div class="resizeBL"></div>
