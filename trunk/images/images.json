@@ -5,7 +5,7 @@
 			{"id": 1, "view": "top", "size": [945, 945], "center": [472.5, 472.5], "base": [21, 21], "file": "background/abaddon45.png", "z": -2}
 		],
 		"character": [
-			{"id": 100, "view": "side", "size": [72, 72], "center": [36, 54], "base": [1, 1], "palette": "wesnoth", "palette": "wesnoth", "file": "piece/adept-die1.png"},
+			{"id": 100, "view": "side", "size": [72, 72], "center": [36, 54], "base": [1, 1], "palette": "wesnoth", "file": "piece/adept-die1.png"},
 			{"id": 101, "view": "side", "size": [72, 72], "center": [36, 54], "base": [1, 1], "palette": "wesnoth", "file": "piece/ambusher.png"},
 			{"id": 102, "view": "side", "size": [96, 96], "center": [48, 72], "base": [1, 1], "palette": "wesnoth", "file": "piece/armageddon-fire-inhale-3.png"},
 			{"id": 103, "view": "side", "size": [72, 72], "center": [36, 54], "base": [1, 1], "palette": "wesnoth", "file": "piece/dark-sorcerer.png"},
