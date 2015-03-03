@@ -20,13 +20,25 @@ LT.Panel = function (name) {
 
 	this.setX(this.getX());
 	this.setY(this.getY());
-	this.setHeight(this.getHeight());
 	this.setWidth(this.getWidth());
+	this.setHeight(this.getHeight());
+
+	this.resize();
 
 	LT.Panel.list.push(this); // panels in the order they were created
 	LT.Panel.order.push(this); // panels in back-to-front order
 
 	var self = this; // remember the current "this" during event handlers
+
+	// after page loads we know real height of .tabBar
+	if ($(this.outside).find(".tabBar").height() > 0)
+		$(this.outside).addClass("loaded");
+	else $(window).load(function () {
+		$(self.outside).addClass("loaded");
+		self.setHeight(self.getHeight());
+		self.resize();
+	});
+
 	$(this.button).click(function () {
 		if ($(this).hasClass("disabled")) return;
 		if (!self.isVisible()) self.show();
@@ -82,6 +94,7 @@ LT.Panel.clickCornerY = 0; // vertical position of corner being resized
 
 // TODO: explain each of these margins
 LT.Panel.PAGEBAR_HEIGHT = 26;
+LT.Panel.TITLE_HEIGHT = 23;
 LT.Panel.MIN_WIDTH = 140;
 
 // STATIC FUNCTIONS
@@ -164,6 +177,7 @@ LT.Panel.prototype = {
 		this.setY(this.defaultY);
 		this.setWidth(this.defaultWidth);
 		this.setHeight(this.defaultHeight);
+		this.resize();
 	},
 
 	// Returns true if the panel is visible, false if it is hidden
@@ -244,6 +258,7 @@ LT.Panel.prototype = {
 		var tabs = $(this.outside).find(".tab");
 		if (tabs.filter("[data-tab='" + data.tab + "']").css("display") == "none")
 			this.selectTab($(tabs[0]).data("tab"));
+		this.resize();
 	},
 
 /*
@@ -271,8 +286,10 @@ Or maybe we should change how we do it.
 		LT.dragY = Math.min(LT.dragY - LT.clickY, maxY);
 		LT.dragX = Math.max(LT.dragX, 0);
 		LT.dragY = Math.max(LT.dragY, LT.Panel.PAGEBAR_HEIGHT);
+
 		this.setX(LT.dragX);
 		this.setY(LT.dragY);
+		this.resize();
 	},
 
 	// Resize panel using the bottom-right handle.
@@ -286,8 +303,10 @@ Or maybe we should change how we do it.
 		LT.dragY = Math.max(LT.dragY - LT.clickY, 0);
 		var maxWidth  = window.innerWidth  - this.getX();
 		var maxHeight = window.innerHeight - this.getY();
+
 		this.setWidth(Math.min(LT.dragX, maxWidth));
 		this.setHeight(Math.min(LT.dragY, maxHeight));
+		this.resize();
 	},
 
 	// Resize panel using the top-left handle.
@@ -303,10 +322,12 @@ Or maybe we should change how we do it.
 		LT.dragY = Math.max(LT.dragY, LT.clickY + LT.Panel.PAGEBAR_HEIGHT);
 		LT.dragX = Math.min(LT.dragX, LT.Panel.clickCornerX - LT.Panel.MIN_WIDTH);
 		LT.dragY = Math.min(LT.dragY, LT.Panel.clickCornerY);
+
 		this.setX(LT.dragX - LT.clickX);
 		this.setY(LT.dragY - LT.clickY);
 		this.setWidth(LT.Panel.clickCornerX - LT.dragX);
 		this.setHeight(LT.Panel.clickCornerY - LT.dragY);
+		this.resize();
 	},
 
 	// Resize panel using the top-right handle.
@@ -321,13 +342,14 @@ Or maybe we should change how we do it.
 		}
 		LT.dragY = Math.max(LT.dragY, LT.clickY - LT.clickT + LT.Panel.PAGEBAR_HEIGHT);
 		LT.dragY = Math.min(LT.dragY, LT.clickY + LT.clickH);
-		this.setHeight(LT.clickH + LT.clickY - LT.dragY);
-		this.setY(LT.clickT - LT.clickY + LT.dragY);
-
 		var newWidth = LT.clickW + (LT.dragX - LT.clickX);
 		newWidth = Math.min(newWidth, window.innerWidth - this.getX());
 		newWidth = Math.max(newWidth, LT.Panel.MIN_WIDTH);
+
+		this.setY(LT.clickT - LT.clickY + LT.dragY);
 		this.setWidth(newWidth);
+		this.setHeight(LT.clickH + LT.clickY - LT.dragY);
+		this.resize();
 	},
 	
 	// Resize panel using the bottom-left handle.
@@ -342,12 +364,13 @@ Or maybe we should change how we do it.
 		}
 		LT.dragX = Math.max(LT.dragX, LT.clickX);
 		LT.dragX = Math.min(LT.dragX, LT.Panel.clickCornerX - LT.Panel.MIN_WIDTH);
-		this.setX(LT.dragX - LT.clickX);
-		this.setWidth(LT.Panel.clickCornerX - LT.dragX);
-
 		LT.dragY = Math.max(LT.dragY, panelY + LT.Panel.PAGEBAR_HEIGHT);
 		LT.dragY = Math.min(LT.dragY, window.innerHeight);
+
+		this.setX(LT.dragX - LT.clickX);
+		this.setWidth(LT.Panel.clickCornerX - LT.dragX);
 		this.setHeight(LT.clickH - LT.clickY + LT.dragY);
+		this.resize();
 	},
 	
 	// Change the position and size of the panel
@@ -356,9 +379,8 @@ Or maybe we should change how we do it.
 	setWidth: function (w) {$(this.outside).css({width: w + "px"});},
 	setHeight: function (h) {
 		$(this.outside).css({height: h + "px"});
-		// TODO: why is this 23 here?
 		$(this.outside).find(".content").css({
-			height: (h - $(this.outside).find(".tabBar").height() - 23) + "px"
+			height: (h - $(this.outside).find(".tabBar").height() - LT.Panel.TITLE_HEIGHT) + "px"
 		});
 	},
 
@@ -368,5 +390,7 @@ Or maybe we should change how we do it.
 	getWidth: function () {return parseInt($(this.outside).css("width"));},
 	getHeight: function () {return parseInt($(this.outside).css("height"));},
 
+	// by default do nothing when resizing;
+	resize: function () {return false;},
 };
 
