@@ -89,7 +89,8 @@ $(function () { // This anonymous function runs after the page loads.
 					title: image.file,
 					src: "images/" + image.file,
 				}).click(function () {
-					// TODO: change piece image
+					LT.pieceSelected.image = $.extend({}, image);
+					LT.savePieceSettings(LT.pieceSelected);
 					$("#pieceEditorImages *").removeClass("selected");
 					$(this).addClass("selected");
 				});
@@ -492,6 +493,18 @@ LT.loadTiles = function () {
 	}); // $.get("php/Map.read.php", {map: LT.currentMap.id}, function (data) {
 }; // LT.loadTiles = function () {
 
+LT.savePieceSettings = function (piece) {
+	$.post("php/Piece.settings.php", {
+		"piece": piece.id,
+		"image": JSON.stringify(piece.image),
+		"name": piece.name || "",
+		"character": piece.character,
+		"locked": piece.locked,
+		"markers": JSON.stringify(piece.markers),
+		"color": piece.color,
+	}, LT.refreshMap);
+};
+
 LT.loadPieces = function () {
 	$.post("php/Map.pieces.php", {map: LT.currentMap.id}, function (data) {
 		var selectedPiece = LT.getCookie("piece");
@@ -519,21 +532,10 @@ LT.loadPieces = function () {
 				if (confirm("Are you sure you want to delete " + name + "?"))
 					$.post("php/Piece.delete.php", {piece: piece.id}, LT.refreshMap);
 			};
-			var update = function () {
-				$.post("php/Piece.settings.php", {
-					"piece": piece.id,
-					"image": JSON.stringify(piece.image),
-					"name": piece.name || "",
-					"character": piece.character,
-					"locked": piece.locked,
-					"markers": JSON.stringify(piece.markers),
-					"color": piece.color,
-				}, LT.refreshMap);
-				// TODO: update piece info tab when the map refreshes
-			};
 
 			// select piece when you click on the piece on the map or list
 			var select = function () {
+				LT.pieceSelected = piece;
 				// remember selected piece when you refresh the pieces
 				LT.setCookie("piece", piece.id);
 				// TODO: select linked character in character panel
@@ -560,7 +562,7 @@ LT.loadPieces = function () {
 						case "facing": piece.image.angle =
 							Math.round(Math.atan2(x, -y) * 180 / Math.PI); break;
 					}
-					update();
+					LT.savePieceSettings(piece);
 				})[0];
 				var context = canvas.getContext("2d");
 				var center = [canvas.width * 0.5, canvas.height * 0.5];
@@ -683,21 +685,20 @@ LT.loadPieces = function () {
 					if (newName != null && newName != piece.name) {
 						piece.name = newName;
 						$("#pieceName").text(piece.name || "[unnamed piece]");
-						update();
+						LT.savePieceSettings(piece);
 					}
 				});
 				$("#deletePiece").off("click").click(deletePiece);
 				$("#pieceColor").val(piece.color).off("change").change(function () {
 					piece.color = $(this).val();
-					update();
+					LT.savePieceSettings(piece);
 				});
 				$("#pieceDepth").val(piece.image.z || 0).off("change").change(function () {
 					piece.image.z = $(this).val();
-					update();
+					LT.savePieceSettings(piece);
 				});
 
-				// TODO: piece depth (z-index, piece.image.z)
-				// TODO: select piece image
+				// TODO: angle should not be tied to image
 				// TODO: external url
 				// TODO: scale
 				// TODO: character selector
@@ -743,7 +744,6 @@ LT.loadPieces = function () {
 
 			// clickable piece element
 			var mover = $("<div>").attr("title", piece.name).mousedown(function () {
-				LT.pieceSelected = piece;
 				LT.pieceElement = element;
 				LT.pieceMover = mover;
 				LT.pieceMoving = true;
