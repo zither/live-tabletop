@@ -428,7 +428,10 @@ img.swatch {
 	left: 0;
 	top: 0;
 }
-
+#clickLayers {
+	position: relative;
+	z-index: 2; /* higher than pieces that are above the fog */
+}
 
 
 /* Pieces */
