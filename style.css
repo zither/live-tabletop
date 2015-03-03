@@ -395,7 +395,7 @@ img.swatch {
 #toolOptions > div:not([data-tool=piece]) {display: none;}
 
 /* Piece Images */
-#pieceCreatorImages img, #pieceEditorImages img {max-width: 200px;}
+#pieceCreatorImages img, #pieceEditorImages img {max-width: 100px;}
 #pieceCreatorImages, #pieceEditorImages {
 	clear: both;
 	overflow: none;

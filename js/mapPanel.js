@@ -644,7 +644,9 @@ LT.loadPieces = function () {
 						$("#pieceImageDebug").text(Math.round(scale2 * 100) + "%");
 					}
 					context.translate(-center[0], -center[1]);
-					context.drawImage(image || element[0], offset[0], offset[1]);
+					if (element[0].tagName == "CANVAS")
+						context.drawImage(element[0], offset[0], offset[1]);
+					else context.drawImage(image, offset[0], offset[1]);
 					context.restore();
 					// draw center, base, scale or facing control
 					switch ($("#pieceImageMode").val()) {
@@ -742,7 +744,6 @@ LT.loadPieces = function () {
 					}).css(style).css("z-index", piece.image.z || 0);
 					var context = canvas[0].getContext("2d");
 					context.drawImage(image, 0, 0);
-					delete image;
 					element = canvas;
 					if (piece.image.z) element.css("z-index", piece.image.z);
 					// remap colors
