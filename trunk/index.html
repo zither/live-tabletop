@@ -125,10 +125,10 @@
 		<!-- MAP (the campaign's current map) -->
 
 		<div id="map">
-			<div id="tileLayer"></div>
-			<div id="wallLayer"></div>
-			<div id="pieceLayer"></div>
-			<div id="fogLayer"></div>
+			<div class="mapLayer" id="tileLayer"></div>
+			<div class="mapLayer" id="wallLayer"></div>
+			<div class="mapLayer" id="pieceLayer"></div>
+			<div class="mapLayer" id="fogLayer"></div>
 			<div id="clickLayers">
 				<div class="clickLayer" id="clickTileLayer"></div>
 				<div class="clickLayer" id="clickWallLayer"></div>
@@ -499,12 +499,11 @@
 				</table>
 			</div>
 			<div class="content" data-tab="piece info">
-				<div id="pieceImageWindow"><canvas id="pieceImage"></canvas></div>
 				<div>
 					<span id="pieceName"></span>
 					<input id="renamePiece" type="button" value="rename piece"/>
 				</div>
-				<div>Character: <select name="character"><option value="-1">no character</option></select></div>
+				<div><!-- Character: --><select name="character"><option value="-1">no character</option></select></div>
 				<div>
 					<select id="pieceColor">
 						<option>red</option>
@@ -521,24 +520,18 @@
 					</select>
 				</div>
 				<div><input id="deletePiece" type="button" value="delete piece"/></div>
-				<form id="pieceEditor">
-					<!-- TODO: replace input with button and prompt -->
-					<div><input type="text" name="url" placeholder="external image URL"/></div>
-					<!-- TODO: GUI for centering piece -->
-					<div>
-						Center:
-						<input name="centerY" type="text" size="2" value="0"/> px,
-						<input name="centerX" type="text" size="2" value="0"/> px
-					</div>
-					<div>
-						Base:
-						<input name="baseX" type="text" size="1" value="0"/> &times;
-						<input name="baseY" type="text" size="1" value="0"/> tiles
-					</div>
-					<div>Scale: <input name="scale" type="text" size="3" value="100"/>%</div>
-					<div><input type="button" value="apply changes" id="applyPieceChanges"/></div>
-				</form>
-				<div id="pieceEditorImages">TODO: piece image selection</div>
+				<div id="pieceImageWindow">
+					<div id="pieceImageDebug"></div>
+					<canvas id="pieceImage" width="150" height="150"></canvas>
+					<select id="pieceImageMode" size="4">
+						<option>center</option>
+						<option>base</option>
+						<option>scale</option>
+						<option>facing</option>
+					</select>
+				</div>
+				<div><span id="pieceURL"></span><input type="button" value="external image URL"/></div>
+				<div id="pieceEditorImages"></div>
 			</div>
 			<div class="resizeBL"></div>
 			<div class="resizeBR"></div>

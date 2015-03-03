@@ -51,7 +51,7 @@ $(function () { // This anonymous function runs after the page loads.
 		});
 	});
 	$("#userName input[type=button]").click(function () {
-		var newName = prompt("new user name", LT.currentUser.name);
+		var newName = prompt("new user name", LT.currentUser.name || "");
 		if (newName != null && newName != LT.currentUser.name) {
 			LT.currentUser.name = newName;
 			$.post("php/User.settings.php", LT.currentUser, function () {

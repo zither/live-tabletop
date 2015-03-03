@@ -398,17 +398,8 @@ img.swatch {
 	clear: both;
 	overflow: none;
 }
-#pieceImageWindow {
-	text-align: center;
-	overflow: hidden;
-	width: 72px;
-	height: 72px;
-}
-#pieceImage {
-	position: relative;
-	left: 100%;
-	margin-left: -200%;
-}
+#pieceImageMode {height: 150px;}
+#pieceImageWindow {position: relative;} #pieceImageDebug {position: absolute; left: 0; top: 0;}
 
 /* MAP */
 

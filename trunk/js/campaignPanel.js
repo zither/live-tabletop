@@ -15,7 +15,7 @@ $(function () { // This anonymous function runs after the page loads.
 
 	// campaign info form
 	$("#campaignName input").click(function () {
-		var newName = prompt("new campaign name", LT.currentCampaign.name);
+		var newName = prompt("new campaign name", LT.currentCampaign.name || "");
 		if (newName != null && newName != LT.currentCampaign.name) {
 			$.post("php/Campaign.name.php", {
 				campaign: LT.currentCampaign.id,

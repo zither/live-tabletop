@@ -1,95 +1,10 @@
 LT.RESOLUTION = 62;
 LT.FOG_IMAGE = 44;
-LT.PALETTES = {
-	"wesnoth": [     [ 63,   0,  22],  [ 85,   0,  42],  [105,   0,  57],
-	[123,   0,  69], [140,   0,  81],  [158,   0,  93],  [177,   0, 105],
-	[195,   0, 116], [214,   0, 127],  [236,   0, 140],  [238,  61, 150],
-	[239,  91, 161], [241, 114, 172],  [242, 135, 182],  [244, 154, 193],
-	[246, 173, 205], [248, 193, 217],  [250, 213, 229],  [253, 233, 241]],
-};
-LT.COLORS = [
-	{"name": "black",  "hue":   0, "saturation": 0.0, "luminosity": 0.1},
-	{"name": "white",  "hue":   0, "saturation": 0.0, "luminosity": 0.9},
-	{"name": "gray",   "hue":   0, "saturation": 0.0, "luminosity": 0.5},
-	{"name": "brown",  "hue":  30, "saturation": 0.5, "luminosity": 0.5},
-	{"name": "pink",   "hue":   0, "saturation": 1.0, "luminosity": 0.8},
-	{"name": "red",    "hue":   0, "saturation": 1.0, "luminosity": 0.5},
-	{"name": "orange", "hue":  30, "saturation": 1.0, "luminosity": 0.5},
-	{"name": "yellow", "hue":  60, "saturation": 1.0, "luminosity": 0.5},
-	{"name": "green",  "hue": 120, "saturation": 1.0, "luminosity": 0.5},
-	{"name": "blue",   "hue": 240, "saturation": 1.0, "luminosity": 0.5},
-	{"name": "purple", "hue": 300, "saturation": 1.0, "luminosity": 0.5}];
 
 LT.colorMaps = {};
-
-$.each(LT.PALETTES, function (name, palette) {
-	LT.colorMaps[name] = {};
-	$.each(LT.COLORS, function (colorIndex, color) {
-		LT.colorMaps[name][color.name] = {};
-		$.each(palette, function (paletteIndex, rgb) {
-			var h, s, l, c; // hue, saturation, luminosity, output RGB channels
-			h = color.hue / 360;
-			s = color.saturation;
-			// blend half the colors to black and the other half to white
-			var blend = 2 * (paletteIndex + 1) / palette.length;
-			if (blend < 1) l = color.luminosity * blend;
-			else l = color.luminosity * (2 - blend) + (blend - 1);
-			// convert HSL to RGB
-			if (s == 0) {
-				l = Math.round(l * 255);
-				c = [l, l, l];
-			} else {
-				var t1 = l < 0.5 ? l * (1 + s) : l + s - l * s;
-				var t2 = 2 * l - t1;
-				c = [(h + 1/3) % 1, h, (h + 2/3) % 1];
-				$.each(c, function (i, x) {
-					if (x * 6 < 1) c[i] = t2 + (t1 - t2) * 6 * x;
-					else if (x * 2 < 1) c[i] = t1;
-					else if (x * 3 < 2) c[i] = t2 + (t1 - t2) * (2/3 - x) * 6;
-					else c[i] = t2;
-					c[i] = Math.round (c[i] * 255);
-				});
-			}
-			LT.colorMaps[name][color.name][rgb[0] * 65536 + rgb[1] * 256 + rgb[2]] = c;
-		});
-	});
-});
-
 LT.toggleFog = 0;
 LT.dragging = 0;
 LT.pieceMoving = false;
-LT.dropHandlers.push(function () {
-	LT.dragging = 0;
-	if (LT.pieceMoving) {
-		LT.pieceMoving = false;
-		// TODO: freeze piece movement until map refreshes?
-		// TODO: freeze map piece refreshes while moving pieces?
-		$.post("php/Piece.move.php", {
-			"piece": LT.pieceSelected.id,
-			"x": LT.pieceElement.position().left / LT.RESOLUTION,
-			"y": LT.pieceElement.position().top  / LT.RESOLUTION,
-		}, LT.refreshMap);
-	}
-});
-LT.dragHandlers.push(function () {
-	if (LT.pieceMoving) {
-		if (LT.clickDragGap == 0) {
-			LT.clickX = LT.dragX - LT.pieceElement.position().left;
-			LT.clickY = LT.dragY - LT.pieceElement.position().top;
-			LT.clickDragGap = 1;
-		}
-		var x = Math.max(0, Math.min(LT.dragX - LT.clickX, $("#map").width()));
-		var y = Math.max(0, Math.min(LT.dragY - LT.clickY, $("#map").height()));
-/*
-		// TODO: snap settings
-		// snap to centers of tiles
-		x = LT.RESOLUTION * (Math.floor(x / LT.RESOLUTION) + 0.5);
-		y = LT.RESOLUTION * (Math.floor(y / LT.RESOLUTION) + 0.5);
-*/
-		LT.pieceElement.css({left: x + "px", top: y + "px"});
-		LT.pieceMover.css({left: x + "px", top: y + "px"});
-	}
-});
 
 $(function () { // This anonymous function runs after the page loads.
 	LT.mapPanel = new LT.Panel("map");
@@ -199,14 +114,94 @@ $(function () { // This anonymous function runs after the page loads.
 
 	}); // $.get("images/images.json", function (data) {
 
+	var PALETTES = {
+		"wesnoth": [     [ 63,   0,  22],  [ 85,   0,  42],  [105,   0,  57],
+		[123,   0,  69], [140,   0,  81],  [158,   0,  93],  [177,   0, 105],
+		[195,   0, 116], [214,   0, 127],  [236,   0, 140],  [238,  61, 150],
+		[239,  91, 161], [241, 114, 172],  [242, 135, 182],  [244, 154, 193],
+		[246, 173, 205], [248, 193, 217],  [250, 213, 229],  [253, 233, 241]]};
+	var COLORS = [
+		{"name": "black",  "hue":   0, "saturation": 0.0, "luminosity": 0.1},
+		{"name": "white",  "hue":   0, "saturation": 0.0, "luminosity": 0.9},
+		{"name": "gray",   "hue":   0, "saturation": 0.0, "luminosity": 0.5},
+		{"name": "brown",  "hue":  30, "saturation": 0.5, "luminosity": 0.5},
+		{"name": "pink",   "hue":   0, "saturation": 1.0, "luminosity": 0.8},
+		{"name": "red",    "hue":   0, "saturation": 1.0, "luminosity": 0.5},
+		{"name": "orange", "hue":  30, "saturation": 1.0, "luminosity": 0.5},
+		{"name": "yellow", "hue":  60, "saturation": 1.0, "luminosity": 0.5},
+		{"name": "green",  "hue": 120, "saturation": 1.0, "luminosity": 0.5},
+		{"name": "blue",   "hue": 240, "saturation": 1.0, "luminosity": 0.5},
+		{"name": "purple", "hue": 300, "saturation": 1.0, "luminosity": 0.5}];
+	$.each(PALETTES, function (name, palette) {
+		LT.colorMaps[name] = {};
+		$.each(COLORS, function (colorIndex, color) {
+			LT.colorMaps[name][color.name] = {};
+			$.each(palette, function (paletteIndex, rgb) {
+				var h, s, l, c; // hue, saturation, luminosity, output RGB channels
+				h = color.hue / 360;
+				s = color.saturation;
+				// blend half the colors to black and the other half to white
+				var blend = 2 * (paletteIndex + 1) / palette.length;
+				if (blend < 1) l = color.luminosity * blend;
+				else l = color.luminosity * (2 - blend) + (blend - 1);
+				// convert HSL to RGB
+				if (s == 0) {
+					l = Math.round(l * 255);
+					c = [l, l, l];
+				} else {
+					var t1 = l < 0.5 ? l * (1 + s) : l + s - l * s;
+					var t2 = 2 * l - t1;
+					c = [(h + 1/3) % 1, h, (h + 2/3) % 1];
+					$.each(c, function (i, x) {
+						if (x * 6 < 1) c[i] = t2 + (t1 - t2) * 6 * x;
+						else if (x * 2 < 1) c[i] = t1;
+						else if (x * 3 < 2) c[i] = t2 + (t1 - t2) * (2/3 - x) * 6;
+						else c[i] = t2;
+						c[i] = Math.round (c[i] * 255);
+					});
+				}
+				LT.colorMaps[name][color.name][rgb[0] * 65536 + rgb[1] * 256 + rgb[2]] = c;
+			}); // $.each(palette, function (paletteIndex, rgb) {
+		}); // $.each(COLORS, function (colorIndex, color) {
+	}); // $.each(PALETTES, function (name, palette) {
 
-	// pieces
+	LT.dropHandlers.push(function () {
+		LT.dragging = 0;
+		if (LT.pieceMoving) {
+			LT.pieceMoving = false;
+			// TODO: freeze piece movement until map refreshes?
+			// TODO: freeze map piece refreshes while moving pieces?
+			$.post("php/Piece.move.php", {
+				"piece": LT.pieceSelected.id,
+				"x": LT.pieceElement.position().left / LT.RESOLUTION,
+				"y": LT.pieceElement.position().top  / LT.RESOLUTION,
+			}, LT.refreshMap);
+		}
+	});
+	LT.dragHandlers.push(function () {
+		if (LT.pieceMoving) {
+			if (LT.clickDragGap == 0) {
+				LT.clickX = LT.dragX - LT.pieceElement.position().left;
+				LT.clickY = LT.dragY - LT.pieceElement.position().top;
+				LT.clickDragGap = 1;
+			}
+			var x = Math.max(0, Math.min(LT.dragX - LT.clickX, $("#map").width()));
+			var y = Math.max(0, Math.min(LT.dragY - LT.clickY, $("#map").height()));
+	/*
 
-	$("#submitStats").click(function () {LT.Piece.updateStats();});
-	$("#applyPieceChanges").click(function () {LT.Piece.selected.edit();});
-	$("#addStat").click(function () {LT.Piece.addStat();});
+			// TODO: snap settings
+			// snap to centers of tiles
+			x = LT.RESOLUTION * (Math.floor(x / LT.RESOLUTION) + 0.5);
+			y = LT.RESOLUTION * (Math.floor(y / LT.RESOLUTION) + 0.5);
 
-});
+	*/
+			LT.pieceElement.css({left: x + "px", top: y + "px"});
+
+			LT.pieceMover.css({left: x + "px", top: y + "px"});
+		}
+	});
+
+}); // $(function () { // This anonymous function runs after the page loads.
 
 LT.hideMapTabs = function () {
 	LT.mapPanel.hideTab("map info");
@@ -238,7 +233,7 @@ LT.loadMap = function (id) {
 
 LT.leaveMap = function () {
 	LT.hideMapTabs();
-	$("#tileLayer, #clickTileLayer, #clickWallLayer, #wallLayer, #fogLayer").empty();
+	$(".mapLayer, .clickLayer").empty();
 	$("#map, #clickWallLayer, #clickTileLayer").css({"width": 0, "height": 0});
 	delete LT.currentMap;
 };
@@ -499,11 +494,14 @@ LT.loadTiles = function () {
 
 LT.loadPieces = function () {
 	$.post("php/Map.pieces.php", {map: LT.currentMap.id}, function (data) {
-		$("#pieceLayer").empty();
-		$("#clickPieceLayer").empty();
+		var selectedPiece = LT.getCookie("piece");
+		$("#pieceLayer, #clickPieceLayer").empty();
 		$("#pieceList tr:not(.template)").remove();
 		$.each(data, function (i, piece) {
 			var source = piece.image.url || "images/" + piece.image.file;
+			var mirror = piece.image.view == "side" && Math.abs(piece.image.angle) > 90;
+			var angle = piece.image.angle || 0;
+			if (piece.image.view == "side" || piece.image.view == "front") angle = 0;
 			var style = {
 				width:  piece.image.size[0] + "px",
 				height: piece.image.size[1] + "px",
@@ -512,14 +510,32 @@ LT.loadPieces = function () {
 				marginLeft: (-piece.image.center[0] - 1) + "px",
 				marginTop:  (-piece.image.center[1] - 1) + "px",
 			};
+			if (mirror) style.transform = "scale(-1, 1)";
+			if (angle) style.transform = "rotate(" + angle + "deg)";
+
 			var deletePiece = function () {
 				var name = "this piece"
 				if (piece.name) name = "the piece named " + piece.name;
 				if (confirm("Are you sure you want to delete " + name + "?"))
 					$.post("php/Piece.delete.php", {piece: piece.id}, LT.refreshMap);
 			};
+			var update = function () {
+				$.post("php/Piece.settings.php", {
+					"piece": piece.id,
+					"image": JSON.stringify(piece.image),
+					"name": piece.name || "",
+					"character": piece.character,
+					"locked": piece.locked,
+					"markers": JSON.stringify(piece.markers),
+					"color": piece.color,
+				}, LT.refreshMap);
+				// TODO: update piece info tab when the map refreshes
+			};
+
+			// select piece when you click on the piece on the map or list
 			var select = function () {
-				// TODO: remember selected piece when you refresh the pieces
+				// remember selected piece when you refresh the pieces
+				LT.setCookie("piece", piece.id);
 				// TODO: select linked character in character panel
 				$("#clickPieceLayer > *").removeClass("selected");
 				$("#pieceLayer > *").removeClass("selected");
@@ -528,20 +544,150 @@ LT.loadPieces = function () {
 				// piece info tab
 				LT.mapPanel.showTab("piece info");
 				LT.mapPanel.selectTab("piece info");
-				var canvas = $("#pieceImage")[0];
-				canvas.width = element.width();
-				canvas.height = element.height();
-				canvas.getContext("2d").drawImage(element[0], 0, 0);
+				// draw image and center point on canvas;
+				var canvas = $("#pieceImage").off("click").click(function () {
+					var x = LT.dragX - center[0] - $(this).offset().left;
+					var y = LT.dragY - center[1] - $(this).offset().top;
+					switch ($("#pieceImageMode").val()) {
+						case "center": piece.image.center = [
+							x + piece.image.center[0],
+							y + piece.image.center[1]]; break;
+						case "base": piece.image.base = [
+							Math.max(1, Math.ceil(Math.abs(2 * x / LT.RESOLUTION))),
+							Math.max(1, Math.ceil(Math.abs(2 * y / LT.RESOLUTION)))]; break;
+						case "scale": piece.image.scale =
+							2 * Math.sqrt(x * x + y * y) / LT.RESOLUTION; break;
+						case "facing": piece.image.angle =
+							Math.round(Math.atan2(y, x) * 180 / Math.PI); break;
+					}
+					update();
+				})[0];
+				var context = canvas.getContext("2d");
+				var center = [canvas.width * 0.5, canvas.height * 0.5];
+				var offset = [
+					center[0] - piece.image.center[0],
+					center[1] - piece.image.center[1]];
+				var drawX = function (context, x, y, length, thickness, color) {
+					context.lineCap = "round";
+					context.strokeStyle = color;
+					context.lineWidth = thickness;
+					context.beginPath();
+					context.moveTo(x - length, y - length);
+					context.lineTo(x + length, y + length);
+					context.moveTo(x - length, y + length);
+					context.lineTo(x + length, y - length);
+					context.stroke();					
+				};
+				var drawBase = function (context, x, y, columns, rows, scale, thickness, color) {
+					context.lineCap = "round";
+					context.strokeStyle = color;
+					context.lineWidth = thickness;
+					context.beginPath();
+					var left = x - scale * columns / 2;
+					var right = x + scale * columns / 2;
+					var top = y - scale * rows / 2;
+					var bottom = y + scale * rows / 2;
+					for (var row = 0; row <= rows; row++) {
+						context.moveTo(left, top + row * scale);
+						context.lineTo(right, top + row * scale);
+					}
+					for (var column = 0; column <= columns; column++) {
+						context.moveTo(left + column * scale, top);
+						context.lineTo(left + column * scale, bottom);
+					}
+					context.stroke();					
+				};
+				var drawScale = function (context, x, y, small, big, thickness, color) {
+					context.lineCap = "round";
+					context.strokeStyle = color;
+					context.lineWidth = thickness;
+					context.beginPath();
+					context.arc(x, y, small, 0, 2 * Math.PI);
+					context.stroke();					
+					context.beginPath();
+					context.arc(x, y, big, 0, 2 * Math.PI);
+					context.stroke();					
+				};
+				var drawArrow = function (context, x, y, angle, length, head, barb, thickness, color) {
+					context.lineCap = "round";
+					context.strokeStyle = color;
+					context.lineWidth = thickness;
+					context.save();
+					context.translate(x, y);
+					context.rotate(angle);
+					context.beginPath();
+					context.moveTo(0, 0);
+					context.lineTo(length, 0);
+					context.moveTo(length, 0);
+					context.lineTo(length * (1 - head), length * barb);
+					context.moveTo(length, 0);
+					context.lineTo(length * (1 - head), -length * barb);
+					context.stroke();
+					context.restore();
+				};
+				var paint = function (x, y) {
+					var radius = LT.RESOLUTION / 2;
+					context.clearRect(0, 0, canvas.width, canvas.height);
+					// draw piece image
+					context.save();
+					context.translate(center[0], center[1]);
+					if (mirror) context.scale(-1, 1);
+					if (angle) context.rotate(Math.PI * angle / 180);
+					context.translate(-center[0], -center[1]);
+					context.drawImage(element[0], offset[0], offset[1]);
+					context.restore();
+					// draw center, base, scale or facing control
+					switch ($("#pieceImageMode").val()) {
+						case "center":
+							if (isNaN(x)) x = center[0];
+							if (isNaN(y)) y = center[1];
+							drawX(context, x, y, 3, 5, "white");
+							drawX(context, x, y, 3, 1.5, "black");
+							$("#pieceImageDebug").text([x, y].join(", ")); break;
+						case "base":
+							var columns = piece.image.base[0];
+							var rows = piece.image.base[1];
+							if (!isNaN(x)) columns = Math.max(1, Math.ceil(Math.abs((x - center[0]) / radius)));
+							if (!isNaN(y)) rows = Math.max(1, Math.ceil(Math.abs((y - center[1]) / radius)));
+							drawBase(context, center[0], center[1], columns, rows, LT.RESOLUTION, 4, "white");
+							drawBase(context, center[0], center[1], columns, rows, LT.RESOLUTION, 1.2, "black");
+							$("#pieceImageDebug").text([columns, rows].join(", ")); break;
+						case "scale":
+							var scale1 = piece.image.scale || 1;
+							var scale2 = piece.image.scale || 1;
+							if (!isNaN(x) && !isNaN(y))
+								scale2 = Math.sqrt(Math.pow(x - center[0], 2) + Math.pow(y - center[1], 2)) / radius;
+							drawScale(context, center[0], center[1], radius * scale1, radius * scale2, 4, "white");
+							drawScale(context, center[0], center[1], radius * scale1, radius * scale2, 1.5, "black");
+							$("#pieceImageDebug").text(Math.round(scale2 * 100) + "%"); break;
+						case "facing":
+							var a = piece.image.angle ? Math.PI * piece.image.angle / 180 : 0;
+							if (!isNaN(x) && !isNaN(y))
+								a = Math.atan2(y - center[1], x - center[0]);
+							drawArrow(context, center[0], center[1], a, radius, 0.2, 0.1, 4, "white");
+							drawArrow(context, center[0], center[1], a, radius, 0.2, 0.1, 1.5, "black");
+							$("#pieceImageDebug").text(Math.round(180 * a / Math.PI) + String.fromCharCode(176)); break;
+					}
+				};
+				paint();
+
+				$("#pieceImage").off("mouseout").on("mouseout", paint).off("mousemove").on("mousemove", function () {
+					paint(
+						LT.dragX - $(this).offset().left,
+						LT.dragY - $(this).offset().top);
+				});
+				$("#pieceImageMode").off("change").change(paint);
 				$("#pieceName").text(piece.name || "[unnamed piece]");
 				$("#renamePiece").off("click").click(function () {
-					var newName = prompt("new piece name", piece.name);
+					var newName = prompt("new piece name", piece.name || "");
 					if (newName != null && newName != piece.name) {
 						piece.name = newName;
 						$("#pieceName").text(piece.name || "[unnamed piece]");
-						$.post("php/Piece.settings.php", piece);
+						update();
 					}
 				});
 				$("#deletePiece").off("click").click(deletePiece);
+
 				// TODO: piece color
 				// TODO: character selector
 				// TODO: external url
@@ -550,38 +696,41 @@ LT.loadPieces = function () {
 				// TODO: scale
 				// TODO: apply changes
 				// TODO: select piece image
-				return false;
-			};
+/**/
+			}; // var select = function () {
 
 			// visual piece element
 			var image = new Image();
 			image.src = source;
 			image.onload = function () {
-				if (!piece.image.palette) return;
-				// convert image into canvas
-				var canvas = $("<canvas>").attr({
-					width: piece.image.size[0],
-					height: piece.image.size[1],
-				}).appendTo("#pieceLayer").css(style);
-				var context = canvas[0].getContext("2d");
-				context.drawImage(image, 0, 0);
-				image.remove();
-				element = canvas;
-				// remap colors
-				var map = LT.colorMaps[piece.image.palette][piece.color];
-				var buffer = context.getImageData(0, 0, piece.image.size[0], piece.image.size[1]);
-				var bytes = buffer.data;
-				for (var n = 0; n < bytes.length; n += 4) {
-					if (bytes[n + 3] == 0) continue; // ignore transparent pixels
-					var key = bytes[n] * 65536 + bytes[n + 1] * 256 + bytes[n + 2];
-					if (key in map) {
-						var rgb = map[key];
-						bytes[n] = rgb[0];
-						bytes[n + 1] = rgb[1];
-						bytes[n + 2] = rgb[2];
+				if (piece.image.palette) {
+					// convert image into canvas
+					var canvas = $("<canvas>").attr({
+						width: piece.image.size[0],
+						height: piece.image.size[1],
+					}).appendTo("#pieceLayer").css(style);
+					var context = canvas[0].getContext("2d");
+					context.drawImage(image, 0, 0);
+					image.remove();
+					element = canvas;
+					// remap colors
+					var map = LT.colorMaps[piece.image.palette][piece.color];
+					var buffer = context.getImageData(0, 0, piece.image.size[0], piece.image.size[1]);
+					var bytes = buffer.data;
+					for (var n = 0; n < bytes.length; n += 4) {
+						if (bytes[n + 3] == 0) continue; // ignore transparent pixels
+						var key = bytes[n] * 65536 + bytes[n + 1] * 256 + bytes[n + 2];
+						if (key in map) {
+							var rgb = map[key];
+							bytes[n] = rgb[0];
+							bytes[n + 1] = rgb[1];
+							bytes[n + 2] = rgb[2];
+						}
 					}
+					context.putImageData(buffer, 0, 0);
 				}
-				context.putImageData(buffer, 0, 0);
+				// show piece to piece info tab.
+				if (piece.id == selectedPiece) select();
 			};
 			var element = $(image).appendTo("#pieceLayer").css(style);
 
@@ -617,6 +766,7 @@ LT.loadPieces = function () {
 			copy.find("input[value=delete]").click(deletePiece);
 			copy.appendTo("#pieceList");
 
+/**/
 		}); // $.each(data, function (i, piece) {
 	}); // $.post("php/Map.pieces.php", {map: LT.currentMap.id}, function (data) {
 }; // LT.loadPieces = function () {
