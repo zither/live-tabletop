@@ -124,14 +124,14 @@ $(function () { // This anonymous function runs after the page loads.
 		{"name": "black",  "hue":   0, "saturation": 0.0, "luminosity": 0.1},
 		{"name": "white",  "hue":   0, "saturation": 0.0, "luminosity": 0.9},
 		{"name": "gray",   "hue":   0, "saturation": 0.0, "luminosity": 0.5},
-		{"name": "brown",  "hue":  30, "saturation": 0.5, "luminosity": 0.5},
+		{"name": "brown",  "hue":  30, "saturation": 0.5, "luminosity": 0.3},
 		{"name": "pink",   "hue":   0, "saturation": 1.0, "luminosity": 0.8},
-		{"name": "red",    "hue":   0, "saturation": 1.0, "luminosity": 0.5},
+		{"name": "red",    "hue":   0, "saturation": 1.0, "luminosity": 0.4},
 		{"name": "orange", "hue":  30, "saturation": 1.0, "luminosity": 0.5},
 		{"name": "yellow", "hue":  60, "saturation": 1.0, "luminosity": 0.5},
-		{"name": "green",  "hue": 120, "saturation": 1.0, "luminosity": 0.5},
+		{"name": "green",  "hue": 120, "saturation": 1.0, "luminosity": 0.3},
 		{"name": "blue",   "hue": 240, "saturation": 1.0, "luminosity": 0.5},
-		{"name": "purple", "hue": 300, "saturation": 1.0, "luminosity": 0.5}];
+		{"name": "purple", "hue": 280, "saturation": 1.0, "luminosity": 0.4}];
 	$.each(PALETTES, function (name, palette) {
 		LT.colorMaps[name] = {};
 		$.each(COLORS, function (colorIndex, color) {
@@ -687,8 +687,11 @@ LT.loadPieces = function () {
 					}
 				});
 				$("#deletePiece").off("click").click(deletePiece);
+				$("#pieceColor").val(piece.color).off("change").change(function () {
+					piece.color = $(this).val();
+					update();
+				});
 
-				// TODO: piece color
 				// TODO: piece depth (z-index, piece.image.z)
 				// TODO: select piece image
 				// TODO: external url
