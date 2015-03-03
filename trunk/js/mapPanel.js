@@ -691,6 +691,10 @@ LT.loadPieces = function () {
 					piece.color = $(this).val();
 					update();
 				});
+				$("#pieceDepth").val(piece.image.z || 0).off("change").change(function () {
+					piece.image.z = $(this).val();
+					update();
+				});
 
 				// TODO: piece depth (z-index, piece.image.z)
 				// TODO: select piece image
@@ -714,7 +718,7 @@ LT.loadPieces = function () {
 					context.drawImage(image, 0, 0);
 					image.remove();
 					element = canvas;
-					if (piece.image.z) element.style("z-index", piece.image.z);
+					if (piece.image.z) element.css("z-index", piece.image.z);
 					// remap colors
 					var map = LT.colorMaps[piece.image.palette][piece.color];
 					var buffer = context.getImageData(0, 0, piece.image.size[0], piece.image.size[1]);
@@ -735,7 +739,7 @@ LT.loadPieces = function () {
 				if (piece.id == selectedPiece) select();
 			};
 			var element = $(image).appendTo("#pieceLayer").css(style);
-			if (piece.image.z) element.style("z-index", piece.image.z);
+			if (piece.image.z) element.css("z-index", piece.image.z);
 
 			// clickable piece element
 			var mover = $("<div>").attr("title", piece.name).mousedown(function () {
