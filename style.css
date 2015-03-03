@@ -31,7 +31,7 @@ Table of Contents:
 body {
 	margin: 0;
 	padding: 0;
-	background: #999;
+	background: #cb8;
 	font-size: 14px;
 	font-family: Arial,Helvetica,sans-serif;
 	scrollbar-face-color:#8080FF;
@@ -438,12 +438,12 @@ img.swatch {
 
 #clickPieceLayer > * , #pieceLayer > * {
 	position: absolute;
-	border: 1px dashed transparent;
+	border: 2px dashed transparent;
 }
-#clickPieceLayer > .selected {border-color: black;}
-/*
-#pieceLayer > .selected {background: rgba(255, 255, 255, 0.5);}
-*/
+#clickPieceLayer > .selected {
+	border-color: rgba(255, 255, 255, 0.5);
+	border-radius: 50%;
+}
 #pieceLayer > .selected {
 	background-image: url(images/ui/glow.png);
 	background-size: 100% 100%;
