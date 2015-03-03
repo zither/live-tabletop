@@ -520,6 +520,14 @@
 					</select>
 				</div>
 				<div><input id="deletePiece" type="button" value="delete piece"/></div>
+				<div>
+					<select id="pieceDepth">
+						<option value="-2">under tiles</option>
+						<option value="-1">under grid</option>
+						<option value="0">over grid</option>
+						<option value="1">over fog</option>
+					</select>
+				</div>
 				<div id="pieceImageWindow">
 					<div id="pieceImageDebug"></div>
 					<canvas id="pieceImage" width="150" height="150"></canvas>
