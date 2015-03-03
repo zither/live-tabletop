@@ -689,14 +689,12 @@ LT.loadPieces = function () {
 				$("#deletePiece").off("click").click(deletePiece);
 
 				// TODO: piece color
-				// TODO: character selector
-				// TODO: external url
-				// TODO: center piece
-				// TODO: edit base
-				// TODO: scale
-				// TODO: apply changes
+				// TODO: piece depth (z-index, piece.image.z)
 				// TODO: select piece image
-/**/
+				// TODO: external url
+				// TODO: scale
+				// TODO: character selector
+
 			}; // var select = function () {
 
 			// visual piece element
@@ -713,6 +711,7 @@ LT.loadPieces = function () {
 					context.drawImage(image, 0, 0);
 					image.remove();
 					element = canvas;
+					if (piece.image.z) element.style("z-index", piece.image.z);
 					// remap colors
 					var map = LT.colorMaps[piece.image.palette][piece.color];
 					var buffer = context.getImageData(0, 0, piece.image.size[0], piece.image.size[1]);
@@ -733,6 +732,7 @@ LT.loadPieces = function () {
 				if (piece.id == selectedPiece) select();
 			};
 			var element = $(image).appendTo("#pieceLayer").css(style);
+			if (piece.image.z) element.style("z-index", piece.image.z);
 
 			// clickable piece element
 			var mover = $("<div>").attr("title", piece.name).mousedown(function () {
@@ -766,7 +766,6 @@ LT.loadPieces = function () {
 			copy.find("input[value=delete]").click(deletePiece);
 			copy.appendTo("#pieceList");
 
-/**/
 		}); // $.each(data, function (i, piece) {
 	}); // $.post("php/Map.pieces.php", {map: LT.currentMap.id}, function (data) {
 }; // LT.loadPieces = function () {
