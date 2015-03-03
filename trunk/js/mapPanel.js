@@ -499,7 +499,7 @@ LT.loadPieces = function () {
 		$("#pieceList tr:not(.template)").remove();
 		$.each(data, function (i, piece) {
 			var source = piece.image.url || "images/" + piece.image.file;
-			var mirror = piece.image.view == "side" && Math.abs(piece.image.angle) > 90;
+			var mirror = piece.image.view == "side" && piece.image.angle < 0;
 			var angle = piece.image.angle || 0;
 			if (piece.image.view == "side" || piece.image.view == "front") angle = 0;
 			var style = {
@@ -558,7 +558,7 @@ LT.loadPieces = function () {
 						case "scale": piece.image.scale =
 							2 * Math.sqrt(x * x + y * y) / LT.RESOLUTION; break;
 						case "facing": piece.image.angle =
-							Math.round(Math.atan2(y, x) * 180 / Math.PI); break;
+							Math.round(Math.atan2(x, -y) * 180 / Math.PI); break;
 					}
 					update();
 				})[0];
@@ -617,11 +617,11 @@ LT.loadPieces = function () {
 					context.rotate(angle);
 					context.beginPath();
 					context.moveTo(0, 0);
-					context.lineTo(length, 0);
-					context.moveTo(length, 0);
-					context.lineTo(length * (1 - head), length * barb);
-					context.moveTo(length, 0);
-					context.lineTo(length * (1 - head), -length * barb);
+					context.lineTo(0, -length);
+					context.moveTo(0, -length);
+					context.lineTo(length * barb, -length * (1 - head));
+					context.moveTo(0, -length);
+					context.lineTo(-length * barb, -length * (1 - head));
 					context.stroke();
 					context.restore();
 				};
@@ -663,7 +663,7 @@ LT.loadPieces = function () {
 						case "facing":
 							var a = piece.image.angle ? Math.PI * piece.image.angle / 180 : 0;
 							if (!isNaN(x) && !isNaN(y))
-								a = Math.atan2(y - center[1], x - center[0]);
+								a = Math.atan2(x - center[0], -(y - center[1]));
 							drawArrow(context, center[0], center[1], a, radius, 0.2, 0.1, 4, "white");
 							drawArrow(context, center[0], center[1], a, radius, 0.2, 0.1, 1.5, "black");
 							$("#pieceImageDebug").text(Math.round(180 * a / Math.PI) + String.fromCharCode(176)); break;
