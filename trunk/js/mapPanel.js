@@ -726,8 +726,6 @@ LT.loadPieces = function () {
 				});
 
 				// TODO: angle should not be tied to image
-				// TODO: external url
-				// TODO: scale
 				// TODO: character selector
 
 			}; // var select = function () {
