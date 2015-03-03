@@ -512,6 +512,7 @@ LT.loadPieces = function () {
 		$("#pieceList tr:not(.template)").remove();
 		$.each(data, function (i, piece) {
 			var source = piece.image.url || "images/" + piece.image.file;
+			var scale = piece.image.scale ? piece.image.scale / 100 : 1;
 			var mirror = piece.image.view == "side" && piece.image.angle < 0;
 			var angle = piece.image.angle || 0;
 			if (piece.image.view == "side" || piece.image.view == "front") angle = 0;
@@ -525,6 +526,7 @@ LT.loadPieces = function () {
 			};
 			if (mirror) style.transform = "scale(-1, 1)";
 			if (angle) style.transform = "rotate(" + angle + "deg)";
+			if (scale != 1) style.transform += "scale(" + scale + ")"; 
 
 			var deletePiece = function () {
 				var name = "this piece"
@@ -541,7 +543,6 @@ LT.loadPieces = function () {
 				// TODO: select linked character in character panel
 				$("#clickPieceLayer > *").removeClass("selected");
 				$("#pieceLayer > *").removeClass("selected");
-				element.addClass("selected");
 				mover.addClass("selected");
 				// piece info tab
 				LT.mapPanel.showTab("piece info");
@@ -558,7 +559,7 @@ LT.loadPieces = function () {
 							Math.max(1, Math.ceil(Math.abs(2 * x / LT.RESOLUTION))),
 							Math.max(1, Math.ceil(Math.abs(2 * y / LT.RESOLUTION)))]; break;
 						case "scale": piece.image.scale =
-							2 * Math.sqrt(x * x + y * y) / LT.RESOLUTION; break;
+							Math.round(200 * Math.sqrt(x * x + y * y) / LT.RESOLUTION); break;
 						case "facing": piece.image.angle =
 							Math.round(Math.atan2(x, -y) * 180 / Math.PI); break;
 					}
@@ -599,18 +600,15 @@ LT.loadPieces = function () {
 					}
 					context.stroke();					
 				};
-				var drawScale = function (context, x, y, small, big, thickness, color) {
+				var drawScale = function (context, x, y, radius, thickness, color) {
 					context.lineCap = "round";
 					context.strokeStyle = color;
 					context.lineWidth = thickness;
 					context.beginPath();
-					context.arc(x, y, small, 0, 2 * Math.PI);
-					context.stroke();					
-					context.beginPath();
-					context.arc(x, y, big, 0, 2 * Math.PI);
+					context.arc(x, y, radius, 0, 2 * Math.PI);
 					context.stroke();					
 				};
-				var drawArrow = function (context, x, y, angle, length, head, barb, thickness, color) {
+				var drawArrow = function (context, x, y, angle, length, tail, head, barb, thickness, color) {
 					context.lineCap = "round";
 					context.strokeStyle = color;
 					context.lineWidth = thickness;
@@ -618,7 +616,7 @@ LT.loadPieces = function () {
 					context.translate(x, y);
 					context.rotate(angle);
 					context.beginPath();
-					context.moveTo(0, 0);
+					context.moveTo(0, -length * tail);
 					context.lineTo(0, -length);
 					context.moveTo(0, -length);
 					context.lineTo(length * barb, -length * (1 - head));
@@ -635,6 +633,16 @@ LT.loadPieces = function () {
 					context.translate(center[0], center[1]);
 					if (mirror) context.scale(-1, 1);
 					if (angle) context.rotate(Math.PI * angle / 180);
+					if ($("#pieceImageMode").val() != "scale")
+						context.scale(scale, scale);
+					else if (isNaN(x) || isNaN(y)) {
+						if (scale != 1) context.scale(scale, scale);
+						$("#pieceImageDebug").text(Math.round(scale * 100) + "%");
+					} else {
+						var scale2 = Math.sqrt(Math.pow(x - center[0], 2) + Math.pow(y - center[1], 2)) / radius;
+						context.scale(scale2, scale2)
+						$("#pieceImageDebug").text(Math.round(scale2 * 100) + "%");
+					}
 					context.translate(-center[0], -center[1]);
 					context.drawImage(element[0], offset[0], offset[1]);
 					context.restore();
@@ -654,20 +662,24 @@ LT.loadPieces = function () {
 							drawBase(context, center[0], center[1], columns, rows, LT.RESOLUTION, 4, "white");
 							drawBase(context, center[0], center[1], columns, rows, LT.RESOLUTION, 1.2, "black");
 							$("#pieceImageDebug").text([columns, rows].join(", ")); break;
+/*
 						case "scale":
-							var scale1 = piece.image.scale || 1;
-							var scale2 = piece.image.scale || 1;
-							if (!isNaN(x) && !isNaN(y))
+							drawScale(context, center[0], center[1], radius * scale, 4, "white");
+							drawScale(context, center[0], center[1], radius * scale, 1.5, "black");
+							var scale2 = scale;
+							if (!isNaN(x) && !isNaN(y)) {
 								scale2 = Math.sqrt(Math.pow(x - center[0], 2) + Math.pow(y - center[1], 2)) / radius;
-							drawScale(context, center[0], center[1], radius * scale1, radius * scale2, 4, "white");
-							drawScale(context, center[0], center[1], radius * scale1, radius * scale2, 1.5, "black");
+								drawScale(context, center[0], center[1], radius * scale2, 4, "white");
+								drawScale(context, center[0], center[1], radius * scale2, 1.5, "black");
+							}
 							$("#pieceImageDebug").text(Math.round(scale2 * 100) + "%"); break;
+*/
 						case "facing":
 							var a = piece.image.angle ? Math.PI * piece.image.angle / 180 : 0;
 							if (!isNaN(x) && !isNaN(y))
 								a = Math.atan2(x - center[0], -(y - center[1]));
-							drawArrow(context, center[0], center[1], a, radius, 0.2, 0.1, 4, "white");
-							drawArrow(context, center[0], center[1], a, radius, 0.2, 0.1, 1.5, "black");
+							drawArrow(context, center[0], center[1], a, radius * 1.25, 0.5, 0.2, 0.1, 4, "white");
+							drawArrow(context, center[0], center[1], a, radius * 1.25, 0.5, 0.2, 0.1, 1.5, "black");
 							$("#pieceImageDebug").text(Math.round(180 * a / Math.PI) + String.fromCharCode(176)); break;
 					}
 				};
@@ -696,6 +708,14 @@ LT.loadPieces = function () {
 				$("#pieceDepth").val(piece.image.z || 0).off("change").change(function () {
 					piece.image.z = $(this).val();
 					LT.savePieceSettings(piece);
+				});
+				$("#renamePiece").off("click").click(function () {
+					var newName = prompt("new piece name", piece.name || "");
+					if (newName != null && newName != piece.name) {
+						piece.name = newName;
+						$("#pieceName").text(piece.name || "[unnamed piece]");
+						LT.savePieceSettings(piece);
+					}
 				});
 
 				// TODO: angle should not be tied to image
