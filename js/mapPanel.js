@@ -526,7 +526,7 @@ LT.loadPieces = function () {
 			};
 			if (mirror) style.transform = "scale(-1, 1)";
 			if (angle) style.transform = "rotate(" + angle + "deg)";
-			if (scale != 1) style.transform += "scale(" + scale + ")"; 
+			if (scale != 1) style.transform += "scale(" + scale + ")";
 
 			var deletePiece = function () {
 				var name = "this piece"
@@ -644,7 +644,7 @@ LT.loadPieces = function () {
 						$("#pieceImageDebug").text(Math.round(scale2 * 100) + "%");
 					}
 					context.translate(-center[0], -center[1]);
-					context.drawImage(element[0], offset[0], offset[1]);
+					context.drawImage(image || element[0], offset[0], offset[1]);
 					context.restore();
 					// draw center, base, scale or facing control
 					switch ($("#pieceImageMode").val()) {
@@ -709,11 +709,18 @@ LT.loadPieces = function () {
 					piece.image.z = $(this).val();
 					LT.savePieceSettings(piece);
 				});
-				$("#renamePiece").off("click").click(function () {
-					var newName = prompt("new piece name", piece.name || "");
-					if (newName != null && newName != piece.name) {
-						piece.name = newName;
-						$("#pieceName").text(piece.name || "[unnamed piece]");
+				$("#pieceURL").text(piece.image.url || "");
+				$("#changePieceURL").off("click").click(function () {
+					var url = prompt("new external image URL", piece.image.url || "");
+					if (url != null && url != piece.image.url) {
+						piece.image = {
+							"url": url,
+							"view": "top",
+							"size": [LT.RESOLUTION, LT.RESOLUTION],
+							"center": [LT.RESOLUTION / 2, LT.RESOLUTION / 2],
+							"base": [1, 1],
+						};
+						$("#pieceURL").text(piece.image.url || "");
 						LT.savePieceSettings(piece);
 					}
 				});
@@ -731,13 +738,13 @@ LT.loadPieces = function () {
 			image.onload = function () {
 				if (piece.image.palette) {
 					// convert image into canvas
-					var canvas = $("<canvas>").attr({
+					var canvas = $("<canvas>").appendTo("#pieceLayer").attr({
 						width: piece.image.size[0],
 						height: piece.image.size[1],
-					}).appendTo("#pieceLayer").css(style);
+					}).css(style).css("z-index", piece.image.z || 0);
 					var context = canvas[0].getContext("2d");
 					context.drawImage(image, 0, 0);
-					image.remove();
+					delete image;
 					element = canvas;
 					if (piece.image.z) element.css("z-index", piece.image.z);
 					// remap colors
@@ -759,8 +766,15 @@ LT.loadPieces = function () {
 				// show piece to piece info tab.
 				if (piece.id == selectedPiece) select();
 			};
-			var element = $(image).appendTo("#pieceLayer").css(style);
-			if (piece.image.z) element.css("z-index", piece.image.z);
+			var element = $("<div>").appendTo("#pieceLayer").append(
+				$("<div>").css({
+					"width": "100%",
+					"height": "100%",
+					"background-image": "url(" + source + ")",
+					"background-repeat": "no-repeat",
+					"background-size": "contain",
+				})
+			).css(style).css("z-index", piece.image.z || 0);
 
 			// clickable piece element
 			var mover = $("<div>").attr("title", piece.name).mousedown(function () {
