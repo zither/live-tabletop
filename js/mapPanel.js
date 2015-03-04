@@ -26,6 +26,10 @@ $(function () { // This anonymous function runs after the page loads.
 	// disable map panel button until a campaign is loaded
 	LT.mapPanel.disable();
 
+	// create grid
+	LT.grid = new LT.Grid(1, 1, LT.RESOLUTION, LT.RESOLUTION,
+		0, "black", 3, "black", 3, "white", "square", $("#wallLayer")[0]);
+
 	// submit map creation form
 	$("#createMap").click(function () {
 		$.post("php/Map.create.php", LT.formValues("#mapCreator"), function (data) {
@@ -389,11 +393,10 @@ LT.refreshMap = function () {
 					$("#mapTilt").val("[" + map.min_tilt + "," + map.max_tilt + "]");
 				}
 
-				// TODO: repaint grid in case the color or thickness have changed.
-
 				// update pieces and tiles if they have changed
 				if (LT.currentMap.piece_changes < map.piece_changes) LT.loadPieces();
 				if (LT.currentMap.tile_changes  < map.tile_changes)  LT.loadTiles();
+				else if (LT.updateGrid(map)) LT.grid.repaint();
 
 				LT.currentMap = map;
 
@@ -441,18 +444,14 @@ LT.loadTiles = function () {
 		if (map.type == "hex") width = Math.round(width * 1.5 / Math.sqrt(3));
 
 		// empty and resize layers
-		$("#tileLayer, #clickTileLayer, #clickWallLayer, #wallLayer, #fogLayer").empty();
+		$("#tileLayer, #clickTileLayer, #clickWallLayer, #fogLayer").empty();
 		$("#map, #clickWallLayer, #clickTileLayer").css({
 			"width": width * map.columns + "px",
 			"height": height * map.rows + "px",
 		});
 
-		// TODO: update grid instead of recreating it each time?
-		// Add a new grid to the wall layer
-		var grid = new LT.Grid(map.columns, map.rows, width, height,
-			map.grid_thickness, map.grid_color,
-			map.wall_thickness, map.wall_color,
-			map.door_thickness, map.door_color, map.type, $("#wallLayer")[0]);
+		LT.updateGrid(map);
+		LT.grid.reset();
 
 		$.each(map.flags.split(""), function (i, flag) {
 			var x = i % (map.columns + 1);
@@ -476,12 +475,12 @@ LT.loadTiles = function () {
 
 			// create walls and doors
 			var side = map.type == "hex" ? "se" : "e";
-			if ("IJKLMNOPQijklmnopq".indexOf(flag) != -1) grid.wall(x, y, "s");
-			if ("RSTUVWXYZrstuvwxyz".indexOf(flag) != -1) grid.door(x, y, "s");
-			if ("CDELMNUVWcdelmnuvw".indexOf(flag) != -1) grid.wall(x, y, side);
-			if ("FGHOPQXYZfghopqxyz".indexOf(flag) != -1) grid.door(x, y, side);
-			if ("ADGJMPSVYadgjmpsvy".indexOf(flag) != -1) grid.wall(x, y, "ne");
-			if ("BEHKNQTWZbehknqtwz".indexOf(flag) != -1) grid.door(x, y, "ne");
+			if ("IJKLMNOPQijklmnopq".indexOf(flag) != -1) LT.grid.wall(x, y, "s");
+			if ("RSTUVWXYZrstuvwxyz".indexOf(flag) != -1) LT.grid.door(x, y, "s");
+			if ("CDELMNUVWcdelmnuvw".indexOf(flag) != -1) LT.grid.wall(x, y, side);
+			if ("FGHOPQXYZfghopqxyz".indexOf(flag) != -1) LT.grid.door(x, y, side);
+			if ("ADGJMPSVYadgjmpsvy".indexOf(flag) != -1) LT.grid.wall(x, y, "ne");
+			if ("BEHKNQTWZbehknqtwz".indexOf(flag) != -1) LT.grid.door(x, y, "ne");
 
 			// function to create click detectors for walls
 			var createWallClickDetector = function (column, row, direction, l, t, w, h) {
@@ -493,12 +492,12 @@ LT.loadTiles = function () {
 				}).click(function () {
 					if (row > map.rows) row = 0; // wrap rows for bottom left staggered edges
 					// TODO: depending on which tool is selected set newType to "door" or "clear"?
-					var oldType = grid.getWall(column, row, direction);
+					var oldType = LT.grid.getWall(column, row, direction);
 					var newType = oldType == "wall" ? "door" : oldType == "door" ? "none" : "wall";
-					grid.setWall(column, row, direction, newType);
+					LT.grid.setWall(column, row, direction, newType);
 					var args = {"map": map.id, "x": column - 1, "y": row - 1};
 					args[direction] = newType;
-					$.post("php/Map.tile.php", args);
+					$.post("php/Map.tile.php", args, LT.refreshMap);
 				});
 			};
 
@@ -584,8 +583,39 @@ LT.loadTiles = function () {
 			}
 
 		}); // $.each(map.flags.split(""), function (i, flag) {
+
+		LT.grid.repaint();
+
 	}); // $.get("php/Map.read.php", {map: LT.currentMap.id}, function (data) {
 }; // LT.loadTiles = function () {
+
+LT.updateGrid = function (map) {
+	var changed = false;
+	if (map.columns != LT.grid.getColumns())
+		{LT.grid.setColumns(map.columns); changed = true;}
+	if (map.rows != LT.grid.getRows())
+		{LT.grid.setRows(map.rows); changed = true;}
+	if (map.type != LT.grid.getType()) {
+		if (map.type == "hex")
+			LT.grid.setWidth(Math.round(LT.RESOLUTION * 1.5 / Math.sqrt(3)));
+		else LT.grid.setWidth(LT.RESOLUTION);
+		LT.grid.setType(map.type);
+		changed = true;
+	}
+	if (map.grid_thickness != LT.grid.getThickness())
+		{LT.grid.setThickness(map.grid_thickness); changed = true;}
+	if (map.grid_color != LT.grid.getColor())
+		{LT.grid.setColor(map.grid_color); changed = true;}
+	if (map.wall_thickness != LT.grid.getWallThickness())
+		{LT.grid.setWallThickness(map.wall_thickness); changed = true;}
+	if (map.wall_color != LT.grid.getWallColor())
+		{LT.grid.setWallColor(map.wall_color); changed = true;}
+	if (map.door_thickness != LT.grid.getDoorThickness())
+		{LT.grid.setDoorThickness(map.door_thickness); changed = true;}
+	if (map.door_color != LT.grid.getDoorColor())
+		{LT.grid.setDoorColor(map.door_color); changed = true;}
+	return changed;
+};
 
 LT.savePieceSettings = function (piece) {
 	$.post("php/Piece.settings.php", {
