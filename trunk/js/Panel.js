@@ -146,6 +146,7 @@ LT.Panel.prototype = {
 		$(this.outside).find(".content").hide();
 		$(this.outside).find(".tab[data-tab='" + tabName + "']").addClass("active");
 		$(this.outside).find(".content[data-tab='" + tabName + "']").show();
+		this.resize();
 	},
 
 	// Get selected tab

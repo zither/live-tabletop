@@ -12,6 +12,7 @@ $(function () { // This anonymous function runs after the page loads.
 	LT.mapPanel = new LT.Panel("map");
 	LT.mapPanel.resize = function () {
 		var width = LT.mapPanel.getWidth();
+		$(".pieceColumn").width(width - $(".pieceDelete:visible").width() - LT.GUTTERS);
 		$("#pieceName").width(width - $("#renamePiece").width() - LT.GUTTERS);
 		$("#pieceCharacter").width(width - $("#deletePiece").width() - LT.GUTTERS - 2);
 		$("#pieceURL").width(width - $("#changePieceURL").width() - LT.GUTTERS);
@@ -520,7 +521,7 @@ LT.loadPieces = function () {
 	$.post("php/Map.pieces.php", {map: LT.currentMap.id}, function (data) {
 		var selectedPiece = LT.getCookie("piece");
 		$("#pieceLayer, #clickPieceLayer").empty();
-		$("#pieceList tr:not(.template)").remove();
+		$("#pieceList div:not(.template)").remove();
 		$.each(data, function (i, piece) {
 			var source = piece.image.url || "images/" + piece.image.file;
 			var scale = piece.image.scale ? piece.image.scale / 100 : 1;
@@ -551,13 +552,12 @@ LT.loadPieces = function () {
 				LT.pieceSelected = piece;
 				// remember selected piece when you refresh the pieces
 				LT.setCookie("piece", piece.id);
+				// piece info tab
+				LT.mapPanel.showTab("piece info");
 				// TODO: select linked character in character panel
 				$("#clickPieceLayer > *").removeClass("selected");
 				$("#pieceLayer > *").removeClass("selected");
 				mover.addClass("selected");
-				// piece info tab
-				LT.mapPanel.showTab("piece info");
-				LT.mapPanel.selectTab("piece info");
 				// draw image and center point on canvas;
 				var canvas = $("#pieceCanvas").off("click").click(function () {
 					var center = [canvas.width * 0.5, canvas.height * 0.5];
@@ -787,8 +787,9 @@ LT.loadPieces = function () {
 					}
 					context.putImageData(buffer, 0, 0);
 				}
-				// show piece to piece info tab.
+				// show piece in piece info tab.
 				if (piece.id == selectedPiece) select();
+			
 			};
 			var element = $("<div>").appendTo("#pieceLayer").append(
 				$("<div>").css({
@@ -806,6 +807,7 @@ LT.loadPieces = function () {
 				LT.pieceMover = mover;
 				LT.pieceMoving = true;
 				select();
+				LT.mapPanel.selectTab("piece info");
 				return false;
 			}).mouseover(function () {
 				element.addClass("selected");
@@ -822,6 +824,7 @@ LT.loadPieces = function () {
 					element.offset().left - window.innerWidth / 2,
 					element.offset().top - window.innerHeight / 2);
 				select();
+				LT.mapPanel.selectTab("piece info");
 				return false;
 			});
 			copy.find(".inlineImage").attr("src", source);
