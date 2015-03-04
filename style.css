@@ -541,10 +541,12 @@ img.swatch {
 	background: #999;
 }
 .ellipsis {
-	display: inline-block;
-	vertical-align: middle;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	width: 100px;
+}
+span.ellipsis {
+	display: inline-block;
+	vertical-align: middle;
 }
