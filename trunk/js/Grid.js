@@ -13,7 +13,7 @@ LT.Grid = function (columns, rows, width, height, thickness, color, wall_thickne
 	if (parent) parent.appendChild(this.canvas);
 	this.canvas.className = "grid";
 	this.walls = [];
-	this.resize(columns + 1, rows + 1);
+	this.resize(columns, rows);
 };
 
 LT.Grid.prototype = {
@@ -38,9 +38,9 @@ LT.Grid.prototype = {
 			this._door_thickness + 2 * Math.max(1, this._thickness));
 
 		// resize canvas to fit grid lines, walls and doors
-		this.canvas.width = (this.getColumns() + (this._type == "hex" ? 1/3 : 0) - 1)
+		this.canvas.width = (this.getColumns() + (this._type == "hex" ? 1/3 : 0))
 			* this._width + thickness;
-		this.canvas.height = (this.getRows() + (this._type == "hex" ? 1/2 : 0) - 1)
+		this.canvas.height = (this.getRows() + (this._type == "hex" ? 1/2 : 0))
 			* this._height + thickness;
 
 		// offset coordinate system to center of grid lines
@@ -53,9 +53,9 @@ LT.Grid.prototype = {
 			context.strokeStyle = this._color;
 			context.lineWidth = this._thickness;
 			context.beginPath();
-			for (var column = 1; column < this.getColumns(); column++) {
+			for (var column = 1; column <= this.getColumns(); column++) {
 				var stagger = this._type == "hex" ? 0.5 * (column % 2) : 0;
-				for (var row = 1; row < this.getRows(); row++) {
+				for (var row = 1; row <= this.getRows(); row++) {
 					context.moveTo(
 						(points[0][0] + column) * this._width,
 						(points[0][1] + row + stagger) * this._height);
@@ -72,9 +72,9 @@ LT.Grid.prototype = {
 
 		if (this._wall_thickness) {
 			// draw walls
-			for (var column = 0; column < this.getColumns(); column++) {
+			for (var column = 0; column <= this.getColumns(); column++) {
 				var stagger = this._type == "hex" ? 0.5 * (column % 2) : 0;
-				for (var row = 0; row < this.getRows(); row++) {
+				for (var row = 0; row <= this.getRows(); row++) {
 					for (var direction in this.walls[row][column]) {
 						if (this.walls[row][column][direction] == "wall") {
 							var i = this.SHAPES[this._type].directions[direction];
@@ -100,9 +100,9 @@ LT.Grid.prototype = {
 				}
 			}
 			// draw doors
-			for (var column = 0; column < this.getColumns(); column++) {
+			for (var column = 0; column <= this.getColumns(); column++) {
 				var stagger = this._type == "hex" ? 0.5 * (column % 2) : 0;
-				for (var row = 0; row < this.getRows(); row++) {
+				for (var row = 0; row <= this.getRows(); row++) {
 					for (var direction in this.walls[row][column]) {
 						if (this.walls[row][column][direction] == "door") {
 							var i = this.SHAPES[this._type].directions[direction];
@@ -143,17 +143,16 @@ LT.Grid.prototype = {
 	},
 
 	resize: function (columns, rows) {
-		while (this.walls.length < rows) this.walls.push([]);
-		while (this.walls.length > rows) this.walls.pop();
-		for (var row = 0; row < rows; row++) {
-			while (this.walls[row].length < columns) this.walls[row].push({});
-			while (this.walls[row].length > columns) this.walls[row].pop();
+		while (this.walls.length < rows + 1) this.walls.push([]);
+		while (this.walls.length > rows + 1) this.walls.pop();
+		for (var row = 0; row < rows + 1; row++) {
+			while (this.walls[row].length < columns + 1) this.walls[row].push({});
+			while (this.walls[row].length > columns + 1) this.walls[row].pop();
 		}
-		this.repaint();
 	},
 
 	getColumns: function () {
-		return this.walls.length == 0 ? 0 : this.walls[0].length;
+		return this.walls[0].length - 1;
 	},
 
 	setColumns: function (columns) {
@@ -161,7 +160,7 @@ LT.Grid.prototype = {
 	},
 
 	getRows: function () {
-		return this.walls.length;
+		return this.walls.length - 1;
 	},
 
 	setRows: function (rows) {
@@ -172,10 +171,7 @@ LT.Grid.prototype = {
 
 	setType: function (type) {
 		this._type = type;
-		var rows = this.getRows();
-		var columns = this.getColumns();
-		this.walls = [];
-		this.resize(columns, rows);
+		this.reset();
 	},
 
 	getColor: function () {return this._color;},
@@ -187,14 +183,14 @@ LT.Grid.prototype = {
 	getWidth: function () {return this._width;},
 	getHeight: function () {return this._height;},
 
-	setColor: function (value) {this._color = value; this.repaint();},
-	setThickness: function (value) {this._thickness = value; this.repaint();},
-	setWallColor: function (value) {this._wall_color = value; this.repaint();},
-	setWallThickness: function (value) {this._wall_thickness = value; this.repaint();},
-	setDoorColor: function (value) {this._door_color = value; this.repaint();},
-	setDoorThickness: function (value) {this._door_thickness = value; this.repaint();},
-	setWidth: function (value) {this._width = value; this.repaint();},
-	setHeight: function (value) {this._height = value; this.repaint();},
+	setColor: function (value) {this._color = value;},
+	setThickness: function (value) {this._thickness = value;},
+	setWallColor: function (value) {this._wall_color = value;},
+	setWallThickness: function (value) {this._wall_thickness = value;},
+	setDoorColor: function (value) {this._door_color = value;},
+	setDoorThickness: function (value) {this._door_thickness = value;},
+	setWidth: function (value) {this._width = value;},
+	setHeight: function (value) {this._height = value;},
 
 	// normalize walls to avoid redundancy
 	normalize: function (column, row, direction) {
@@ -220,7 +216,6 @@ LT.Grid.prototype = {
 		else {
 			this.walls[c.row][c.column][c.direction] = type;
 		}
-		this.repaint();
 	},
 
 	wall: function (column, row, direction) {
@@ -233,6 +228,13 @@ LT.Grid.prototype = {
 
 	clear: function (column, row, direction) {
 		this.setWall(column, row, direction, "none");
+	},
+
+	reset: function () {
+		var rows = this.getRows();
+		var columns = this.getColumns();
+		this.walls = [];
+		this.resize(columns, rows);
 	},
 
 };
