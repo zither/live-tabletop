@@ -553,8 +553,8 @@ LT.loadPieces = function () {
 					var y = LT.dragY - center[1] - $(this).offset().top;
 					switch ($("#pieceImageMode").val()) {
 						case "center": piece.image.center = [
-							x + piece.image.center[0],
-							y + piece.image.center[1]]; break;
+							piece.image.center[0] + x * (mirror ? -1 : 1),
+							piece.image.center[1] + y]; break;
 						case "base": piece.image.base = [
 							Math.max(1, Math.ceil(Math.abs(2 * x / LT.RESOLUTION))),
 							Math.max(1, Math.ceil(Math.abs(2 * y / LT.RESOLUTION)))]; break;
@@ -570,6 +570,10 @@ LT.loadPieces = function () {
 				var offset = [
 					center[0] - piece.image.center[0],
 					center[1] - piece.image.center[1]];
+/*
+				if (mirror)
+					offset[0] = center[0] + piece.image.center[0] - piece.image.size[0];
+*/
 				var drawX = function (context, x, y, length, thickness, color) {
 					context.lineCap = "round";
 					context.strokeStyle = color;
@@ -633,6 +637,13 @@ LT.loadPieces = function () {
 					context.translate(center[0], center[1]);
 					if (mirror) context.scale(-1, 1);
 					if (angle) context.rotate(Math.PI * angle / 180);
+					context.translate(offset[0], offset[1]);
+					if (piece.image.url) {
+						var scale3 = Math.min(
+							piece.image.size[0] / image.width,
+							piece.image.size[1] / image.height);
+						context.scale(scale3, scale3);
+					}
 					if ($("#pieceImageMode").val() != "scale")
 						context.scale(scale, scale);
 					else if (isNaN(x) || isNaN(y)) {
@@ -644,9 +655,8 @@ LT.loadPieces = function () {
 						$("#pieceImageDebug").text(Math.round(scale2 * 100) + "%");
 					}
 					context.translate(-center[0], -center[1]);
-					if (element[0].tagName == "CANVAS")
-						context.drawImage(element[0], offset[0], offset[1]);
-					else context.drawImage(image, offset[0], offset[1]);
+					var pic = element[0].tagName == "CANVAS" ? element[0] : image;
+					context.drawImage(pic, 0, 0);
 					context.restore();
 					// draw center, base, scale or facing control
 					switch ($("#pieceImageMode").val()) {
@@ -655,15 +665,20 @@ LT.loadPieces = function () {
 							if (isNaN(y)) y = center[1];
 							drawX(context, x, y, 3, 5, "white");
 							drawX(context, x, y, 3, 1.5, "black");
+							// TODO: scaled and rotated images
+							x = piece.image.center[0] + (x - center[0]) * (mirror ? -1 : 1);
+							y = piece.image.center[1] + (y - center[1]);
 							$("#pieceImageDebug").text([x, y].join(", ")); break;
 						case "base":
-							var columns = piece.image.base[0];
-							var rows = piece.image.base[1];
-							if (!isNaN(x)) columns = Math.max(1, Math.ceil(Math.abs((x - center[0]) / radius)));
-							if (!isNaN(y)) rows = Math.max(1, Math.ceil(Math.abs((y - center[1]) / radius)));
-							drawBase(context, center[0], center[1], columns, rows, LT.RESOLUTION, 4, "white");
-							drawBase(context, center[0], center[1], columns, rows, LT.RESOLUTION, 1.2, "black");
-							$("#pieceImageDebug").text([columns, rows].join(", ")); break;
+							var w = piece.image.base[0];
+							var h = piece.image.base[1];
+							if (!isNaN(x))
+								w = Math.max(1, Math.ceil(Math.abs((x - center[0]) / radius)));
+							if (!isNaN(y))
+								h = Math.max(1, Math.ceil(Math.abs((y - center[1]) / radius)));
+							drawBase(context, center[0], center[1], w, h, LT.RESOLUTION, 4, "white");
+							drawBase(context, center[0], center[1], w, h, LT.RESOLUTION, 1.2, "black");
+							$("#pieceImageDebug").text([w, h].join(", ")); break;
 /*
 						case "scale":
 							drawScale(context, center[0], center[1], radius * scale, 4, "white");
@@ -744,6 +759,7 @@ LT.loadPieces = function () {
 					}).css(style).css("z-index", piece.image.z || 0);
 					var context = canvas[0].getContext("2d");
 					context.drawImage(image, 0, 0);
+					element.remove();
 					element = canvas;
 					if (piece.image.z) element.css("z-index", piece.image.z);
 					// remap colors
