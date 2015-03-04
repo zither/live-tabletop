@@ -646,13 +646,6 @@ LT.loadPieces = function () {
 					context.translate(center[0], center[1]);
 					if (mirror) context.scale(-1, 1);
 					if (angle) context.rotate(Math.PI * angle / 180);
-					context.translate(offset[0], offset[1]);
-					if (piece.image.url) {
-						var scale3 = Math.min(
-							piece.image.size[0] / image.width,
-							piece.image.size[1] / image.height);
-						context.scale(scale3, scale3);
-					}
 					if ($("#pieceCanvasMode").val() != "scale")
 						context.scale(scale, scale);
 					else if (isNaN(x) || isNaN(y)) {
@@ -663,7 +656,14 @@ LT.loadPieces = function () {
 						context.scale(scale2, scale2)
 						$("#pieceCanvasText").text(Math.round(scale2 * 100) + "%");
 					}
+					context.translate(offset[0], offset[1]);
 					context.translate(-center[0], -center[1]);
+					if (piece.image.url) {
+						var scale3 = Math.min(
+							piece.image.size[0] / image.width,
+							piece.image.size[1] / image.height);
+						context.scale(scale3, scale3);
+					}
 					var pic = element[0].tagName == "CANVAS" ? element[0] : image;
 					context.drawImage(pic, 0, 0);
 					context.restore();
