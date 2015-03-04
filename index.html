@@ -460,7 +460,11 @@
 					<div class="swatch selected" data-tool="piece">piece</div>
 				</div>
 				<div id="toolOptions">
-					<div data-tool="tile"></div>
+					<div data-tool="tile">
+						Click on an image below to use it as a brush.
+						Click and drag on the map to paint tiles.
+						<br/>
+					</div>
 					<div data-tool="erase">
 						Click and drag on the map to erase tile images.
 					</div>
@@ -479,6 +483,7 @@
 							Click on a piece on the map to see its properties.
 							Drag a piece on the map to move it.
 							Click on an image below to create a new piece.
+							<br/>
 						</div>
 						<div id="pieceCreatorImages"></div>
 					</div>
@@ -500,11 +505,35 @@
 			</div>
 			<div class="content" data-tab="piece info">
 				<div>
-					<span id="pieceName"></span>
+					<span id="pieceName" class="ellipsis"></span>
 					<input id="renamePiece" type="button" value="rename piece"/>
 				</div>
-				<div><!-- Character: --><select name="character"><option value="-1">no character</option></select></div>
 				<div>
+					<select name="character" id="pieceCharacter">
+						<option value="-1">no character</option>
+					</select>
+					<input id="deletePiece" type="button" value="delete piece"/>	
+				</div>
+				<div>
+					<select id="pieceView">
+						<option value="top">top view</option>
+						<option value="side">side view</option>
+						<option value="front">front view</option>
+						<option value="flat">flat front</option>
+					</select>
+					<select id="pieceDepth">
+						<option value="-2">under tiles</option>
+						<option value="-1">under grid</option>
+						<option value="0">over grid</option>
+						<option value="1">over fog</option>
+					</select>
+				</div>
+				<div>
+					<select id="pieceBase">
+						<option value="none">do not show base</option>
+						<option value="ellipse">elliptical base</option>
+						<option value="rectangle">rectangular base</option>
+					</select>
 					<select id="pieceColor">
 						<option>red</option>
 						<option>orange</option>
@@ -519,26 +548,20 @@
 						<option>brown</option>
 					</select>
 				</div>
-				<div><input id="deletePiece" type="button" value="delete piece"/></div>
-				<div>
-					<select id="pieceDepth">
-						<option value="-2">under tiles</option>
-						<option value="-1">under grid</option>
-						<option value="0">over grid</option>
-						<option value="1">over fog</option>
-					</select>
-				</div>
-				<div id="pieceImageWindow">
-					<select id="pieceImageMode" size="4">
+				<div id="pieceCanvasWindow">
+					<select id="pieceCanvasMode" size="4">
 						<option>center</option>
 						<option>base</option>
 						<option>scale</option>
 						<option>facing</option>
 					</select>
-					<div id="pieceImageDebug"></div>
-					<canvas id="pieceImage" width="150" height="150"></canvas>
+					<div id="pieceCanvasText"></div>
+					<canvas id="pieceCanvas" width="150" height="150"></canvas>
 				</div>
-				<div><span id="pieceURL"></span><input id="changePieceURL" type="button" value="external image URL"/></div>
+				<div>
+					<input id="changePieceURL" type="button" value="external image URL"/>
+					<span id="pieceURL" class="ellipsis"></span>
+				</div>
 				<div id="pieceEditorImages"></div>
 			</div>
 			<div class="resizeBL"></div>

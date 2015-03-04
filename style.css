@@ -296,6 +296,7 @@ th, td {padding: 0;}
 	color: #333;
 */
 	overflow: auto;
+	margin: 0;
 /*	padding: 0 5px; */
 }
 
@@ -386,9 +387,9 @@ img.swatch {
 .swatch.selected {border: 1px solid #F00;}
 #tools .swatch {
 	float: left;
-	width: 50px;
-	height: 30px;
-	line-height: 30px;
+	width: 41px;
+	height: 25px;
+	line-height: 25px;
 	text-align: center;
 	margin: 1px;
 }
@@ -400,9 +401,9 @@ img.swatch {
 	clear: both;
 	overflow: none;
 }
-#pieceImageMode {height: 150px;}
-#pieceImageWindow {position: relative;}
-#pieceImageDebug {position: absolute; left: 5.5em; top: 0.5em;}
+#pieceCanvasMode {height: 150px;}
+#pieceCanvasWindow {position: relative;}
+#pieceCanvasText {position: absolute; left: 5.5em; top: 0.5em;}
 
 /* MAP */
 
@@ -539,4 +540,11 @@ img.swatch {
 	clear: both;
 	background: #999;
 }
-
+.ellipsis {
+	display: inline-block;
+	vertical-align: middle;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	width: 100px;
+}
