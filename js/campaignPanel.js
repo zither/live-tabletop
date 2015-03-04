@@ -14,13 +14,13 @@ $(function () { // This anonymous function runs after the page loads.
 	});
 
 	// campaign info form
-	$("#campaignName input").click(function () {
+	$("#renameCampaign").click(function () {
 		var newName = prompt("new campaign name", LT.currentCampaign.name || "");
 		if (newName != null && newName != LT.currentCampaign.name) {
 			$.post("php/Campaign.name.php", {
 				campaign: LT.currentCampaign.id,
 				name: LT.currentCampaign.name = newName
-			}, function () {$("#campaignName span").text(newName);});
+			}, function () {$("#campaignName").text(newName);});
 		}
 	});
 	$("#campaignPrivate").click(function () {
@@ -126,7 +126,7 @@ LT.refreshCampaign = function () {
 				if (!LT.currentCampaign) return;
 
 				// update campaign name
-				$("#campaignName span").text(data.name || "[unnamed campaign]");
+				$("#campaignName").text(data.name || "[unnamed campaign]");
 
 				// update campaign private/public toggle
 				$("#campaignPrivate").val(data.private);

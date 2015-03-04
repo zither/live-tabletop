@@ -12,15 +12,16 @@ $(function () { // This anonymous function runs after the page loads.
 	LT.mapPanel = new LT.Panel("map");
 	LT.mapPanel.resize = function () {
 		var width = LT.mapPanel.getWidth();
-		$(".pieceColumn").width(width - $(".pieceDelete:visible").width() - LT.GUTTERS);
-		$("#pieceName").width(width - $("#renamePiece").width() - LT.GUTTERS);
-		$("#pieceCharacter").width(width - $("#deletePiece").width() - LT.GUTTERS - 2);
+		$("#mapName").css("max-width", width - $("#renameMap").width() - LT.GUTTERS + "px");
+		$(".mapListRow").width(width - $(".disownMap:visible").width() - LT.GUTTERS);
+		$(".pieceListRow").width(width - $(".pieceDelete:visible").width() - LT.GUTTERS);
+		$("#pieceName").css("max-width", width - $("#renamePiece").width() - LT.GUTTERS + "px");
+		$("#pieceCharacter").css("max-width", width - $("#deletePiece").width() - LT.GUTTERS - 2 + "px");
 		$("#pieceURL").width(width - $("#changePieceURL").width() - LT.GUTTERS);
 		$("#pieceCanvas")[0].width = width - $("#pieceCanvasMode").width() - LT.GUTTERS;
 		$("#pieceCanvas")[0].width -= $("#pieceCanvas")[0].width % 2; // even number
 		if (LT.repaintPieceCanvas) LT.repaintPieceCanvas();
 	};
-//	LT.hideMapTabs();
 
 	// disable map panel button until a campaign is loaded
 	LT.mapPanel.disable();
@@ -32,20 +33,100 @@ $(function () { // This anonymous function runs after the page loads.
 		});
 	});
 
-	// submit map settings form
-	$("#applyMapChanges").click(function () {
-		var args = LT.formValues("#mapEditor");
-		args.map = LT.currentMap.id;
+	// map info form
+	var saveMapSettings = function () {
+		$.post("php/Map.settings.php", {
+			"map": LT.currentMap.id,
+			"name": LT.currentMap.name,
+			"type": LT.currentMap.type,
+			"min_zoom": LT.currentMap.min_zoom,
+			"max_zoom": LT.currentMap.max_zoom,
+			"min_rotate": LT.currentMap.min_rotate,
+			"max_rotate": LT.currentMap.max_rotate,
+			"min_tilt": LT.currentMap.min_tilt,
+			"max_tilt": LT.currentMap.max_tilt,
+			"grid_thickness": LT.currentMap.grid_thickness,
+			"grid_color": LT.currentMap.grid_color,
+			"wall_thickness": LT.currentMap.wall_thickness,
+			"wall_color": LT.currentMap.wall_color,
+			"door_thickness": LT.currentMap.door_thickness,
+			"door_color": LT.currentMap.door_color,
+		}, LT.refreshMap);
+	};
+	$("#renameMap").click(function () {
+		var newName = prompt("new map name", LT.currentMap.name || "");
+		if (newName != null && newName != LT.currentMap.name) {
+			LT.currentMap.name = newName;
+			saveMapSettings();
+		}
+	});
+	$("#mapType").change(function () {
+		LT.currentMap.type = $(this).val();
+		saveMapSettings();
+	});
+	var resize = function (left, top, right, bottom) {
+		$.post("php/Map.size.php", {
+			"map": LT.currentMap.id,
+			"left": left,
+			"top": top,
+			"right": LT.currentMap.columns + right,
+			"bottom": LT.currentMap.rows + bottom,
+			"tile": 0,
+			"flags": "0",
+		}, LT.refreshMap);		
+	};
+	$.each([-10, -1, 1, 10], function (i, n) {
+		$("#resizeMapLeft input")[i].click(function () {resize(n, 0, 0, 0);});
+		$("#resizeMapTop input")[i].click(function () {resize(0, n, 0, 0);});
+		$("#resizeMapRight input")[i].click(function () {resize(0, 0, n, 0);});
+		$("#resizeMapBottom input")[i].click(function () {resize(0, 0, 0, n);});
+	});
+	$("#grid_thickness").change(function () {
+		LT.currentMap.grid_thickness = parseInt($(this).val());
+		saveMapSettings();
+	});
+	$("#grid_color").change(function () {
+		LT.currentMap.grid_color = $(this).val();
+		saveMapSettings();
+	});
+	$("#wall_thickness").change(function () {
+		LT.currentMap.wall_thickness = parseInt($(this).val());
+		saveMapSettings();
+	});
+	$("#wall_color").change(function () {
+		LT.currentMap.wall_color = $(this).val();
+		saveMapSettings();
+	});
+	$("#door_thickness").change(function () {
+		LT.currentMap.door_thickness = parseInt($(this).val());
+		saveMapSettings();
+	});
+	$("#door_color").change(function () {
+		LT.currentMap.door_color = $(this).val();
+		saveMapSettings();
+	});
+	$("#min_zoom").change(function () {
+		LT.currentMap.min_zoom = parseInt($(this).val()) / 100; // percentage
+		saveMapSettings();
+	});
+	$("#max_zoom").change(function () {
+		LT.currentMap.max_zoom = parseInt($(this).val()) / 100; // percentage
+		saveMapSettings();
+	});
+	$("#min_rotate").change(function () {
+		LT.currentMap.min_rotate = parseInt($(this).val());
+		saveMapSettings();
+	});
+	$("#max_rotate").change(function () {
+		LT.currentMap.max_rotate = parseInt($(this).val());
+		saveMapSettings();
+	});
+	$("#mapTilt").change(function () {
 		// convert tilt selection into minimum and maximum angles
-		var tilt = JSON.parse(args.tilt);
-		args.min_tilt = tilt[0];
-		args.max_tilt = tilt[1];
-		delete args.tilt;
-		// convert zoom from percentage to fraction
-		args.min_zoom /= 100;
-		args.max_zoom /= 100;
-		// submit changes
-		$.post("php/Map.settings.php", args, LT.refreshMap);
+		var tilt = JSON.parse($(this).val());
+		LT.currentMap.min_tilt = tilt[0];
+		LT.currentMap.max_tilt = tilt[1];
+		saveMapSettings();
 	});
 
 	// close map
@@ -254,7 +335,7 @@ LT.leaveMap = function () {
 LT.refreshMapList = function () {
 	$.post("php/User.maps.php", function (theData) {
 		var list = $(".content[data-tab='map list']");
-		$("#mapList tr:not(.template)").remove();
+		$("#mapList > div:not(.template)").remove();
 		$.each(theData, function (i, theMap) {
 			var copy = $("#mapList .template").clone().removeClass("template");
 			copy.find(".name").text(theMap.name || "[unnamed map]").click(function () {
@@ -265,7 +346,7 @@ LT.refreshMapList = function () {
 			copy.find(".columns").text(theMap.columns);
 			copy.find(".rows").text(theMap.rows);
 			copy.find(".type").text(theMap.type);
-			copy.find(".disown").click(function () {
+			copy.find(".disownMap").click(function () {
 				if (!confirm("Are you sure you want to disown "
 					+ (theMap.name || "[unnamed map]")
 					+ "? The map will be deleted if it has no other owners.")) return;
@@ -275,6 +356,7 @@ LT.refreshMapList = function () {
 			});
 			copy.appendTo("#mapList");
 		});
+		LT.mapPanel.resize();
 	}, "json");
 };
 
@@ -290,21 +372,21 @@ LT.refreshMap = function () {
 				// populate map info form
 				// do this when loading a new map and while the map info tab is hidden
 				if (!("name" in LT.currentMap) || LT.mapPanel.getTab() != "map info") {
-					$("#mapEditor [name=name]").val(map.name);
-					$("#mapEditor [name=type]").val(map.type);
-					$("#mapEditor [name=columns]").val(map.columns);
-					$("#mapEditor [name=rows]").val(map.rows);
-					$("#mapEditor [name=min_rotate]").val(map.min_rotate);
-					$("#mapEditor [name=max_rotate]").val(map.max_rotate);
-					$("#mapEditor [name=tilt]").val("[" + map.min_tilt + "," + map.max_tilt + "]");
-					$("#mapEditor [name=min_zoom]").val(Math.round(map.min_zoom * 100));
-					$("#mapEditor [name=max_zoom]").val(Math.round(map.max_zoom * 100));
-					$("#mapEditor [name=grid_thickness]").val(map.grid_thickness);
-					$("#mapEditor [name=wall_thickness]").val(map.wall_thickness);
-					$("#mapEditor [name=door_thickness]").val(map.door_thickness);
-					$("#mapEditor [name=grid_color]").val(map.grid_color);
-					$("#mapEditor [name=wall_color]").val(map.wall_color);
-					$("#mapEditor [name=door_color]").val(map.door_color);
+					$("#mapName").text(map.name || "[unnamed map]");
+					$("#mapType").val(map.type);
+					$("#mapColumns").text(map.columns);
+					$("#mapRows").text(map.rows);
+					$("#grid_thickness").val(map.grid_thickness);
+					$("#wall_thickness").val(map.wall_thickness);
+					$("#door_thickness").val(map.door_thickness);
+					$("#grid_color").val(map.grid_color);
+					$("#wall_color").val(map.wall_color);
+					$("#door_color").val(map.door_color);
+					$("#min_zoom").val(Math.round(map.min_zoom * 100));
+					$("#max_zoom").val(Math.round(map.max_zoom * 100));
+					$("#min_rotate").val(map.min_rotate);
+					$("#max_rotate").val(map.max_rotate);
+					$("#mapTilt").val("[" + map.min_tilt + "," + map.max_tilt + "]");
 				}
 
 				// TODO: repaint grid in case the color or thickness have changed.
@@ -835,6 +917,9 @@ LT.loadPieces = function () {
 			copy.appendTo("#pieceList");
 
 		}); // $.each(data, function (i, piece) {
+
+		LT.mapPanel.resize();
+
 	}); // $.post("php/Map.pieces.php", {map: LT.currentMap.id}, function (data) {
 }; // LT.loadPieces = function () {
 
