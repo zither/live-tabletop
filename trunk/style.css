@@ -331,6 +331,8 @@ th, td {padding: 0;}
 .panel .content table {float: left;}
 
 .panel .content td {padding-left: 5px;}
+#resizeMap td {padding: 0;}
+#resizeMap td:first-child {vertical-align: top;}
 
 .panel:not(.loaded) .content {display: none !important;}
 
@@ -544,7 +546,6 @@ img.swatch {
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	width: 100px;
 }
 span.ellipsis {
 	display: inline-block;

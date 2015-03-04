@@ -249,9 +249,9 @@
 				</table>
 			</div>
 			<div class="content" data-tab="campaign info">
-				<div id="campaignName">
-					<span>campaign name</span>
-					<input type="button" value="rename"/>
+				<div>
+					<span id="campaignName">campaign name</span>
+					<input id="renameCampaign" type="button" value="rename"/>
 				</div>
 				<div>
 					<input type="checkbox" value="private" id="campaignPrivate" checked="checked"/>
@@ -316,13 +316,9 @@
 				<div class="tab" data-tab="piece info">Piece Info</div>
 			</div>
 			<div class="content" data-tab="map list">
-				<form id="mapCreator">
-					<!-- TODO: default tile option -->
-					<div><!-- Map Name: --><input type="text" name="name" placeholder="map name"/></div>
-					<div>
-<!--
-						Tiles:
--->
+				<div>
+					<form id="mapCreator">
+						<input type="text" name="name" placeholder="map name"/>
 						<input name="columns" type="text" size="2" value="25"/>
 						&times;
 						<input name="rows" type="text" size="2" value="25"/>
@@ -330,114 +326,170 @@
 							<option value="square" selected="selected">square</option>
 							<option value="hex">hex</option>
 						</select>
+						<input type="button" value="create map" id="createMap"/>
+					</form>
+				</div>
+				<div id="mapList">
+					<div class="template">
+						<span class="ellipsis mapListRow">
+							<a class="name">Map Name</a>
+							(<span class="columns">25</span>
+							&times;
+							<span class="rows">25</span>
+							<span class="type">square</span>)&nbsp;
+						</span>
+						<input type="button" value="disown" class="disownMap"/>
 					</div>
-					<div><input type="button" value="create map" id="createMap"/></div>
-				</form>
-				<table id="mapList">
-					<tr class="template">
-						<td><a class="name">Map Name</a> (<span class="columns">25</span> &times;
-							<span class="rows">25</span> <span class="type">square</span>)</td>
-						<td><input type="button" value="disown" class="disown"/></td>
-					</tr>
-				</table>
+				</div>
 			</div>
 			<div class="content" data-tab="map info">
-				<form id="mapEditor">
-					<div>Name: <input name="name" type="text" placeholder="map name"/></div>
-					<div>
-						Tiles:
-						<input name="columns" type="text" size="2" value="25"/>
-						&times;
-						<input name="rows" type="text" size="2" value="25"/>
-						<select name="type">
-							<option value="square" selected="selected">square</option>
-							<option value="hex">hex</option>
-						</select>
-					</div>
-					<div>
-						Zoom:
-						<input name="min_zoom" type="text" size="3" value="25"/>%
-						-
-						<input name="max_zoom" type="text" size="3" value="400"/>%
-					</div>
-					<div>
-						Rotate:
-						<input name="min_rotate" type="text" size="3" value="-180"/>&deg;
-						-
-						<input name="max_rotate" type="text" size="3" value="180"/>&deg;
-						<select name="tilt">
-							<option value="[30,90]" selected="selected">free tilt</option>
-							<option value="[30,30]">side view</option>
-							<option value="[90,90]">top view</option>
-						</select>
-					</div>
-					<div>
-						Grid:
-						<select name="grid_thickness">
-							<option value="0">none</option>
-							<option value="1" selected="selected">thin</option>
-							<option value="2">thick</option>
-						</select>
-						<select name="grid_color">
-							<option>red</option>
-							<option>orange</option>
-							<option>yellow</option>
-							<option>green</option>
-							<option>blue</option>
-							<option>purple</option>
-							<option>black</option>
-							<option>gray</option>
-							<option>white</option>
-							<option>pink</option>
-							<option>brown</option>
-						</select>
-					</div>
-					<div>
-						Wall:
-						<select name="wall_thickness">
-							<option value="3" selected="selected">thin</option>
-							<option value="6">thick</option>
-						</select>
-						<select name="wall_color">
-							<option>red</option>
-							<option>orange</option>
-							<option>yellow</option>
-							<option>green</option>
-							<option>blue</option>
-							<option>purple</option>
-							<option>black</option>
-							<option>gray</option>
-							<option>white</option>
-							<option>pink</option>
-							<option>brown</option>
-						</select>
-					</div>
-					<div>
-						Door:
-						<select name="door_thickness">
-							<option value="3" selected="selected">thin</option>
-							<option value="6">thick</option>
-						</select>
-						<select name="door_color">
-							<option>red</option>
-							<option>orange</option>
-							<option>yellow</option>
-							<option>green</option>
-							<option>blue</option>
-							<option>purple</option>
-							<option>black</option>
-							<option>gray</option>
-							<option>white</option>
-							<option>pink</option>
-							<option>brown</option>
-						</select>
-					</div>
-					<div>
-						<input type="button" value="apply changes" id="applyMapChanges"/>
-					</div>
-				</form>
+				<div>
+					<span id="mapName" class="ellipsis">Map Name</span>
+					<input id="renameMap" type="button" value="rename"/>
+				</div>
+				<div>
+					<span id="mapColumns">25</span> &times; <span id="mapRows">25</span>
+					<select id="mapType">
+						<option value="square" selected="selected">square</option>
+						<option value="hex">hex</option>
+					</select>
+				</div>
 				<div>
 					<input type="button" value="close map" id="mapClose"/>
+				</div>
+				<div>
+					<table id="resizeMap">
+						<tr id="resizeMapLeft">
+							<td>left columns: </td>
+							<td><input type="button" value="-10"/></td>
+							<td><input type="button" value="-1"/></td>
+							<td><input type="button" value="+1"/></td>
+							<td><input type="button" value="+10"/></td>
+						</tr>
+						<tr id="resizeMapRight">
+							<td>right columns:&nbsp;</td>
+							<td><input type="button" value="-10"/></td>
+							<td><input type="button" value="-1"/></td>
+							<td><input type="button" value="+1"/></td>
+							<td><input type="button" value="+10"/></td>
+						</tr>
+						<tr id="resizeMapTop">
+							<td>top rows: </td>
+							<td><input type="button" value="-10"/></td>
+							<td><input type="button" value="-1"/></td>
+							<td><input type="button" value="+1"/></td>
+							<td><input type="button" value="+10"/></td>
+						</tr>
+						<tr id="resizeMapBottom">
+							<td>bottom rows: </td>
+							<td><input type="button" value="-10"/></td>
+							<td><input type="button" value="-1"/></td>
+							<td><input type="button" value="+1"/></td>
+							<td><input type="button" value="+10"/></td>
+						</tr>
+					</table>
+				</div>
+				<div>
+					Grid:
+					<select id="grid_thickness">
+						<option value="0">none</option>
+						<option value="1" selected="selected">thin</option>
+						<option value="2">thick</option>
+					</select>
+					<select id="grid_color">
+						<option>red</option>
+						<option>orange</option>
+						<option>yellow</option>
+						<option>green</option>
+						<option>blue</option>
+						<option>purple</option>
+						<option>black</option>
+						<option>gray</option>
+						<option>white</option>
+						<option>pink</option>
+						<option>brown</option>
+					</select>
+				</div>
+				<div>
+					Wall:
+					<select id="wall_thickness">
+						<option value="3" selected="selected">thin</option>
+						<option value="6">thick</option>
+					</select>
+					<select id="wall_color">
+						<option>red</option>
+						<option>orange</option>
+						<option>yellow</option>
+						<option>green</option>
+						<option>blue</option>
+						<option>purple</option>
+						<option>black</option>
+						<option>gray</option>
+						<option>white</option>
+						<option>pink</option>
+						<option>brown</option>
+					</select>
+				</div>
+				<div>
+					Door:
+					<select id="door_thickness">
+						<option value="3" selected="selected">thin</option>
+						<option value="6">thick</option>
+					</select>
+					<select id="door_color">
+						<option>red</option>
+						<option>orange</option>
+						<option>yellow</option>
+						<option>green</option>
+						<option>blue</option>
+						<option>purple</option>
+						<option>black</option>
+						<option>gray</option>
+						<option>white</option>
+						<option>pink</option>
+						<option>brown</option>
+					</select>
+				</div>
+				<div>
+					Zoom:
+					<select id="min_zoom">
+						<option value="25">25%</option>
+						<option value="50">50%</option>
+						<option value="100">100%</option>
+						<option value="200">200%</option>
+						<option value="400">400%</option>
+					</select>
+					-
+					<select id="max_zoom">
+						<option value="25">25%</option>
+						<option value="50">50%</option>
+						<option value="100">100%</option>
+						<option value="200">200%</option>
+						<option value="400">400%</option>
+					</select>
+				</div>
+				<div>
+					Rotate:
+					<select id="min_rotate">
+						<option value="-180">-180&deg;</option>
+						<option value="-135">-135&deg;</option>
+						<option value="-90">-90&deg;</option>
+						<option value="-45">-45&deg;</option>
+						<option value="0">0&deg;</option>
+					</select>
+					-
+					<select id="max_rotate">
+						<option value="180">180&deg;</option>
+						<option value="135">135&deg;</option>
+						<option value="90">90&deg;</option>
+						<option value="45">45&deg;</option>
+						<option value="0">0&deg;</option>
+					</select>
+					<select id="mapTilt">
+						<option value="[30,90]" selected="selected">free tilt</option>
+						<option value="[30,30]">side view</option>
+						<option value="[90,90]">top view</option>
+					</select>
 				</div>
 				<div>
 					Owners:
@@ -492,7 +544,7 @@
 			<div class="content" data-tab="piece list">
 				<div id="pieceList">
 					<div class="template">
-						<span class="ellipsis pieceColumn">
+						<span class="ellipsis pieceListRow">
 							<a class="link">
 								<img class="inlineImage" src="images/piece/rogue.png"/>
 								<span class="name">rogue</span>
