@@ -1,6 +1,8 @@
 LT.RESOLUTION = 62;
 LT.FOG_IMAGE = 44;
+LT.GUTTERS = 32;
 
+LT.images = {};
 LT.colorMaps = {};
 LT.toggleFog = 0;
 LT.dragging = 0;
@@ -8,6 +10,15 @@ LT.pieceMoving = false;
 
 $(function () { // This anonymous function runs after the page loads.
 	LT.mapPanel = new LT.Panel("map");
+	LT.mapPanel.resize = function () {
+		var width = LT.mapPanel.getWidth();
+		$("#pieceName").width(width - $("#renamePiece").width() - LT.GUTTERS);
+		$("#pieceCharacter").width(width - $("#deletePiece").width() - LT.GUTTERS - 2);
+		$("#pieceURL").width(width - $("#changePieceURL").width() - LT.GUTTERS);
+		$("#pieceCanvas")[0].width = width - $("#pieceCanvasMode").width() - LT.GUTTERS;
+		$("#pieceCanvas")[0].width -= $("#pieceCanvas")[0].width % 2; // even number
+		if (LT.repaintPieceCanvas) LT.repaintPieceCanvas();
+	};
 //	LT.hideMapTabs();
 
 	// disable map panel button until a campaign is loaded
@@ -67,7 +78,6 @@ $(function () { // This anonymous function runs after the page loads.
 	});
 
 	// load images
-	LT.images = {};
 	$.get("images/images.json", function (data) {
 
 		// read pieces
@@ -79,6 +89,7 @@ $(function () { // This anonymous function runs after the page loads.
 					title: image.file,
 					src: "images/" + image.file
 				}).click(function () {
+					// TODO: place new piece at the center of the screen
 					$.post("php/Piece.create.php", {
 						"map": LT.currentMap.id,
 						"image": JSON.stringify(image)
@@ -548,10 +559,11 @@ LT.loadPieces = function () {
 				LT.mapPanel.showTab("piece info");
 				LT.mapPanel.selectTab("piece info");
 				// draw image and center point on canvas;
-				var canvas = $("#pieceImage").off("click").click(function () {
+				var canvas = $("#pieceCanvas").off("click").click(function () {
+					var center = [canvas.width * 0.5, canvas.height * 0.5];
 					var x = LT.dragX - center[0] - $(this).offset().left;
 					var y = LT.dragY - center[1] - $(this).offset().top;
-					switch ($("#pieceImageMode").val()) {
+					switch ($("#pieceCanvasMode").val()) {
 						case "center": piece.image.center = [
 							piece.image.center[0] + x * (mirror ? -1 : 1),
 							piece.image.center[1] + y]; break;
@@ -566,14 +578,6 @@ LT.loadPieces = function () {
 					LT.savePieceSettings(piece);
 				})[0];
 				var context = canvas.getContext("2d");
-				var center = [canvas.width * 0.5, canvas.height * 0.5];
-				var offset = [
-					center[0] - piece.image.center[0],
-					center[1] - piece.image.center[1]];
-/*
-				if (mirror)
-					offset[0] = center[0] + piece.image.center[0] - piece.image.size[0];
-*/
 				var drawX = function (context, x, y, length, thickness, color) {
 					context.lineCap = "round";
 					context.strokeStyle = color;
@@ -629,8 +633,13 @@ LT.loadPieces = function () {
 					context.stroke();
 					context.restore();
 				};
-				var paint = function (x, y) {
+				LT.repaintPieceCanvas = function (x, y) {
+					if (!LT.pieceSelected) return;
 					var radius = LT.RESOLUTION / 2;
+					var center = [canvas.width * 0.5, canvas.height * 0.5];
+					var offset = [
+						center[0] - piece.image.center[0],
+						center[1] - piece.image.center[1]];
 					context.clearRect(0, 0, canvas.width, canvas.height);
 					// draw piece image
 					context.save();
@@ -644,22 +653,22 @@ LT.loadPieces = function () {
 							piece.image.size[1] / image.height);
 						context.scale(scale3, scale3);
 					}
-					if ($("#pieceImageMode").val() != "scale")
+					if ($("#pieceCanvasMode").val() != "scale")
 						context.scale(scale, scale);
 					else if (isNaN(x) || isNaN(y)) {
 						if (scale != 1) context.scale(scale, scale);
-						$("#pieceImageDebug").text(Math.round(scale * 100) + "%");
+						$("#pieceCanvasText").text(Math.round(scale * 100) + "%");
 					} else {
 						var scale2 = Math.sqrt(Math.pow(x - center[0], 2) + Math.pow(y - center[1], 2)) / radius;
 						context.scale(scale2, scale2)
-						$("#pieceImageDebug").text(Math.round(scale2 * 100) + "%");
+						$("#pieceCanvasText").text(Math.round(scale2 * 100) + "%");
 					}
 					context.translate(-center[0], -center[1]);
 					var pic = element[0].tagName == "CANVAS" ? element[0] : image;
 					context.drawImage(pic, 0, 0);
 					context.restore();
 					// draw center, base, scale or facing control
-					switch ($("#pieceImageMode").val()) {
+					switch ($("#pieceCanvasMode").val()) {
 						case "center":
 							if (isNaN(x)) x = center[0];
 							if (isNaN(y)) y = center[1];
@@ -668,7 +677,7 @@ LT.loadPieces = function () {
 							// TODO: scaled and rotated images
 							x = piece.image.center[0] + (x - center[0]) * (mirror ? -1 : 1);
 							y = piece.image.center[1] + (y - center[1]);
-							$("#pieceImageDebug").text([x, y].join(", ")); break;
+							$("#pieceCanvasText").text([x, y].join(", ")); break;
 						case "base":
 							var w = piece.image.base[0];
 							var h = piece.image.base[1];
@@ -678,7 +687,7 @@ LT.loadPieces = function () {
 								h = Math.max(1, Math.ceil(Math.abs((y - center[1]) / radius)));
 							drawBase(context, center[0], center[1], w, h, LT.RESOLUTION, 4, "white");
 							drawBase(context, center[0], center[1], w, h, LT.RESOLUTION, 1.2, "black");
-							$("#pieceImageDebug").text([w, h].join(", ")); break;
+							$("#pieceCanvasText").text([w, h].join(", ")); break;
 /*
 						case "scale":
 							drawScale(context, center[0], center[1], radius * scale, 4, "white");
@@ -689,7 +698,7 @@ LT.loadPieces = function () {
 								drawScale(context, center[0], center[1], radius * scale2, 4, "white");
 								drawScale(context, center[0], center[1], radius * scale2, 1.5, "black");
 							}
-							$("#pieceImageDebug").text(Math.round(scale2 * 100) + "%"); break;
+							$("#pieceCanvasText").text(Math.round(scale2 * 100) + "%"); break;
 */
 						case "facing":
 							var a = piece.image.angle ? Math.PI * piece.image.angle / 180 : 0;
@@ -697,17 +706,17 @@ LT.loadPieces = function () {
 								a = Math.atan2(x - center[0], -(y - center[1]));
 							drawArrow(context, center[0], center[1], a, radius * 1.25, 0.5, 0.2, 0.1, 4, "white");
 							drawArrow(context, center[0], center[1], a, radius * 1.25, 0.5, 0.2, 0.1, 1.5, "black");
-							$("#pieceImageDebug").text(Math.round(180 * a / Math.PI) + String.fromCharCode(176)); break;
+							$("#pieceCanvasText").text(Math.round(180 * a / Math.PI) + String.fromCharCode(176)); break;
 					}
 				};
-				paint();
+				LT.repaintPieceCanvas();
 
-				$("#pieceImage").off("mouseout").on("mouseout", paint).off("mousemove").on("mousemove", function () {
-					paint(
+				$("#pieceCanvas").off("mousemove").on("mousemove", function () {
+					LT.repaintPieceCanvas(
 						LT.dragX - $(this).offset().left,
 						LT.dragY - $(this).offset().top);
-				});
-				$("#pieceImageMode").off("change").change(paint);
+				}).off("mouseout").on("mouseout", LT.repaintPieceCanvas);
+				$("#pieceCanvasMode").off("change").change(LT.repaintPieceCanvas);
 				$("#pieceName").text(piece.name || "[unnamed piece]");
 				$("#renamePiece").off("click").click(function () {
 					var newName = prompt("new piece name", piece.name || "");
