@@ -139,9 +139,13 @@ LT.refreshCampaign = function () {
 						campaign: LT.currentCampaign.id
 					}, function (theUsers) {
 
+						var currentUserCanEditThisCampaign = false;
+
 						// add campaign owners, members and guests to campaign info tab
 						$("#campaignUsers tr:not(.template)").remove();
 						$.each(theUsers, function (i, user) {
+							if (user.id == LT.currentUser.id && user.permission == "owner")
+								currentUserCanEditThisCampaign = true;
 							var copy = $("#campaignUsers .template").clone().removeClass("template");
 							copy.find(".name").text(user.name || user.email);
 							copy.find(".permission").change(function () {
@@ -183,6 +187,10 @@ LT.refreshCampaign = function () {
 						// add campaign owners, members and guests to LT.users
 						LT.players = theUsers;
 						LT.indexUsers();
+
+						// show or hide controls based on whether you are a campaign owner
+						if (currentUserCanEditThisCampaign) LT.mapPanel.enable();
+						$(".campaignOwner").toggle(currentUserCanEditThisCampaign);
 
 					}); // $.get("php/Campaign.users.php", {
 				} // if (data.users_modified > LT.currentCampaign.users_modified) {
@@ -233,8 +241,7 @@ LT.refreshCampaign = function () {
 					copy.appendTo("#turns");
 				});
 
-				// enable map panel button and load or unload maps
-				LT.mapPanel.enable();
+				// load or unload maps
 				if (data.map) {
 //					LT.showMapTabs();
 					if (LT.currentCampaign.map != data.map) LT.loadMap(data.map);
