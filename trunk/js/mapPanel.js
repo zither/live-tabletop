@@ -838,13 +838,25 @@ LT.loadPieces = function () {
 						LT.savePieceSettings(piece);
 					}
 				});
+
+				// TODO: character selector
+
 				$("#deletePiece").off("click").click(deletePiece);
-				$("#pieceColor").val(piece.color).off("change").change(function () {
-					piece.color = $(this).val();
+				$("#pieceView").val(piece.image.view || "top").off("change").change(function () {
+					piece.image.view = $(this).val();
 					LT.savePieceSettings(piece);
 				});
 				$("#pieceDepth").val(piece.image.z || 0).off("change").change(function () {
 					piece.image.z = $(this).val();
+					LT.savePieceSettings(piece);
+				});
+				$("#pieceBase").val(piece.image.baseType || "none").off("change").change(function () {
+					piece.image.baseType = $(this).val();
+					if (piece.image.baseType == "none") delete piece.image.baseType;
+					LT.savePieceSettings(piece);
+				});
+				$("#pieceColor").val(piece.color).off("change").change(function () {
+					piece.color = $(this).val();
 					LT.savePieceSettings(piece);
 				});
 				$("#pieceURL").text(piece.image.url || "");
@@ -864,7 +876,6 @@ LT.loadPieces = function () {
 				});
 
 				// TODO: angle should not be tied to image
-				// TODO: character selector
 
 			}; // var select = function () {
 
