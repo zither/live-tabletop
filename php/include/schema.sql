@@ -762,6 +762,7 @@ BEGIN
 	THEN
 		DELETE FROM campaigns WHERE `id` = the_campaign;
 	END IF;
+	UPDATE campaigns SET `users_modified` = NOW() WHERE `id` = the_campaign;
 	COMMIT;
 END;
 
@@ -779,6 +780,7 @@ BEGIN
 		UPDATE campaign_users SET `viewing` = 1
 			WHERE `user` = the_user AND `campaign` = the_campaign;
 	END IF;
+	UPDATE campaigns SET `users_modified` = NOW() WHERE `id` = the_campaign;
 	COMMIT;
 END;
 
@@ -791,6 +793,7 @@ BEGIN
 /* delete ALL guests who are not viewing the campaign including this user
 if it is a guest and any others who did not log out properly. */
 	DELETE FROM campaign_users WHERE `permission` IS NULL AND `viewing` = 0;
+	UPDATE campaigns SET `users_modified` = NOW() WHERE `id` = the_campaign;
 	COMMIT;
 END;
 
@@ -798,8 +801,11 @@ END;
 CREATE PROCEDURE update_campaign_user_avatar
 	(IN the_user INT, IN the_campaign INT, IN the_avatar INT)
 BEGIN
+	START TRANSACTION;
 	UPDATE campaign_users SET `avatar` = the_avatar
 		WHERE `user` = the_user AND `campaign` = the_campaign;
+	UPDATE campaigns SET `users_modified` = NOW() WHERE `id` = the_campaign;
+	COMMIT;
 END;
 
 /* User disowns the campaign
@@ -820,6 +826,7 @@ BEGIN
 	THEN
 		DELETE FROM campaigns WHERE `id` = the_campaign;
 	END IF;
+	UPDATE campaigns SET `users_modified` = NOW() WHERE `id` = the_campaign;
 	COMMIT;
 END;
 

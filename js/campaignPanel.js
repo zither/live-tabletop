@@ -164,7 +164,7 @@ LT.refreshCampaign = function () {
 										return;
 									}
 								}
-								if (after == "guest") $.post("php/Campaign.permission.php", {
+								if (after != "guest") $.post("php/Campaign.permission.php", {
 									"campaign": LT.currentCampaign.id,
 									"permission": after,
 									"user": user.id}, function () {LT.refreshCampaign();});
@@ -236,7 +236,7 @@ LT.refreshCampaign = function () {
 				// enable map panel button and load or unload maps
 				LT.mapPanel.enable();
 				if (data.map) {
-					LT.showMapTabs();
+//					LT.showMapTabs();
 					if (LT.currentCampaign.map != data.map) LT.loadMap(data.map);
 				} else {
 					LT.hideMapTabs();
