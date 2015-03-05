@@ -1,139 +1,138 @@
 {
-	"pieces": {
-
-		"background": [
-			{"id": 1, "view": "top", "size": [945, 945], "center": [472.5, 472.5], "base": [21, 21], "file": "background/abaddon45.png", "z": -2}
+	"pieces":{
+		"background":[
+			{"id":1,"view":"top","size":[945,945],"center":[472.5,472.5],"base":[21,21],"file":"background/abaddon45.png","z":-2}
 		],
-		"character": [
-			{"id": 100, "view": "side", "size": [72, 72], "center": [36, 54], "base": [1, 1], "palette": "wesnoth", "file": "piece/adept-die1.png"},
-			{"id": 101, "view": "side", "size": [72, 72], "center": [36, 54], "base": [1, 1], "palette": "wesnoth", "file": "piece/ambusher.png"},
-			{"id": 102, "view": "side", "size": [96, 96], "center": [48, 72], "base": [1, 1], "palette": "wesnoth", "file": "piece/armageddon-fire-inhale-3.png"},
-			{"id": 103, "view": "side", "size": [72, 72], "center": [36, 54], "base": [1, 1], "palette": "wesnoth", "file": "piece/dark-sorcerer.png"},
-			{"id": 104, "view": "side", "size": [72, 72], "center": [36, 54], "base": [1, 1], "palette": "wesnoth", "file": "piece/dark-sorcerer+female.png"},
-			{"id": 105, "view": "side", "size": [72, 72], "center": [36, 54], "base": [1, 1], "palette": "wesnoth", "file": "piece/fighter-axe-1.png"},
-			{"id": 106, "view": "side", "size": [72, 72], "center": [36, 54], "base": [1, 1], "palette": "wesnoth", "file": "piece/hero.png"},
-			{"id": 107, "view": "side", "size": [72, 72], "center": [36, 54], "base": [1, 1], "palette": "wesnoth", "file": "piece/highwayman-melee-1.png"},
-			{"id": 108, "view": "side", "size": [72, 72], "center": [36, 54], "base": [1, 1], "palette": "wesnoth", "file": "piece/mage+female-die-2.png"},
-			{"id": 109, "view": "side", "size": [72, 72], "center": [36, 54], "base": [1, 1], "palette": "wesnoth", "file": "piece/mage+female-die-4.png"},
-			{"id": 110, "view": "side", "size": [72, 72], "center": [36, 54], "base": [1, 1], "palette": "wesnoth", "file": "piece/peasant-ranged.png"},
-			{"id": 111, "view": "side", "size": [72, 72], "center": [36, 54], "base": [1, 1], "palette": "wesnoth", "file": "piece/priest.png"},
-			{"id": 112, "view": "side", "size": [72, 72], "center": [36, 54], "base": [1, 1], "palette": "wesnoth", "file": "piece/red-mage-attack-staff-1.png"},
-			{"id": 113, "view": "side", "size": [72, 72], "center": [36, 54], "base": [1, 1], "palette": "wesnoth", "file": "piece/red-mage+female-attack-staff-1.png"},
-			{"id": 114, "view": "side", "size": [72, 72], "center": [36, 54], "base": [1, 1], "palette": "wesnoth", "file": "piece/rogue.png"},
-			{"id": 115, "view": "side", "size": [72, 72], "center": [36, 54], "base": [1, 1], "palette": "wesnoth", "file": "piece/rogue+female-ranged.png"},
-			{"id": 116, "view": "side", "size": [72, 72], "center": [36, 54], "base": [1, 1], "palette": "wesnoth", "file": "piece/shocktrooper-attack-1.png"},
-			{"id": 117, "view": "side", "size": [72, 72], "center": [36, 54], "base": [1, 1], "palette": "wesnoth", "file": "piece/skeleton.png"},
-			{"id": 118, "view": "side", "size": [72, 72], "center": [36, 54], "base": [1, 1], "palette": "wesnoth", "file": "piece/soulless-attack.png"},
-			{"id": 119, "view": "side", "size": [72, 72], "center": [36, 54], "base": [1, 1], "palette": "wesnoth", "file": "piece/spearman.png"},
-			{"id": 120, "view": "side", "size": [72, 72], "center": [36, 54], "base": [1, 1], "palette": "wesnoth", "file": "piece/warrior.png"},
-			{"id": 2, "view": "side", "size": [55, 63], "center": [24, 58], "base": [1, 1], "file": "piece/priest.png"},
-			{"id": 3, "view": "side", "size": [50, 56], "center": [21, 51], "base": [1, 1], "file": "piece/rogue.png"}
+		"character":[
+			{"id":100,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/adept-die1.png"},
+			{"id":101,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/ambusher.png"},
+			{"id":102,"view":"side","size":[96,96],"center":[48,72],"base":[1,1],"palette":"wesnoth","file":"piece/armageddon-fire-inhale-3.png"},
+			{"id":103,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/dark-sorcerer.png"},
+			{"id":104,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/dark-sorcerer+female.png"},
+			{"id":105,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/fighter-axe-1.png"},
+			{"id":106,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/hero.png"},
+			{"id":107,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/highwayman-melee-1.png"},
+			{"id":108,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/mage+female-die-2.png"},
+			{"id":109,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/mage+female-die-4.png"},
+			{"id":110,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/peasant-ranged.png"},
+			{"id":111,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/priest.png"},
+			{"id":112,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/red-mage-attack-staff-1.png"},
+			{"id":113,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/red-mage+female-attack-staff-1.png"},
+			{"id":114,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/rogue.png"},
+			{"id":115,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/rogue+female-ranged.png"},
+			{"id":116,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/shocktrooper-attack-1.png"},
+			{"id":117,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/skeleton.png"},
+			{"id":118,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/soulless-attack.png"},
+			{"id":119,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/spearman.png"},
+			{"id":120,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/warrior.png"},
+			{"id":2,"view":"side","size":[55,63],"center":[24,58],"base":[1,1],"file":"piece/priest.png"},
+			{"id":3,"view":"side","size":[50,56],"center":[21,51],"base":[1,1],"file":"piece/rogue.png"}
 		]
 	},
-	"portraits": [
-			{"id": 121, "file": "portrait/bandit.png"},
-			{"id": 122, "file": "portrait/duelist.png"},
-			{"id": 123, "file": "portrait/fighter.png"},
-			{"id": 124, "file": "portrait/fighter-2.png"},
-			{"id": 125, "file": "portrait/footpad+female.png"},
-			{"id": 126, "file": "portrait/impaler.png"},
-			{"id": 127, "file": "portrait/inferno.png"},
-			{"id": 128, "file": "portrait/iron-mauler.png"},
-			{"id": 129, "file": "portrait/mage-red.png"},
-			{"id": 130, "file": "portrait/mage-red+female.png"},
-			{"id": 131, "file": "portrait/necromancer.png"},
-			{"id": 132, "file": "portrait/necromancer+female.png"},
-			{"id": 133, "file": "portrait/shadow.png"},
-			{"id": 134, "file": "portrait/skeleton.png"},
-			{"id": 135, "file": "portrait/skirmisher.png"},
-			{"id": 136, "file": "portrait/thief.png"},
-			{"id": 137, "file": "portrait/thief+female.png"},
-			{"id": 138, "file": "portrait/troll.png"}
+	"portraits":[
+			{"id":121,"file":"portrait/bandit.png"},
+			{"id":122,"file":"portrait/duelist.png"},
+			{"id":123,"file":"portrait/fighter.png"},
+			{"id":124,"file":"portrait/fighter-2.png"},
+			{"id":125,"file":"portrait/footpad+female.png"},
+			{"id":126,"file":"portrait/impaler.png"},
+			{"id":127,"file":"portrait/inferno.png"},
+			{"id":128,"file":"portrait/iron-mauler.png"},
+			{"id":129,"file":"portrait/mage-red.png"},
+			{"id":130,"file":"portrait/mage-red+female.png"},
+			{"id":131,"file":"portrait/necromancer.png"},
+			{"id":132,"file":"portrait/necromancer+female.png"},
+			{"id":133,"file":"portrait/shadow.png"},
+			{"id":134,"file":"portrait/skeleton.png"},
+			{"id":135,"file":"portrait/skirmisher.png"},
+			{"id":136,"file":"portrait/thief.png"},
+			{"id":137,"file":"portrait/thief+female.png"},
+			{"id":138,"file":"portrait/troll.png"}
 	],
-	"tiles": {
-		"pit": [
-			{"id": 4, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "chasm/abyss-1.png", "layer": 0},
-			{"id": 5, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "chasm/depths.png", "layer": 1},
-			{"id": 44, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "void/void.png", "layer": 2},
-			{"id": 62, "size": [144, 144], "center": [72, 72], "hex": [72, 72], "square": [72, 72], "file": "tile/void-blended.png", "layer": 3},
-			{"id": 76, "size": [72, 72], "center": [72, 72], "hex": [72, 72], "square": [72, 72], "file": "tile/void.png", "layer": 4},
-			{"id": 47, "size": [144, 144], "center": [72, 72], "hex": [72, 72], "square": [72, 72], "file": "tile/black-blended.png", "layer": 5},
-			{"id": 64, "size": [72, 72], "center": [72, 72], "hex": [72, 72], "square": [72, 72], "file": "tile/black.png", "layer": 6},
-			{"id": 56, "size": [144, 144], "center": [72, 72], "hex": [72, 72], "square": [72, 72], "file": "tile/lava-blended.png", "layer": 7},
-			{"id": 70, "size": [72, 72], "center": [72, 72], "hex": [72, 72], "square": [72, 72], "file": "tile/lava.png", "layer": 8}
+	"tiles":{
+		"pit":[
+			{"id":4,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"chasm/abyss-1.png","layer":0},
+			{"id":5,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"chasm/depths.png","layer":1},
+			{"id":44,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"void/void.png","layer":2},
+			{"id":62,"size":[144,144],"center":[72,72],"hex":[72,72],"square":[72,72],"file":"tile/void-blended.png","layer":3},
+			{"id":76,"size":[72,72],"center":[36,36],"hex":[72,72],"square":[72,72],"file":"tile/void.png","layer":4},
+			{"id":47,"size":[144,144],"center":[72,72],"hex":[72,72],"square":[72,72],"file":"tile/black-blended.png","layer":5},
+			{"id":64,"size":[72,72],"center":[36,36],"hex":[72,72],"square":[72,72],"file":"tile/black.png","layer":6},
+			{"id":56,"size":[144,144],"center":[72,72],"hex":[72,72],"square":[72,72],"file":"tile/lava-blended.png","layer":7},
+			{"id":70,"size":[72,72],"center":[36,36],"hex":[72,72],"square":[72,72],"file":"tile/lava.png","layer":8}
 		],
-		"water": [
-			{"id": 43, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "swamp/water-1.png", "layer": 10},
-			{"id": 45, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "water/ford.png", "layer": 11},
-			{"id": 46, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "water/ocean-long-blend-A01.png", "layer": 12},
-			{"id": 63, "size": [144, 144], "center": [72, 72], "hex": [72, 72], "square": [72, 72], "file": "tile/water-blended.png", "layer": 13},
-			{"id": 55, "size": [144, 144], "center": [72, 72], "hex": [72, 72], "square": [72, 72], "file": "tile/islands-blended.png", "layer": 14},
-			{"id": 69, "size": [72, 72], "center": [72, 72], "hex": [72, 72], "square": [72, 72], "file": "tile/islands.png", "layer": 15}
+		"water":[
+			{"id":43,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"swamp/water-1.png","layer":10},
+			{"id":45,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"water/ford.png","layer":11},
+			{"id":46,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"water/ocean-long-blend-A01.png","layer":12},
+			{"id":63,"size":[144,144],"center":[72,72],"hex":[72,72],"square":[72,72],"file":"tile/water-blended.png","layer":13},
+			{"id":55,"size":[144,144],"center":[72,72],"hex":[72,72],"square":[72,72],"file":"tile/islands-blended.png","layer":14},
+			{"id":69,"size":[72,72],"center":[36,36],"hex":[72,72],"square":[72,72],"file":"tile/islands.png","layer":15}
 		],
-		"path": [
-			{"id": 8, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "cave/flagstones-dark-1.png", "layer": 20},
-			{"id": 13, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "flat/desert-road-1.png", "layer": 21},
-			{"id": 14, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "flat/road-1.png", "layer": 22},
-			{"id": 15, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "flat/road-clean-1.png", "layer": 23},
-			{"id": 16, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "flat/stone-path-1.png", "layer": 24},
-			{"id": 61, "size": [144, 144], "center": [72, 72], "hex": [72, 72], "square": [72, 72], "file": "tile/stone-blended.png", "layer": 25},
-			{"id": 75, "size": [72, 72], "center": [72, 72], "hex": [72, 72], "square": [72, 72], "file": "tile/stone.png", "layer": 26}
+		"path":[
+			{"id":8,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"cave/flagstones-dark-1.png","layer":20},
+			{"id":13,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"flat/desert-road-1.png","layer":21},
+			{"id":14,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"flat/road-1.png","layer":22},
+			{"id":15,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"flat/road-clean-1.png","layer":23},
+			{"id":16,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"flat/stone-path-1.png","layer":24},
+			{"id":61,"size":[144,144],"center":[72,72],"hex":[72,72],"square":[72,72],"file":"tile/stone-blended.png","layer":25},
+			{"id":75,"size":[72,72],"center":[36,36],"hex":[72,72],"square":[72,72],"file":"tile/stone.png","layer":26}
 		],
-		"dirt": [
-			{"id": 42, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "swamp/mud-long-1.png", "layer": 30},
-			{"id": 6, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "cave/bank-1.png", "layer": 31},
-			{"id": 7, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "cave/earthy-floor-1.png", "layer": 32},
-			{"id": 9, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "cave/floor-1.png", "layer": 32},
-			{"id": 11, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "flat/bank-1.png", "layer": 34},
-			{"id": 12, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "flat/bank-to-ice-1.png", "layer": 35},
-			{"id": 17, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "flat/dirt-1.png", "layer": 36},
-			{"id": 18, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "flat/dirt-dark-1.png", "layer": 37},
-			{"id": 40, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "sand/beach-1.png", "layer": 38},
-			{"id": 41, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "sand/desert-1.png", "layer": 39},
-			{"id": 59, "size": [144, 144], "center": [72, 72], "hex": [72, 72], "square": [72, 72], "file": "tile/sand-blended.png", "layer": 40}
+		"dirt":[
+			{"id":42,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"swamp/mud-long-1.png","layer":30},
+			{"id":6,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"cave/bank-1.png","layer":31},
+			{"id":7,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"cave/earthy-floor-1.png","layer":32},
+			{"id":9,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"cave/floor-1.png","layer":32},
+			{"id":11,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"flat/bank-1.png","layer":34},
+			{"id":12,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"flat/bank-to-ice-1.png","layer":35},
+			{"id":17,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"flat/dirt-1.png","layer":36},
+			{"id":18,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"flat/dirt-dark-1.png","layer":37},
+			{"id":40,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"sand/beach-1.png","layer":38},
+			{"id":41,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"sand/desert-1.png","layer":39},
+			{"id":59,"size":[144,144],"center":[72,72],"hex":[72,72],"square":[72,72],"file":"tile/sand-blended.png","layer":40}
 		],
-		"grass": [
-			{"id": 30, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "grass/leaf-litter-long-1.png", "layer": 40},
-			{"id": 23, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "grass/dry-abrupt-1.png", "layer": 41},
-			{"id": 24, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "grass/dry-medium-1.png", "layer": 42},
-			{"id": 31, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "grass/semi-dry-abrupt-1.png", "layer": 43},
-			{"id": 32, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "grass/semi-dry-medium-1.png", "layer": 44},
-			{"id": 28, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "grass/green-abrupt-1.png", "layer": 45},
-			{"id": 29, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "grass/green-medium-2.png", "layer": 46},
-			{"id": 52, "size": [144, 144], "center": [72, 72], "hex": [72, 72], "square": [72, 72], "file": "tile/grass-blended.png", "layer": 47},
-			{"id": 26, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "grass/flowers-abrupt.png", "layer": 48},
-			{"id": 27, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "grass/flowers-medium.png", "layer": 49}
+		"grass":[
+			{"id":30,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"grass/leaf-litter-long-1.png","layer":40},
+			{"id":23,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"grass/dry-abrupt-1.png","layer":41},
+			{"id":24,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"grass/dry-medium-1.png","layer":42},
+			{"id":31,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"grass/semi-dry-abrupt-1.png","layer":43},
+			{"id":32,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"grass/semi-dry-medium-1.png","layer":44},
+			{"id":28,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"grass/green-abrupt-1.png","layer":45},
+			{"id":29,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"grass/green-medium-2.png","layer":46},
+			{"id":52,"size":[144,144],"center":[72,72],"hex":[72,72],"square":[72,72],"file":"tile/grass-blended.png","layer":47},
+			{"id":26,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"grass/flowers-abrupt.png","layer":48},
+			{"id":27,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"grass/flowers-medium.png","layer":49}
 		],
-		"snow": [
-			{"id": 19, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "frozen/ice-1.png", "layer": 50},
-			{"id": 20, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "frozen/ice-to-water-1.png", "layer": 51},
-			{"id": 21, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "frozen/snow-1.png", "layer": 52},
-			{"id": 22, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "frozen/snow-to-water-1.png", "layer": 53}
+		"snow":[
+			{"id":19,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"frozen/ice-1.png","layer":50},
+			{"id":20,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"frozen/ice-to-water-1.png","layer":51},
+			{"id":21,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"frozen/snow-1.png","layer":52},
+			{"id":22,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"frozen/snow-to-water-1.png","layer":53}
 		],
-		"hill": [
-			{"id": 10, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "cave/hills-1.png", "layer": 61},
-			{"id": 33, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "hills/desert-1.png", "layer": 62},
-			{"id": 34, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "hills/dry-1.png", "layer": 63},
-			{"id": 25, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "hills/dry-to-water-1.png", "layer": 64},
-			{"id": 35, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "hills/regular-1.png", "layer": 65},
-			{"id": 36, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "hills/regular-to-water-1.png", "layer": 66},
-			{"id": 37, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "hills/snow-1.png", "layer": 67},
-			{"id": 38, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "hills/snow-to-water-1.png", "layer": 68}
+		"hill":[
+			{"id":10,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"cave/hills-1.png","layer":61},
+			{"id":33,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"hills/desert-1.png","layer":62},
+			{"id":34,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"hills/dry-1.png","layer":63},
+			{"id":25,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"hills/dry-to-water-1.png","layer":64},
+			{"id":35,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"hills/regular-1.png","layer":65},
+			{"id":36,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"hills/regular-to-water-1.png","layer":66},
+			{"id":37,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"hills/snow-1.png","layer":67},
+			{"id":38,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"hills/snow-to-water-1.png","layer":68}
 		],
-		"inside": [
-			{"id": 51, "size": [144, 144], "center": [72, 72], "hex": [72, 72], "square": [72, 72], "file": "tile/floor-blended.png", "layer": 74},
-			{"id": 67, "size": [72, 72], "center": [72, 72], "hex": [72, 72], "square": [72, 72], "file": "tile/floor.png", "layer": 74},
-			{"id": 39, "size": [144, 144], "center": [72, 72], "hex": [54, 72], "square": [50.91, 58.79], "file": "interior/wood-regular-1.png", "layer": 76},
-			{"id": 57, "size": [144, 144], "center": [72, 72], "hex": [72, 72], "square": [72, 72], "file": "tile/metal-blended.png", "layer": 79},
-			{"id": 71, "size": [72, 72], "center": [72, 72], "hex": [72, 72], "square": [72, 72], "file": "tile/metal.png", "layer": 79},
-			{"id": 60, "size": [144, 144], "center": [72, 72], "hex": [72, 72], "square": [72, 72], "file": "tile/stairs-blended.png", "layer": 80},
-			{"id": 74, "size": [72, 72], "center": [72, 72], "hex": [72, 72], "square": [72, 72], "file": "tile/stairs.png", "layer": 80},
-			{"id": 50, "size": [144, 144], "center": [72, 72], "hex": [72, 72], "square": [72, 72], "file": "tile/brick-blended.png", "layer": 81},
-			{"id": 66, "size": [72, 72], "center": [72, 72], "hex": [72, 72], "square": [72, 72], "file": "tile/brick.png", "layer": 81},
-			{"id": 48, "size": [144, 144], "center": [72, 72], "hex": [72, 72], "square": [72, 72], "file": "tile/books-blended.png", "layer": 82},
-			{"id": 65, "size": [72, 72], "center": [72, 72], "hex": [72, 72], "square": [72, 72], "file": "tile/books.png", "layer": 82},
-			{"id": 58, "size": [144, 144], "center": [72, 72], "hex": [72, 72], "square": [72, 72], "file": "tile/roof-blended.png", "layer": 83},
-			{"id": 72, "size": [72, 72], "center": [72, 72], "hex": [72, 72], "square": [72, 72], "file": "tile/roof.png", "layer": 83}
+		"inside":[
+			{"id":51,"size":[144,144],"center":[72,72],"hex":[72,72],"square":[72,72],"file":"tile/floor-blended.png","layer":74},
+			{"id":67,"size":[72,72],"center":[36,36],"hex":[72,72],"square":[72,72],"file":"tile/floor.png","layer":74},
+			{"id":39,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"interior/wood-regular-1.png","layer":76},
+			{"id":57,"size":[144,144],"center":[72,72],"hex":[72,72],"square":[72,72],"file":"tile/metal-blended.png","layer":79},
+			{"id":71,"size":[72,72],"center":[36,36],"hex":[72,72],"square":[72,72],"file":"tile/metal.png","layer":79},
+			{"id":60,"size":[144,144],"center":[72,72],"hex":[72,72],"square":[72,72],"file":"tile/stairs-blended.png","layer":80},
+			{"id":74,"size":[72,72],"center":[36,36],"hex":[72,72],"square":[72,72],"file":"tile/stairs.png","layer":80},
+			{"id":50,"size":[144,144],"center":[72,72],"hex":[72,72],"square":[72,72],"file":"tile/brick-blended.png","layer":81},
+			{"id":66,"size":[72,72],"center":[36,36],"hex":[72,72],"square":[72,72],"file":"tile/brick.png","layer":81},
+			{"id":48,"size":[144,144],"center":[72,72],"hex":[72,72],"square":[72,72],"file":"tile/books-blended.png","layer":82},
+			{"id":65,"size":[72,72],"center":[36,36],"hex":[72,72],"square":[72,72],"file":"tile/books.png","layer":82},
+			{"id":58,"size":[144,144],"center":[72,72],"hex":[72,72],"square":[72,72],"file":"tile/roof-blended.png","layer":83},
+			{"id":72,"size":[72,72],"center":[36,36],"hex":[72,72],"square":[72,72],"file":"tile/roof.png","layer":83}
 		]
 	}
 }
