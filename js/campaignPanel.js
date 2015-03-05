@@ -252,7 +252,7 @@ LT.refreshCampaign = function () {
 						$.each(theMessages, function (i, message) {
 							var name = "[unknown user]";
 							if (message.user in LT.users)
-								name = LT.users[message.user].name;
+								name = LT.users[message.user].name || LT.users[message.user].email;
 							copy = $("#chatOutput .template").clone().removeClass("template");
 							copy.find(".time").text("[" + LT.formatTime(message.time) + "]");
 							copy.find(".user").text(" " + name + ": ");
