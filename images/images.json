@@ -51,15 +51,16 @@
 	],
 	"tiles":{
 		"pit":[
-			{"id":4,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"chasm/abyss-1.png","layer":0},
-			{"id":5,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"chasm/depths.png","layer":1},
-			{"id":44,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"void/void.png","layer":2},
-			{"id":62,"size":[144,144],"center":[72,72],"hex":[72,72],"square":[72,72],"file":"tile/void-blended.png","layer":3},
-			{"id":76,"size":[72,72],"center":[36,36],"hex":[72,72],"square":[72,72],"file":"tile/void.png","layer":4},
-			{"id":47,"size":[144,144],"center":[72,72],"hex":[72,72],"square":[72,72],"file":"tile/black-blended.png","layer":5},
-			{"id":64,"size":[72,72],"center":[36,36],"hex":[72,72],"square":[72,72],"file":"tile/black.png","layer":6},
-			{"id":56,"size":[144,144],"center":[72,72],"hex":[72,72],"square":[72,72],"file":"tile/lava-blended.png","layer":7},
-			{"id":70,"size":[72,72],"center":[36,36],"hex":[72,72],"square":[72,72],"file":"tile/lava.png","layer":8}
+			{"id":140,"size":[288,288],"center":[144,144],"hex":[216,288],"square":[203.64,235.16],"file":"black-hex.png","layer":0},
+			{"id":4,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"chasm/abyss-1.png","layer":1},
+			{"id":5,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"chasm/depths.png","layer":2},
+			{"id":44,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"void/void.png","layer":3},
+			{"id":62,"size":[144,144],"center":[72,72],"hex":[72,72],"square":[72,72],"file":"tile/void-blended.png","layer":4},
+			{"id":76,"size":[72,72],"center":[36,36],"hex":[72,72],"square":[72,72],"file":"tile/void.png","layer":5},
+			{"id":47,"size":[144,144],"center":[72,72],"hex":[72,72],"square":[72,72],"file":"tile/black-blended.png","layer":6},
+			{"id":64,"size":[72,72],"center":[36,36],"hex":[72,72],"square":[72,72],"file":"tile/black.png","layer":7},
+			{"id":56,"size":[144,144],"center":[72,72],"hex":[72,72],"square":[72,72],"file":"tile/lava-blended.png","layer":8},
+			{"id":70,"size":[72,72],"center":[36,36],"hex":[72,72],"square":[72,72],"file":"tile/lava.png","layer":9}
 		],
 		"water":[
 			{"id":43,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[50.91,58.79],"file":"swamp/water-1.png","layer":10},
