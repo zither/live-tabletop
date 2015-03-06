@@ -306,37 +306,46 @@ $(function () { // This anonymous function runs after the page loads.
 	});
 
 	// map rotate, tilt and zoom controls
-	var transform = function () {
-		$("#map").css("transform", "scale(" + LT.zoom + "," + LT.zoom 
-			* Math.sin(Math.PI * LT.tilt / 180) + ") rotate(" + LT.rotate + "deg)");
-console.log([LT.zoom, LT.tilt, LT.rotate]);
-	};
 	$("#zoomOut").click(function () {
 		LT.zoom = Math.max(LT.zoom / 2 , LT.currentMap.min_zoom);
-		transform();
+		LT.transform();
 	});
 	$("#zoomIn").click(function () {
 		LT.zoom = Math.min(LT.zoom * 2, LT.currentMap.max_zoom);
-		transform();
+		LT.transform();
 	});
 	$("#rotateLeft").click(function () {
-		LT.rotate = Math.max(LT.rotate - 15, LT.currentMap.min_rotate);
-		transform();
+		if (LT.currentMap.max_rotate - LT.currentMap.min_rotate == 360)
+			LT.rotate = (LT.rotate - 15 + 540) % 360 - 180;
+		else LT.rotate = Math.max(LT.rotate - 15, LT.currentMap.min_rotate);
+		LT.transform();
 	});
 	$("#rotateRight").click(function () {
-		LT.rotate = Math.min(LT.rotate + 15, LT.currentMap.max_rotate);
-		transform();
+		if (LT.currentMap.max_rotate - LT.currentMap.min_rotate == 360)
+			LT.rotate = (LT.rotate + 15 + 540) % 360 - 180;
+		else LT.rotate = Math.min(LT.rotate + 15, LT.currentMap.max_rotate);
+		LT.transform();
 	});
 	$("#tiltDown").click(function () {
 		LT.tilt = Math.max(LT.tilt - 15, LT.currentMap.min_tilt);
-		transform();
+		LT.transform();
 	});
 	$("#tiltUp").click(function () {
 		LT.tilt = Math.min(LT.tilt + 15, LT.currentMap.max_tilt);
-		transform();
+		LT.transform();
 	});
 
 }); // $(function () { // This anonymous function runs after the page loads.
+
+// apply map rotation, tilt and zoom
+LT.transform = function () {
+	var stretch = Math.sin(Math.PI * LT.tilt / 180);
+	$("#map").css("transform", "scale(" + LT.zoom + ","
+		+ LT.zoom * stretch + ") rotate(" + LT.rotate + "deg)");
+	$("#map .flat").css("transform", "rotate(" + -LT.rotate + "deg)");
+	$("#map .front, #map .side").css("transform",
+		"rotate(" + -LT.rotate + "deg) scaleY(" + 1 / stretch + ")");
+};
 
 LT.hideMapTabs = function () {
 	LT.mapPanel.hideTab("map info");
@@ -695,16 +704,14 @@ LT.loadPieces = function () {
 			var angle = piece.image.angle || 0;
 			if (piece.image.view == "side" || piece.image.view == "front") angle = 0;
 			var style = {
-				width:  piece.image.size[0] + "px",
-				height: piece.image.size[1] + "px",
+				width:  piece.image.size[0] * scale + "px",
+				height: piece.image.size[1] * scale + "px",
 				left: piece.x * LT.RESOLUTION + "px",
 				top:  piece.y * LT.RESOLUTION + "px",
-				marginLeft: (-piece.image.center[0] - 1) + "px",
-				marginTop:  (-piece.image.center[1] - 1) + "px",
+				marginLeft: (-piece.image.center[0] * scale - 1) + "px",
+				marginTop:  (-piece.image.center[1] * scale - 1) + "px",
 			};
-			if (mirror) style.transform = "scale(-1, 1)";
-			if (angle) style.transform = "rotate(" + angle + "deg)";
-			if (scale != 1) style.transform += "scale(" + scale + ")";
+
 
 			var deletePiece = function () {
 				var name = "this piece"
@@ -934,20 +941,19 @@ LT.loadPieces = function () {
 			}; // var select = function () {
 
 			// visual piece element
+			var transform = "";
+			if (mirror) transform += "scaleX(-1)";
+			if (angle) transform += "rotate(" + angle + "deg)";
 			var image = new Image();
 			image.src = source;
 			image.onload = function () {
 				if (piece.image.palette) {
 					// convert image into canvas
-					var canvas = $("<canvas>").appendTo("#pieceLayer").attr({
-						width: piece.image.size[0],
-						height: piece.image.size[1],
-					}).css(style).css("z-index", piece.image.z || 0);
-					var context = canvas[0].getContext("2d");
+					var canvas = $("<canvas>")[0];
+					canvas.width = piece.image.size[0];
+					canvas.height = piece.image.size[1];
+					var context = canvas.getContext("2d");
 					context.drawImage(image, 0, 0);
-					element.remove();
-					element = canvas;
-					if (piece.image.z) element.css("z-index", piece.image.z);
 					// remap colors
 					var map = LT.colorMaps[piece.image.palette][piece.color];
 					var buffer = context.getImageData(0, 0, piece.image.size[0], piece.image.size[1]);
@@ -963,10 +969,12 @@ LT.loadPieces = function () {
 						}
 					}
 					context.putImageData(buffer, 0, 0);
+					// replace contents of visual piece element with canvas
+					element.empty().append($(canvas).css("transform", transform))
+						.css(style).css("z-index", piece.image.z || 0).addClass(piece.image.view);
 				}
 				// show piece in piece info tab.
 				if (piece.id == selectedPiece) select();
-			
 			};
 			var element = $("<div>").appendTo("#pieceLayer").append(
 				$("<div>").css({
@@ -975,8 +983,9 @@ LT.loadPieces = function () {
 					"background-image": "url(" + source + ")",
 					"background-repeat": "no-repeat",
 					"background-size": "contain",
+					"transform": transform,
 				})
-			).css(style).css("z-index", piece.image.z || 0);
+			).css(style).css("z-index", piece.image.z || 0).addClass(piece.image.view);
 
 			// clickable piece element
 			var mover = $("<div>").attr("title", piece.name).mousedown(function () {
@@ -992,7 +1001,7 @@ LT.loadPieces = function () {
 			}).mouseout(function () {
 				element.removeClass("selected");
 				return false;
-			}).appendTo("#clickPieceLayer").css(style);
+			}).appendTo("#clickPieceLayer").css(style).addClass(piece.image.view);
 
 			// piece list
 			var copy = $("#pieceList .template").clone().removeClass("template");
@@ -1014,41 +1023,10 @@ LT.loadPieces = function () {
 		}); // $.each(data, function (i, piece) {
 
 		LT.mapPanel.resize();
+		LT.transform();
 
 	}); // $.post("php/Map.pieces.php", {map: LT.currentMap.id}, function (data) {
 }; // LT.loadPieces = function () {
 
-/*
-<div class="statRow">
-	<span class="statName"></span>
-	<input type="text" name="value" size="1"/>
-	<div class="buttonDiv">-</div>
-</div>
-*/
-LT.readStats = function () {
-//	LT.Piece.statEditor.form.style.display = "block";
-	$(".statRow").remove();
-	$.each(LT.pieceSelected.getStats(), function (i, stat) {
-		$("<div>").addClass("statRow").insertBefore($("#submitStats")).append([
-			$("<span>").addClass("statName").text(stat.name + ": "),
-			$("<input>").attr({type: "text", name: "value", size: "1"}).text(stat.value),
-			$("<div>").addClass("buttonDiv").text("-").click(function () {
-				LT.pieceSelected.deleteStat(stat.name);
-				LT.readStats();
-			}),
-		]);
-	});
-};
-LT.updateStats = function () {
-	$.each(LT.pieceSelected.getStats(), function (i, stat) {
-		LT.pieceSelected.setStat(stat.name, stat.valueInput.value);
-	});
-	LT.readStats();
-};
-LT.addStat = function () {
-	LT.pieceSelected.setStat(LT.Piece.statEditor.newStatName.value,
-		LT.Piece.statEditor.newStatValue.value);
-	LT.readStats();
-};
 
 
