@@ -10,6 +10,10 @@ LT.toggleFog = 0;
 LT.dragging = 0;
 LT.pieceMoving = false;
 
+LT.rotate = 0;
+LT.tilt = 90;
+LT.zoom = 1;
+
 $(function () { // This anonymous function runs after the page loads.
 	LT.mapPanel = new LT.Panel("map");
 	LT.mapPanel.resize = function () {
@@ -301,6 +305,37 @@ $(function () { // This anonymous function runs after the page loads.
 		}
 	});
 
+	// map rotate, tilt and zoom controls
+	var transform = function () {
+		$("#map").css("transform", "scale(" + LT.zoom + "," + LT.zoom 
+			* Math.sin(Math.PI * LT.tilt / 180) + ") rotate(" + LT.rotate + "deg)");
+console.log([LT.zoom, LT.tilt, LT.rotate]);
+	};
+	$("#zoomOut").click(function () {
+		LT.zoom = Math.max(LT.zoom / 2 , LT.currentMap.min_zoom);
+		transform();
+	});
+	$("#zoomIn").click(function () {
+		LT.zoom = Math.min(LT.zoom * 2, LT.currentMap.max_zoom);
+		transform();
+	});
+	$("#rotateLeft").click(function () {
+		LT.rotate = Math.max(LT.rotate - 15, LT.currentMap.min_rotate);
+		transform();
+	});
+	$("#rotateRight").click(function () {
+		LT.rotate = Math.min(LT.rotate + 15, LT.currentMap.max_rotate);
+		transform();
+	});
+	$("#tiltDown").click(function () {
+		LT.tilt = Math.max(LT.tilt - 15, LT.currentMap.min_tilt);
+		transform();
+	});
+	$("#tiltUp").click(function () {
+		LT.tilt = Math.min(LT.tilt + 15, LT.currentMap.max_tilt);
+		transform();
+	});
+
 }); // $(function () { // This anonymous function runs after the page loads.
 
 LT.hideMapTabs = function () {
@@ -556,12 +591,15 @@ LT.loadTiles = function () {
 				if (fog) {
 					if (fogElement === null) fogElement = $("<img>").appendTo("#fogLayer");
 					var byWall = false;
-					$.each(["n", "ne", "se", "s", "sw", "nw"], function (i, direction) {
+					var directions = ["n", "ne", "se", "s", "sw", "nw"];
+					if (map.type == "square") directions = ["n", "e", "s", "w"];
+					$.each(directions, function (i, direction) {
 						var wallType = LT.grid.getWall(x, y, direction);
 						if (wallType == "wall" || wallType == "door") byWall = true;
 					});
-					var image = LT.images[LT.FOG_IMAGE];
-					if (byWall) image = LT.images[map.type == "hex" ? LT.FOG_HEX : LT.FOG_SQUARE];
+					var image = LT.images[LT.FOG_SQUARE];
+					if (map.type == "hex") image = LT.images[LT.FOG_HEX];
+					if (!byWall) image = LT.images[LT.FOG_IMAGE];
 					fogElement.attr("src", "images/" + image.file).css(style(image)).css("z-index", 0);
 				} else {
 					if (fogElement) fogElement.remove();
