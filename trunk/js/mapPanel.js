@@ -1,5 +1,7 @@
 LT.RESOLUTION = 62;
 LT.FOG_IMAGE = 44;
+LT.FOG_HEX = 140;
+LT.FOG_SQUARE = 64;
 LT.GUTTERS = 32;
 
 LT.images = {};
@@ -440,7 +442,8 @@ LT.loadTiles = function () {
 
 		// TODO: loading a map is really slow, investigate why
 
-		var height = LT.RESOLUTION, width = LT.RESOLUTION;
+		var height = LT.RESOLUTION;
+		var width = LT.RESOLUTION;
 		if (map.type == "hex") width = Math.round(width * 1.5 / Math.sqrt(3));
 
 		// empty and resize layers
@@ -458,7 +461,8 @@ LT.loadTiles = function () {
 			var y = Math.floor(i / (map.columns + 1));
 			var offset = map.type == "hex" ? 1 / 6 : 0;
 			var stagger = map.type == "hex" ? (x % 2) * 0.5 : 0;
-			var tileElement = null, fogElement = null;
+			var tileElement = null;
+			var fogElement = null;
 			var tile = x == 0 || y == 0 ? 0 : map.tiles[(x - 1) + (y - 1) * map.columns];
 			var fog = "1abcdefghijklmnopqrstuvwxyz".indexOf(flag) != -1 ? 1 : 0;
 
@@ -520,20 +524,10 @@ LT.loadTiles = function () {
 					createWallClickDetector(x, y + 1, "ne",  1,  stagger,       1/3, 1/2);
 			}
 
-			// function to create or update the fog or tile image element
-			var updateImageElement = function (element, index, parent) {
-				if (index <= 0) {
-					if (element) element.remove();
-					return null;
-				}
-				// TODO: new tile will not be in correct order until refresh
-				if (element === null) element = $("<img>").appendTo(parent);
-
-				var image = LT.images[index];
-				var scaleX = height / image[map.type][0];
-				var scaleY = width / image[map.type][1];
-				return element.attr("src", "images/" + image.file).css({
-					position: "absolute", // TODO: put this in style.css?
+			var style = function (image) {
+				var scaleX = width / image[map.type][0];
+				var scaleY = height / image[map.type][1];
+				return {
 					left: Math.round((x - 0.5 + offset) * width) + "px",
 					top: Math.round((y - 0.5 + stagger) * height) + "px",
 					width:  Math.round(image.size[0] * scaleX) + "px",
@@ -541,33 +535,55 @@ LT.loadTiles = function () {
 					marginLeft: -Math.round(image.center[0] * scaleX) + "px",
 					marginTop:  -Math.round(image.center[1] * scaleY) + "px",
 					zIndex: image.layer,
-				});
+				};
+			};
+
+			// function to create or update the tile image element
+			var updateTileElement = function () {
+				if (tile > 0) {
+					// TODO: new tile will not be in correct order until refresh
+					if (tileElement === null) tileElement = $("<img>").appendTo("#tileLayer");
+					var image = LT.images[tile];
+					tileElement.attr("src", "images/" + image.file).css(style(image));
+				} else {
+					if (tileElement) tileElement.remove();
+					tileElement = null;
+				}
+			};
+
+			// function to create or update the fog image element
+			var updateFogElement = function () {
+				if (fog) {
+					if (fogElement === null) fogElement = $("<img>").appendTo("#fogLayer");
+					var byWall = false;
+					$.each(["n", "ne", "se", "s", "sw", "nw"], function (i, direction) {
+						var wallType = LT.grid.getWall(x, y, direction);
+						if (wallType == "wall" || wallType == "door") byWall = true;
+					});
+					var image = LT.images[LT.FOG_IMAGE];
+					if (byWall) image = LT.images[map.type == "hex" ? LT.FOG_HEX : LT.FOG_SQUARE];
+					fogElement.attr("src", "images/" + image.file).css(style(image)).css("z-index", 0);
+				} else {
+					if (fogElement) fogElement.remove();
+					fogElement = null;
+				}
 			};
 
 			// function called when clicking or dragging over the tile
 			var updateTile = function () {
 				var args = {"map": map.id, "x": x - 1, "y": y - 1};
 				switch ($("#tools .swatch.selected").data("tool")) {
-					case "tile":
-						tile = args.tile = LT.tile;
-						tileElement = updateImageElement(tileElement, tile, "#tileLayer");
-						break;
-					case "erase":
-						tile = args.tile = 0;
-						tileElement = updateImageElement(tileElement, tile, "#tileLayer");
-						break;
-					case "fog":
-						fog = args.fog = LT.toggleFog;
-						fogElement = updateImageElement(fogElement, fog ? LT.FOG_IMAGE : 0, "#fogLayer");
-						break;
+					case "tile": tile = args.tile = LT.tile; updateTileElement(); break;
+					case "erase": tile = args.tile = 0; updateTileElement(); break;
+					case "fog": fog = args.fog = LT.toggleFog; updateFogElement(); break;
 				}
 				$.post("php/Map.tile.php", args);
 			};
 
 			// create tile and fog now unless this is the first row or column
 			if (x > 0 && y > 0) {
-				if (tile) tileElement = updateImageElement(null, tile, "#tileLayer");
-				if (fog) fogElement = updateImageElement(null, LT.FOG_IMAGE, "#fogLayer");
+				updateTileElement();
+				updateFogElement();
 				$("<div>").appendTo("#clickTileLayer").css({
 					"left": width * (x - 1 + offset) + "px",
 					"top": height * (y - 1 + stagger) + "px",
