@@ -53,6 +53,8 @@ DROP PROCEDURE IF EXISTS read_map;
 DROP PROCEDURE IF EXISTS read_map_tiles;
 DROP PROCEDURE IF EXISTS read_map_campaigns;
 DROP PROCEDURE IF EXISTS update_map_tiles;
+DROP PROCEDURE IF EXISTS update_map_walls;
+DROP PROCEDURE IF EXISTS update_map_fog;
 DROP PROCEDURE IF EXISTS update_map_size;
 DROP PROCEDURE IF EXISTS update_map;
 DROP PROCEDURE IF EXISTS create_map_owner;
@@ -257,18 +259,12 @@ CREATE TABLE messages (
 	rows/columns: height and width of the map, in grid units
 	min/max zoom, rotate and tilt: allowed viewing options
 	grid/wall/door thickness and color: style for grid and wall overlay
-	tiles: JSON array containing the image ids of each tile in the map
-	flags: string of characters representing fog, walls and doors of each tile
-		symbol  0ABCDEFGHIJKLMNOPQRSTUVWXYZ1abcdefghijklmnopqrstuvwxyz
-		fog                                ***************************
-		S wall           *********                  *********
-		S door                    *********                  *********
-		E wall     ***      ***      ***      ***      ***      ***   
-		E door        ***      ***      ***      ***      ***      ***
-		SE wall    ***      ***      ***      ***      ***      ***   
-		SE door       ***      ***      ***      ***      ***      ***
-		NE wall  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * 
-		NE door   *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
+	tiles: string representing image id of each tile as two base64 characters
+	walls: string representing walls and doors of each tile as a base64 character
+		each side is a 2 bit number: 0 = none, 1 = wall, 3 = door, 4 = open
+		combine them into 6 bits: hex(SE * 16 + S * 4 + SE) square(S * 4 + E)
+		extra top row and extra columns on each side for walls along edges
+	fog: string of base64 characters representing fog bits packed into sextuplets
 */
 
 CREATE TABLE maps (
@@ -292,7 +288,8 @@ CREATE TABLE maps (
 	`piece_changes` INT NOT NULL DEFAULT 0,
 	`tile_changes` INT NOT NULL DEFAULT 0,
 	`tiles` TEXT,
-	`flags` TEXT);
+	`walls` TEXT,
+	`fog` TEXT);
 
 
 /* MAP_OWNERS TABLE
@@ -871,14 +868,14 @@ END;
 /* User creates a new map */
 CREATE PROCEDURE create_map (IN the_user INT, IN the_type TEXT,
 	IN the_rows SMALLINT, IN the_columns SMALLINT,
-	IN the_name TEXT, IN the_tiles TEXT, IN the_flags TEXT)
+	IN the_name TEXT, IN the_tiles TEXT, IN the_walls TEXT, IN the_fog TEXT)
 BEGIN
 	START TRANSACTION;
 /* create the map */
 	INSERT INTO maps (type, `rows`, `columns`, `name`,
-		`tiles`, `flags`, `grid_color`, `wall_color`, `door_color`)
+		`tiles`, `walls`, `fog`, `grid_color`, `wall_color`, `door_color`)
 	VALUES (the_type, the_rows, the_columns, the_name,
-		the_tiles, the_flags, 'black', 'black', 'white');
+		the_tiles, the_walls, the_fog, 'black', 'black', 'white');
 	SET @id = LAST_INSERT_ID();
 /* make the user an owner */
 	INSERT INTO map_owners (`user`, `map`) VALUES (the_user, @id);
@@ -914,7 +911,8 @@ END;
 /* User paints or erases tiles, fog or walls */
 CREATE PROCEDURE read_map_tiles (IN the_map INT)
 BEGIN
-	SELECT `rows`, `columns`, `tiles`, `flags` FROM maps WHERE `id` = the_map
+	SELECT `type`, `rows`, `columns`, `tiles`, `walls`, `fog`
+		FROM maps WHERE `id` = the_map
 		FOR UPDATE; /* lock row so simultaneous edits don't cancel each other */
 END;
 
@@ -940,25 +938,37 @@ BEGIN
 */
 END;
 
-/* User paints or erases tiles, fog or walls */
-CREATE PROCEDURE update_map_tiles
-	(IN the_map INT, IN the_tiles TEXT, IN the_flags TEXT)
+/* User paints or erases tiles */
+CREATE PROCEDURE update_map_tiles (IN the_map INT, IN the_tiles TEXT)
 BEGIN
-	UPDATE maps SET `tile_changes` = `tile_changes` + 1,
-		`tiles` = the_tiles, `flags` = the_flags
+	UPDATE maps SET `tile_changes` = `tile_changes` + 1, `tiles` = the_tiles
+		WHERE `id` = the_map;
+END;
+
+/* User paints or erases walls */
+CREATE PROCEDURE update_map_walls (IN the_map INT, IN the_walls TEXT)
+BEGIN
+	UPDATE maps SET `tile_changes` = `tile_changes` + 1, `walls` = the_walls
+		WHERE `id` = the_map;
+END;
+
+/* User paints or erases walls */
+CREATE PROCEDURE update_map_fog (IN the_map INT, IN the_fog TEXT)
+BEGIN
+	UPDATE maps SET `tile_changes` = `tile_changes` + 1, `fog` = the_fog
 		WHERE `id` = the_map;
 END;
 
 /* User resizes a map */
 CREATE PROCEDURE update_map_size (IN the_map INT, IN the_left SMALLINT,
 	IN the_top SMALLINT, IN the_right SMALLINT, IN the_bottom SMALLINT,
-	IN the_tiles TEXT, IN the_flags TEXT)
+	IN the_tiles TEXT, IN the_walls TEXT, IN the_fog TEXT)
 BEGIN
 	START TRANSACTION;
 /* update map properties */
 	UPDATE maps SET `tile_changes` = `tile_changes` + 1,
 		`rows` = the_bottom - the_top, `columns` = the_right - the_left,
-		`tiles` = the_tiles, `flags` = the_flags
+		`tiles` = the_tiles, `walls` = the_walls, `fog` = the_fog
 		WHERE `id` = the_map;
 /* shift coordinates to post-resize coordinate system */
 	UPDATE pieces SET `x` = `x` - the_left, `y` = `y` - the_top
