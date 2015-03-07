@@ -4,7 +4,9 @@
 			{"id":1,"view":"top","size":[945,945],"center":[472.5,472.5],"base":[21,21],"file":"background/abaddon45.png","z":-2},
 			{"id":141,"view":"top","size":[72,72],"center":[36,36],"base":[1,1],"file":"pit-circle.png","z":-1},
 			{"id":142,"view":"top","size":[72,72],"center":[36,36],"base":[1,1],"file":"pit-square.png","z":-1},
-			{"id":143,"view":"flat","size":[72,72],"center":[36,36],"base":[1,1],"file":"pit-3d.png","z":-1}
+			{"id":143,"view":"flat","size":[72,72],"center":[36,36],"base":[1,1],"file":"pit-3d.png","z":-1},
+			{"id":144,"view":"top","size":[72,72],"center":[36,36],"base":[1,1],"file":"stairs-up.png","z":-1},
+			{"id":145,"view":"top","size":[72,72],"center":[36,36],"base":[1,1],"file":"stairs-down.png","z":-1}
 		],
 		"character":[
 			{"id":100,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/adept-die1.png"},
