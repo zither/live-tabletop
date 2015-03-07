@@ -18,12 +18,14 @@ $columns = intval($_REQUEST['columns']);
 $tile = intval($_REQUEST['tile']);
 $name = $LT_SQL->real_escape_string($_REQUEST['name']);
 
-$tiles = json_encode(array_fill(0, $rows * $columns, $tile));
-$flags = str_repeat('0', ($rows + 1) * ($columns + 1));
+$tiles = str_repeat('A', $columns * $rows * 2);
+$walls = str_repeat('A', ($columns + 2) * ($rows + 1));
+$fog = str_repeat('A', ceil($columns * $rows / 6));
 
 // Query the Database
 
-$rows = LT_call('create_map', $user, $type, $rows, $columns, $name, $tiles, $flags);
+$rows = LT_call('create_map',
+	$user, $type, $rows, $columns, $name, $tiles, $walls, $fog);
 
 include('include/json_headers.php');
 echo json_encode(array('id' => intval($rows[0]['id'])));

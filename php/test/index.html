@@ -25,6 +25,8 @@ TEST.INSTALL_ARGS = {
 TEST.MESSAGE_IN = "From 1975 - 2010, [0 + 2010 - 1975] years passed.";
 TEST.MESSAGE_OUT = 'From 1975 - 2010, <span class="roll">0 + 2010 - 1975 = 35</span> years passed.';
 
+TEST.BASE64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
 // list of tests
 TEST.tests = [
 
@@ -246,13 +248,17 @@ TEST.tests = [
 		for (var i = 0; i < data.length; i++)
 			if (data[i].id = TEST.USER2.user)
 				TEST.USER2.resetCode = data[i].reset_code;
+console.log(TEST.USER2.password);
 		TEST.USER2.password += "_new";
+console.log(TEST.USER2.password);
 		return "PASS";}},
 	{action: "../Admin.logout.php", args: {}, result: TEST.blank},
 	{action: "../User.password.php", args: function() {return TEST.USER2;}, result: TEST.blank},
 	{action: "../User.login.php", args: function () {return TEST.USER2;}, result: TEST.exists},
 	{action: "../User.password.php", args: function () {
+console.log(TEST.USER2.password);
 		TEST.USER2.password = TEST.USER2.password.slice(0, -("_new".length));
+console.log(TEST.USER2.password);
 		return {password: TEST.USER2.password};}, result: TEST.blank},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
@@ -260,6 +266,7 @@ TEST.tests = [
 	{action: "../User.friends.php", args: {}, result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER2, result: TEST.exists},
 	{action: "../User.friends.php", args: {}, result: function (ajax) {
+console.log(TEST.USER2.password);
 		try {var data = JSON.parse(ajax.responseText);}
 		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
 		if (data.requested.length + data.received.length + data.confirmed.length == 0) return "PASS";
@@ -554,8 +561,9 @@ TEST.tests = [
 			&& data.door_color == "white"
 			&& typeof(data.piece_changes) == "number"
 			&& typeof(data.tile_changes) == "number"
-			&& JSON.stringify(data.tiles) == JSON.stringify(Array(30 * 40 + 1).join().split('').map(function () {return 1;}))
-			&& data.flags == Array(31 * 41 + 1).join("0")) return "PASS";
+			&& data.tiles == Array(30 * 40 + 1).join("AA")
+			&& data.walls == Array(31 * 42 + 1).join("A")
+			&& data.fog == Array(Math.ceil(30 * 40 / 6) + 1).join("A")) return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
@@ -596,18 +604,19 @@ TEST.tests = [
 			&& data.door_color == "green"
 			&& typeof(data.piece_changes) == "number"
 			&& typeof(data.tile_changes) == "number"
-			&& JSON.stringify(data.tiles) == JSON.stringify(Array(30 * 40 + 1).join().split('').map(function () {return 1;}))
-			&& data.flags == Array(31 * 41 + 1).join("0")) return "PASS";
+			&& data.tiles == Array(30 * 40 + 1).join("AA")
+			&& data.walls == Array(31 * 42 + 1).join("A")
+			&& data.fog == Array(Math.ceil(30 * 40 / 6) + 1).join("A")) return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.SIZE"},
 	{action: "../Map.size.php",
-		args: function () {return {map: TEST.map, left: -5, top: -5, right: 45, bottom: 35, tile: 1, flags: "0"};},
+		args: function () {return {map: TEST.map, left: -5, top: -5, right: 45, bottom: 35, tile: 0};},
 		result: TEST.logged_out},
 	{action: "../User.login.php", args: TEST.USER2, result: TEST.exists},
 	{action: "../Map.size.php",
-		args: function () {return {map: TEST.map, left: -5, top: -5, right: 45, bottom: 35, tile: 1, flags: "0"};},
+		args: function () {return {map: TEST.map, left: -5, top: -5, right: 45, bottom: 35, tile: 0};},
 		result: TEST.blank},
 	{action: "../Map.read.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);}
@@ -630,21 +639,11 @@ TEST.tests = [
 			&& data.door_color == "green"
 			&& typeof(data.piece_changes) == "number"
 			&& typeof(data.tile_changes) == "number"
-			&& JSON.stringify(data.tiles) == JSON.stringify(Array(40 * 50 + 1).join().split('').map(function () {return 1;}))
-			&& data.flags == Array(41 * 51 + 1).join("0")) return "PASS";
+			&& data.tiles == Array(40 * 50 + 1).join("AA")
+			&& data.walls == Array(41 * 52 + 1).join("A")
+			&& data.fog == Array(Math.ceil(40 * 50 / 6) + 1).join("A")) return "PASS";
 		else return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
-
-// symbol  0ABCDEFGHIJKLMNOPQRSTUVWXYZ1abcdefghijklmnopqrstuvwxyz
-// fog                                ***************************
-// S wall           *********                  *********
-// S door                    *********                  *********
-// E wall     ***      ***      ***      ***      ***      ***   
-// E door        ***      ***      ***      ***      ***      ***
-// SE wall    ***      ***      ***      ***      ***      ***   
-// SE door       ***      ***      ***      ***      ***      ***
-// NE wall  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * 
-// NE door   *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
 
 	{group: "MAP.TILE"},
 	{action: "../Map.tile.php", args: function () {return {map: TEST.map, x: 3, y: 2, tile: 2};}, result: TEST.logged_out},
@@ -653,57 +652,83 @@ TEST.tests = [
 	{action: "../Map.read.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);}
 		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data.tiles[3 + 2 * 50] == 2) return "PASS";
-		else return "FAIL [" + data.tiles.indexOf(2) + "]";}},
-	{action: "../Map.tile.php", args: function () {return {map: TEST.map, x: 3, y: 2, fog: 1};}, result: TEST.blank},
+		if (data.tiles.substr((3 + 2 * 50) * 2, 2) == "AC") return "PASS";
+		else return "FAIL [" + data.tiles.indexOf("AC") + " " + data.tiles + "]";}},
+	{action: "../Map.tile.php", args: function () {return {map: TEST.map, x: 3, y: 2, tile: 128};}, result: TEST.blank},
 	{action: "../Map.read.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);}
 		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data.flags[(3 + 1) + (2 + 1) * (50 + 1)] == "1") return "PASS";
-		else return "FAIL [" + data.flags.indexOf("1") + "]";}},
-	{action: "../Map.tile.php", args: function () {return {map: TEST.map, x: 3, y: 2, fog: 0};}, result: TEST.blank},
+		if (data.tiles.substr((3 + 2 * 50) * 2, 2) == "CA") return "PASS";
+		else return "FAIL [" + data.tiles.indexOf("CA") + " " + data.tiles + "]";}},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
+
+	{group: "MAP.FOG"},
+	{action: "../Map.fog.php", args: function () {return {map: TEST.map, x: 3, y: 2, fog: 1};}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER2, result: TEST.exists},
+	{action: "../Map.fog.php", args: function () {return {map: TEST.map, x: 3, y: 2, fog: 1};}, result: TEST.blank},
 	{action: "../Map.read.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);}
 		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data.flags[(3 + 1) + (2 + 1) * (50 + 1)] == "0") return "PASS";
-		else return "FAIL [0 != " + data.flags[(3 + 1) + (2 + 1) * (50 + 1)] + "]";}},
-	{action: "../Map.tile.php", args: function () {return {map: TEST.map, x: 3, y: 2, s: 'wall'};}, result: TEST.blank},
+		var index = Math.floor((3 + 2 * 50) / 6);
+		var value = TEST.BASE64[Math.pow(2, 5 - (3 + 2 * 50) % 6)];
+		if (data.fog[index] == value) return "PASS";
+		else return "FAIL [" + value + " not found at " + index + " in " + data.fog + "]";}},
+	{action: "../Map.fog.php", args: function () {return {map: TEST.map, x: 3, y: 2, fog: 0};}, result: TEST.blank},
 	{action: "../Map.read.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);}
 		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data.flags[(3 + 1) + (2 + 1) * (50 + 1)] == "I") return "PASS";
-		else return "FAIL [" + data.flags.indexOf("I") + "]";}},
-	{action: "../Map.tile.php", args: function () {return {map: TEST.map, x: 3, y: 2, s: 'none'};}, result: TEST.blank},
+		var index = Math.floor((3 + 2 * 50) / 6);
+		var value = TEST.BASE64[0];
+		if (data.fog[index] == value) return "PASS";
+		else return "FAIL [" + value + " not found at " + index + " in " + data.fog + "]";}},
+	{action: "../User.logout.php", args: {}, result: TEST.blank},
+
+	{group: "MAP.WALL"},
+	{action: "../Map.wall.php", args: function () {return {map: TEST.map, x: 3, y: 2, side: 's', type: 'wall'};}, result: TEST.logged_out},
+	{action: "../User.login.php", args: TEST.USER2, result: TEST.exists},
+	{action: "../Map.wall.php", args: function () {return {map: TEST.map, x: 3, y: 2, side: 's', type: 'wall'};}, result: TEST.blank},
 	{action: "../Map.read.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);}
 		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data.flags[(3 + 1) + (2 + 1) * (50 + 1)] == "0") return "PASS";
-		else return "FAIL [0 != " + data.flags[(3 + 1) + (2 + 1) * (50 + 1)] + "]";}},
-	{action: "../Map.tile.php", args: function () {return {map: TEST.map, x: 3, y: 2, e: 'wall'};}, result: TEST.blank},
+		var index = 3 + 2 * (50 + 2); var value = TEST.BASE64[4 * 1];
+		if (data.walls[index] == value) return "PASS";
+		else return "FAIL [" + value + " not found at " + index + " in " + data.walls + "]";}},
+	{action: "../Map.wall.php", args: function () {return {map: TEST.map, x: 3, y: 2, side: 's', type: 'none'};}, result: TEST.blank},
 	{action: "../Map.read.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);}
 		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data.flags[(3 + 1) + (2 + 1) * (50 + 1)] == "C") return "PASS";
-		else return "FAIL [" + data.flags.indexOf("C") + "]";}},
-	{action: "../Map.tile.php", args: function () {return {map: TEST.map, x: 3, y: 2, se: 'door'};}, result: TEST.blank},
+		var index = 3 + 2 * (50 + 2); var value = TEST.BASE64[0];
+		if (data.walls[index] == value) return "PASS";
+		else return "FAIL [" + value + " not found at " + index + " in " + data.walls + "]";}},
+	{action: "../Map.wall.php", args: function () {return {map: TEST.map, x: 3, y: 2, side: 'e', type: 'wall'};}, result: TEST.blank},
 	{action: "../Map.read.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);}
 		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data.flags[(3 + 1) + (2 + 1) * (50 + 1)] == "F") return "PASS";
-		else return "FAIL [" + data.flags.indexOf("F") + "]";}},
-	{action: "../Map.tile.php", args: function () {return {map: TEST.map, x: 3, y: 2, ne: 'door'};}, result: TEST.blank},
+		var index = 3 + 2 * (50 + 2); var value = TEST.BASE64[1 * 1];
+		if (data.walls[index] == value) return "PASS";
+		else return "FAIL [" + value + " not found at " + index + " in " + data.walls + "]";}},
+	{action: "../Map.wall.php", args: function () {return {map: TEST.map, x: 3, y: 2, side: 'se', type: 'door'};}, result: TEST.blank},
 	{action: "../Map.read.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);}
 		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data.flags[(3 + 1) + (2 + 1) * (50 + 1)] == "H") return "PASS";
-		else return "FAIL [" + data.flags.indexOf("H") + " " + data.flags[(3 + 1) + (2 + 1) * (50 + 1)] + "]";}},
-	{action: "../Map.tile.php", args: function () {return {map: TEST.map, x: 3, y: 2, se: 'none'};}, result: TEST.blank},
-	{action: "../Map.tile.php", args: function () {return {map: TEST.map, x: 3, y: 2, ne: 'none'};}, result: TEST.blank},
+		var index = 3 + 2 * (50 + 2); var value = TEST.BASE64[1 * 2];
+		if (data.walls[index] == value) return "PASS";
+		else return "FAIL [" + value + " not found at " + index + " in " + data.walls + "]";}},
+	{action: "../Map.wall.php", args: function () {return {map: TEST.map, x: 3, y: 2, side: 'sw', type: 'door'};}, result: TEST.blank},
 	{action: "../Map.read.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);}
 		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data.flags[(3 + 1) + (2 + 1) * (50 + 1)] == "0") return "PASS";
-		else return "FAIL [0 != " + data.flags[(3 + 1) + (2 + 1) * (50 + 1)] + "]";}},
+		var index = 3 + 2 * (50 + 2); var value = TEST.BASE64[1 * 2 + 16 * 2];
+		if (data.walls[index] == value) return "PASS";
+		else return "FAIL [" + value + " not found at " + index + " in " + data.walls + "]";}},
+	{action: "../Map.wall.php", args: function () {return {map: TEST.map, x: 3, y: 2, side: 'se', type: 'none'};}, result: TEST.blank},
+	{action: "../Map.wall.php", args: function () {return {map: TEST.map, x: 3, y: 2, side: 'sw', type: 'none'};}, result: TEST.blank},
+	{action: "../Map.read.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
+		try {var data = JSON.parse(ajax.responseText);}
+		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
+		var index = 3 + 2 * (50 + 2); var value = TEST.BASE64[0];
+		if (data.walls[index] == value) return "PASS";
+		else return "FAIL [" + value + " not found at " + index + " in " + data.walls + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.CHANGES"},
@@ -715,8 +740,8 @@ TEST.tests = [
 		TEST.piece_changes = data.piece_changes;
 		TEST.tile_changes = data.tile_changes;
 		return "PASS";}},
-	{action: "../Map.tile.php", args: function () {return {map: TEST.map, x: 0, y: 0, ne: 'wall'};}, result: TEST.blank},
-	{action: "../Map.tile.php", args: function () {return {map: TEST.map, x: 0, y: 0, ne: 'none'};}, result: TEST.blank},
+	{action: "../Map.wall.php", args: function () {return {map: TEST.map, x: 0, y: 0, side: 'sw', type: 'wall'};}, result: TEST.blank},
+	{action: "../Map.wall.php", args: function () {return {map: TEST.map, x: 0, y: 0, side: 'sw', type: 'none'};}, result: TEST.blank},
 	{action: "../Map.changes.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);}
 		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
@@ -775,8 +800,8 @@ TEST.tests = [
 	{action: "../Map.read.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);}
 		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data.flags == Array(41 * 51 + 1).join("1")) return "PASS";
-		else return "FAIL [" + data.flags + "]";}},
+		if (data.fog == Array(Math.ceil(40 * 50 / 6) + 1).join("/")) return "PASS";
+		else return "FAIL [" + data.fog + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	{group: "MAP.CLEAR FOG"},
@@ -786,8 +811,8 @@ TEST.tests = [
 	{action: "../Map.read.php", args: function () {return {map: TEST.map};}, result: function (ajax) {
 		try {var data = JSON.parse(ajax.responseText);}
 		catch (e) {return "FAIL [not JSON: " + ajax.responseText + "]";}
-		if (data.flags == Array(41 * 51 + 1).join("0")) return "PASS";
-		else return "FAIL [" + data.flags + "]";}},
+		if (data.fog == Array(Math.ceil(40 * 50 / 6) + 1).join("A")) return "PASS";
+		else return "FAIL [" + data.fog + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
 	// P I E C E
@@ -812,7 +837,7 @@ TEST.tests = [
 				&& data[i].character === null
 				&& data[i].locked == true
 				&& JSON.stringify(data[i].markers) == JSON.stringify([])
-				&& data[i].color === null) return "PASS";
+				&& data[i].color == "gray") return "PASS";
 		return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
@@ -832,7 +857,7 @@ TEST.tests = [
 				&& data[i].character === null
 				&& data[i].locked == true
 				&& JSON.stringify(data[i].markers) == JSON.stringify([])
-				&& data[i].color === null) return "PASS";
+				&& data[i].color == "gray") return "PASS";
 		return "FAIL [" + ajax.responseText + "]";}},
 	{action: "../User.logout.php", args: {}, result: TEST.blank},
 
