@@ -139,6 +139,8 @@ LT.refreshCampaign = function () {
 						campaign: LT.currentCampaign.id
 					}, function (theUsers) {
 
+						if (LT.currentMap) LT.updateCursors(theUsers);
+
 						var currentUserCanEditThisCampaign = false;
 
 						// add campaign owners, members and guests to campaign info tab
@@ -274,7 +276,7 @@ LT.refreshCampaign = function () {
 				LT.currentCampaign = data; //new LT.Campaign(data);
 			});
 		} // if (!LT.holdTimeStamps) { // do not update while dragging
-		LT.refreshCampaignTimeout = setTimeout(LT.refreshCampaign, 10000);
+		LT.refreshCampaignTimeout = setTimeout(LT.refreshCampaign, LT.DELAY);
 	} // if (LT.currentUser && LT.currentCampaign) { // stop updating if no campaign is loaded
 }
 

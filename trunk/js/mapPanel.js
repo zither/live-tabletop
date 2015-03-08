@@ -478,7 +478,7 @@ LT.refreshMap = function () {
 			});
 
 		} // if (!LT.holdTimeStamps) { // do not update while dragging
-		LT.refreshMapTimeout = setTimeout(LT.refreshMap, 10000);
+		LT.refreshMapTimeout = setTimeout(LT.refreshMap, LT.DELAY);
 	} // if (LT.currentUser && LT.currentMap) { // stop updating if no map is loaded
 }
 
@@ -1039,4 +1039,16 @@ LT.loadPieces = function () {
 }; // LT.loadPieces = function () {
 
 
-
+LT.updateCursors = function (theUsers) {
+	$(".cursor").remove();
+	var duration = 60000; // fade out over 1 minute
+	$.each(theUsers, function (i, user) {
+		var time = $.now() - 1000 * user.cursor.time;
+		if (time < duration) $("<div>").appendTo("#map").addClass("cursor").css({
+			"left": user.cursor.x + "px",
+			"top": user.cursor.y + "px",
+			"opacity": (duration - time) / duration,
+			"background-color": user.color || "black",
+		});
+	});
+};
