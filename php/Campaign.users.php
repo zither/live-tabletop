@@ -16,5 +16,6 @@ if (LT_can_view_campaign($campaign))
 	if (is_array($rows = LT_call('read_campaign_users', $campaign)))
 		LT_output_array($rows, array(
 			'integer' => array('id', 'avatar'),
-			'boolean' => array('viewing')));
+			'boolean' => array('viewing'),
+			'json' => array('cursor')));
 ?>

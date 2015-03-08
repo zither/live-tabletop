@@ -415,6 +415,16 @@ img.swatch {
 	display: none;
 }
 
+.cursor {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 10px;
+	height: 10px;
+	margin: -5px;
+	border-radius: 50%;
+}
+
 /* Layers */
 
 #tileLayer {

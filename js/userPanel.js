@@ -138,7 +138,7 @@ LT.refreshUser = function () {
 			LT.refreshMapList();
 			LT.refreshCharacterList();
 		} // if (!LT.holdTimeStamps) { // do not update while dragging
-		LT.refreshUserTimeout = setTimeout(LT.refreshUser, 10000);
+		LT.refreshUserTimeout = setTimeout(LT.refreshUser, LT.DELAY);
 	} // if (LT.currentUser) { // stop updating if no user is logged in
 };
 

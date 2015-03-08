@@ -41,7 +41,9 @@ DROP PROCEDURE IF EXISTS update_campaign_user_permission;
 DROP PROCEDURE IF EXISTS update_campaign_user_arrive;
 DROP PROCEDURE IF EXISTS update_campaign_user_leave;
 DROP PROCEDURE IF EXISTS update_campaign_user_avatar;
+DROP PROCEDURE IF EXISTS update_campaign_user_cursor;
 DROP PROCEDURE IF EXISTS delete_campaign_user;
+
 DROP PROCEDURE IF EXISTS create_message;
 DROP PROCEDURE IF EXISTS read_messages;
 DROP PROCEDURE IF EXISTS delete_messages_expired;
@@ -127,7 +129,7 @@ CREATE TABLE admins (
 	last_action: indicates whether the user has been active recently
 	logged_in: 0 if the user has logged out since his last login
 	name: preferred form of address, not unique, can be changed at any time
-	color: ???
+	color: user color
 */
 
 CREATE TABLE users (
@@ -226,6 +228,7 @@ CREATE TABLE campaign_users (
 	`permission` TEXT,
 	`viewing` TINYINT NOT NULL DEFAULT 0,
 	`avatar` INT,
+	`cursor` TEXT,
 	FOREIGN KEY (`user`) REFERENCES users(`id`) ON DELETE CASCADE,
 	FOREIGN KEY (`campaign`) REFERENCES campaigns(`id`) ON DELETE CASCADE,
 	PRIMARY KEY (`user`, `campaign`));
@@ -482,8 +485,12 @@ END;
 CREATE PROCEDURE update_user (IN the_user INT, IN the_subscribed TINYINT,
 	IN the_name VARCHAR(200), IN the_color TEXT)
 BEGIN
+	START TRANSACTION;
 	UPDATE users SET subscribed = the_subscribed, name = the_name,
 		color = the_color, last_action = NOW() WHERE id = the_user;
+	UPDATE campaigns SET `users_modified` = NOW() WHERE `id` IN
+		(SELECT `campaign` FROM campaign_users WHERE `user` = the_user);
+	COMMIT;
 END;
 
 /* User has logged in or logged out */
@@ -728,8 +735,8 @@ END;
 /* User views the owners, members and guests of this campaign */
 CREATE PROCEDURE read_campaign_users (IN the_campaign INT)
 BEGIN
-	SELECT `id`, `permission`, `viewing`, `avatar`, `color`, `email`, users.name AS `name`
-		FROM campaign_users JOIN users ON `id` = `user`
+	SELECT `id`, `permission`, `viewing`, `avatar`, `color`, `email`, `cursor`,
+		users.name AS `name` FROM campaign_users JOIN users ON `id` = `user`
 		WHERE `campaign` = the_campaign AND `permission` <> 'banned';
 END;
 
@@ -800,6 +807,17 @@ CREATE PROCEDURE update_campaign_user_avatar
 BEGIN
 	START TRANSACTION;
 	UPDATE campaign_users SET `avatar` = the_avatar
+		WHERE `user` = the_user AND `campaign` = the_campaign;
+	UPDATE campaigns SET `users_modified` = NOW() WHERE `id` = the_campaign;
+	COMMIT;
+END;
+
+/* User shows his cursor's position on the map to other players */
+CREATE PROCEDURE update_campaign_user_cursor
+	(IN the_user INT, IN the_campaign INT, IN the_cursor TEXT)
+BEGIN
+	START TRANSACTION;
+	UPDATE campaign_users SET `cursor` = the_cursor
 		WHERE `user` = the_user AND `campaign` = the_campaign;
 	UPDATE campaigns SET `users_modified` = NOW() WHERE `id` = the_campaign;
 	COMMIT;

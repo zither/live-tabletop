@@ -76,6 +76,22 @@ document.onmousedown = function () {
 	LT.holdTimestamps = 1;
 }
 
+LT.DELAY = 1000;
+LT.cursorRequested = false;
+LT.cursorMove = function () {
+	if (LT.cursorRequested && LT.currentUser && LT.currentCampaign && LT.currentMap) {
+		var position = $("#map").offset();
+		$.post("php/User.cursor.php", {
+			"campaign": LT.currentCampaign.id,
+			"x": LT.dragX - position.left,
+			"y": LT.dragY - position.top,
+		});
+	}
+	LT.cursorRequested = false;
+	setTimeout(LT.cursorMove, LT.DELAY);
+};
+LT.cursorMove();
+
 // Move or resize a panel when the mouse is dragged.
 document.onmousemove = function (e) {
 	if (!e) var e = window.event;
@@ -87,6 +103,9 @@ document.onmousemove = function (e) {
 		LT.dragX = e.pageX;
 		LT.dragY = e.pageY;
 	}
+
+	if (e.ctrlKey) {LT.cursorRequested = true;}
+
 	for (var i = 0; i < LT.dragHandlers.length; i++)
 		LT.dragHandlers[i](e);
 	e.preventDefault();
