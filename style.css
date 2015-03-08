@@ -435,6 +435,7 @@ img.swatch {
 	position: relative;
 	z-index: 2; /* higher than pieces that are above the fog */
 }
+/* #clickWallLayer > * {border: 1px dashed black;} /**/
 
 
 /* Pieces */
