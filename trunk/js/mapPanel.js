@@ -504,17 +504,18 @@ LT.loadTiles = function () {
 		$.each(map.walls.split(""), function (i, code) {
 			var x = i % (map.columns + 2);
 			var y = Math.floor(i / (map.columns + 2));
+			var side = map.type == "hex" ? "se" : "e";
 			var walls = LT.BASE64.indexOf(code);
 			// TODO: change magic numbers to constants
-			if (walls & 3 == 1) LT.grid.wall(x, y, "e"); // same as se
-			if (walls & 3 == 2) LT.grid.door(x, y, "e"); // same as se
-			if (walls & 3 == 3) LT.grid.open(x, y, "e"); // same as se
-			if (walls & 12 == 4) LT.grid.wall(x, y, "s");
-			if (walls & 12 == 8) LT.grid.door(x, y, "s");
-			if (walls & 12 == 12) LT.grid.open(x, y, "s");
-			if (walls & 48 == 16) LT.grid.wall(x, y, "sw");
-			if (walls & 48 == 32) LT.grid.door(x, y, "sw");
-			if (walls & 48 == 48) LT.grid.open(x, y, "sw");
+			if ((walls & 3) == 1) LT.grid.wall(x, y, side);
+			if ((walls & 3) == 2) LT.grid.door(x, y, side);
+			if ((walls & 3) == 3) LT.grid.open(x, y, side);
+			if ((walls & 12) == 4) LT.grid.wall(x, y, "s");
+			if ((walls & 12) == 8) LT.grid.door(x, y, "s");
+			if ((walls & 12) == 12) LT.grid.open(x, y, "s");
+			if ((walls & 48) == 16) LT.grid.wall(x, y, "sw");
+			if ((walls & 48) == 32) LT.grid.door(x, y, "sw");
+			if ((walls & 48) == 48) LT.grid.open(x, y, "sw");
 			// function to create click detectors for walls
 			var createWallClickDetector = function (x, y, side, l, t, w, h) {
 				$("<div>").appendTo($("#clickWallLayer")).css({
@@ -541,20 +542,22 @@ LT.loadTiles = function () {
 				if (y > 0) createWallClickDetector(x, y, "e",  5/6,  1/6, 1/3, 2/3);
 			}
 			if (map.type == "hex") {
-				var stagger = (x % 2) * -0.5;
+				var stagger = (1 - x % 2) * 0.5;
 				if (x > 0 && x <= map.columns) // no south walls on side columns
 					createWallClickDetector(x, y, "s", 1/3, stagger + 5/6, 2/3, 1/3);
-				if (!(y == 0 && stagger)) { // no sw, se sides on staggered top tiles
+				if (!(y == 0 && x % 2)) { // no sw, se sides on staggered top tiles
 					// no se sides on right column, bottom-left corner or...
-					if (x <= map.columns && !(x == 0 && y == map.rows && stagger)
+					if (x <= map.columns && !(x == 0 && y == map.rows)
 						&& !(x == map.columns && y == 0)) // top 2nd-from-right tile
 						createWallClickDetector(x, y, "se", 1, stagger + 1/2, 1/3, 1/2);
 					// no sw sides on left column or bottom-right non-staggered corner
-					if (x > 0 && !(x > map.columns && y == map.rows && !stagger))
+					if (x > 0 && !(x > map.columns && y == map.rows && !(x % 2)))
 						createWallClickDetector(x, y, "sw", 0, stagger + 1/2, 1/3, 1/2);
 				}
 			}
 		});
+
+		LT.grid.repaint();
 
 		// tiles and fog
 		$.each(map.tiles.match(/.{1,2}/g), function (i, code) {
@@ -656,8 +659,6 @@ LT.loadTiles = function () {
 			}
 
 		}); // $.each(map.flags.split(""), function (i, flag) {
-
-		LT.grid.repaint();
 
 	}); // $.get("php/Map.read.php", {map: LT.currentMap.id}, function (data) {
 }; // LT.loadTiles = function () {
