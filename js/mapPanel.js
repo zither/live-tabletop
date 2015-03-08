@@ -564,7 +564,7 @@ LT.loadTiles = function () {
 			var x = i % map.columns;
 			var y = Math.floor(i / map.columns);
 			var offset = map.type == "hex" ? 1 / 6 : 0;
-			var stagger = map.type == "hex" ? ((x + 1) % 2) * 0.5 : 0;
+			var stagger = map.type == "hex" ? (x % 2) * 0.5 : 0;
 			var tileElement = null;
 			var fogElement = null;
 			var fogIndex = LT.BASE64.indexOf(map.fog[Math.floor(i / 6)]);
@@ -575,8 +575,8 @@ LT.loadTiles = function () {
 				var scaleX = width / image[map.type][0];
 				var scaleY = height / image[map.type][1];
 				return {
-					left: Math.round((x - 0.5 + offset) * width) + "px",
-					top: Math.round((y - 0.5 + stagger) * height) + "px",
+					left: Math.round((x + 0.5 + offset) * width) + "px",
+					top: Math.round((y + 0.5 + stagger) * height) + "px",
 					width:  Math.round(image.size[0] * scaleX) + "px",
 					height: Math.round(image.size[1] * scaleY) + "px",
 					marginLeft: -Math.round(image.center[0] * scaleX) + "px",
@@ -606,8 +606,8 @@ LT.loadTiles = function () {
 					var directions = ["n", "ne", "se", "s", "sw", "nw"];
 					if (map.type == "square") directions = ["n", "e", "s", "w"];
 					$.each(directions, function (i, direction) {
-						var wallType = LT.grid.getWall(x + 1, y + 1, direction);
-						if (wallType == "wall" || wallType == "door") byWall = true;
+						if (LT.grid.getWall(x + 1, y + 1, direction) != "none")
+							byWall = true;
 					});
 					var image = LT.images[LT.FOG_SQUARE];
 					if (map.type == "hex") image = LT.images[LT.FOG_HEX];
@@ -640,23 +640,22 @@ LT.loadTiles = function () {
 				}
 			};
 
-			// create tile and fog now unless this is the first row or column
-			if (x > 0 && y > 0) {
-				updateTileElement();
-				updateFogElement();
-				$("<div>").appendTo("#clickTileLayer").css({
-					"left": width * (x - 1 + offset) + "px",
-					"top": height * (y - 1 + stagger) + "px",
-					"width": width + "px",
-					"height": height + "px",
-				}).mousedown(function () { // click
-					LT.dragging = 1;
-					LT.toggleFog = 1 - fog; // TODO: make sure this doesn't do anything bad to the tile or erase tool
-					updateTile();
-				}).mouseover(function () { // drag
-					if (LT.dragging) updateTile();
-				});
-			}
+			// create tile and fog clickable element
+			$("<div>").appendTo("#clickTileLayer").css({
+				"left": width * (x + offset) + "px",
+				"top": height * (y + stagger) + "px",
+				"width": width + "px",
+				"height": height + "px",
+			}).mousedown(function () { // click
+				LT.dragging = 1;
+				LT.toggleFog = 1 - fog; // TODO: make sure this doesn't do anything bad to the tile or erase tool
+				updateTile();
+			}).mouseover(function () { // drag
+				if (LT.dragging) updateTile();
+			});
+
+			updateTileElement();
+			updateFogElement();
 
 		}); // $.each(map.flags.split(""), function (i, flag) {
 
