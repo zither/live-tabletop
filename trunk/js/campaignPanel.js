@@ -47,14 +47,17 @@ $(function () { // This anonymous function runs after the page loads.
 	});
 
 	// chat
-	$("#chatForm input[value=send]").click(function () {
-//		if (!LT.currentCampaign) return false;
-		var args = {campaign: LT.currentCampaign.id, text: $("#chatInput").val()};
-		$.post("php/Campaign.message.php", args, function () {
-			$("#chatInput").val("").focus();
-//			LT.refreshChatPanel();
-		});
-		return false;
+//var i = 0; var hate = "I am in control. You are my slave. ";
+	$("#chatInput").keydown(function (e) {
+		if (e.keyCode == 13) {
+			$.post("php/Campaign.message.php", {
+				campaign: LT.currentCampaign.id, text: $("#chatInput").val()
+			}, function () {
+//i = 0;
+				$("#chatInput").val("").focus();
+			});
+		}
+//else {$("#chatInput").val($("#chatInput").val() + hate[i]); i++; i %= hate.length; return false;}
 	});
 });
 

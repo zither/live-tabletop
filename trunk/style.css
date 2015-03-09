@@ -359,7 +359,23 @@ th, td {padding: 0;}
 
 /* Chat */
 
-#chatInput {border: 1px solid #CCC;}
+#chatForm {
+	width: 100%;
+	padding: 0 5px;
+	margin: 0;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+#chatInput {
+	border: 1px solid #CCC;
+	width: 100%;
+	padding: 0 5px;
+	margin: 0;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
 .alert {color: #039;}
 .roll {font-style: italic; color: #900;}
 
