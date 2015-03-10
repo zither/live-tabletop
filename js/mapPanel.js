@@ -850,6 +850,7 @@ LT.loadPieces = function () {
 					var pic = element[0].tagName == "CANVAS" ? element[0] : image;
 					context.drawImage(pic, 0, 0);
 					context.restore();
+					// FIXME: refreshing the map resets the zoom to 100% until you move the mouse
 					// draw center, base, scale or facing control
 					switch ($("#pieceCanvasMode").val()) {
 						case "center":

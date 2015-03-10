@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+		<title>Fog Maker</title>
+		<script type="text/javascript" src="jquery-1.11.0.min.js"></script>
+		<script>
+
+$(function () {
+	var canvas = $("canvas")[0];
+	var context = canvas.getContext("2d");
+	var pixels = context.getImageData(0, 0, canvas.width, canvas.height);
+	var i = 0;
+	var x0 = (canvas.width - 1) / 2;
+	var y0 = (canvas.height - 1) / 2;
+	var r0 = Math.min(canvas.width, canvas.height) / 2;
+	var x1 = (canvas.width / 2 - 1) / 2;
+	for (var y = 0; y < canvas.height; y++) {
+		for (var x = 0; x < canvas.width; x++) {
+			var r = Math.sqrt((x - x0) * (x - x0) + (y - y0) * (y - y0)) / r0;
+			r = Math.round((1 - r) / (1 - Math.sqrt(0.5)) * 255);
+			if (x > canvas.width / 2 || y < canvas.width / 2) {
+				pixels.data[i + 3] = r;
+			} else {
+				var a = 180 * Math.atan2(-(x - x1), (y - y0)) / Math.PI;
+				var r1 = Math.sqrt((x - x1) * (x - x1) + (y - y0) * (y - y0)) / r0;
+				//r1 = Math.round((1 - (r1 + 0.5)) / (1 - Math.sqrt(0.5)) * 255);
+				var n = (1 - Math.sqrt(0.5)) * (1 - Math.pow((90 - a) / 90, 2));
+				r1 = Math.round((1 - (r1 + 0.5)) / n * 255);
+				//pixels.data[i] = Math.round(n * 255);
+				pixels.data[i + 3] = r1;
+			}
+			i += 4;
+		}
+	}
+	context.putImageData(pixels, 0, 0);
+	context.fillStyle = "white";
+//	context.fillRect(canvas.width / 4, canvas.height / 4, canvas.width / 2, canvas.height / 2);
+	$("img").attr("src", canvas.toDataURL());
+});
+
+		</script>
+	</head>
+	<body>
+		<canvas width="256" height="256"></canvas>
+		<img/>
+	</body>
+</html>
