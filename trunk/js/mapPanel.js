@@ -1045,11 +1045,20 @@ LT.updateCursors = function (theUsers) {
 	var duration = 60000; // fade out over 1 minute
 	$.each(theUsers, function (i, user) {
 		var time = $.now() - 1000 * user.cursor.time;
-		if (time < duration) $("<div>").appendTo("#map").addClass("cursor").css({
-			"left": user.cursor.x + "px",
-			"top": user.cursor.y + "px",
-			"opacity": (duration - time) / duration,
-			"background-color": user.color || "black",
-		});
+		if (time < duration) {
+			var cursor = $("<div>").appendTo("#map").addClass("cursor").css({
+				"left": user.cursor.x + "px",
+				"top": user.cursor.y + "px",
+				"background-color": user.color || "black",
+			});
+			var fade = function () {
+				var time = $.now() - 1000 * user.cursor.time;
+				if (time < duration && cursor.closest("html").length == 1) {
+					cursor.css("opacity", (duration - time) / duration);
+					setTimeout(fade, LT.DELAY);
+				}
+			};
+			fade();
+		}
 	});
 };
