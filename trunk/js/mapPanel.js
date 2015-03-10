@@ -1,7 +1,4 @@
 LT.RESOLUTION = 62;
-LT.FOG_IMAGE = 44;
-LT.FOG_HEX = 140;
-LT.FOG_SQUARE = 64;
 LT.GUTTERS = 32;
 LT.BASE64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -169,6 +166,7 @@ $(function () { // This anonymous function runs after the page loads.
 		else if (tool == "wall") $("#clickWallLayer").show();
 	 	else $("#clickTileLayer").show();
 	});
+	$("#tools .swatch[data-tool=piece]").click();
 
 	// load images
 	$.get("images/images.json", function (data) {
@@ -491,6 +489,13 @@ LT.loadTiles = function () {
 		var width = LT.RESOLUTION;
 		if (map.type == "hex") width = Math.round(width * 1.5 / Math.sqrt(3));
 
+		// sort tiles after creating or painting tiles
+		var sortTiles = function () {
+			$("#tileLayer *").sort(function (a, b) {
+				return parseFloat($(a).data("order")) - parseFloat($(b).data("order"));
+			}).appendTo("#tileLayer");
+		}
+
 		// empty and resize layers
 		$("#tileLayer, #clickTileLayer, #clickWallLayer, #fogLayer").empty();
 		$("#map, #clickWallLayer, #clickTileLayer").css({
@@ -571,6 +576,7 @@ LT.loadTiles = function () {
 			var fog = Math.floor(fogIndex / Math.pow(2, 5 - i % 6)) % 2;
 			var tile = LT.BASE64.indexOf(code[0]) * 64 + LT.BASE64.indexOf(code[1]);
 
+			// function that generates CSS shared by fog and tile elements
 			var style = function (image) {
 				var scaleX = width / image[map.type][0];
 				var scaleY = height / image[map.type][1];
@@ -592,6 +598,7 @@ LT.loadTiles = function () {
 					if (tileElement === null) tileElement = $("<img>").appendTo("#tileLayer");
 					var image = LT.images[tile];
 					tileElement.attr("src", "images/" + image.file).css(style(image));
+					tileElement.data("order", 2 * i + 3 * (x % 2));
 				} else {
 					if (tileElement) tileElement.remove();
 					tileElement = null;
@@ -609,10 +616,22 @@ LT.loadTiles = function () {
 						if (LT.grid.getWall(x + 1, y + 1, direction) != "none")
 							byWall = true;
 					});
-					var image = LT.images[LT.FOG_SQUARE];
-					if (map.type == "hex") image = LT.images[LT.FOG_HEX];
-					if (!byWall) image = LT.images[LT.FOG_IMAGE];
-					fogElement.attr("src", "images/" + image.file).css(style(image)).css("z-index", 0);
+					if (!byWall) fogElement.css(style({
+						"size": [144, 144],
+						"center": [72, 72],
+						"hex": [54, 72],
+						"square": [50.91, 58.79],
+						"layer": 0})).attr("src", "images/void/void.png");
+					else if (map.type == "hex") fogElement.css(style({
+						"size": [288, 288],
+						"center": [144, 144],
+						"hex": [216, 288],
+						"layer": 0})).attr("src", "images/black-hex.png");
+					else fogElement.css(style({
+						"size": [72, 72],
+						"center": [36, 36],
+						"square": [72, 72],
+						"layer": 0})).attr("src", "images/tile/black.png");
 				} else {
 					if (fogElement) fogElement.remove();
 					fogElement = null;
@@ -626,6 +645,7 @@ LT.loadTiles = function () {
 						tile = LT.tile;
 						$.post("php/Map.tile.php", {"map": map.id, "x": x, "y": y, "tile": tile});
 						updateTileElement();
+						sortTiles();
 						break;
 					case "erase":
 						tile = 0;
@@ -658,6 +678,8 @@ LT.loadTiles = function () {
 			updateFogElement();
 
 		}); // $.each(map.flags.split(""), function (i, flag) {
+
+	sortTiles();
 
 	}); // $.get("php/Map.read.php", {map: LT.currentMap.id}, function (data) {
 }; // LT.loadTiles = function () {

@@ -396,7 +396,8 @@ th, td {padding: 0;}
 .swatch {
 	border: 1px solid black;
 	margin: 1px 1px 1px 1px;
-	max-width: 50px;
+	max-width: 72px;
+	max-height: 72px;
 }
 img.swatch {
 	border-color: transparent;
@@ -414,7 +415,10 @@ img.swatch {
 #toolOptions > div:not([data-tool=piece]) {display: none;}
 
 /* Piece Images */
-#pieceCreatorImages img, #pieceEditorImages img {max-width: 100px;}
+#pieceCreatorImages img, #pieceEditorImages img {
+	max-width: 72px;
+	max-height: 72px;
+}
 #pieceCreatorImages, #pieceEditorImages {
 	clear: both;
 	overflow: none;
@@ -462,6 +466,13 @@ img.swatch {
 	z-index: 2; /* higher than pieces that are above the fog */
 }
 /* #clickWallLayer > * {border: 1px dashed black;} /**/
+/* #clickTileLayer > :hover, */
+#clickWallLayer > *:hover {
+	background-image: url(images/ui/glow.png);
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	background-position: center;
+}
 
 
 /* Pieces */
