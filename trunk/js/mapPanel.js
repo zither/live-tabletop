@@ -1,4 +1,7 @@
-LT.RESOLUTION = 64;
+LT.HEIGHT = 64;
+LT.WIDTH = 64; // sometimes 55. A variable constant? You know that's right!
+LT.HEX_WIDTH = 55;
+LT.SQUARE_WIDTH = 64;
 LT.GUTTERS = 32;
 LT.BASE64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -11,6 +14,8 @@ LT.pieceMoving = false;
 LT.rotate = 0;
 LT.tilt = 90;
 LT.zoom = 1;
+LT.mapX = 0;
+LT.mapY = 0;
 
 $(function () { // This anonymous function runs after the page loads.
 	LT.mapPanel = new LT.Panel("map");
@@ -45,7 +50,7 @@ $(function () { // This anonymous function runs after the page loads.
 	LT.mapPanel.disable();
 
 	// create grid
-	LT.grid = new LT.Grid(1, 1, LT.RESOLUTION, LT.RESOLUTION,
+	LT.grid = new LT.Grid(1, 1, LT.WIDTH, LT.HEIGHT,
 		0, "black", 3, "black", 3, "white", "square", $("#wallLayer")[0]);
 
 	// submit map creation form
@@ -290,31 +295,36 @@ $(function () { // This anonymous function runs after the page loads.
 			// TODO: freeze map piece refreshes while moving pieces?
 			$.post("php/Piece.move.php", {
 				"piece": LT.pieceSelected.id,
-				"x": LT.pieceElement.position().left / LT.RESOLUTION,
-				"y": LT.pieceElement.position().top  / LT.RESOLUTION,
+				"x": parseFloat(LT.pieceElement.css("left")) / LT.WIDTH,
+				"y": parseFloat(LT.pieceElement.css("top"))  / LT.HEIGHT,
 			}, LT.refreshMap);
 		}
 	});
 	LT.dragHandlers.push(function () {
 		if (LT.pieceMoving) {
+			var x = parseFloat(LT.pieceElement.css("left")) / LT.WIDTH;
+			var y = parseFloat(LT.pieceElement.css("top")) / LT.HEIGHT;
+			var mouse = LT.screenToMap(LT.dragX, LT.dragY);
 			if (LT.clickDragGap == 0) {
-				LT.clickX = LT.dragX - LT.pieceElement.position().left;
-				LT.clickY = LT.dragY - LT.pieceElement.position().top;
+				LT.clickX = mouse[0] - x;
+				LT.clickY = mouse[1] - y;
 				LT.clickDragGap = 1;
 			}
-			var x = Math.max(0, Math.min(LT.dragX - LT.clickX, $("#map").width()));
-			var y = Math.max(0, Math.min(LT.dragY - LT.clickY, $("#map").height()));
-	/*
+			x = Math.max(0, Math.min(mouse[0] - LT.clickX, $("#map").width()));
+			y = Math.max(0, Math.min(mouse[1] - LT.clickY, $("#map").height()));
+$("#debug").empty();
+$.each(mouse.concat([LT.clickX, LT.clickY]), function (i, n) {$("<div>").text(n.toFixed(1)).appendTo("#debug");});
+/*
 
 			// TODO: snap settings
 			// snap to centers of tiles
-			x = LT.RESOLUTION * (Math.floor(x / LT.RESOLUTION) + 0.5);
-			y = LT.RESOLUTION * (Math.floor(y / LT.RESOLUTION) + 0.5);
+			x = LT.WIDTH * (Math.floor(x / LT.WIDTH) + 0.5);
+			y = LT.HEIGHT * (Math.floor(y / LT.HEIGHT) + 0.5);
 
-	*/
-			LT.pieceElement.css({left: x + "px", top: y + "px"});
-
-			LT.pieceMover.css({left: x + "px", top: y + "px"});
+*/
+			var style = {left: x * LT.WIDTH + "px", top: y * LT.HEIGHT + "px"};
+			LT.pieceElement.css(style);
+			LT.pieceMover.css(style);
 		}
 	});
 
@@ -347,6 +357,8 @@ $(function () { // This anonymous function runs after the page loads.
 		LT.tilt = Math.min(LT.tilt + 15, LT.currentMap.max_tilt);
 		LT.transform();
 	});
+
+	$(window).resize(LT.centerMap);
 
 }); // $(function () { // This anonymous function runs after the page loads.
 
@@ -452,10 +464,16 @@ LT.refreshMap = function () {
 					$("#mapTilt").val("[" + map.min_tilt + "," + map.max_tilt + "]");
 				}
 
+				// change the aspect column/row aspect ratio
+				LT.WIDTH = map.type == "hex" ? LT.HEX_WIDTH : LT.SQUARE_WIDTH;
+
 				// update pieces and tiles if they have changed
 				if (LT.currentMap.piece_changes < map.piece_changes) LT.loadPieces();
 				if (LT.currentMap.tile_changes  < map.tile_changes)  LT.loadTiles();
 				else if (LT.updateGrid(map)) LT.grid.repaint();
+
+				// position map so there is room for rotation
+				LT.centerMap();				
 
 				LT.currentMap = map;
 
@@ -497,12 +515,6 @@ LT.refreshMap = function () {
 LT.loadTiles = function () {
 	$.get("php/Map.read.php", {map: LT.currentMap.id}, function (map) {
 
-		// TODO: loading a map is really slow, investigate why
-
-		var height = LT.RESOLUTION;
-		var width = LT.RESOLUTION;
-		if (map.type == "hex") width = Math.round(width * 1.5 / Math.sqrt(3));
-
 		// sort tiles after creating or painting tiles
 		var sortTiles = function () {
 			$("#tileLayer *").sort(function (a, b) {
@@ -513,8 +525,8 @@ LT.loadTiles = function () {
 		// empty and resize layers
 		$("#tileLayer, #clickTileLayer, #clickWallLayer, #fogLayer").empty();
 		$("#map, #clickWallLayer, #clickTileLayer").css({
-			"width": width * map.columns + "px",
-			"height": height * map.rows + "px",
+			"width": LT.WIDTH * map.columns + "px",
+			"height": LT.HEIGHT * map.rows + "px",
 		});
 
 		// create walls and doors
@@ -538,10 +550,10 @@ LT.loadTiles = function () {
 			// function to create click detectors for walls
 			var createWallClickDetector = function (x, y, side, l, t, w, h) {
 				$("<div>").appendTo($("#clickWallLayer")).css({
-					"left": width	* (x + l - 1) + "px",
-					"top": height * (y + t - 1) + "px",
-					"width": width * w + "px",
-					"height": height * h + "px",
+					"left": LT.WIDTH	* (x + l - 1) + "px",
+					"top": LT.HEIGHT * (y + t - 1) + "px",
+					"width": LT.WIDTH * w + "px",
+					"height": LT.HEIGHT * h + "px",
 				}).click(function () {
 					// TODO: set type based on tool options?
 					var type = LT.grid.getWall(x, y, side);
@@ -592,11 +604,11 @@ LT.loadTiles = function () {
 
 			// function that generates CSS shared by fog and tile elements
 			var style = function (image) {
-				var scaleX = width / image[map.type][0];
-				var scaleY = height / image[map.type][1];
+				var scaleX = LT.WIDTH / image[map.type][0];
+				var scaleY = LT.HEIGHT / image[map.type][1];
 				return {
-					left: Math.round((x + 0.5 + offset) * width) + "px",
-					top: Math.round((y + 0.5 + stagger) * height) + "px",
+					left: Math.round((x + 0.5 + offset) * LT.WIDTH) + "px",
+					top: Math.round((y + 0.5 + stagger) * LT.HEIGHT) + "px",
 					width:  Math.round(image.size[0] * scaleX) + "px",
 					height: Math.round(image.size[1] * scaleY) + "px",
 					marginLeft: -Math.round(image.center[0] * scaleX) + "px",
@@ -676,10 +688,10 @@ LT.loadTiles = function () {
 
 			// create tile and fog clickable element
 			$("<div>").appendTo("#clickTileLayer").css({
-				"left": width * (x + offset) + "px",
-				"top": height * (y + stagger) + "px",
-				"width": width + "px",
-				"height": height + "px",
+				"left": LT.WIDTH * (x + offset) + "px",
+				"top": LT.HEIGHT * (y + stagger) + "px",
+				"width": LT.WIDTH + "px",
+				"height": LT.HEIGHT + "px",
 			}).mousedown(function () { // click
 				LT.dragging = 1;
 				LT.toggleFog = 1 - fog; // TODO: make sure this doesn't do anything bad to the tile or erase tool
@@ -705,9 +717,7 @@ LT.updateGrid = function (map) {
 	if (map.rows != LT.grid.getRows())
 		{LT.grid.setRows(map.rows); changed = true;}
 	if (map.type != LT.grid.getType()) {
-		if (map.type == "hex")
-			LT.grid.setWidth(Math.round(LT.RESOLUTION * 1.5 / Math.sqrt(3)));
-		else LT.grid.setWidth(LT.RESOLUTION);
+		LT.grid.setWidth(LT.WIDTH); // the variable constant may have changed
 		LT.grid.setType(map.type);
 		changed = true;
 	}
@@ -752,8 +762,8 @@ LT.loadPieces = function () {
 			var style = {
 				width:  piece.image.size[0] * scale + "px",
 				height: piece.image.size[1] * scale + "px",
-				left: piece.x * LT.RESOLUTION + "px",
-				top:  piece.y * LT.RESOLUTION + "px",
+				left: piece.x * LT.WIDTH + "px",
+				top:  piece.y * LT.HEIGHT + "px",
 				marginLeft: (-piece.image.center[0] * scale - 1) + "px",
 				marginTop:  (-piece.image.center[1] * scale - 1) + "px",
 			};
@@ -787,10 +797,10 @@ LT.loadPieces = function () {
 							piece.image.center[0] + x * (mirror ? -1 : 1),
 							piece.image.center[1] + y]; break;
 						case "base": piece.image.base = [
-							Math.max(1, Math.ceil(Math.abs(2 * x / LT.RESOLUTION))),
-							Math.max(1, Math.ceil(Math.abs(2 * y / LT.RESOLUTION)))]; break;
+							Math.max(1, Math.ceil(Math.abs(2 * x / LT.HEIGHT))),
+							Math.max(1, Math.ceil(Math.abs(2 * y / LT.HEIGHT)))]; break;
 						case "scale": piece.image.scale =
-							Math.round(200 * Math.sqrt(x * x + y * y) / LT.RESOLUTION); break;
+							Math.round(200 * Math.sqrt(x * x + y * y) / LT.HEIGHT); break;
 						case "facing": piece.image.angle =
 							Math.round(Math.atan2(x, -y) * 180 / Math.PI); break;
 					}
@@ -854,7 +864,7 @@ LT.loadPieces = function () {
 				};
 				LT.repaintPieceCanvas = function (x, y) {
 					if (!LT.pieceSelected) return;
-					var radius = LT.RESOLUTION / 2;
+					var radius = LT.HEIGHT / 2;
 					var center = [canvas.width * 0.5, canvas.height * 0.5];
 					var offset = [
 						center[0] - piece.image.center[0],
@@ -905,8 +915,8 @@ LT.loadPieces = function () {
 								w = Math.max(1, Math.ceil(Math.abs((x - center[0]) / radius)));
 							if (!isNaN(y))
 								h = Math.max(1, Math.ceil(Math.abs((y - center[1]) / radius)));
-							drawBase(context, center[0], center[1], w, h, LT.RESOLUTION, 4, "white");
-							drawBase(context, center[0], center[1], w, h, LT.RESOLUTION, 1.2, "black");
+							drawBase(context, center[0], center[1], w, h, LT.HEIGHT, 4, "white");
+							drawBase(context, center[0], center[1], w, h, LT.HEIGHT, 1.2, "black");
 							$("#pieceCanvasText").text([w, h].join(", ")); break;
 /*
 						case "scale":
@@ -974,8 +984,8 @@ LT.loadPieces = function () {
 						piece.image = {
 							"url": url,
 							"view": "top",
-							"size": [LT.RESOLUTION, LT.RESOLUTION],
-							"center": [LT.RESOLUTION / 2, LT.RESOLUTION / 2],
+							"size": [LT.HEIGHT, LT.HEIGHT],
+							"center": [LT.HEIGHT / 2, LT.HEIGHT / 2],
 							"base": [1, 1],
 						};
 						$("#pieceURL").text(piece.image.url || "");
@@ -1098,3 +1108,57 @@ LT.updateCursors = function (theUsers) {
 		}
 	});
 };
+
+LT.mapToScreen = function (c, r) {
+	var rows = LT.currentMap.rows;
+	var columns = LT.currentMap.columns;
+	var offset = $("#map").offset();
+	c -= columns / 2;
+	r -= rows / 2;
+	var angle = Math.PI * LT.rotate / 180;
+	var x = c * Math.cos(angle) - r * Math.sin(angle);
+	var y = r * Math.cos(angle) + c * Math.sin(angle);
+	x *= LT.zoom * LT.WIDTH;
+	y *= LT.zoom * LT.HEIGHT * Math.sin(Math.PI * LT.tilt / 180);
+	return [
+		x + LT.mapX + columns * LT.WIDTH / 2,
+		y + LT.mapY + rows * LT.HEIGHT / 2];
+};
+
+LT.screenToMap = function (x, y) {
+	var rows = LT.currentMap.rows;
+	var columns = LT.currentMap.columns;
+	x -= LT.mapX + columns * LT.WIDTH / 2;
+	y -= LT.mapY + rows * LT.HEIGHT / 2;
+	x /= LT.zoom * LT.WIDTH;
+	y /= LT.zoom * LT.HEIGHT * Math.sin(Math.PI * LT.tilt / 180);
+	var angle = -Math.PI * LT.rotate / 180;
+	return [
+		x * Math.cos(angle) - y * Math.sin(angle) + columns / 2,
+		y * Math.cos(angle) + x * Math.sin(angle) + rows / 2];
+};
+
+LT.centerMap = function () {
+	if (!LT.currentMap) return;
+	var rows = LT.currentMap.rows;
+	var columns = LT.currentMap.columns;
+	var x = LT.WIDTH * (columns + 1);
+	var y = LT.HEIGHT * (rows + 1);
+	var length = Math.sqrt(x * x + y * y);	
+	LT.mapX = Math.max($(window).width() - length, length - LT.WIDTH * columns) / 2;
+	LT.mapY = Math.max($(window).height() - length, length - LT.HEIGHT * rows) / 2;
+	$("#map").css("margin", LT.mapY + "px " + LT.mapX + "px");
+};
+
+/*
+$(document).mousemove(function () {
+	if (!LT.currentMap) return;
+	var s2m = LT.screenToMap(LT.dragX, LT.dragY);
+	var m2s = LT.mapToScreen(s2m[0], s2m[1]);
+	$("#debug").empty();
+	$.each(s2m.concat(m2s), function (i, n) {$("<div>").text(n.toFixed(1)).appendTo("#debug");});
+});
+/**/
+
+
+
