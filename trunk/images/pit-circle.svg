@@ -17,8 +17,8 @@
    inkscape:version="0.48.4 r9939"
    sodipodi:docname="pit-circle.svg"
    inkscape:export-filename="/home/seth/Desktop/www/live-tabletop/images/pit-circle.png"
-   inkscape:export-xdpi="90"
-   inkscape:export-ydpi="90">
+   inkscape:export-xdpi="71.428574"
+   inkscape:export-ydpi="71.428574">
   <defs
      id="defs4">
     <linearGradient
@@ -146,6 +146,14 @@
        fy="36"
        r="36"
        gradientUnits="userSpaceOnUse" />
+    <filter
+       inkscape:collect="always"
+       id="filter3836">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.8"
+         id="feGaussianBlur3838" />
+    </filter>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -154,8 +162,8 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="7.4829246"
-     inkscape:cx="45.950561"
+     inkscape:zoom="1"
+     inkscape:cx="21.962614"
      inkscape:cy="36.428475"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -192,7 +200,7 @@
      transform="translate(0,-980.36218)">
     <path
        sodipodi:type="arc"
-       style="fill:url(#radialGradient3864);fill-opacity:1;stroke:none"
+       style="fill:url(#radialGradient3864);fill-opacity:1;stroke:none;filter:url(#filter3836)"
        id="path3856"
        sodipodi:cx="36"
        sodipodi:cy="36"

@@ -15,12 +15,27 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="pit-circle.svg"
+   sodipodi:docname="pit-3d.svg"
    inkscape:export-filename="/home/seth/Desktop/www/live-tabletop/images/pit-3d.png"
-   inkscape:export-xdpi="90"
-   inkscape:export-ydpi="90">
+   inkscape:export-xdpi="68.86657"
+   inkscape:export-ydpi="68.86657">
   <defs
      id="defs4">
+    <linearGradient
+       id="linearGradient3792">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop3794" />
+      <stop
+         id="stop3856"
+         offset="0.5"
+         style="stop-color:#808080;stop-opacity:0;" />
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="1"
+         id="stop3796" />
+    </linearGradient>
     <linearGradient
        id="linearGradient3858">
       <stop
@@ -147,6 +162,23 @@
        r="36"
        gradientUnits="userSpaceOnUse"
        gradientTransform="matrix(1.5,0,0,1.5,-18,-27)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3792"
+       id="linearGradient3798"
+       x1="18"
+       y1="0"
+       x2="18"
+       y2="72"
+       gradientUnits="userSpaceOnUse" />
+    <filter
+       inkscape:collect="always"
+       id="filter3898">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.8"
+         id="feGaussianBlur3900" />
+    </filter>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -155,8 +187,8 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="7.4829246"
-     inkscape:cx="21.695339"
+     inkscape:zoom="3.9933812"
+     inkscape:cx="20.324458"
      inkscape:cy="36.428475"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -193,7 +225,7 @@
      transform="translate(0,-980.36218)">
     <path
        sodipodi:type="arc"
-       style="fill:url(#radialGradient3864);fill-opacity:1;stroke:none"
+       style="fill:url(#radialGradient3864);fill-opacity:1;stroke:url(#linearGradient3798);stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter3898)"
        id="path3856"
        sodipodi:cx="36"
        sodipodi:cy="36"
