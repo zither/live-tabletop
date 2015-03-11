@@ -390,6 +390,7 @@ img.swatch {
 	text-align: center;
 	margin: 1px;
 }
+/*
 #tools {
 	position: absolute;
 	background-color: #fff;
@@ -399,6 +400,7 @@ img.swatch {
 #toolOptions {
 	margin-top: 30px;
 }
+*/
 #toolOptions > div:not([data-tool=piece]) {display: none;}
 
 /* Piece Images */
@@ -567,6 +569,7 @@ img.swatch {
 	clear: both;
 	background: #999;
 }
+.nowrap {white-space: nowrap;}
 .ellipsis {
 	white-space: nowrap;
 	overflow: hidden;
@@ -575,4 +578,9 @@ img.swatch {
 span.ellipsis {
 	display: inline-block;
 	vertical-align: middle;
+}
+#debug {
+	position: fixed;
+	top: 26px;
+	right: 0;
 }

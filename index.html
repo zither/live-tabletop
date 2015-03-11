@@ -153,11 +153,9 @@
 				<div class="tab" data-tab="user received">Received</div>
 			</div>
 			<div class="content" data-tab="user info">
-				<div id="userName">
-					<span>User Name</span>
-					<input type="button" value="rename"/>
-				</div>
 				<div>
+					<span id="userName">User Name</span>
+					<input id="renameUser" type="button" value="rename"/>
 					<select id="userColor">
 						<option>red</option>
 						<option>orange</option>
@@ -171,10 +169,10 @@
 						<option>pink</option>
 						<option>brown</option>
 					</select>
-				</div>
-				<div>
-					<input type="checkbox" id="userSubscribed"/>
-					<label for="userSubscribed">receive e-mail updates</label>
+					<span class="nowrap">
+						<input type="checkbox" id="userSubscribed"/>
+						<label for="userSubscribed">receive e-mail updates</label>
+					</span>
 				</div>
 				<div id="userPassword">
 <!-- TODO: should we require your old password? This would require additional code support in User.password
@@ -252,13 +250,11 @@
 				<div>
 					<span id="campaignName">campaign name</span>
 					<input class="campaignOwner" id="renameCampaign" type="button" value="rename"/>
-				</div>
-				<div class="campaignOwner">
-					<input type="checkbox" value="private" id="campaignPrivate" checked="checked"/>
-					<label for="campaignPrivate">private</label>
-				</div>
-				<div>
-					<input type="button" value="close campaign" id="campaignClose"/>
+					<input type="button" id="campaignClose" value="close campaign"/>
+					<span class="nowrap">
+						<input class="campaignOwner" id="campaignPrivate" type="checkbox" value="private" checked="checked"/>
+						<label class="campaignOwner" for="campaignPrivate">private</label>
+					</span>
 				</div>
 				<div class="campaignOwner">
 					<select name="user" id="campaignFriend"><option>My Friend</option></select>
@@ -718,6 +714,8 @@
 				<input type="button" value="&#8595;" id="tiltDown"/>
 			</div>
 		</div>
+
+		<div id="debug"></div>
 
 	</body>
 </html>
