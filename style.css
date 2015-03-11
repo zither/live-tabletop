@@ -312,7 +312,6 @@ th, td {padding: 0;}
 
 .panel .content a {cursor: pointer; text-decoration: none;}
 .panel .content a:hover {text-decoration: underline;}
-
 .panel .content input, .panel .content select {
 	background: #FFF;
 	color: #333;
@@ -321,38 +320,17 @@ th, td {padding: 0;}
 	margin-top: -1px;
 	background: #FFF;
 }
-
 .panel .content > div {
-	float: left;
 	margin: 1px 5px 0 5px;
-	min-height: 21px;
+	min-height: 21px; /* ??? */
 }
-
-.panel .content table {float: left;}
-
 .panel .content td {padding-left: 5px;}
-#resizeMap td {padding: 0;}
-#resizeMap td:first-child {vertical-align: top;}
-
 .panel:not(.loaded) .content {display: none !important;}
-
 
 /* tiny images no taller than a line of text */
 .inlineImage {
 	max-height: 19px;
 	vertical-align: middle;
-}
-
-.buttonDiv {
-	float: left;
-	background: #333;
-	border: 1px solid #000;
-	color: #CCC;
-	min-width: 10px;
-	text-align: center;
-}
-.buttonDiv:hover {
-	cursor: pointer;
 }
 
 /* #friendsConfirmed, #friendsRequested, #friendsReceived {width: 100%;} */
@@ -411,6 +389,15 @@ img.swatch {
 	line-height: 25px;
 	text-align: center;
 	margin: 1px;
+}
+#tools {
+	position: absolute;
+	background-color: #fff;
+	margin-top: -1px;
+	padding-top: 1px;
+}
+#toolOptions {
+	margin-top: 30px;
 }
 #toolOptions > div:not([data-tool=piece]) {display: none;}
 

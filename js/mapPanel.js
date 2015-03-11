@@ -18,6 +18,8 @@ $(function () { // This anonymous function runs after the page loads.
 		var width = LT.mapPanel.getWidth();
 		$("#mapName").css("max-width", width - $("#renameMap").width() - LT.GUTTERS + "px");
 		$(".mapListRow").width(width - $(".disownMap:visible").width() - LT.GUTTERS);
+		$("#mapOwner").css("max-width", width - $("#mapShare").width() - LT.GUTTERS - 2 + "px");
+		$(".mapOwnerName").width(width - $(".mapOwnerRemove:visible").width() - LT.GUTTERS);
 		$(".pieceListRow").width(width - $(".pieceDelete:visible").width() - LT.GUTTERS);
 		$("#pieceName").css("max-width", width - $("#renamePiece").width() - LT.GUTTERS + "px");
 		$("#pieceCharacter").css("max-width", width - $("#deletePiece").width() - LT.GUTTERS - 2 + "px");
@@ -450,11 +452,11 @@ LT.refreshMap = function () {
 			// load map owners
 			$.get("php/Map.owners.php", {map: LT.currentMap.id}, function (owners) {
 				var currentUserCanEditThisMap = false;
-				$("#mapOwners tr:not(.template)").remove();
+				$("#mapOwners > :not(.template)").remove();
 				$.each(owners, function (i, owner) {
-					var copy = $("#mapOwners .template").clone().removeClass("template");
-					copy.find(".name").text(owner.name || owner.email);
-					copy.find("input[value=remove]").click(function () {
+					var copy = $("#mapOwners > .template").clone().removeClass("template");
+					copy.find(".mapOwnerName").text(owner.name || owner.email);
+					copy.find(".mapOwnerRemove").click(function () {
 						$.post("php/Map.deleteOwner.php", {
 							map: LT.currentMap.id,
 							user: owner.id
