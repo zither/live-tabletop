@@ -312,8 +312,6 @@ $(function () { // This anonymous function runs after the page loads.
 			}
 			x = Math.max(0, Math.min(mouse[0] - LT.clickX, $("#map").width()));
 			y = Math.max(0, Math.min(mouse[1] - LT.clickY, $("#map").height()));
-$("#debug").empty();
-$.each(mouse.concat([LT.clickX, LT.clickY]), function (i, n) {$("<div>").text(n.toFixed(1)).appendTo("#debug");});
 /*
 
 			// TODO: snap settings
