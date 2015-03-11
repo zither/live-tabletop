@@ -23,10 +23,10 @@
 		],
 		"background":[
 			{"id":141,"view":"top","size":[64,64],"center":[32,32],"base":[1,1],"file":"pit-circle.png","z":-1},
-			{"id":142,"view":"top","size":[68,68],"center":[32,32],"base":[1,1],"file":"pit-square.png","z":-1},
+			{"id":142,"view":"top","size":[68,68],"center":[34,34],"base":[1,1],"file":"pit-square.png","z":-1},
 			{"id":143,"view":"flat","size":[64,64],"center":[32,32],"base":[1,1],"file":"pit-3d.png","z":-1},
-			{"id":144,"view":"top","size":[72,72],"center":[36,36],"base":[1,1],"file":"stairs-up.png","z":-1},
-			{"id":145,"view":"top","size":[72,72],"center":[36,36],"base":[1,1],"file":"stairs-down.png","z":-1},
+			{"id":144,"view":"top","size":[64,64],"center":[32,32],"base":[1,1],"file":"stairs-up.png","z":-1},
+			{"id":145,"view":"top","size":[64,64],"center":[32,32],"base":[1,1],"file":"stairs-down.png","z":-1},
 			{"id":246,"view":"top","size":[72,72],"center":[36,54],"base":[1,1],"file":"scenery/circle-magic.png"},
 			{"id":247,"view":"top","size":[72,72],"center":[36,54],"base":[1,1],"file":"scenery/circle-magic-glow.png"},
 			{"id":270,"view":"top","size":[72,72],"center":[36,54],"base":[1,1],"file":"scenery/rune1.png"},
