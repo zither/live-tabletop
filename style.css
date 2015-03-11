@@ -390,6 +390,12 @@ img.swatch {
 	text-align: center;
 	margin: 1px;
 }
+/* clearfix */
+#tools:after {
+	content: "";
+	display: table;
+	clear: both;
+}
 /*
 #tools {
 	position: absolute;
