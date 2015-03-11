@@ -290,7 +290,6 @@ Or maybe we should change how we do it.
 
 		this.setX(LT.dragX);
 		this.setY(LT.dragY);
-		this.resize();
 	},
 
 	// Resize panel using the bottom-right handle.

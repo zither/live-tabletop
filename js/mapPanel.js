@@ -16,17 +16,29 @@ $(function () { // This anonymous function runs after the page loads.
 	LT.mapPanel = new LT.Panel("map");
 	LT.mapPanel.resize = function () {
 		var width = LT.mapPanel.getWidth();
-		$("#mapName").css("max-width", width - $("#renameMap").width() - LT.GUTTERS + "px");
-		$(".mapListRow").width(width - $(".disownMap:visible").width() - LT.GUTTERS);
-		$("#mapOwner").css("max-width", width - $("#mapShare").width() - LT.GUTTERS - 2 + "px");
-		$(".mapOwnerName").width(width - $(".mapOwnerRemove:visible").width() - LT.GUTTERS);
-		$(".pieceListRow").width(width - $(".pieceDelete:visible").width() - LT.GUTTERS);
-		$("#pieceName").css("max-width", width - $("#renamePiece").width() - LT.GUTTERS + "px");
-		$("#pieceCharacter").css("max-width", width - $("#deletePiece").width() - LT.GUTTERS - 2 + "px");
-		$("#pieceURL").width(width - $("#changePieceURL").width() - LT.GUTTERS);
-		$("#pieceCanvas")[0].width = width - $("#pieceCanvasMode").width() - LT.GUTTERS;
-		$("#pieceCanvas")[0].width -= $("#pieceCanvas")[0].width % 2; // even number
-		if (LT.repaintPieceCanvas) LT.repaintPieceCanvas();
+		switch (LT.mapPanel.getTab()) {
+			case "map list":
+				$("#mapName").css("max-width", width - $("#renameMap").width() - LT.GUTTERS + "px");
+				$(".mapListRow").width(width - $(".disownMap:visible").width() - LT.GUTTERS);
+				break;
+			case "map info":
+				$("#mapOwner").css("max-width", width - $("#mapShare").width() - LT.GUTTERS - 2 + "px");
+				$(".mapOwnerName").width(width - $(".mapOwnerRemove:visible").width() - LT.GUTTERS);
+				break;
+			case "map tools":
+				break;
+			case "piece list":
+				$(".pieceListRow").width(width - $(".pieceDelete:visible").width() - LT.GUTTERS);
+				break;
+			case "piece info":
+				$("#pieceName").css("max-width", width - $("#renamePiece").width() - LT.GUTTERS + "px");
+				$("#pieceCharacter").css("max-width", width - $("#deletePiece").width() - LT.GUTTERS - 2 + "px");
+				$("#pieceURL").width(width - $("#changePieceURL").width() - LT.GUTTERS);
+				$("#pieceCanvas")[0].width = width - $("#pieceCanvasMode").width() - LT.GUTTERS;
+				$("#pieceCanvas")[0].width -= $("#pieceCanvas")[0].width % 2; // even number
+				if (LT.repaintPieceCanvas) LT.repaintPieceCanvas();
+				break;
+		}
 	};
 
 	// disable map panel button until a campaign is loaded
