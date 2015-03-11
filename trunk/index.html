@@ -352,45 +352,38 @@
 					<select id="mapType">
 						<option value="square" selected="selected">square</option>
 						<option value="hex">hex</option>
+						<input type="button" value="close map" id="mapClose"/>
 					</select>
 				</div>
-				<div>
-					<input type="button" value="close map" id="mapClose"/>
+				<div id="resizeMapLeft">
+					<input type="button" value="-10"/>
+					<input type="button" value="-1"/>
+					<input type="button" value="+1"/>
+					<input type="button" value="+10"/>
+					left columns 
+				</div>
+				<div id="resizeMapRight">
+					<input type="button" value="-10"/>
+					<input type="button" value="-1"/>
+					<input type="button" value="+1"/>
+					<input type="button" value="+10"/>
+					right columns
+				</div>
+				<div id="resizeMapTop">
+					<input type="button" value="-10"/>
+					<input type="button" value="-1"/>
+					<input type="button" value="+1"/>
+					<input type="button" value="+10"/>
+					top rows 
+				</div>
+				<div id="resizeMapBottom">
+					<input type="button" value="-10"/>
+					<input type="button" value="-1"/>
+					<input type="button" value="+1"/>
+					<input type="button" value="+10"/>
+					bottom rows 
 				</div>
 				<div>
-					<table id="resizeMap">
-						<tr id="resizeMapLeft">
-							<td>left columns: </td>
-							<td><input type="button" value="-10"/></td>
-							<td><input type="button" value="-1"/></td>
-							<td><input type="button" value="+1"/></td>
-							<td><input type="button" value="+10"/></td>
-						</tr>
-						<tr id="resizeMapRight">
-							<td>right columns:&nbsp;</td>
-							<td><input type="button" value="-10"/></td>
-							<td><input type="button" value="-1"/></td>
-							<td><input type="button" value="+1"/></td>
-							<td><input type="button" value="+10"/></td>
-						</tr>
-						<tr id="resizeMapTop">
-							<td>top rows: </td>
-							<td><input type="button" value="-10"/></td>
-							<td><input type="button" value="-1"/></td>
-							<td><input type="button" value="+1"/></td>
-							<td><input type="button" value="+10"/></td>
-						</tr>
-						<tr id="resizeMapBottom">
-							<td>bottom rows: </td>
-							<td><input type="button" value="-10"/></td>
-							<td><input type="button" value="-1"/></td>
-							<td><input type="button" value="+1"/></td>
-							<td><input type="button" value="+10"/></td>
-						</tr>
-					</table>
-				</div>
-				<div>
-					Grid:
 					<select id="grid_thickness">
 						<option value="0">none</option>
 						<option value="1" selected="selected">thin</option>
@@ -409,9 +402,9 @@
 						<option>pink</option>
 						<option>brown</option>
 					</select>
+					grid
 				</div>
 				<div>
-					Wall:
 					<select id="wall_thickness">
 						<option value="3" selected="selected">thin</option>
 						<option value="6">thick</option>
@@ -429,9 +422,9 @@
 						<option>pink</option>
 						<option>brown</option>
 					</select>
+					wall
 				</div>
 				<div>
-					Door:
 					<select id="door_thickness">
 						<option value="3" selected="selected">thin</option>
 						<option value="6">thick</option>
@@ -449,9 +442,9 @@
 						<option>pink</option>
 						<option>brown</option>
 					</select>
+					door
 				</div>
 				<div>
-					Zoom:
 					<select id="min_zoom">
 						<option value="25">25%</option>
 						<option value="50">50%</option>
@@ -467,9 +460,9 @@
 						<option value="200">200%</option>
 						<option value="400">400%</option>
 					</select>
+					zoom
 				</div>
 				<div>
-					Rotate:
 					<select id="min_rotate">
 						<option value="-180">-180&deg;</option>
 						<option value="-135">-135&deg;</option>
@@ -485,6 +478,7 @@
 						<option value="45">45&deg;</option>
 						<option value="0">0&deg;</option>
 					</select>
+					spin
 					<select id="mapTilt">
 						<option value="[30,90]" selected="selected">free tilt</option>
 						<option value="[30,30]">side view</option>
@@ -492,16 +486,15 @@
 					</select>
 				</div>
 				<div>
-					Owners:
 					<select name="user" id="mapOwner"><option>My Friend</option></select>
-					<input type="button" value="share map" id="mapShare"/>
+					<input type="button" id="mapShare" value="share map"/>
 				</div>
-				<table id="mapOwners">
-					<tr class="template">
-						<td class="name">user name</td>
-						<td><input type="button" value="remove"/></td>
-					</tr>
-				</table>
+				<div id="mapOwners">
+					<div class="template">
+						<span class="ellipsis mapOwnerName">user name</span>
+						<input class="mapOwnerRemove" type="button" value="remove owner"/>
+					</div>
+				</div>
 			</div>
 			<div class="content" data-tab="map tools">
 				<div id="tools">
