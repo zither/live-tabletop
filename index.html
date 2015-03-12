@@ -600,16 +600,65 @@
 						<option>brown</option>
 					</select>
 				</div>
-				<div id="pieceCanvasWindow">
-					<select id="pieceCanvasMode" size="4">
-						<option>center</option>
-						<option>base</option>
-						<option>scale</option>
-						<option>facing</option>
-					</select>
-					<div id="pieceCanvasText"></div>
-					<canvas id="pieceCanvas" width="150" height="150"></canvas>
-				</div>
+				<table>
+					<tr>
+						<td>
+							<div>
+								<select id="pieceCanvasMode" size="4">
+									<option>facing</option>
+									<option>scale</option>
+									<option>base</option>
+									<option>center</option>
+								</select>
+							</div>
+							<div>
+								<select id="pieceFacing" class="pieceTransform">
+									<option value="">facing</option>
+									<option value="0">up</option>
+									<option value="30">30&deg; (1 o'clock)</option>
+									<option value="60">60&deg; (2 o'clock)</option>
+									<option value="90">right</option>
+									<option value="120">120&deg; (4 o'clock)</option>
+									<option value="150">150&deg; (5 o'clock)</option>
+									<option value="180">down</option>
+									<option value="-150">-150&deg; (7 o'clock)</option>
+									<option value="-120">-120&deg; (8 o'clock)</option>
+									<option value="-90">left</option>
+									<option value="-60">-60&deg; (10 o'clock)</option>
+									<option value="-30">-30&deg; (11 o'clock)</option>
+								</select>
+							</div>
+							<div>
+								<select id="pieceScale" class="pieceTransform">
+									<option value="">scale</option>
+									<option value="0.1">10%</option>
+									<option value="0.25">25%</option>
+									<option value="0.5">50%</option>
+									<option value="1">100%</option>
+									<option value="2">200%</option>
+									<option value="4">400%</option>
+									<option value="8">800%</option>
+								</select>
+							</div>
+							<div>
+								<select id="pieceBase" class="pieceTransform">
+									<option value="">base</option>
+									<option value="1">1 &times; 1</option>
+									<option value="2">2 &times; 2</option>
+									<option value="3">3 &times; 3</option>
+									<option value="4">4 &times; 4</option>
+									<option value="5">5 &times; 5</option>
+									<option value="6">6 &times; 6</option>
+								</select>
+							</div>
+							<input id="pieceCenter" class="pieceTransform" type="button" value="center"/>
+						</td>
+						<td id="pieceCanvasWindow">
+							<div id="pieceCanvasText"></div>
+							<canvas id="pieceCanvas" width="150" height="150"></canvas>
+						</td>
+					</tr>
+				</table>
 				<div>
 					<input id="changePieceURL" type="button" value="external image URL"/>
 					<span id="pieceURL" class="ellipsis"></span>

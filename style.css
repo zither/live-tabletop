@@ -418,9 +418,17 @@ img.swatch {
 	clear: both;
 	overflow: none;
 }
-#pieceCanvasMode {height: 150px;}
-#pieceCanvasWindow {position: relative;}
-#pieceCanvasText {position: absolute; left: 5.5em; top: 0.5em;}
+/*#pieceCanvasMode {height: 150px;}*/
+.pieceTransform {width: 5em;}
+#pieceCanvasWindow {
+	position: relative;
+	padding: 0;
+}
+#pieceCanvasText {
+	position: absolute;
+	left: 0.5em;
+	top: 0.5em;
+}
 
 /* MAP */
 
