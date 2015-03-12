@@ -430,9 +430,11 @@ LT.leaveMap = function () {
 	delete LT.currentMap;
 };
 
+// Update the map list if that tab is visible.
 LT.refreshMapList = function () {
+	if (LT.mapPanel.getTab() != "map list") return;
 	$.post("php/User.maps.php", function (theData) {
-		var list = $(".content[data-tab='map list']");
+		if (LT.mapPanel.getTab() != "map list") return;
 		$("#mapList > div:not(.template)").remove();
 		$.each(theData, function (i, theMap) {
 			var copy = $("#mapList .template").clone().removeClass("template");
@@ -896,8 +898,13 @@ LT.loadPieces = function () {
 					context.stroke();
 					context.restore();
 				};
-				LT.repaintPieceCanvas = function (x, y) {
+				LT.repaintPieceCanvas = function () {
 					if (!LT.pieceSelected) return;
+					var x, y;
+					var offset = $("#pieceCanvas").offset();
+					if (LT.dragX >= offset.left && LT.dragX < offset.left + canvas.width
+						&& LT.dragY >= offset.top && LT.dragY < offset.top + canvas.height)
+						{x = LT.dragX - offset.left; y = LT.dragY - offset.top;}
 					var radius = LT.HEIGHT / 2;
 					var center = [canvas.width * 0.5, canvas.height * 0.5];
 					var offset = [
@@ -913,11 +920,11 @@ LT.loadPieces = function () {
 						context.scale(scale, scale);
 					else if (isNaN(x) || isNaN(y)) {
 						if (scale != 1) context.scale(scale, scale);
-						$("#pieceCanvasText").text(Math.round(scale * 100) + "%");
+//						$("#pieceCanvasText").text(Math.round(scale * 100) + "%");
 					} else {
 						var scale2 = Math.sqrt(Math.pow(x - center[0], 2) + Math.pow(y - center[1], 2)) / radius;
 						context.scale(scale2, scale2)
-						$("#pieceCanvasText").text(Math.round(scale2 * 100) + "%");
+//						$("#pieceCanvasText").text(Math.round(scale2 * 100) + "%");
 					}
 					context.translate(offset[0], offset[1]);
 					context.translate(-center[0], -center[1]);
@@ -952,7 +959,6 @@ LT.loadPieces = function () {
 							drawBase(context, center[0], center[1], w, h, LT.HEIGHT, 4, "white");
 							drawBase(context, center[0], center[1], w, h, LT.HEIGHT, 1.2, "black");
 							$("#pieceCanvasText").text([w, h].join(", ")); break;
-/*
 						case "scale":
 							drawScale(context, center[0], center[1], radius * scale, 4, "white");
 							drawScale(context, center[0], center[1], radius * scale, 1.5, "black");
@@ -963,7 +969,6 @@ LT.loadPieces = function () {
 								drawScale(context, center[0], center[1], radius * scale2, 1.5, "black");
 							}
 							$("#pieceCanvasText").text(Math.round(scale2 * 100) + "%"); break;
-*/
 						case "facing":
 							var a = piece.image.angle ? Math.PI * piece.image.angle / 180 : 0;
 							if (!isNaN(x) && !isNaN(y))
@@ -974,13 +979,10 @@ LT.loadPieces = function () {
 					}
 				};
 				LT.repaintPieceCanvas();
-
-				$("#pieceCanvas").off("mousemove").on("mousemove", function () {
-					LT.repaintPieceCanvas(
-						LT.dragX - $(this).offset().left,
-						LT.dragY - $(this).offset().top);
-				}).off("mouseout").on("mouseout", LT.repaintPieceCanvas);
+				$("#pieceCanvas").off("mousemove").on("mousemove", LT.repaintPieceCanvas)
+					.off("mouseout").on("mouseout", LT.repaintPieceCanvas);
 				$("#pieceCanvasMode").off("change").change(LT.repaintPieceCanvas);
+
 				$("#pieceName").text(piece.name || "[unnamed piece]");
 				$("#renamePiece").off("click").click(function () {
 					var newName = prompt("new piece name", piece.name || "");
@@ -1011,6 +1013,35 @@ LT.loadPieces = function () {
 					piece.color = $(this).val();
 					LT.savePieceSettings(piece);
 				});
+
+				$("#pieceFacing option:first-child").text(
+					(piece.image.angle || 0) + String.fromCharCode(176));
+				$("#pieceFacing").val("").off("change").change(function () {
+					if ($(this).val() == "") return;
+					piece.image.angle = parseInt($(this).val());
+					LT.savePieceSettings(piece);
+				});
+				$("#pieceScale option:first-child").text(
+					(piece.image.scale || 1) + "%");
+				$("#pieceScale").val("").off("change").change(function () {
+					if ($(this).val() == "") return;
+					piece.image.scale = parseFloat($(this).val());
+					LT.savePieceSettings(piece);
+				});
+				$("#pieceBase option:first-child").text((piece.image.base || [1, 1])
+					.join(" " + String.fromCharCode(215) + " "));
+				$("#pieceBase").val("").off("change").change(function () {
+					if ($(this).val() == "") return;
+					piece.image.base = [parseInt($(this).val()), parseInt($(this).val())];
+					LT.savePieceSettings(piece);
+				});
+				$("#pieceCenter").off("click").click(function () {
+					if (!confirm("Center this piece around the exact image center?")) return;
+					piece.image.center = [piece.image.size[0] / 2, piece.image.size[1] / 2];
+					LT.savePieceSettings(piece);
+				});
+
+
 				$("#pieceURL").text(piece.image.url || "");
 				$("#changePieceURL").off("click").click(function () {
 					var url = prompt("new external image URL", piece.image.url || "");
