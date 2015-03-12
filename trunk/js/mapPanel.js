@@ -195,6 +195,22 @@ $(function () { // This anonymous function runs after the page loads.
 	// load images
 	$.get("images/images.json", function (data) {
 
+		// read tiles
+		$.each(data.tiles, function (name, group) {
+			$.each(group, function (i, image) {
+				LT.images[image.id] = image;
+				$("<img>").appendTo("#toolOptions [data-tool=tile]").attr({
+					title: image.file,
+					src: "images/" + image.file,
+				}).addClass("swatch").click(function () {
+					$("#toolOptions [data-tool=tile] .swatch").removeClass("selected");
+					$(this).addClass("selected");
+					LT.tile = image.id;
+				});
+			});
+		});
+		$("#toolOptions [data-tool=tile] .swatch:first-child").click();
+
 		// read pieces
 		$.each(data.pieces, function (name, group) {
 			$.each(group, function (i, image) {
@@ -223,23 +239,26 @@ $(function () { // This anonymous function runs after the page loads.
 			});
 		});
 
-		// read tiles
-		$.each(data.tiles, function (name, group) {
-			$.each(group, function (i, image) {
-				LT.images[image.id] = image;
-				$("<img>").appendTo("#toolOptions [data-tool=tile]").attr({
-					title: image.file,
-					src: "images/" + image.file,
-				}).addClass("swatch").click(function () {
-					$("#toolOptions [data-tool=tile] .swatch").removeClass("selected");
-					$(this).addClass("selected");
-					LT.tile = image.id;
-				});
-			});
-		});
-		$("#toolOptions [data-tool=tile] .swatch:first-child").click();
-
 	}); // $.get("images/images.json", function (data) {
+
+	// create new piece from external image URL
+	$("#newPieceURL").click(function () {
+		var url = prompt("external image URL");
+		if (url != null && url.indexOf("://") != -1) {
+			// TODO: place new piece at the center of the screen
+			$.post("php/Piece.create.php", {
+				"map": LT.currentMap.id,
+				"image": JSON.stringify({
+					"url": url,
+					"view": "top",
+					"size": [LT.HEIGHT, LT.HEIGHT],
+					"center": [LT.HEIGHT / 2, LT.HEIGHT / 2],
+					"base": [1, 1],
+				}),
+			}, LT.refreshMap);
+		}
+	});
+
 
 	var PALETTES = {
 		"wesnoth": [     [ 63,   0,  22],  [ 85,   0,  42],  [105,   0,  57],
