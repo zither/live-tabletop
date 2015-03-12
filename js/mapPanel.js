@@ -2,6 +2,10 @@ LT.HEIGHT = 64;
 LT.WIDTH = 64; // sometimes 55. A variable constant? You know that's right!
 LT.HEX_WIDTH = 55;
 LT.SQUARE_WIDTH = 64;
+LT.TOP = 32;
+LT.LEFT = 32; // sometimes 37. A variable constant? You know that's right!
+LT.HEX_LEFT = 37;
+LT.SQUARE_LEFT = 32;
 LT.GUTTERS = 32;
 LT.BASE64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -10,6 +14,7 @@ LT.colorMaps = {};
 LT.toggleFog = 0;
 LT.dragging = 0;
 LT.pieceMoving = false;
+LT.cursorRequested = false;
 
 LT.rotate = 0;
 LT.tilt = 90;
@@ -300,7 +305,9 @@ $(function () { // This anonymous function runs after the page loads.
 			}, LT.refreshMap);
 		}
 	});
-	LT.dragHandlers.push(function () {
+	LT.dragHandlers.push(function (e) {
+		if (e.ctrlKey) LT.cursorRequested = true;
+
 		if (LT.pieceMoving) {
 			var x = parseFloat(LT.pieceElement.css("left")) / LT.WIDTH;
 			var y = parseFloat(LT.pieceElement.css("top")) / LT.HEIGHT;
@@ -310,21 +317,13 @@ $(function () { // This anonymous function runs after the page loads.
 				LT.clickY = mouse[1] - y;
 				LT.clickDragGap = 1;
 			}
-			x = Math.max(0, Math.min(mouse[0] - LT.clickX, LT.currentMap.columns));
-			y = Math.max(0, Math.min(mouse[1] - LT.clickY, LT.currentMap.rows));
+			x = Math.max(0, Math.min(mouse[0] - LT.clickX, LT.currentMap.columns - 1));
+			y = Math.max(0, Math.min(mouse[1] - LT.clickY, LT.currentMap.rows - 1));
 			if ($("#snap").prop("checked")) {
-				x = Math.floor(x) + 0.5;
-				var stagger = (LT.currentMap.type == "hex" && x % 2 == 1.5) ? 0.5 : 0;
-				y = Math.floor(y + stagger) + 0.5 - stagger;
+				x = Math.round(x);
+				var stagger = (LT.currentMap.type == "hex" && x % 2) ? 0.5 : 0;
+				y = Math.round(y + stagger) - stagger;
 			}
-/*
-
-			// TODO: snap settings
-			// snap to centers of tiles
-			x = LT.WIDTH * (Math.floor(x / LT.WIDTH) + 0.5);
-			y = LT.HEIGHT * (Math.floor(y / LT.HEIGHT) + 0.5);
-
-*/
 			var style = {left: x * LT.WIDTH + "px", top: y * LT.HEIGHT + "px"};
 			LT.pieceElement.css(style);
 			LT.pieceMover.css(style);
@@ -360,6 +359,8 @@ $(function () { // This anonymous function runs after the page loads.
 		LT.tilt = Math.min(LT.tilt + 15, LT.currentMap.max_tilt);
 		LT.transform();
 	});
+
+	LT.cursorMove(); // start showing cursor when user holds ctrl key
 
 	$(window).resize(LT.centerMap);
 
@@ -468,7 +469,17 @@ LT.refreshMap = function () {
 				}
 
 				// change the aspect column/row aspect ratio
-				LT.WIDTH = map.type == "hex" ? LT.HEX_WIDTH : LT.SQUARE_WIDTH;
+				if (map.type == "hex") {
+					LT.WIDTH = LT.HEX_WIDTH;
+					LT.LEFT = LT.HEX_LEFT;
+				} else {
+					LT.WIDTH = LT.SQUARE_WIDTH;
+					LT.LEFT = LT.SQUARE_LEFT;
+				}
+				$("#pieceLayer, #clickPieceLayer").css({
+					"left": LT.LEFT + "px",
+					"top": LT.TOP + "px",
+				});
 
 				// update pieces and tiles if they have changed
 				if (LT.currentMap.piece_changes < map.piece_changes) LT.loadPieces();
@@ -1090,15 +1101,31 @@ LT.loadPieces = function () {
 }; // LT.loadPieces = function () {
 
 
+// update cursor when mouse has moved
+LT.cursorMove = function () {
+	if (LT.cursorRequested && LT.currentUser && LT.currentCampaign && LT.currentMap) {
+		var position = LT.screenToMap(LT.dragX, LT.dragY);
+		$.post("php/User.cursor.php", {
+			"campaign": LT.currentCampaign.id,
+			"x": position[0],
+			"y": position[1],
+		});
+	}
+	LT.cursorRequested = false;
+	setTimeout(LT.cursorMove, LT.DELAY);
+};
+
+// show users' cursors
 LT.updateCursors = function (theUsers) {
 	$(".cursor").remove();
 	var duration = 60000; // fade out over 1 minute
 	$.each(theUsers, function (i, user) {
+		if (!user.cursor) return;
 		var time = $.now() - 1000 * user.cursor.time;
 		if (time < duration) {
 			var cursor = $("<div>").appendTo("#map").addClass("cursor").css({
-				"left": user.cursor.x + "px",
-				"top": user.cursor.y + "px",
+				"left": user.cursor.x * LT.WIDTH + "px",
+				"top": user.cursor.y * LT.HEIGHT + "px",
 				"background-color": user.color || "black",
 			});
 			var fade = function () {
@@ -1149,13 +1176,15 @@ LT.centerMap = function () {
 	var columns = LT.currentMap.columns;
 	var x = LT.WIDTH * (columns + 1);
 	var y = LT.HEIGHT * (rows + 1);
-	var length = Math.sqrt(x * x + y * y);	
-	LT.mapX = Math.max($(window).width() - length, length - LT.WIDTH * columns) / 2;
-	LT.mapY = Math.max($(window).height() - length, length - LT.HEIGHT * rows) / 2;
-	$("#map").css("margin", LT.mapY + "px " + LT.mapX + "px");
+	var r = Math.sqrt(x * x + y * y);	
+	x = Math.max($(window).width() - r, r - LT.WIDTH * columns) / 2;
+	y = Math.max($(window).height() - r, r - LT.HEIGHT * rows) / 2;
+	$("#map").css("padding", y + "px " + x + "px");
+	LT.mapX = x + LT.LEFT;
+	LT.mapY = y + LT.TOP;
 };
 
-
+/*
 $(document).mousemove(function () {
 	if (!LT.currentMap) return;
 	var s2m = LT.screenToMap(LT.dragX, LT.dragY);
