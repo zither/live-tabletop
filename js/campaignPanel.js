@@ -61,8 +61,11 @@ $(function () { // This anonymous function runs after the page loads.
 	});
 });
 
+// Update the campagn list if that tab is visible
 LT.refreshCampaignList = function () {
+	if (LT.campaignPanel.getTab() != "campaign list") return;
 	$.get("php/User.campaigns.php", function (data) {
+		if (LT.campaignPanel.getTab() != "campaign list") return;
 		$("#campaignList tr:not(.template)").remove();
 		$.each(data, function (i, campaign) {
 			var row = $("#campaignList .template").clone().removeClass("template");
