@@ -426,10 +426,8 @@ img.swatch {
 
 #map {
 	position: relative;
-	margin: 200px 200px 200px 200px;
 	display: none;
 }
-
 .cursor {
 	position: absolute;
 	left: 0;
@@ -442,24 +440,19 @@ img.swatch {
 
 /* Layers */
 
-#tileLayer {
-	position: relative;
-	z-index: -1; /* subcontext for z-layered image tiles */
-}
-#fogLayer {
-	position: relative;
-	z-index: 0; /* subcontext for z-layered fog files */
-}
-#fogLayer > *, #pieceLayer > *, #tileLayer > *,
-.clickLayer, .clickLayer > div, .grid {
+.mapLayer, #clickLayers, .clickLayer {position: relative;}
+#fogLayer > *, #pieceLayer > *, #tileLayer > *, .clickLayer > *, .grid {
 	position: absolute;
 	left: 0;
 	top: 0;
 }
-#clickLayers {
-	position: relative;
-	z-index: 2; /* higher than pieces that are above the fog */
-}
+
+/* z-indices */
+#tileLayer {z-index: -1;} /* subcontext for z-layered image tiles */
+#fogLayer {z-index: 0;} /* subcontext for z-layered fog files */
+/* pieces have no z-index subcontext, so they can be above or below other layers */
+#clickLayers {z-index: 2;} /* higher than pieces that are above the fog */
+
 /* #clickWallLayer > * {border: 1px dashed black;} /**/
 /* #clickTileLayer > :hover, */
 #clickWallLayer > *:hover {
