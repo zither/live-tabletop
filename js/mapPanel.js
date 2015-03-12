@@ -553,16 +553,17 @@ LT.loadTiles = function () {
 					"width": LT.WIDTH * w + "px",
 					"height": LT.HEIGHT * h + "px",
 				}).click(function () {
-					// TODO: set type based on tool options?
 					var type = LT.grid.getWall(x, y, side);
-					if (type == "none") type = "wall";
-					else if (type == "wall") type = "door";
-					else if (type == "door") type = "open";
-					else type = "none";
-					LT.grid.setWall(x, y, side, type);
+					var mode = $("#wallMode").val();
+					if (mode == "open") { // only affects open or closed doors
+						if (type == "door") type = "open";
+						else if (type == "open") type = "door";
+					} else type = mode; // replaces anything
 					$.post("php/Map.wall.php", {
 						"map": map.id, "x": x, "y": y, "side": side, "type": type
 					}, LT.refreshMap);
+					LT.grid.setWall(x, y, side, type);
+					LT.grid.repaint();
 				});
 			};
 			// create the wall click detectors now

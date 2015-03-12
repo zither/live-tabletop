@@ -380,67 +380,6 @@
 					bottom rows 
 				</div>
 				<div>
-					<select id="grid_thickness">
-						<option value="0">none</option>
-						<option value="1" selected="selected">thin</option>
-						<option value="2">thick</option>
-					</select>
-					<select id="grid_color">
-						<option>red</option>
-						<option>orange</option>
-						<option>yellow</option>
-						<option>green</option>
-						<option>blue</option>
-						<option>purple</option>
-						<option>black</option>
-						<option>gray</option>
-						<option>white</option>
-						<option>pink</option>
-						<option>brown</option>
-					</select>
-					grid
-				</div>
-				<div>
-					<select id="wall_thickness">
-						<option value="3" selected="selected">thin</option>
-						<option value="6">thick</option>
-					</select>
-					<select id="wall_color">
-						<option>red</option>
-						<option>orange</option>
-						<option>yellow</option>
-						<option>green</option>
-						<option>blue</option>
-						<option>purple</option>
-						<option>black</option>
-						<option>gray</option>
-						<option>white</option>
-						<option>pink</option>
-						<option>brown</option>
-					</select>
-					wall
-				</div>
-				<div>
-					<select id="door_thickness">
-						<option value="3" selected="selected">thin</option>
-						<option value="6">thick</option>
-					</select>
-					<select id="door_color">
-						<option>red</option>
-						<option>orange</option>
-						<option>yellow</option>
-						<option>green</option>
-						<option>blue</option>
-						<option>purple</option>
-						<option>black</option>
-						<option>gray</option>
-						<option>white</option>
-						<option>pink</option>
-						<option>brown</option>
-					</select>
-					door
-				</div>
-				<div>
 					<select id="min_zoom">
 						<option value="25">25%</option>
 						<option value="50">50%</option>
@@ -518,6 +457,73 @@
 					</div>
 					<div data-tool="wall">
 						Click on grid lines to create or remove walls and doors.
+						<select id="wallMode" size="4">
+							<option value="wall" selected="selected">draw walls</option>
+							<option value="door">create doors</option>
+							<option value="open">open and close doors</option>
+							<option value="none">erase walls and doors</option>
+						</select>
+						<div>
+							<select id="grid_thickness">
+								<option value="0">none</option>
+								<option value="1" selected="selected">thin</option>
+								<option value="2">thick</option>
+							</select>
+							<select id="grid_color">
+								<option>red</option>
+								<option>orange</option>
+								<option>yellow</option>
+								<option>green</option>
+								<option>blue</option>
+								<option>purple</option>
+								<option>black</option>
+								<option>gray</option>
+								<option>white</option>
+								<option>pink</option>
+								<option>brown</option>
+							</select>
+							grid
+						</div>
+						<div>
+							<select id="wall_thickness">
+								<option value="3" selected="selected">thin</option>
+								<option value="6">thick</option>
+							</select>
+							<select id="wall_color">
+								<option>red</option>
+								<option>orange</option>
+								<option>yellow</option>
+								<option>green</option>
+								<option>blue</option>
+								<option>purple</option>
+								<option>black</option>
+								<option>gray</option>
+								<option>white</option>
+								<option>pink</option>
+								<option>brown</option>
+							</select>
+							wall
+						</div>
+						<div>
+							<select id="door_thickness">
+								<option value="3" selected="selected">thin</option>
+								<option value="6">thick</option>
+							</select>
+							<select id="door_color">
+								<option>red</option>
+								<option>orange</option>
+								<option>yellow</option>
+								<option>green</option>
+								<option>blue</option>
+								<option>purple</option>
+								<option>black</option>
+								<option>gray</option>
+								<option>white</option>
+								<option>pink</option>
+								<option>brown</option>
+							</select>
+							door
+						</div>
 					</div>
 					<div data-tool="piece">
 						<div>
