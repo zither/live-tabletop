@@ -898,11 +898,12 @@ LT.loadPieces = function () {
 					context.stroke();
 					context.restore();
 				};
-				LT.repaintPieceCanvas = function () {
+				LT.repaintPieceCanvas = function (out) {
 					if (!LT.pieceSelected) return;
 					var x, y;
 					var offset = $("#pieceCanvas").offset();
-					if (LT.dragX >= offset.left && LT.dragX < offset.left + canvas.width
+					if ((typeof(out) != "boolean" || out == false)
+						&& LT.dragX >= offset.left && LT.dragX < offset.left + canvas.width
 						&& LT.dragY >= offset.top && LT.dragY < offset.top + canvas.height)
 						{x = LT.dragX - offset.left; y = LT.dragY - offset.top;}
 					var radius = LT.HEIGHT / 2;
@@ -979,8 +980,8 @@ LT.loadPieces = function () {
 					}
 				};
 				LT.repaintPieceCanvas();
-				$("#pieceCanvas").off("mousemove").on("mousemove", LT.repaintPieceCanvas)
-					.off("mouseout").on("mouseout", LT.repaintPieceCanvas);
+				$("#pieceCanvas").off("mousemove").mousemove(LT.repaintPieceCanvas)
+					.off("mouseout").mouseout(function () {LT.repaintPieceCanvas(true);});
 				$("#pieceCanvasMode").off("change").change(LT.repaintPieceCanvas);
 
 				$("#pieceName").text(piece.name || "[unnamed piece]");
@@ -1004,7 +1005,7 @@ LT.loadPieces = function () {
 					piece.image.z = $(this).val();
 					LT.savePieceSettings(piece);
 				});
-				$("#pieceBase").val(piece.image.baseType || "none").off("change").change(function () {
+				$("#pieceBaseType").val(piece.image.baseType || "none").off("change").change(function () {
 					piece.image.baseType = $(this).val();
 					if (piece.image.baseType == "none") delete piece.image.baseType;
 					LT.savePieceSettings(piece);
@@ -1028,9 +1029,9 @@ LT.loadPieces = function () {
 					piece.image.scale = parseFloat($(this).val());
 					LT.savePieceSettings(piece);
 				});
-				$("#pieceBase option:first-child").text((piece.image.base || [1, 1])
+				$("#pieceBaseSize option:first-child").text((piece.image.base || [1, 1])
 					.join(" " + String.fromCharCode(215) + " "));
-				$("#pieceBase").val("").off("change").change(function () {
+				$("#pieceBaseSize").val("").off("change").change(function () {
 					if ($(this).val() == "") return;
 					piece.image.base = [parseInt($(this).val()), parseInt($(this).val())];
 					LT.savePieceSettings(piece);
