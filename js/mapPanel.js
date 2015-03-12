@@ -310,8 +310,13 @@ $(function () { // This anonymous function runs after the page loads.
 				LT.clickY = mouse[1] - y;
 				LT.clickDragGap = 1;
 			}
-			x = Math.max(0, Math.min(mouse[0] - LT.clickX, $("#map").width()));
-			y = Math.max(0, Math.min(mouse[1] - LT.clickY, $("#map").height()));
+			x = Math.max(0, Math.min(mouse[0] - LT.clickX, LT.currentMap.columns));
+			y = Math.max(0, Math.min(mouse[1] - LT.clickY, LT.currentMap.rows));
+			if ($("#snap").prop("checked")) {
+				x = Math.floor(x) + 0.5;
+				var stagger = (LT.currentMap.type == "hex" && x % 2 == 1.5) ? 0.5 : 0;
+				y = Math.floor(y + stagger) + 0.5 - stagger;
+			}
 /*
 
 			// TODO: snap settings
@@ -1111,7 +1116,7 @@ LT.updateCursors = function (theUsers) {
 LT.mapToScreen = function (c, r) {
 	var rows = LT.currentMap.rows;
 	var columns = LT.currentMap.columns;
-	var offset = $("#map").offset();
+	if (LT.currentMap.type == "hex") {columns += 1/3; rows += 0.5;}
 	c -= columns / 2;
 	r -= rows / 2;
 	var angle = Math.PI * LT.rotate / 180;
@@ -1127,6 +1132,7 @@ LT.mapToScreen = function (c, r) {
 LT.screenToMap = function (x, y) {
 	var rows = LT.currentMap.rows;
 	var columns = LT.currentMap.columns;
+	if (LT.currentMap.type == "hex") {columns += 1/3; rows += 0.5;}
 	x -= LT.mapX + columns * LT.WIDTH / 2;
 	y -= LT.mapY + rows * LT.HEIGHT / 2;
 	x /= LT.zoom * LT.WIDTH;
@@ -1149,7 +1155,7 @@ LT.centerMap = function () {
 	$("#map").css("margin", LT.mapY + "px " + LT.mapX + "px");
 };
 
-/*
+
 $(document).mousemove(function () {
 	if (!LT.currentMap) return;
 	var s2m = LT.screenToMap(LT.dragX, LT.dragY);

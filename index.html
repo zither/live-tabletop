@@ -6,7 +6,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 		<title>Live Tabletop</title>
 		<!-- JQuery framework for DOM manipulation and Ajax -->
-		<script type="text/javascript" src="jquery-1.11.0.min.js"></script>
+		<script type="text/javascript" src="jquery-1.11.1.js"></script>
 		<!-- main Live Tabletop object: global LT variable -->
 		<script type="text/javascript" src="js/LT.js"></script>
 		<!-- classes: LT.Panel, LT.Table, LT.User, LT.Tile, etc. -->
@@ -530,7 +530,11 @@
 							Click on a piece on the map to see its properties.
 							Drag a piece on the map to move it.
 							Click on an image below to create a new piece.
-<!-- TODO: external image URL -->
+							<span class="nowrap">
+								<input type="checkbox" checked="checked" id="snap"/>
+								<label for="snap">snap pieces to grid</label>
+							</span>
+							<input id="newPieceURL" type="button" value="external image URL"/>
 							<br/>
 						</div>
 						<div id="pieceCreatorImages"></div>
