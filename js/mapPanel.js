@@ -646,14 +646,22 @@ LT.loadTiles = function () {
 		LT.grid.repaint();
 
 		// tiles and fog
+		var fogXY = new Array(map.rows);
+		var i = 0;
+		for (var y = 0; y < map.rows; y++) {
+			fogXY[y] = new Array(map.columns);
+			for (var x = 0; x < map.columns; x++) {
+				var fogIndex = LT.BASE64.indexOf(map.fog[Math.floor(i / 6)]);
+				fogXY[y][x] = Math.floor(fogIndex / Math.pow(2, 5 - i % 6)) % 2;
+				i++;
+			} 
+		}
 		$.each(map.tiles.match(/.{1,2}/g), function (i, code) {
 			var x = i % map.columns;
 			var y = Math.floor(i / map.columns);
 			var stagger = map.type == "hex" ? (x % 2) * 0.5 : 0;
 			var tileElement = null;
 			var fogElement = null;
-			var fogIndex = LT.BASE64.indexOf(map.fog[Math.floor(i / 6)]);
-			var fog = Math.floor(fogIndex / Math.pow(2, 5 - i % 6)) % 2;
 			var tile = LT.BASE64.indexOf(code[0]) * 64 + LT.BASE64.indexOf(code[1]);
 
 			// function that generates CSS shared by fog and tile elements
@@ -687,31 +695,67 @@ LT.loadTiles = function () {
 
 			// function to create or update the fog image element
 			var updateFogElement = function () {
-				if (fog) {
-					if (fogElement === null) fogElement = $("<img>").appendTo("#fogLayer");
-					var byWall = false;
-					var directions = ["n", "ne", "se", "s", "sw", "nw"];
-					if (map.type == "square") directions = ["n", "e", "s", "w"];
-					$.each(directions, function (i, direction) {
-						if (LT.grid.getWall(x + 1, y + 1, direction) != "none")
-							byWall = true;
-					});
-					if (!byWall) fogElement.css(style({
-						"size": [144, 144],
-						"center": [72, 72],
-						"hex": [54, 72],
-						"square": [50.91, 58.79],
-						"layer": 0})).attr("src", "images/void/void.png");
-					else if (map.type == "hex") fogElement.css(style({
-						"size": [288, 288],
-						"center": [144, 144],
-						"hex": [216, 288],
-						"layer": 0})).attr("src", "images/black-hex.png");
-					else fogElement.css(style({
-						"size": [72, 72],
-						"center": [36, 36],
-						"square": [72, 72],
-						"layer": 0})).attr("src", "images/tile/black.png");
+				if (fogXY[y][x]) {
+					if (fogElement === null)
+						fogElement = $("<div>").appendTo("#fogLayer");
+					fogElement.removeClass("hex square").addClass(map.type).css({
+						"left": LT.WIDTH * x + "px",
+						"top": LT.HEIGHT * (y + stagger) + "px",
+					}).empty();
+					var fogBlender = $("<div>").appendTo(fogElement);
+					if (LT.grid.getWall(x + 1, y + 1, "n") == "none"
+						&& (y == 0 || fogXY[y - 1][x] == 0))
+						fogBlender.append($("<div>").addClass("side n"));
+					if (LT.grid.getWall(x + 1, y + 1, "s") == "none"
+						&& (y == map.rows - 1 || fogXY[y + 1][x] == 0))
+						fogBlender.append($("<div>").addClass("side s"));
+					if (map.type == "square") {
+						if (LT.grid.getWall(x + 1, y + 1, "w") == "none"
+							&& (x == 0 || fogXY[y][x - 1] == 0))
+							fogBlender.append($("<div>").addClass("side w"));
+						if (LT.grid.getWall(x + 1, y + 1, "e") == "none"
+							&& (x == map.columns - 1 || fogXY[y][x + 1] == 0))
+							fogBlender.append($("<div>").addClass("side e"));
+						if (LT.grid.getWall(x + 1, y + 1, "n") == "none"
+							&& LT.grid.getWall(x + 1, y + 1, "w") == "none"
+							&& (x == 0 || y == 0 || (fogXY[y - 1][x - 1] == 0
+								&& LT.grid.getWall(x, y, "s") == "none"
+								&& LT.grid.getWall(x, y, "e") == "none")))
+							fogBlender.append($("<div>").addClass("corner nw"));
+						if (LT.grid.getWall(x + 1, y + 1, "n") == "none"
+							&& LT.grid.getWall(x + 1, y + 1, "e") == "none"
+							&& (x == map.columns - 1 || y == 0 || (fogXY[y - 1][x + 1] == 0
+								&& LT.grid.getWall(x + 2, y, "s") == "none"
+								&& LT.grid.getWall(x + 2, y, "w") == "none")))
+							fogBlender.append($("<div>").addClass("corner ne"));
+						if (LT.grid.getWall(x + 1, y + 1, "s") == "none"
+							&& LT.grid.getWall(x + 1, y + 1, "w") == "none"
+							&& (x == 0 || y == map.rows - 1 || (fogXY[y + 1][x - 1] == 0
+								&& LT.grid.getWall(x, y + 2, "n") == "none"
+								&& LT.grid.getWall(x, y + 2, "e") == "none")))
+							fogBlender.append($("<div>").addClass("corner sw"));
+						if (LT.grid.getWall(x + 1, y + 1, "s") == "none"
+							&& LT.grid.getWall(x + 1, y + 1, "e") == "none"
+							&& (x == map.columns - 1 || y == map.rows - 1 || (fogXY[y + 1][x + 1] == 0
+								&& LT.grid.getWall(x + 2, y + 2, "n") == "none"
+								&& LT.grid.getWall(x + 2, y + 2, "w") == "none")))
+							fogBlender.append($("<div>").addClass("corner se"));
+					}
+					if (map.type == "hex") {
+						var Y = y + x % 2;
+						if (LT.grid.getWall(x + 1, y + 1, "nw") == "none"
+							&& (x == 0 || y == 0 || fogXY[Y - 1][x - 1] == 0))
+							fogBlender.append($("<div>").addClass("side nw"));
+						if (LT.grid.getWall(x + 1, y + 1, "ne") == "none"
+							&& (x == map.columns - 1 || y == 0 || fogXY[Y - 1][x + 1] == 0))
+							fogBlender.append($("<div>").addClass("side ne"));
+						if (LT.grid.getWall(x + 1, y + 1, "sw") == "none"
+							&& (x == 0 || y == map.rows - 1 || fogXY[Y][x - 1] == 0))
+							fogBlender.append($("<div>").addClass("side sw"));
+						if (LT.grid.getWall(x + 1, y + 1, "se") == "none"
+							&& (x == map.columns - 1 || y == map.rows - 1 || fogXY[Y][x + 1] == 0))
+							fogBlender.append($("<div>").addClass("side se"));
+					}
 				} else {
 					if (fogElement) fogElement.remove();
 					fogElement = null;
@@ -733,8 +777,8 @@ LT.loadTiles = function () {
 						updateTileElement();
 						break;
 					case "fog":
-						fog = LT.toggleFog;
-						$.post("php/Map.fog.php", {"map": map.id, "x": x, "y": y, "fog": fog});
+						fogXY[y][x] = LT.toggleFog;
+						$.post("php/Map.fog.php", {"map": map.id, "x": x, "y": y, "fog": fogXY[y][x]});
 						updateFogElement();
 						break;
 				}
@@ -750,7 +794,7 @@ LT.loadTiles = function () {
 				"margin-left": -LT.WIDTH / 2 + "px",
 			}).mousedown(function () { // click
 				LT.dragging = 1;
-				LT.toggleFog = 1 - fog; // TODO: make sure this doesn't do anything bad to the tile or erase tool
+				LT.toggleFog = 1 - fogXY[y][x];
 				updateTile();
 			}).mouseover(function () { // drag
 				if (LT.dragging) updateTile();
