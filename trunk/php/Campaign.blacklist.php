@@ -14,5 +14,5 @@ if (!isset($_SESSION['user'])) {
 $campaign = intval($_REQUEST['campaign']);
 if (LT_can_view_campaign($campaign))
 	if (is_array($rows = LT_call('read_campaign_user_blacklist', $campaign)))
-		LT_output_array($rows);
+		LT_output_array($rows, array());
 ?>

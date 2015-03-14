@@ -449,7 +449,7 @@ img.swatch {
 /* Layers */
 
 .mapLayer, #clickLayers, .clickLayer {position: relative;}
-#fogLayer > *, #pieceLayer > *, #tileLayer > *, .clickLayer > *, .grid {
+#fogLayer > *, #pieceLayer > *, #tileLayer > *, .clickLayer > *, #grid {
 	position: absolute;
 	left: 0;
 	top: 0;
