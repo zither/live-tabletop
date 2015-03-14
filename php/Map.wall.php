@@ -11,7 +11,7 @@ if (!isset($_SESSION['user'])) {
 }
 
 $base64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-$place_factors = array('sw' => 16, 's' => 4, 'se' => 1, 'e' => 1);
+$place_factors = array('w' => 16, 'sw' => 16, 's' => 4, 'se' => 1, 'e' => 1);
 $flags = array('none' => 0, 'wall' => 1, 'door' => 2, 'open' => 3);
 
 // Interpret the Request

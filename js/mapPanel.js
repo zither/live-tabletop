@@ -54,10 +54,6 @@ $(function () { // This anonymous function runs after the page loads.
 	// disable map panel button until a campaign is loaded
 	LT.mapPanel.disable();
 
-	// create grid
-	LT.grid = new LT.Grid(1, 1, LT.WIDTH, LT.HEIGHT,
-		0, "black", 3, "black", 3, "white", "square", $("#wallLayer")[0]);
-
 	// submit map creation form
 	$("#createMap").click(function () {
 		$.post("php/Map.create.php", LT.formValues("#mapCreator"), function (data) {
@@ -524,7 +520,15 @@ LT.refreshMap = function () {
 				// update pieces and tiles if they have changed
 				if (LT.currentMap.piece_changes < map.piece_changes) LT.loadPieces();
 				if (LT.currentMap.tile_changes  < map.tile_changes)  LT.loadTiles();
-				else if (LT.updateGrid(map)) LT.grid.repaint();
+				else if (map.type != LT.currentMap.type
+					|| map.rows != LT.currentMap.rows
+					|| map.columns != LT.currentMap.columns
+					|| map.grid_thickness != LT.currentMap.grid_thickness
+					|| map.wall_thickness != LT.currentMap.wall_thickness
+					|| map.door_thickness != LT.currentMap.door_thickness
+					|| map.grid_color != LT.currentMap.grid_color
+					|| map.wall_color != LT.currentMap.wall_color
+					|| map.door_color != LT.currentMap.door_color) LT.paintGrid();
 
 				// position map so there is room for rotation
 				LT.centerMap();				
@@ -584,76 +588,18 @@ LT.loadTiles = function () {
 		});
 
 		// create walls and doors
-		LT.updateGrid(map);
-		LT.grid.reset();
-		$.each(map.walls.split(""), function (i, code) {
-			var x = i % (map.columns + 2);
-			var y = Math.floor(i / (map.columns + 2));
-			var side = map.type == "hex" ? "se" : "e";
-			var walls = LT.BASE64.indexOf(code);
-			// TODO: change magic numbers to constants
-			if ((walls & 3) == 1) LT.grid.wall(x, y, side);
-			if ((walls & 3) == 2) LT.grid.door(x, y, side);
-			if ((walls & 3) == 3) LT.grid.open(x, y, side);
-			if ((walls & 12) == 4) LT.grid.wall(x, y, "s");
-			if ((walls & 12) == 8) LT.grid.door(x, y, "s");
-			if ((walls & 12) == 12) LT.grid.open(x, y, "s");
-			if ((walls & 48) == 16) LT.grid.wall(x, y, "sw");
-			if ((walls & 48) == 32) LT.grid.door(x, y, "sw");
-			if ((walls & 48) == 48) LT.grid.open(x, y, "sw");
-			// function to create click detectors for walls
-			var createWallClickDetector = function (x, y, side, l, t, w, h) {
-				$("<div>").appendTo($("#clickWallLayer")).css({
-					"left": LT.WIDTH	* (x + l - 1) + "px",
-					"top": LT.HEIGHT * (y + t - 1) + "px",
-					"width": LT.WIDTH * w + "px",
-					"height": LT.HEIGHT * h + "px",
-				}).click(function () {
-					var type = LT.grid.getWall(x, y, side);
-					var mode = $("#wallMode").val();
-					if (mode == "open") { // only affects open or closed doors
-						if (type == "door") type = "open";
-						else if (type == "open") type = "door";
-					} else type = mode; // replaces anything
-					$.post("php/Map.wall.php", {
-						"map": map.id, "x": x, "y": y, "side": side, "type": type
-					}, LT.refreshMap);
-					LT.grid.setWall(x, y, side, type);
-					LT.grid.repaint();
-				});
-			};
-			// create the wall click detectors now
-			if (map.type == "square") {
-				if (x > 0) createWallClickDetector(x, y, "s", -1/3,  1/3, 2/3, 1/3);
-				if (y > 0) createWallClickDetector(x, y, "e",  1/3, -1/3, 1/3, 2/3);
-			}
-			if (map.type == "hex") {
-				var stagger = (1 - x % 2) * 0.5;
-				if (x > 0 && x <= map.columns) // no south walls on side columns
-					createWallClickDetector(x, y, "s", -1/3, stagger + 1/3, 2/3, 1/3);
-				if (!(y == 0 && x % 2)) { // no sw, se sides on staggered top tiles
-					// no se sides on right column, bottom-left corner or...
-					if (x <= map.columns && !(x == 0 && y == map.rows)
-						&& !(x == map.columns && y == 0)) // top 2nd-from-right tile
-						createWallClickDetector(x, y, "se", 1/3, stagger, 1/3, 1/2);
-					// no sw sides on left column or bottom-right non-staggered corner
-					if (x > 0 && !(x > map.columns && y == map.rows && !(x % 2)))
-						createWallClickDetector(x, y, "sw", -2/3, stagger, 1/3, 1/2);
-				}
-			}
-		});
-
-		LT.grid.repaint();
+		LT.createGrid(map);
 
 		// tiles and fog
-		var fogXY = new Array(map.rows);
-		var i = 0;
-		for (var y = 0; y < map.rows; y++) {
-			fogXY[y] = new Array(map.columns);
-			for (var x = 0; x < map.columns; x++) {
-				var fogIndex = LT.BASE64.indexOf(map.fog[Math.floor(i / 6)]);
-				fogXY[y][x] = Math.floor(fogIndex / Math.pow(2, 5 - i % 6)) % 2;
-				i++;
+		var fogXY = new Array(map.rows + 2);
+		for (var y = 0; y < map.rows + 2; y++) {
+			fogXY[y] = new Array(map.columns + 2);
+			for (var x = 0; x < map.columns + 2; x++) {
+				if (x > 0 && y > 0 && x <= map.columns && y <= map.rows) {
+					var i = (x - 1) + (y - 1) * map.columns;
+					var fogIndex = LT.BASE64.indexOf(map.fog[Math.floor(i / 6)]);
+					fogXY[y][x] = Math.floor(fogIndex / Math.pow(2, 5 - i % 6)) % 2;
+				}
 			} 
 		}
 		$.each(map.tiles.match(/.{1,2}/g), function (i, code) {
@@ -695,7 +641,9 @@ LT.loadTiles = function () {
 
 			// function to create or update the fog image element
 			var updateFogElement = function () {
-				if (fogXY[y][x]) {
+				var c = x + 1;
+				var r = y + 1;
+				if (fogXY[r][c]) {
 					if (fogElement === null)
 						fogElement = $("<div>").appendTo("#fogLayer");
 					fogElement.removeClass("hex square").addClass(map.type).css({
@@ -703,57 +651,49 @@ LT.loadTiles = function () {
 						"top": LT.HEIGHT * (y + stagger) + "px",
 					}).empty();
 					var fogBlender = $("<div>").appendTo(fogElement);
-					if (LT.grid.getWall(x + 1, y + 1, "n") == "none"
-						&& (y == 0 || fogXY[y - 1][x] == 0))
+					if (LT.getWall(c, r, "n") == "none" && fogXY[r - 1][c] == 0)
 						fogBlender.append($("<div>").addClass("side n"));
-					if (LT.grid.getWall(x + 1, y + 1, "s") == "none"
-						&& (y == map.rows - 1 || fogXY[y + 1][x] == 0))
+					if (LT.getWall(c, r, "s") == "none" && fogXY[r + 1][c] == 0)
 						fogBlender.append($("<div>").addClass("side s"));
 					if (map.type == "square") {
-						if (LT.grid.getWall(x + 1, y + 1, "w") == "none"
-							&& (x == 0 || fogXY[y][x - 1] == 0))
+						if (LT.getWall(c, r, "w") == "none" && fogXY[r][c - 1] == 0)
 							fogBlender.append($("<div>").addClass("side w"));
-						if (LT.grid.getWall(x + 1, y + 1, "e") == "none"
-							&& (x == map.columns - 1 || fogXY[y][x + 1] == 0))
+						if (LT.getWall(c, r, "e") == "none" && fogXY[r][r + 1] == 0)
 							fogBlender.append($("<div>").addClass("side e"));
-						if (LT.grid.getWall(x + 1, y + 1, "n") == "none"
-							&& LT.grid.getWall(x + 1, y + 1, "w") == "none"
-							&& (x == 0 || y == 0 || (fogXY[y - 1][x - 1] == 0
-								&& LT.grid.getWall(x, y, "s") == "none"
-								&& LT.grid.getWall(x, y, "e") == "none")))
+						if (fogXY[r - 1][c - 1] == 0
+							&& LT.getWall(c, r, "n") == "none"
+							&& LT.getWall(c, r, "w") == "none"
+							&& LT.getWall(c - 1, r - 1, "s") == "none"
+							&& LT.getWall(c - 1, r - 1, "e") == "none")
 							fogBlender.append($("<div>").addClass("corner nw"));
-						if (LT.grid.getWall(x + 1, y + 1, "n") == "none"
-							&& LT.grid.getWall(x + 1, y + 1, "e") == "none"
-							&& (x == map.columns - 1 || y == 0 || (fogXY[y - 1][x + 1] == 0
-								&& LT.grid.getWall(x + 2, y, "s") == "none"
-								&& LT.grid.getWall(x + 2, y, "w") == "none")))
+						if (fogXY[r - 1][c + 1] == 0
+							&& LT.getWall(c, r, "n") == "none"
+							&& LT.getWall(c, r, "e") == "none"
+							&& LT.getWall(c + 1, r - 1, "s") == "none"
+							&& LT.getWall(c + 1, r - 1, "w") == "none")
 							fogBlender.append($("<div>").addClass("corner ne"));
-						if (LT.grid.getWall(x + 1, y + 1, "s") == "none"
-							&& LT.grid.getWall(x + 1, y + 1, "w") == "none"
-							&& (x == 0 || y == map.rows - 1 || (fogXY[y + 1][x - 1] == 0
-								&& LT.grid.getWall(x, y + 2, "n") == "none"
-								&& LT.grid.getWall(x, y + 2, "e") == "none")))
+						if (fogXY[r + 1][c - 1] == 0
+							&& LT.getWall(c, r, "s") == "none"
+							&& LT.getWall(c, r, "w") == "none"
+							&& LT.getWall(c - 1, r + 1, "n") == "none"
+							&& LT.getWall(c - 1, r + 1, "e") == "none")
 							fogBlender.append($("<div>").addClass("corner sw"));
-						if (LT.grid.getWall(x + 1, y + 1, "s") == "none"
-							&& LT.grid.getWall(x + 1, y + 1, "e") == "none"
-							&& (x == map.columns - 1 || y == map.rows - 1 || (fogXY[y + 1][x + 1] == 0
-								&& LT.grid.getWall(x + 2, y + 2, "n") == "none"
-								&& LT.grid.getWall(x + 2, y + 2, "w") == "none")))
+						if (fogXY[r + 1][c + 1] == 0
+							&& LT.getWall(c, r, "s") == "none"
+							&& LT.getWall(c, r, "e") == "none"
+							&& LT.getWall(c + 1, r + 1, "n") == "none"
+							&& LT.getWall(c + 1, r + 1, "w") == "none")
 							fogBlender.append($("<div>").addClass("corner se"));
 					}
 					if (map.type == "hex") {
-						var Y = y + x % 2;
-						if (LT.grid.getWall(x + 1, y + 1, "nw") == "none"
-							&& (x == 0 || y == 0 || fogXY[Y - 1][x - 1] == 0))
+						var r1 = r + x % 2;
+						if (LT.getWall(c, r, "nw") == "none" && fogXY[r1 - 1][c - 1] == 0)
 							fogBlender.append($("<div>").addClass("side nw"));
-						if (LT.grid.getWall(x + 1, y + 1, "ne") == "none"
-							&& (x == map.columns - 1 || y == 0 || fogXY[Y - 1][x + 1] == 0))
+						if (LT.getWall(c, r, "ne") == "none" && fogXY[r1 - 1][c + 1] == 0)
 							fogBlender.append($("<div>").addClass("side ne"));
-						if (LT.grid.getWall(x + 1, y + 1, "sw") == "none"
-							&& (x == 0 || y == map.rows - 1 || fogXY[Y][x - 1] == 0))
+						if (LT.getWall(c, r, "sw") == "none" && fogXY[r1][c - 1] == 0)
 							fogBlender.append($("<div>").addClass("side sw"));
-						if (LT.grid.getWall(x + 1, y + 1, "se") == "none"
-							&& (x == map.columns - 1 || y == map.rows - 1 || fogXY[Y][x + 1] == 0))
+						if (LT.getWall(c, r, "se") == "none" && fogXY[r1][c + 1] == 0)
 							fogBlender.append($("<div>").addClass("side se"));
 					}
 				} else {
@@ -777,8 +717,8 @@ LT.loadTiles = function () {
 						updateTileElement();
 						break;
 					case "fog":
-						fogXY[y][x] = LT.toggleFog;
-						$.post("php/Map.fog.php", {"map": map.id, "x": x, "y": y, "fog": fogXY[y][x]});
+						fogXY[y + 1][x + 1] = LT.toggleFog;
+						$.post("php/Map.fog.php", {"map": map.id, "x": x, "y": y, "fog": fogXY[y + 1][x + 1]});
 						updateFogElement();
 						break;
 				}
@@ -794,7 +734,7 @@ LT.loadTiles = function () {
 				"margin-left": -LT.WIDTH / 2 + "px",
 			}).mousedown(function () { // click
 				LT.dragging = 1;
-				LT.toggleFog = 1 - fogXY[y][x];
+				LT.toggleFog = 1 - fogXY[y + 1][x + 1];
 				updateTile();
 			}).mouseover(function () { // drag
 				if (LT.dragging) updateTile();
@@ -809,32 +749,6 @@ LT.loadTiles = function () {
 
 	}); // $.get("php/Map.read.php", {map: LT.currentMap.id}, function (data) {
 }; // LT.loadTiles = function () {
-
-LT.updateGrid = function (map) {
-	var changed = false;
-	if (map.columns != LT.grid.getColumns())
-		{LT.grid.setColumns(map.columns); changed = true;}
-	if (map.rows != LT.grid.getRows())
-		{LT.grid.setRows(map.rows); changed = true;}
-	if (map.type != LT.grid.getType()) {
-		LT.grid.setWidth(LT.WIDTH); // the variable constant may have changed
-		LT.grid.setType(map.type);
-		changed = true;
-	}
-	if (map.grid_thickness != LT.grid.getThickness())
-		{LT.grid.setThickness(map.grid_thickness); changed = true;}
-	if (map.grid_color != LT.grid.getColor())
-		{LT.grid.setColor(map.grid_color); changed = true;}
-	if (map.wall_thickness != LT.grid.getWallThickness())
-		{LT.grid.setWallThickness(map.wall_thickness); changed = true;}
-	if (map.wall_color != LT.grid.getWallColor())
-		{LT.grid.setWallColor(map.wall_color); changed = true;}
-	if (map.door_thickness != LT.grid.getDoorThickness())
-		{LT.grid.setDoorThickness(map.door_thickness); changed = true;}
-	if (map.door_color != LT.grid.getDoorColor())
-		{LT.grid.setDoorColor(map.door_color); changed = true;}
-	return changed;
-};
 
 LT.savePieceSettings = function (piece) {
 	$.post("php/Piece.settings.php", {
