@@ -45,8 +45,10 @@ LT.Grid.prototype = {
 
 		// offset coordinate system to center of grid lines
 		context.translate(thickness / 2 - this._width, thickness / 2 - this._height);
-		this.canvas.style.marginLeft = -thickness / 2 + "px";
-		this.canvas.style.marginTop = -thickness / 2 + "px";
+		this.canvas.style.marginLeft = 
+			-(this._type == "hex" ? 2/3 : 0.5) * this._width - thickness / 2 + "px";
+		this.canvas.style.marginTop = 
+			-(this._type == "hex" ? 0.5 : 0.5) * this._height - thickness / 2 + "px";
 
 		// draw grid
 		if (this._thickness) {

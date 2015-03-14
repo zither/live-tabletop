@@ -477,6 +477,13 @@ img.swatch {
 	position: absolute;
 	border: 2px dashed transparent;
 }
+#pieceLayer > * > div {
+	width: 100%;
+	height: 100%;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-position: center;
+}
 #clickPieceLayer > .selected {
 	border-color: rgba(255, 255, 255, 0.5);
 	border-radius: 50%;

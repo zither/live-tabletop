@@ -346,9 +346,18 @@ $(function () { // This anonymous function runs after the page loads.
 			x = Math.max(0, Math.min(mouse[0] - LT.clickX, LT.currentMap.columns - 1));
 			y = Math.max(0, Math.min(mouse[1] - LT.clickY, LT.currentMap.rows - 1));
 			if ($("#snap").prop("checked")) {
+/*
 				x = Math.round(x);
 				var stagger = (LT.currentMap.type == "hex" && x % 2) ? 0.5 : 0;
 				y = Math.round(y + stagger) - stagger;
+*/
+				if (LT.currentMap.type == "hex") {
+					x = Math.round(x * 6) / 6;
+					y = Math.round(y * 4) / 4;
+				} else {
+					x = Math.round(x * 2) / 2;
+					y = Math.round(y * 2) / 2;
+				}
 			}
 			var style = {left: x * LT.WIDTH + "px", top: y * LT.HEIGHT + "px"};
 			LT.pieceElement.css(style);
@@ -505,10 +514,12 @@ LT.refreshMap = function () {
 					LT.WIDTH = LT.SQUARE_WIDTH;
 					LT.LEFT = LT.SQUARE_LEFT;
 				}
-				$("#pieceLayer, #clickPieceLayer").css({
+				$(".mapLayer .clickLayer").css({
 					"left": LT.LEFT + "px",
 					"top": LT.TOP + "px",
 				});
+
+				// FIXME: when the map type changes, the tiles and tile clickers need to move.
 
 				// update pieces and tiles if they have changed
 				if (LT.currentMap.piece_changes < map.piece_changes) LT.loadPieces();
@@ -638,7 +649,6 @@ LT.loadTiles = function () {
 		$.each(map.tiles.match(/.{1,2}/g), function (i, code) {
 			var x = i % map.columns;
 			var y = Math.floor(i / map.columns);
-			var offset = map.type == "hex" ? 1 / 6 : 0;
 			var stagger = map.type == "hex" ? (x % 2) * 0.5 : 0;
 			var tileElement = null;
 			var fogElement = null;
@@ -648,16 +658,16 @@ LT.loadTiles = function () {
 
 			// function that generates CSS shared by fog and tile elements
 			var style = function (image) {
-				var scaleX = LT.WIDTH / image[map.type][0];
+				var scaleX = LT.WIDTH  / image[map.type][0];
 				var scaleY = LT.HEIGHT / image[map.type][1];
 				return {
-					left: Math.round((x + 0.5 + offset) * LT.WIDTH) + "px",
-					top: Math.round((y + 0.5 + stagger) * LT.HEIGHT) + "px",
-					width:  Math.round(image.size[0] * scaleX) + "px",
-					height: Math.round(image.size[1] * scaleY) + "px",
-					marginLeft: -Math.round(image.center[0] * scaleX) + "px",
-					marginTop:  -Math.round(image.center[1] * scaleY) + "px",
-					zIndex: image.layer,
+					"left": LT.WIDTH * x + "px",
+					"top": LT.HEIGHT * (y + stagger) + "px",
+					"width":  image.size[0] * scaleX + "px",
+					"height": image.size[1] * scaleY + "px",
+					"margin-left": -image.center[0] * scaleX + "px",
+					"margin-top":  -image.center[1] * scaleY + "px",
+					"z-index": image.layer,
 				};
 			};
 
@@ -732,7 +742,7 @@ LT.loadTiles = function () {
 
 			// create tile and fog clickable element
 			$("<div>").appendTo("#clickTileLayer").css({
-				"left": LT.WIDTH * (x + offset) + "px",
+				"left": LT.WIDTH * x + "px",
 				"top": LT.HEIGHT * (y + stagger) + "px",
 				"width": LT.WIDTH + "px",
 				"height": LT.HEIGHT + "px",
@@ -1100,20 +1110,15 @@ LT.loadPieces = function () {
 						}
 					}
 					context.putImageData(buffer, 0, 0);
-					// replace contents of visual piece element with canvas
-					element.empty().append($(canvas).css("transform", transform))
-						.css(style).css("z-index", piece.image.z || 0).addClass(piece.image.view);
+					element.find("*").css("background-image", 
+						"url('" + canvas.toDataURL() + "')");
 				}
 				// show piece in piece info tab.
 				if (piece.id == selectedPiece) select();
 			};
 			var element = $("<div>").appendTo("#pieceLayer").append(
 				$("<div>").css({
-					"width": "100%",
-					"height": "100%",
 					"background-image": "url(" + source + ")",
-					"background-repeat": "no-repeat",
-					"background-size": "contain",
 					"transform": transform,
 				})
 			).css(style).css("z-index", piece.image.z || 0).data({
@@ -1172,7 +1177,7 @@ LT.sortPieces = function () {
 		return a[1] - b[1];
 	};
 	$("#pieceLayer > *").sort(sorter).appendTo("#pieceLayer");
-	$("#clickPieceLayer > *").sort(sorter).appendTo("#clickPieceLayer");
+	$("#clickPieceLayer > F*").sort(sorter).appendTo("#clickPieceLayer");
 };
 
 // update cursor when mouse has moved
