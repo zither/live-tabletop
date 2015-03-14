@@ -495,6 +495,22 @@ img.swatch {
 	background-position: center;
 }
 
+/* Fog */
+#fogLayer > .square {
+	background-color: #000;
+	width: 64px;
+	height: 64px;
+	margin: -32px;
+}
+#fogLayer > .square {
+	background-image: url('images/black-hex.png');
+	background-position: center;
+	background-size: 100% 100%;
+	height: 64px;
+	width: 64px;
+	margin: -32px;
+}
+
 /* WELCOME */
 
 #welcome {
