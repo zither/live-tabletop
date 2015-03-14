@@ -220,10 +220,14 @@ $(function () { // This anonymous function runs after the page loads.
 					title: image.file,
 					src: "images/" + image.file
 				}).click(function () {
-					// TODO: place new piece at the center of the screen
+					var coordinates = LT.screenToMap(
+						$(window).scrollLeft() + $(window).width() / 2,
+						$(window).scrollTop() + $(window).height() / 2);
 					$.post("php/Piece.create.php", {
 						"map": LT.currentMap.id,
-						"image": JSON.stringify(image)
+						"image": JSON.stringify(image),
+						"x": coordinates[0],
+						"y": coordinates[1],
 					}, LT.refreshMap);
 				});
 				// create an image for the piece info tab
@@ -245,7 +249,9 @@ $(function () { // This anonymous function runs after the page loads.
 	$("#newPieceURL").click(function () {
 		var url = prompt("external image URL");
 		if (url != null && url.indexOf("://") != -1) {
-			// TODO: place new piece at the center of the screen
+			var coordinates = LT.screenToMap(
+				$(window).scrollLeft() + $(window).width() / 2,
+				$(window).scrollTop() + $(window).height() / 2);
 			$.post("php/Piece.create.php", {
 				"map": LT.currentMap.id,
 				"image": JSON.stringify({
@@ -253,8 +259,9 @@ $(function () { // This anonymous function runs after the page loads.
 					"view": "top",
 					"size": [LT.HEIGHT, LT.HEIGHT],
 					"center": [LT.HEIGHT / 2, LT.HEIGHT / 2],
-					"base": [1, 1],
-				}),
+					"base": [1, 1]}),
+				"x": coordinates[0],
+				"y": coordinates[1],
 			}, LT.refreshMap);
 		}
 	});
