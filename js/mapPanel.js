@@ -624,21 +624,21 @@ LT.loadTiles = function () {
 			};
 			// create the wall click detectors now
 			if (map.type == "square") {
-				if (x > 0) createWallClickDetector(x, y, "s",  1/6,  5/6, 2/3, 1/3);
-				if (y > 0) createWallClickDetector(x, y, "e",  5/6,  1/6, 1/3, 2/3);
+				if (x > 0) createWallClickDetector(x, y, "s", -1/3,  1/3, 2/3, 1/3);
+				if (y > 0) createWallClickDetector(x, y, "e",  1/3, -1/3, 1/3, 2/3);
 			}
 			if (map.type == "hex") {
 				var stagger = (1 - x % 2) * 0.5;
 				if (x > 0 && x <= map.columns) // no south walls on side columns
-					createWallClickDetector(x, y, "s", 1/3, stagger + 5/6, 2/3, 1/3);
+					createWallClickDetector(x, y, "s", -1/3, stagger + 1/3, 2/3, 1/3);
 				if (!(y == 0 && x % 2)) { // no sw, se sides on staggered top tiles
 					// no se sides on right column, bottom-left corner or...
 					if (x <= map.columns && !(x == 0 && y == map.rows)
 						&& !(x == map.columns && y == 0)) // top 2nd-from-right tile
-						createWallClickDetector(x, y, "se", 1, stagger + 1/2, 1/3, 1/2);
+						createWallClickDetector(x, y, "se", 1/3, stagger, 1/3, 1/2);
 					// no sw sides on left column or bottom-right non-staggered corner
 					if (x > 0 && !(x > map.columns && y == map.rows && !(x % 2)))
-						createWallClickDetector(x, y, "sw", 0, stagger + 1/2, 1/3, 1/2);
+						createWallClickDetector(x, y, "sw", -2/3, stagger, 1/3, 1/2);
 				}
 			}
 		});
