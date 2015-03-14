@@ -746,6 +746,8 @@ LT.loadTiles = function () {
 				"top": LT.HEIGHT * (y + stagger) + "px",
 				"width": LT.WIDTH + "px",
 				"height": LT.HEIGHT + "px",
+				"margin-top": -LT.HEIGHT / 2 + "px",
+				"margin-left": -LT.WIDTH / 2 + "px",
 			}).mousedown(function () { // click
 				LT.dragging = 1;
 				LT.toggleFog = 1 - fog; // TODO: make sure this doesn't do anything bad to the tile or erase tool
