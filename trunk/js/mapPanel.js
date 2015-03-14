@@ -400,6 +400,7 @@ LT.transform = function () {
 	$("#map .flat").css("transform", "rotate(" + -LT.rotate + "deg)");
 	$("#map .front, #map .side").css("transform",
 		"rotate(" + -LT.rotate + "deg) scaleY(" + 1 / stretch + ")");
+	LT.sortPieces();
 };
 
 LT.hideMapTabs = function () {
@@ -560,7 +561,7 @@ LT.loadTiles = function () {
 		// sort tiles after creating or painting tiles
 		var sortTiles = function () {
 			$("#tileLayer *").sort(function (a, b) {
-				return parseFloat($(a).data("order")) - parseFloat($(b).data("order"));
+				return $(a).data("order") - $(b).data("order");
 			}).appendTo("#tileLayer");
 		}
 
@@ -1115,7 +1116,9 @@ LT.loadPieces = function () {
 					"background-size": "contain",
 					"transform": transform,
 				})
-			).css(style).css("z-index", piece.image.z || 0).addClass(piece.image.view);
+			).css(style).css("z-index", piece.image.z || 0).data({
+				"x": piece.x, "y": piece.y, "z": piece.image.z || 0
+			}).addClass(piece.image.view);
 
 			// clickable piece element
 			var mover = $("<div>").attr("title", piece.name).mousedown(function () {
@@ -1131,7 +1134,9 @@ LT.loadPieces = function () {
 			}).mouseout(function () {
 				element.removeClass("selected");
 				return false;
-			}).appendTo("#clickPieceLayer").css(style).addClass(piece.image.view);
+			}).appendTo("#clickPieceLayer").css(style).data({
+				"x": piece.x, "y": piece.y, "z": piece.image.z || 0
+			}).addClass(piece.image.view);
 
 			// piece list
 			var copy = $("#pieceList .template").clone().removeClass("template");
@@ -1153,11 +1158,22 @@ LT.loadPieces = function () {
 		}); // $.each(data, function (i, piece) {
 
 		LT.mapPanel.resize();
-		LT.transform();
+		LT.transform(); // sort and transform pieces
 
 	}); // $.post("php/Map.pieces.php", {map: LT.currentMap.id}, function (data) {
 }; // LT.loadPieces = function () {
 
+LT.sortPieces = function () {
+	var sorter = function (a, b) {
+		var difference = $(a).data("z") - $(b).data("z");
+		if (difference) return difference;
+		a = LT.mapToScreen($(a).data("x"), $(a).data("y"));
+		b = LT.mapToScreen($(b).data("x"), $(b).data("y"));
+		return a[1] - b[1];
+	};
+	$("#pieceLayer > *").sort(sorter).appendTo("#pieceLayer");
+	$("#clickPieceLayer > *").sort(sorter).appendTo("#clickPieceLayer");
+};
 
 // update cursor when mouse has moved
 LT.cursorMove = function () {
