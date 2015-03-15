@@ -651,50 +651,74 @@ LT.loadTiles = function () {
 						"top": LT.HEIGHT * (y + stagger) + "px",
 					}).empty();
 					var fogBlender = $("<div>").appendTo(fogElement);
-					if (LT.getWall(c, r, "n") == "none" && fogXY[r - 1][c] == 0)
+					var sideN = LT.walls[r - 1][c]["s"] == "none";
+					var sideS = LT.walls[r][c]["s"] == "none";
+					if (sideN && fogXY[r - 1][c] == 0 || y == 0)
 						fogBlender.append($("<div>").addClass("side n"));
-					if (LT.getWall(c, r, "s") == "none" && fogXY[r + 1][c] == 0)
+					if (sideS && fogXY[r + 1][c] == 0 || y == map.rows - 1)
 						fogBlender.append($("<div>").addClass("side s"));
+
 					if (map.type == "square") {
-						if (LT.getWall(c, r, "w") == "none" && fogXY[r][c - 1] == 0)
+						var sideW = LT.walls[r][c - 1]["e"] == "none";
+						var sideE = LT.walls[r][c]["e"] == "none";
+						var cornerNNW = LT.walls[r - 1][c - 1]["e"] == "none";
+						var cornerWNW = LT.walls[r - 1][c - 1]["s"] == "none";
+						var cornerNNE = LT.walls[r - 1][c]["e"] == "none";
+						var cornerENE = LT.walls[r - 1][c + 1]["s"] == "none";
+						var cornerSSW = LT.walls[r + 1][c - 1]["e"] == "none";
+						var cornerWSW = LT.walls[r][c - 1]["s"] == "none";
+						var cornerSSE = LT.walls[r + 1][c]["e"] == "none";
+						var cornerESE = LT.walls[r][c + 1]["s"] == "none";
+						if (fogXY[r][c - 1] == 0 && sideW || x == 0)
 							fogBlender.append($("<div>").addClass("side w"));
-						if (LT.getWall(c, r, "e") == "none" && fogXY[r][r + 1] == 0)
+						if (fogXY[r][c + 1] == 0 && sideE || x == map.columns - 1)
 							fogBlender.append($("<div>").addClass("side e"));
-						if (fogXY[r - 1][c - 1] == 0
-							&& LT.getWall(c, r, "n") == "none"
-							&& LT.getWall(c, r, "w") == "none"
-							&& LT.getWall(c - 1, r - 1, "s") == "none"
-							&& LT.getWall(c - 1, r - 1, "e") == "none")
+/*
+						if (fogXY[r - 1][c - 1] == 0 && sideN && sideW && cornerNNW && cornerWNW)
 							fogBlender.append($("<div>").addClass("corner nw"));
-						if (fogXY[r - 1][c + 1] == 0
-							&& LT.getWall(c, r, "n") == "none"
-							&& LT.getWall(c, r, "e") == "none"
-							&& LT.getWall(c + 1, r - 1, "s") == "none"
-							&& LT.getWall(c + 1, r - 1, "w") == "none")
+						if (fogXY[r - 1][c + 1] == 0 && sideN && sideE && cornerNNE && cornerENE)
 							fogBlender.append($("<div>").addClass("corner ne"));
-						if (fogXY[r + 1][c - 1] == 0
-							&& LT.getWall(c, r, "s") == "none"
-							&& LT.getWall(c, r, "w") == "none"
-							&& LT.getWall(c - 1, r + 1, "n") == "none"
-							&& LT.getWall(c - 1, r + 1, "e") == "none")
+						if (fogXY[r + 1][c - 1] == 0 && sideS && sideW && cornerSSW && cornerWSW)
 							fogBlender.append($("<div>").addClass("corner sw"));
-						if (fogXY[r + 1][c + 1] == 0
-							&& LT.getWall(c, r, "s") == "none"
-							&& LT.getWall(c, r, "e") == "none"
-							&& LT.getWall(c + 1, r + 1, "n") == "none"
-							&& LT.getWall(c + 1, r + 1, "w") == "none")
+						if (fogXY[r + 1][c + 1] == 0 && sideS && sideE && cornerSSE && cornerESE)
 							fogBlender.append($("<div>").addClass("corner se"));
+/**/
+						if (sideN && sideW && cornerNNW && cornerWNW || x == 0 || y == 0)
+							fogBlender.append($("<div>").addClass("corner nw"));
+						if (sideN && sideE && cornerNNE && cornerENE || x == map.columns - 1 || y == 0)
+							fogBlender.append($("<div>").addClass("corner ne"));
+						if (sideS && sideW && cornerSSW && cornerWSW || x == 0 || y == map.rows - 1)
+							fogBlender.append($("<div>").addClass("corner sw"));
+						if (sideS && sideE && cornerSSE && cornerESE || x == map.columns - 1 || y == map.rows - 1)
+							fogBlender.append($("<div>").addClass("corner se"));
+/**/
 					}
 					if (map.type == "hex") {
-						var r1 = r + x % 2;
-						if (LT.getWall(c, r, "nw") == "none" && fogXY[r1 - 1][c - 1] == 0)
+						var s = x % 2;
+						var sideNW = LT.walls[r + s - 1][c - 1]["e"] == "none";
+						var sideNE = LT.walls[r + s - 1][c + 1]["w"] == "none";
+						var sideSW = LT.walls[r][c]["w"] == "none";
+						var sideSE = LT.walls[r][c]["e"] == "none";
+						var cornerNW = LT.walls[r - 1][c]["w"] == "none";
+						var cornerNE = LT.walls[r - 1][c]["e"] == "none";
+						var cornerW = LT.walls[r + s - 1][c - 1]["s"] == "none";
+						var cornerE = LT.walls[r + s - 1][c + 1]["s"] == "none";
+						var cornerSW = LT.walls[r + s][c - 1]["e"] == "none";
+						var cornerSE = LT.walls[r + s][c + 1]["w"] == "none";
+						if (fogXY[r + s - 1][c - 1] == 0 && sideNW || x == 0 || y == 0 && s == 0)
 							fogBlender.append($("<div>").addClass("side nw"));
-						if (LT.getWall(c, r, "ne") == "none" && fogXY[r1 - 1][c + 1] == 0)
+						if (fogXY[r + s - 1][c + 1] == 0 && sideNE || x == map.columns - 1 || y == 0 && s == 0)
 							fogBlender.append($("<div>").addClass("side ne"));
-						if (LT.getWall(c, r, "sw") == "none" && fogXY[r1][c - 1] == 0)
+						if (fogXY[r + s][c - 1] == 0 && sideSW || x == 0 || y == map.rows - 1 && s == 1)
 							fogBlender.append($("<div>").addClass("side sw"));
-						if (LT.getWall(c, r, "se") == "none" && fogXY[r1][c + 1] == 0)
+						if (fogXY[r + s][c + 1] == 0 && sideSE || x == map.columns - 1 || y == map.rows - 1 && s == 1)
 							fogBlender.append($("<div>").addClass("side se"));
+						if (cornerNW && sideNW && sideN) fogBlender.append($("<div>").addClass("corner nw"));
+						if (cornerNE && sideNE && sideN) fogBlender.append($("<div>").addClass("corner ne"));
+						if (cornerW && sideNW && sideSW) fogBlender.append($("<div>").addClass("corner w"));
+						if (cornerE && sideNE && sideSE) fogBlender.append($("<div>").addClass("corner e"));
+						if (cornerSW && sideSW && sideS) fogBlender.append($("<div>").addClass("corner sw"));
+						if (cornerSE && sideSE && sideS) fogBlender.append($("<div>").addClass("corner se"));
 					}
 				} else {
 					if (fogElement) fogElement.remove();
