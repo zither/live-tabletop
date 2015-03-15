@@ -9,9 +9,9 @@
 		<script type="text/javascript" src="jquery-1.11.1.js"></script>
 		<!-- main Live Tabletop object: global LT variable -->
 		<script type="text/javascript" src="js/LT.js"></script>
-		<!-- classes: LT.Panel, LT.Table, LT.User, LT.Tile, etc. -->
-		<script type="text/javascript" src="js/Grid.js"></script>
+		<!-- classes used by other scripts (i.e. LT.Panel) -->
 		<script type="text/javascript" src="js/Panel.js"></script>
+		<script type="text/javascript" src="js/grid.js"></script>
 		<!-- panels: LT.characterPanel, LT.userPanel, etc. -->
 		<script type="text/javascript" src="js/campaignPanel.js"></script>
 		<script type="text/javascript" src="js/characterPanel.js"></script>
@@ -437,7 +437,7 @@
 						<br/>
 					</div>
 					<div data-tool="erase">
-						Click and drag on the map to erase tile images.
+						<div>Click and drag on the map to erase tile images.</div>
 					</div>
 					<div data-tool="fog">
 						<div>Click to toggle fog of war on map tiles. Drag to paint or erase.</div>
@@ -447,13 +447,15 @@
 						</div>
 					</div>
 					<div data-tool="wall">
-						Click on grid lines to create or remove walls and doors.
-						<select id="wallMode" size="4">
-							<option value="wall" selected="selected">draw walls</option>
-							<option value="door">create doors</option>
-							<option value="open">open and close doors</option>
-							<option value="none">erase walls and doors</option>
-						</select>
+						<div>Click on grid lines to create or remove walls and doors.</div>
+						<div>
+							<select id="wallMode" size="4">
+								<option value="wall" selected="selected">draw walls</option>
+								<option value="door">create doors</option>
+								<option value="open">open and close doors</option>
+								<option value="none">erase walls and doors</option>
+							</select>
+						</div>
 						<div>
 							<select id="grid_thickness">
 								<option value="0">none</option>
@@ -521,12 +523,13 @@
 							Click on a piece on the map to see its properties.
 							Drag a piece on the map to move it.
 							Click on an image below to create a new piece.
-							<span class="nowrap">
-								<input type="checkbox" checked="checked" id="snap"/>
-								<label for="snap">snap pieces to grid</label>
-							</span>
-							<input id="newPieceURL" type="button" value="external image URL"/>
-							<br/>
+							<div>
+								<span class="nowrap">
+									<input type="checkbox" checked="checked" id="snap"/>
+									<label for="snap">snap pieces to grid</label>
+								</span>
+								<input id="newPieceURL" type="button" value="external image URL"/>
+							</div>
 						</div>
 						<div id="pieceCreatorImages"></div>
 					</div>
