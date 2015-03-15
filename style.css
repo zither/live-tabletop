@@ -381,7 +381,11 @@ img.swatch {
 	border-color: transparent;
 	border-radius: 5px;
 }
-.swatch.selected {border: 1px solid #F00;}
+.swatch.selected {
+	border: 1px solid #C00;
+	background-color: #FFC;
+	color: #C00;
+}
 #tools .swatch {
 	float: left;
 	width: 41px;
@@ -389,6 +393,14 @@ img.swatch {
 	line-height: 25px;
 	text-align: center;
 	margin: 1px;
+}
+#tools :first-child {
+	border-radius: 10px 0 0 10px / 12.5px 0 0 12.5px;
+	padding-left: 3px;
+}
+#tools :last-child {
+	border-radius: 0 10px 10px 0 /  0 12.5px 12.5px 0;
+	padding-right: 3px;
 }
 /* clearfix */
 #tools:after {
