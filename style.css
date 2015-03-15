@@ -518,7 +518,8 @@ img.swatch {
 }
 #fogLayer > * > * > .corner {background-image: url('images/shadow.png');}
 #fogLayer > * > * > .side   {background-image: url('images/fog-side.png');}
-#fogLayer > .square > * > .corner {width: 64px; height: 48px; margin: -24px -32px;}
+/*#fogLayer > .square > * > .corner {width: 64px; height: 48px; margin: -24px -32px;}/**/
+#fogLayer > .square > * > .corner {width: 96px; height: 48px; margin: -24px -48px;}/**/
 #fogLayer > .hex    > * > .corner {width: 32px; height: 32px; margin: -16px;}
 #fogLayer > .square > * > .side {width: 64px; height: 64px; margin: -32px;}
 #fogLayer > .hex    > * > .side {width: 37px; height: 37px; margin: -18.5px;}
