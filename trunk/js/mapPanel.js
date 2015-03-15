@@ -188,6 +188,13 @@ $(function () { // This anonymous function runs after the page loads.
 	});
 	$("#tools .swatch[data-tool=piece]").click();
 
+	$("#fogFill").click(function () {
+		$.post("php/Map.fillFog.php", {"map": LT.currentMap.id}, LT.refreshMap);
+	});
+	$("#fogClear").click(function () {
+		$.post("php/Map.clearFog.php", {"map": LT.currentMap.id}, LT.refreshMap);
+	});
+
 	// load images
 	$.get("images/images.json", function (data) {
 
