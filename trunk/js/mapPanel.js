@@ -731,12 +731,18 @@ LT.loadTiles = function () {
 						if (cornerSW && sideSW && sideS) fogBlender.append($("<div>").addClass("corner sw"));
 						if (cornerSE && sideSE && sideS) fogBlender.append($("<div>").addClass("corner se"));
 */
-						if (cornerNW && sideNW && sideN && (fogN  || fogNW)) fogBlender.append($("<div>").addClass("corner nw"));
-						if (cornerNE && sideNE && sideN && (fogN  || fogNE)) fogBlender.append($("<div>").addClass("corner ne"));
-						if (cornerW && sideNW && sideSW && (fogNW || fogSW)) fogBlender.append($("<div>").addClass("corner w"));
-						if (cornerE && sideNE && sideSE && (fogNE || fogSE)) fogBlender.append($("<div>").addClass("corner e"));
-						if (cornerSW && sideSW && sideS && (fogS  || fogSW)) fogBlender.append($("<div>").addClass("corner sw"));
-						if (cornerSE && sideSE && sideS && (fogS  || fogSE)) fogBlender.append($("<div>").addClass("corner se"));
+						if (cornerNW && sideNW && sideN && (fogN  || fogNW) || edgeW || edgeN)
+							fogBlender.append($("<div>").addClass("corner nw"));
+						if (cornerNE && sideNE && sideN && (fogN  || fogNE) || edgeE || edgeN)
+							fogBlender.append($("<div>").addClass("corner ne"));
+						if (cornerW && sideNW && sideSW && (fogNW || fogSW) || edgeW)
+							fogBlender.append($("<div>").addClass("corner w"));
+						if (cornerE && sideNE && sideSE && (fogNE || fogSE) || edgeE)
+							fogBlender.append($("<div>").addClass("corner e"));
+						if (cornerSW && sideSW && sideS && (fogS  || fogSW) || edgeW || edgeS)
+							fogBlender.append($("<div>").addClass("corner sw"));
+						if (cornerSE && sideSE && sideS && (fogS  || fogSE) || edgeE || edgeS)
+							fogBlender.append($("<div>").addClass("corner se"));
 					}
 				} else {
 					if (fogElement) fogElement.remove();
