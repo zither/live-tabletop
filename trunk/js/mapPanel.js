@@ -188,11 +188,17 @@ $(function () { // This anonymous function runs after the page loads.
 	});
 	$("#tools .swatch[data-tool=piece]").click();
 
+	// fog tool options
 	$("#fogFill").click(function () {
 		$.post("php/Map.fillFog.php", {"map": LT.currentMap.id}, LT.refreshMap);
 	});
 	$("#fogClear").click(function () {
 		$.post("php/Map.clearFog.php", {"map": LT.currentMap.id}, LT.refreshMap);
+	});
+
+	// synchronize grid snap controls
+	$("#snap, #snap2").change(function() {
+		$("#snap, #snap2").prop("checked", this.checked);
 	});
 
 	// load images
