@@ -425,7 +425,6 @@
 			<div class="content" data-tab="map tools">
 				<div id="tools">
 					<div class="swatch" data-tool="tile">tile</div>
-					<div class="swatch" data-tool="erase">erase</div>
 					<div class="swatch" data-tool="fog">fog</div>
 					<div class="swatch" data-tool="wall">wall</div>
 					<div class="swatch selected" data-tool="piece">piece</div>
@@ -434,10 +433,13 @@
 					<div data-tool="tile">
 						Click on an image below to use it as a brush.
 						Click and drag on the map to paint tiles.
-						<br/>
-					</div>
-					<div data-tool="erase">
-						<div>Click and drag on the map to erase tile images.</div>
+						<div>
+							<span class="nowrap">
+								<input type="checkbox" id="erase"/>
+								<label for="erase">erase tiles instead of painting</label>
+							</span>
+						</div>
+						<div id="tilePalette"></div>
 					</div>
 					<div data-tool="fog">
 						<div>Click to toggle fog of war on map tiles. Drag to paint or erase.</div>

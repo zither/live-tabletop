@@ -188,6 +188,12 @@ $(function () { // This anonymous function runs after the page loads.
 	});
 	$("#tools .swatch[data-tool=piece]").click();
 
+	// tile tool options
+	$("#erase").change(function () {
+		if (this.checked) $("#tilePalette *").removeClass("selected");
+		else $("#tile" + LT.tile).addClass("selected");
+	});
+
 	// fog tool options
 	$("#fogFill").click(function () {
 		$.post("php/Map.fillFog.php", {"map": LT.currentMap.id}, LT.refreshMap);
@@ -208,12 +214,14 @@ $(function () { // This anonymous function runs after the page loads.
 		$.each(data.tiles, function (name, group) {
 			$.each(group, function (i, image) {
 				LT.images[image.id] = image;
-				$("<img>").appendTo("#toolOptions [data-tool=tile]").attr({
-					title: image.file,
-					src: "images/" + image.file,
+				$("<img>").appendTo("#tilePalette").attr({
+					"title": image.file,
+					"src": "images/" + image.file,
+					"id": "tile" + image.id,
 				}).addClass("swatch").click(function () {
-					$("#toolOptions [data-tool=tile] .swatch").removeClass("selected");
+					$("#tilePalette *").removeClass("selected");
 					$(this).addClass("selected");
+					$("#erase").prop("checked", false);
 					LT.tile = image.id;
 				});
 			});
@@ -765,23 +773,16 @@ LT.loadTiles = function () {
 
 			// function called when clicking or dragging over the tile
 			var updateTile = function () {
-				switch ($("#tools .swatch.selected").data("tool")) {
-					case "tile":
-						tile = LT.tile;
-						$.post("php/Map.tile.php", {"map": map.id, "x": x, "y": y, "tile": tile});
-						updateTileElement();
-						sortTiles();
-						break;
-					case "erase":
-						tile = 0;
-						$.post("php/Map.tile.php", {"map": map.id, "x": x, "y": y, "tile": tile});
-						updateTileElement();
-						break;
-					case "fog":
-						fogXY[y + 1][x + 1] = LT.toggleFog;
-						$.post("php/Map.fog.php", {"map": map.id, "x": x, "y": y, "fog": fogXY[y + 1][x + 1]});
-						updateFogElement();
-						break;
+				var tool = $("#tools .swatch.selected").data("tool");
+				if (tool == "tile") {
+					tile = $("#erase").prop("checked") ? 0 : LT.tile;
+					$.post("php/Map.tile.php", {"map": map.id, "x": x, "y": y, "tile": tile});
+					updateTileElement();
+					if (tile) sortTiles();
+				} else if (tool == "fog") {
+					fogXY[y + 1][x + 1] = LT.toggleFog;
+					$.post("php/Map.fog.php", {"map": map.id, "x": x, "y": y, "fog": fogXY[y + 1][x + 1]});
+					updateFogElement();
 				}
 			};
 
