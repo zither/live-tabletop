@@ -653,10 +653,14 @@ LT.loadTiles = function () {
 					var fogBlender = $("<div>").appendTo(fogElement);
 					var sideN = LT.walls[r - 1][c]["s"] == "none";
 					var sideS = LT.walls[r][c]["s"] == "none";
-					if (sideN && fogXY[r - 1][c] == 0 || y == 0)
-						fogBlender.append($("<div>").addClass("side n"));
-					if (sideS && fogXY[r + 1][c] == 0 || y == map.rows - 1)
-						fogBlender.append($("<div>").addClass("side s"));
+					var fogN = fogXY[r - 1][c] == 0;
+					var fogS = fogXY[r + 1][c] == 0;
+					var edgeN = y == 0;
+					var edgeS = y == map.rows - 1;
+					var edgeW = x == 0;
+					var edgeE = x == map.columns - 1;
+					if (sideN && fogN || edgeN) fogBlender.append($("<div>").addClass("side n"));
+					if (sideS && fogS || edgeS) fogBlender.append($("<div>").addClass("side s"));
 
 					if (map.type == "square") {
 						var sideW = LT.walls[r][c - 1]["e"] == "none";
@@ -669,27 +673,33 @@ LT.loadTiles = function () {
 						var cornerWSW = LT.walls[r][c - 1]["s"] == "none";
 						var cornerSSE = LT.walls[r + 1][c]["e"] == "none";
 						var cornerESE = LT.walls[r][c + 1]["s"] == "none";
-						if (fogXY[r][c - 1] == 0 && sideW || x == 0)
-							fogBlender.append($("<div>").addClass("side w"));
-						if (fogXY[r][c + 1] == 0 && sideE || x == map.columns - 1)
-							fogBlender.append($("<div>").addClass("side e"));
-/*
-						if (fogXY[r - 1][c - 1] == 0 && sideN && sideW && cornerNNW && cornerWNW)
+						var fogW = fogXY[r][c - 1] == 0;
+						var fogE = fogXY[r][c + 1] == 0;
+						var fogNW = fogXY[r - 1][c - 1] == 0;
+						var fogNE = fogXY[r - 1][c + 1] == 0;
+						var fogSW = fogXY[r + 1][c - 1] == 0;
+						var fogSE = fogXY[r + 1][c + 1] == 0;
+
+						if (fogW && sideW || edgeW) fogBlender.append($("<div>").addClass("side w"));
+						if (fogE && sideE || edgeE) fogBlender.append($("<div>").addClass("side e"));
+
+						if (sideN && sideW && cornerNNW && cornerWNW && (fogNW || fogN || fogW) || edgeW || edgeN)
 							fogBlender.append($("<div>").addClass("corner nw"));
-						if (fogXY[r - 1][c + 1] == 0 && sideN && sideE && cornerNNE && cornerENE)
+						if (sideN && sideE && cornerNNE && cornerENE && (fogNE || fogN || fogE) || edgeE || edgeN)
 							fogBlender.append($("<div>").addClass("corner ne"));
-						if (fogXY[r + 1][c - 1] == 0 && sideS && sideW && cornerSSW && cornerWSW)
+						if (sideS && sideW && cornerSSW && cornerWSW && (fogSW || fogS || fogW) || edgeW || edgeS)
 							fogBlender.append($("<div>").addClass("corner sw"));
-						if (fogXY[r + 1][c + 1] == 0 && sideS && sideE && cornerSSE && cornerESE)
+						if (sideS && sideE && cornerSSE && cornerESE && (fogSE || fogS || fogE) || edgeE || edgeS)
 							fogBlender.append($("<div>").addClass("corner se"));
 /**/
-						if (sideN && sideW && cornerNNW && cornerWNW || x == 0 || y == 0)
+/*
+						if (sideN && sideW && cornerNNW && cornerWNW || edgeW || edgeN)
 							fogBlender.append($("<div>").addClass("corner nw"));
-						if (sideN && sideE && cornerNNE && cornerENE || x == map.columns - 1 || y == 0)
+						if (sideN && sideE && cornerNNE && cornerENE || edgeE || edgeN)
 							fogBlender.append($("<div>").addClass("corner ne"));
-						if (sideS && sideW && cornerSSW && cornerWSW || x == 0 || y == map.rows - 1)
+						if (sideS && sideW && cornerSSW && cornerWSW || edgeW || edgeS)
 							fogBlender.append($("<div>").addClass("corner sw"));
-						if (sideS && sideE && cornerSSE && cornerESE || x == map.columns - 1 || y == map.rows - 1)
+						if (sideS && sideE && cornerSSE && cornerESE || edgeE || edgeS)
 							fogBlender.append($("<div>").addClass("corner se"));
 /**/
 					}
@@ -705,20 +715,28 @@ LT.loadTiles = function () {
 						var cornerE = LT.walls[r + s - 1][c + 1]["s"] == "none";
 						var cornerSW = LT.walls[r + s][c - 1]["e"] == "none";
 						var cornerSE = LT.walls[r + s][c + 1]["w"] == "none";
-						if (fogXY[r + s - 1][c - 1] == 0 && sideNW || x == 0 || y == 0 && s == 0)
-							fogBlender.append($("<div>").addClass("side nw"));
-						if (fogXY[r + s - 1][c + 1] == 0 && sideNE || x == map.columns - 1 || y == 0 && s == 0)
-							fogBlender.append($("<div>").addClass("side ne"));
-						if (fogXY[r + s][c - 1] == 0 && sideSW || x == 0 || y == map.rows - 1 && s == 1)
-							fogBlender.append($("<div>").addClass("side sw"));
-						if (fogXY[r + s][c + 1] == 0 && sideSE || x == map.columns - 1 || y == map.rows - 1 && s == 1)
-							fogBlender.append($("<div>").addClass("side se"));
+						var fogNW = fogXY[r + s - 1][c - 1] == 0;
+						var fogNE = fogXY[r + s - 1][c + 1] == 0;
+						var fogSW = fogXY[r + s][c - 1] == 0;
+						var fogSE = fogXY[r + s][c + 1] == 0;
+						if (fogNW && sideNW || edgeW || edgeN && s == 0) fogBlender.append($("<div>").addClass("side nw"));
+						if (fogNE && sideNE || edgeE || edgeN && s == 0) fogBlender.append($("<div>").addClass("side ne"));
+						if (fogSW && sideSW || edgeW || edgeS && s == 1) fogBlender.append($("<div>").addClass("side sw"));
+						if (fogSE && sideSE || edgeE || edgeS && s == 1) fogBlender.append($("<div>").addClass("side se"));
+/*
 						if (cornerNW && sideNW && sideN) fogBlender.append($("<div>").addClass("corner nw"));
 						if (cornerNE && sideNE && sideN) fogBlender.append($("<div>").addClass("corner ne"));
 						if (cornerW && sideNW && sideSW) fogBlender.append($("<div>").addClass("corner w"));
 						if (cornerE && sideNE && sideSE) fogBlender.append($("<div>").addClass("corner e"));
 						if (cornerSW && sideSW && sideS) fogBlender.append($("<div>").addClass("corner sw"));
 						if (cornerSE && sideSE && sideS) fogBlender.append($("<div>").addClass("corner se"));
+*/
+						if (cornerNW && sideNW && sideN && (fogN  || fogNW)) fogBlender.append($("<div>").addClass("corner nw"));
+						if (cornerNE && sideNE && sideN && (fogN  || fogNE)) fogBlender.append($("<div>").addClass("corner ne"));
+						if (cornerW && sideNW && sideSW && (fogNW || fogSW)) fogBlender.append($("<div>").addClass("corner w"));
+						if (cornerE && sideNE && sideSE && (fogNE || fogSE)) fogBlender.append($("<div>").addClass("corner e"));
+						if (cornerSW && sideSW && sideS && (fogS  || fogSW)) fogBlender.append($("<div>").addClass("corner sw"));
+						if (cornerSE && sideSE && sideS && (fogS  || fogSE)) fogBlender.append($("<div>").addClass("corner se"));
 					}
 				} else {
 					if (fogElement) fogElement.remove();
