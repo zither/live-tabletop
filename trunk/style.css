@@ -357,18 +357,8 @@ th, td {padding: 0;}
 .alert {color: #039;}
 .roll {font-style: italic; color: #900;}
 
-/* Color Palette */
-.colorPalette {
-	clear: left,
-	position: relative,
-	border: 2px solid transparent,
-}
-.colorSwatch {position: absolute;}
-.colorSwatch.selected {
-	border: 1px solid black;
-	margin: -1px;
-	z-index: 1;
-}
+/* Map List */
+#mapListHelp {display: none;}
 
 /* Tiles and Brushes */
 .swatch {

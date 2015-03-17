@@ -469,6 +469,7 @@ LT.refreshMapList = function () {
 	if (LT.mapPanel.getTab() != "map list") return;
 	$.post("php/User.maps.php", function (theData) {
 		if (LT.mapPanel.getTab() != "map list") return;
+		$("#mapListHelp").toggle(theData.length > 0);
 		$("#mapList > div:not(.template)").remove();
 		$.each(theData, function (i, theMap) {
 			var copy = $("#mapList .template").clone().removeClass("template");
@@ -829,6 +830,7 @@ LT.loadPieces = function () {
 		var selectedPiece = LT.getCookie("piece");
 		$("#pieceLayer, #clickPieceLayer").empty();
 		$("#pieceList div:not(.template)").remove();
+		$("#pieceListHelp").toggle(data.length > 0);
 		$.each(data, function (i, piece) {
 			var source = piece.image.url || "images/" + piece.image.file;
 			var scale = piece.image.scale ? piece.image.scale / 100 : 1;
@@ -1172,6 +1174,7 @@ LT.loadPieces = function () {
 					element.offset().left - window.innerWidth / 2,
 					element.offset().top - window.innerHeight / 2);
 				select();
+				$("#tools .swatch[data-tool=piece]").click();
 				LT.mapPanel.selectTab("piece info");
 				return false;
 			});
