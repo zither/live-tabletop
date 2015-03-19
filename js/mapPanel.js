@@ -1202,7 +1202,7 @@ LT.sortPieces = function () {
 		return a[1] - b[1];
 	};
 	$("#pieceLayer > *").sort(sorter).appendTo("#pieceLayer");
-	$("#clickPieceLayer > F*").sort(sorter).appendTo("#clickPieceLayer");
+	$("#clickPieceLayer > *").sort(sorter).appendTo("#clickPieceLayer");
 };
 
 // update cursor when mouse has moved
