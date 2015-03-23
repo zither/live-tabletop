@@ -500,17 +500,17 @@ img.swatch {
 /* Fog */
 #fogLayer > .square {
 	background-color: #000;
-	width: 64px;
-	height: 64px;
-	margin: -32px;
+	width: 66px;
+	height: 66px;
+	margin: -33px;
 }
 #fogLayer > .hex {
 	background-image: url('images/black-hex.png');
 	background-position: center;
 	background-size: 100% 100%;
-	height: 64px;
-	width: 73.33px;
-	margin: -32px -36.67px;
+	height: 66px;
+	width: 75px;
+	margin: -33px -37.5px;
 }
 #fogLayer > * > * {position: relative;}
 #fogLayer > * > * > * {
