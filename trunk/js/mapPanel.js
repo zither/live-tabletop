@@ -79,7 +79,10 @@ $(function () { // This anonymous function runs after the page loads.
 			"wall_color": LT.currentMap.wall_color,
 			"door_thickness": LT.currentMap.door_thickness,
 			"door_color": LT.currentMap.door_color,
-		}, LT.refreshMap);
+		}, function () {
+			LT.refreshMap();
+			LT.paintGrid();
+		});
 	};
 	$("#renameMap").click(function () {
 		var newName = prompt("new map name", LT.currentMap.name || "");
