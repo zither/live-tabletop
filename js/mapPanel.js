@@ -16,8 +16,7 @@ LT.cursorRequested = false;
 LT.rotate = 0;
 LT.tilt = 90;
 LT.zoom = 1;
-LT.mapX = 0;
-LT.mapY = 0;
+LT.center = [0, 0];
 
 $(function () { // This anonymous function runs after the page loads.
 	LT.mapPanel = new LT.Panel("map");
@@ -500,10 +499,9 @@ LT.updateCursors = function (theUsers) {
 		if (!user.cursor) return;
 		var time = $.now() - 1000 * user.cursor.time;
 		if (time < duration) {
-			var position = LT.mapToScreen(user.cursor.x, user.cursor.y);
 			var cursor = $("<div>").appendTo("#cursors").css({
-				"left": position[0] + "px",
-				"top": position[1] + "px",
+				"left": user.cursor.x * LT.WIDTH + "px",
+				"top": user.cursor.y * LT.HEIGHT + "px",
 				"background-color": user.color || "black",
 			});
 			var fade = function () {
@@ -522,30 +520,27 @@ LT.mapToScreen = function (c, r) {
 	var rows = LT.currentMap.rows;
 	var columns = LT.currentMap.columns;
 	if (LT.currentMap.type == "hex") {columns += 1/3; rows += 0.5;}
-	c -= columns / 2;
-	r -= rows / 2;
+	c -= (columns - 1) / 2;
+	r -= (rows - 1) / 2;
 	var angle = Math.PI * LT.rotate / 180;
 	var x = c * Math.cos(angle) - r * Math.sin(angle);
 	var y = r * Math.cos(angle) + c * Math.sin(angle);
 	x *= LT.zoom * LT.WIDTH;
 	y *= LT.zoom * LT.HEIGHT * Math.sin(Math.PI * LT.tilt / 180);
-	return [
-		x + LT.mapX + columns * LT.WIDTH / 2,
-		y + LT.mapY + rows * LT.HEIGHT / 2];
+	return [x + LT.center[0], y + LT.center[1]];
 };
 
 LT.screenToMap = function (x, y) {
 	var rows = LT.currentMap.rows;
 	var columns = LT.currentMap.columns;
 	if (LT.currentMap.type == "hex") {columns += 1/3; rows += 0.5;}
-	x -= LT.mapX + columns * LT.WIDTH / 2;
-	y -= LT.mapY + rows * LT.HEIGHT / 2;
-	x /= LT.zoom * LT.WIDTH;
-	y /= LT.zoom * LT.HEIGHT * Math.sin(Math.PI * LT.tilt / 180);
+	x = (x - LT.center[0]) / (LT.zoom * LT.WIDTH);
+	y = (y - LT.center[1]) / (LT.zoom * LT.HEIGHT
+		* Math.sin(Math.PI * LT.tilt / 180));
 	var angle = -Math.PI * LT.rotate / 180;
 	return [
-		x * Math.cos(angle) - y * Math.sin(angle) + columns / 2,
-		y * Math.cos(angle) + x * Math.sin(angle) + rows / 2];
+		x * Math.cos(angle) - y * Math.sin(angle) + (columns - 1) / 2,
+		y * Math.cos(angle) + x * Math.sin(angle) + (rows - 1) / 2];
 };
 
 LT.centerMap = function () {
@@ -555,14 +550,14 @@ LT.centerMap = function () {
 	var r = LT.zoom * (Math.sqrt(x * x + y * y) + LT.WIDTH + LT.HEIGHT);
 	var w = Math.max($(window).width(), r);
 	var h = Math.max($(window).height(), r + 2 * $("#pageBar").height());
-	LT.mapX = w / 2;
-	LT.mapY = h / 2;
+	LT.center[0] = w / 2;
+	LT.center[1] = h / 2;
 	$("#mapScrollSpace").css({"width": w + "px", "height": h + "px"});
 	$("#map").css({
 		"margin-left": -x / 2 + "px",
 		"margin-top": -y / 2 + "px",
-		"left": LT.mapX + "px",
-		"top": LT.mapY + "px",
+		"left": LT.center[0] + "px",
+		"top": LT.center[1] + "px",
 	});
 };
 
@@ -574,6 +569,7 @@ $(document).mousemove(function () {
 	output.push(LT.mapToScreen(1, 0));
 	output.push(LT.mapToScreen(0, 1));
 	output.push(LT.mapToScreen(1, 1));
+	output.push([output[5][0] - output[2][0], output[5][1] - output[2][1]]);
 	$("#debug").empty();
 	$.each(output, function (i, n) {
 		$("<div>").text([n[0].toFixed(1), n[1].toFixed(1)].join(", ")).appendTo("#debug");}
