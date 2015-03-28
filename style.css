@@ -435,17 +435,8 @@ img.swatch {
 /* MAP */
 
 #map {
-	position: relative;
-	display: none;
-}
-.cursor {
 	position: absolute;
-	left: 0;
-	top: 0;
-	width: 10px;
-	height: 10px;
-	margin: -5px;
-	border-radius: 50%;
+	display: none;
 }
 
 /* Layers */
@@ -462,6 +453,7 @@ img.swatch {
 #fogLayer {z-index: 0;} /* subcontext for z-layered fog files */
 /* pieces have no z-index subcontext, so they can be above or below other layers */
 #clickLayers {z-index: 2;} /* higher than pieces that are above the fog */
+#cursors {z-index: 3;} /* higher than everything */
 
 /* #clickWallLayer > * {border: 1px dashed black;} /**/
 /* #clickTileLayer > :hover, */
@@ -470,6 +462,17 @@ img.swatch {
 	background-size: 100% 100%;
 	background-repeat: no-repeat;
 	background-position: center;
+}
+
+#cursors {position: relative;}
+#cursors > * {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 10px;
+	height: 10px;
+	margin: -5px;
+	border-radius: 50%;
 }
 
 
@@ -500,17 +503,17 @@ img.swatch {
 /* Fog */
 #fogLayer > .square {
 	background-color: #000;
-	width: 66px;
-	height: 66px;
-	margin: -33px;
+	width: 50px;
+	height: 50px;
+	margin: -25px;
 }
 #fogLayer > .hex {
 	background-image: url('images/black-hex.png');
 	background-position: center;
 	background-size: 100% 100%;
-	height: 66px;
-	width: 75px;
-	margin: -33px -37.5px;
+	height: 50px;
+	width: 57px;
+	margin: -25px -28.5px;
 }
 #fogLayer > * > * {position: relative;}
 #fogLayer > * > * > * {
@@ -520,32 +523,31 @@ img.swatch {
 }
 #fogLayer > * > * > .corner {background-image: url('images/shadow.png');}
 #fogLayer > * > * > .side   {background-image: url('images/fog-side.png');}
-/*#fogLayer > .square > * > .corner {width: 64px; height: 48px; margin: -24px -32px;}/**/
-#fogLayer > .square > * > .corner {width: 96px; height: 48px; margin: -24px -48px;}/**/
-#fogLayer > .hex    > * > .corner {width: 32px; height: 32px; margin: -16px;}
-#fogLayer > .square > * > .side {width: 64px; height: 64px; margin: -32px;}
-#fogLayer > .hex    > * > .side {width: 37px; height: 37px; margin: -18.5px;}
+#fogLayer > .square > * > .corner {width: 72px; height: 36px; margin: -18px -36px;}
+#fogLayer > .hex    > * > .corner {width: 24px; height: 24px; margin: -12px;}
+#fogLayer > .square > * > .side {width: 48px; height: 48px; margin: -24px;}
+#fogLayer > .hex    > * > .side {width: 28px; height: 28px; margin: -14px;}
 
-#fogLayer > .square > * > .n  {left: 32px; top: 0px;}
-#fogLayer > .square > * > .s  {left: 32px; top: 64px;}
-#fogLayer > .square > * > .w  {left: 0px;  top: 32px; transform: rotate(90deg);}
-#fogLayer > .square > * > .e  {left: 64px; top: 32px; transform: rotate(90deg);}
-#fogLayer > .square > * > .nw {left: 0px;  top: 0px;  transform: rotate(-45deg);}
-#fogLayer > .square > * > .ne {left: 64px; top: 0px;  transform: rotate(45deg);}
-#fogLayer > .square > * > .sw {left: 0px;  top: 64px; transform: rotate(45deg);}
-#fogLayer > .square > * > .se {left: 64px; top: 64px; transform: rotate(-45deg);}
-#fogLayer > .hex > * > .side.n  {left: 36.67px; top: 0px;}
-#fogLayer > .hex > * > .side.ne {left: 64.17px; top: 16px; transform: rotate( 59.25deg);}
-#fogLayer > .hex > * > .side.se {left: 64.17px; top: 48px; transform: rotate(120.75deg);}
-#fogLayer > .hex > * > .side.s  {left: 36.67px; top: 64px;}
-#fogLayer > .hex > * > .side.sw {left:  9.17px; top: 48px; transform: rotate(-120.75deg);}
-#fogLayer > .hex > * > .side.nw {left:  9.17px; top: 16px; transform: rotate( -59.25deg);}
-#fogLayer > .hex > * > .corner.nw {left: 18.33px; top: 0px;}
-#fogLayer > .hex > * > .corner.ne {left: 55.00px; top: 0px;}
-#fogLayer > .hex > * > .corner.e  {left: 73.33px; top: 32px;}
-#fogLayer > .hex > * > .corner.se {left: 55.00px; top: 64px;}
-#fogLayer > .hex > * > .corner.sw {left: 18.33px; top: 64px;}
-#fogLayer > .hex > * > .corner.w  {left:  0.00px; top: 32px;}
+#fogLayer > .square > * > .n  {left: 24px; top:  0px;}
+#fogLayer > .square > * > .s  {left: 24px; top: 48px;}
+#fogLayer > .square > * > .w  {left:  0px; top: 24px; transform: rotate( 90deg);}
+#fogLayer > .square > * > .e  {left: 48px; top: 24px; transform: rotate( 90deg);}
+#fogLayer > .square > * > .nw {left:  0px; top:  0px; transform: rotate(-45deg);}
+#fogLayer > .square > * > .ne {left: 48px; top:  0px; transform: rotate( 45deg);}
+#fogLayer > .square > * > .sw {left:  0px; top: 48px; transform: rotate( 45deg);}
+#fogLayer > .square > * > .se {left: 48px; top: 48px; transform: rotate(-45deg);}
+#fogLayer > .hex > * > .side.n  {left: 28px; top:  0px;}
+#fogLayer > .hex > * > .side.ne {left: 49px; top: 12px; transform: rotate( 59.25deg);}
+#fogLayer > .hex > * > .side.se {left: 49px; top: 36px; transform: rotate(120.75deg);}
+#fogLayer > .hex > * > .side.s  {left: 28px; top: 48px;}
+#fogLayer > .hex > * > .side.sw {left:  7px; top: 36px; transform: rotate(-120.75deg);}
+#fogLayer > .hex > * > .side.nw {left:  7px; top: 12px; transform: rotate( -59.25deg);}
+#fogLayer > .hex > * > .corner.nw {left: 14px; top:  0px;}
+#fogLayer > .hex > * > .corner.ne {left: 42px; top:  0px;}
+#fogLayer > .hex > * > .corner.e  {left: 56px; top: 24px;}
+#fogLayer > .hex > * > .corner.se {left: 42px; top: 48px;}
+#fogLayer > .hex > * > .corner.sw {left: 14px; top: 48px;}
+#fogLayer > .hex > * > .corner.w  {left:  0px; top: 24px;}
 
 /* WELCOME */
 

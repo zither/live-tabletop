@@ -7,21 +7,18 @@
 		<title>Live Tabletop</title>
 		<!-- JQuery framework for DOM manipulation and Ajax -->
 		<script type="text/javascript" src="jquery-1.11.1.js"></script>
-		<!-- main Live Tabletop object: global LT variable -->
+		<!-- initialization and main Live Tabletop object: global LT variable -->
 		<script type="text/javascript" src="js/LT.js"></script>
-		<!-- classes used by other scripts (i.e. LT.Panel) -->
-		<script type="text/javascript" src="js/Panel.js"></script>
-		<script type="text/javascript" src="js/grid.js"></script>
-		<!-- panels: LT.characterPanel, LT.userPanel, etc. -->
+		<!-- panels and the objects they control (campaigns, characters, maps, users) -->
+		<script type="text/javascript" src="js/Panel.js"></script><!-- LT.Panel class -->
 		<script type="text/javascript" src="js/campaignPanel.js"></script>
 		<script type="text/javascript" src="js/characterPanel.js"></script>
 		<script type="text/javascript" src="js/mapPanel.js"></script>
 		<script type="text/javascript" src="js/userPanel.js"></script>
-		<!-- utility functions -->
-		<script type="text/javascript" src="js/init.js"></script>
-		<script type="text/javascript" src="js/install.js"></script>
-		<script type="text/javascript" src="js/login.js"></script>
-		<script type="text/javascript" src="js/uploader.js"></script>
+		<!-- visual map components -->
+		<script type="text/javascript" src="js/grid.js"></script>
+		<script type="text/javascript" src="js/piece.js"></script>
+		<script type="text/javascript" src="js/tile.js"></script>
 	</head>
 	<body>
 
@@ -115,6 +112,7 @@
 
 		<!-- MAP (the campaign's current map) -->
 
+		<div id="mapScrollSpace"></div>
 		<div id="map">
 			<div class="mapLayer" id="tileLayer"></div>
 			<div class="mapLayer" id="wallLayer"><canvas id="grid"></canvas></div>
@@ -125,6 +123,7 @@
 				<div class="clickLayer" id="clickWallLayer"></div>
 				<div class="clickLayer" id="clickPieceLayer"></div>
 			</div>
+			<div id="cursors"></div>
 		</div>
 
 		<!-- PANELS -->
@@ -560,7 +559,8 @@
 				</div>
 				<div>
 					<select name="character" id="pieceCharacter">
-						<option value="-1">no character</option>
+						<option value="none">no character</option>
+						<option value="new">create new character</option>
 					</select>
 					<input id="deletePiece" type="button" value="delete piece"/>	
 				</div>
