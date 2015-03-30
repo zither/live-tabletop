@@ -14,6 +14,7 @@ if (!isset($_SESSION['user'])) {
 
 $map = intval($_REQUEST['map']);
 $image = $LT_SQL->real_escape_string($_REQUEST['image']);
+$name = $LT_SQL->real_escape_string($_REQUEST['name']);
 $x = floatval($_REQUEST['x']);
 $y = floatval($_REQUEST['y']);
 
@@ -22,7 +23,9 @@ $y = floatval($_REQUEST['y']);
 if (LT_can_edit_map($map)) {
 	if ($rows = LT_call('create_piece', $map, $image)) {
 		$piece = intval($rows[0]['id']);
+		// TODO: add $x, $y, $name parameters to create_piece procedure and drop these two lines
 		LT_call('update_piece_position', $piece, $x, $y);
+		LT_call('update_piece', $piece, $image, $name, NULL, 1, '[]', 'gray');
 		include('include/json_headers.php');
 		echo json_encode(array('id' => $piece));
 	}

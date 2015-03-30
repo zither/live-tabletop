@@ -120,6 +120,44 @@ $(function () { // This anonymous function runs after the page loads.
 
 }); // $(function () { // This anonymous function runs after the page loads.
 
+// read piece images from images.json after it is loaded in mapPanel.js
+LT.readPieceImages = function (pieceImageData) {
+	$.each(pieceImageData, function (name, group) {
+		$.each(group, function (i, image) {
+
+			// create an image for the new piece tab
+			$("<img>").appendTo($("#pieceCreatorImages")).addClass("swatch").attr({
+				title: image.name || image.file,
+				src: "images/" + image.file
+			}).click(function () {
+				var coordinates = LT.screenToMap(
+					$(window).scrollLeft() + $(window).width() / 2,
+					$(window).scrollTop() + $(window).height() / 2);
+				$.post("php/Piece.create.php", {
+					"map": LT.currentMap.id,
+					"image": JSON.stringify(image),
+					"x": coordinates[0],
+					"y": coordinates[1],
+					"name": image.name || "",
+				}, LT.refreshMap);
+			});
+
+			// create an image for the piece info tab
+			$("<img>").appendTo($("#pieceEditorImages")).addClass("swatch").attr({
+				title: image.name || image.file,
+				src: "images/" + image.file,
+			}).click(function () {
+				LT.pieceSelected.image = $.extend({}, image);
+				LT.savePieceSettings(LT.pieceSelected);
+				$("#pieceEditorImages *").removeClass("selected");
+				$(this).addClass("selected");
+			});
+
+		}); // $.each(group, function (i, image) {
+	}); // $.each(pieceImageData, function (name, group) {
+}; // LT.readPieceImages = function (pieceImageData) {
+
+// (re)load pieces after loading or refreshing the map
 LT.loadPieces = function () {
 	$.post("php/Map.pieces.php", {map: LT.currentMap.id}, function (data) {
 		var selectedPiece = LT.getCookie("piece");
