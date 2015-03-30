@@ -1,3 +1,26 @@
+LT.tiles = {};
+
+// read tile images from images.json after it is loaded in mapPanel.js
+LT.readTileImages = function (tileImageData) {
+	$.each(tileImageData, function (name, group) {
+		$.each(group, function (i, image) {
+			LT.tiles[image.id] = image; // to look up map tile data by index
+			$("<img>").appendTo("#tilePalette").attr({
+				"title": image.file,
+				"src": "images/" + image.file,
+				"id": "tile" + image.id,
+			}).addClass("swatch").click(function () {
+				$("#tilePalette *").removeClass("selected");
+				$(this).addClass("selected");
+				$("#erase").prop("checked", false);
+				LT.tile = image.id;
+			});
+		});
+	});
+	$("#toolOptions [data-tool=tile] .swatch:first-child").click();
+};
+
+// create or update tiles after loading or refreshing the map
 LT.loadTiles = function () {
 
 	$.get("php/Map.read.php", {map: LT.currentMap.id}, function (map) {
@@ -64,7 +87,7 @@ LT.loadTiles = function () {
 				if (tile > 0) {
 					// TODO: new tile will not be in correct order until refresh
 					if (tileElement === null) tileElement = $("<img>").appendTo("#tileLayer");
-					var image = LT.images[tile];
+					var image = LT.tiles[tile];
 					tileElement.attr("src", "images/" + image.file).css(style(image));
 					tileElement.data("order", 2 * i + 3 * (x % 2));
 				} else {

@@ -9,7 +9,6 @@ LT.SQUARE_LEFT = 24;
 LT.GUTTERS = 32;
 LT.BASE64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-LT.images = {};
 LT.dragging = 0;
 LT.cursorRequested = false;
 
@@ -208,57 +207,8 @@ $(function () { // This anonymous function runs after the page loads.
 
 	// load images
 	$.get("images/images.json", function (data) {
-
-		// read tile images
-		$.each(data.tiles, function (name, group) {
-			$.each(group, function (i, image) {
-				LT.images[image.id] = image;
-				$("<img>").appendTo("#tilePalette").attr({
-					"title": image.file,
-					"src": "images/" + image.file,
-					"id": "tile" + image.id,
-				}).addClass("swatch").click(function () {
-					$("#tilePalette *").removeClass("selected");
-					$(this).addClass("selected");
-					$("#erase").prop("checked", false);
-					LT.tile = image.id;
-				});
-			});
-		});
-		$("#toolOptions [data-tool=tile] .swatch:first-child").click();
-
-		// read piece images
-		$.each(data.pieces, function (name, group) {
-			$.each(group, function (i, image) {
-				LT.images[image.id] = image;
-				// create an image for the new piece tab
-				$("<img>").appendTo($("#pieceCreatorImages")).addClass("swatch").attr({
-					title: image.file,
-					src: "images/" + image.file
-				}).click(function () {
-					var coordinates = LT.screenToMap(
-						$(window).scrollLeft() + $(window).width() / 2,
-						$(window).scrollTop() + $(window).height() / 2);
-					$.post("php/Piece.create.php", {
-						"map": LT.currentMap.id,
-						"image": JSON.stringify(image),
-						"x": coordinates[0],
-						"y": coordinates[1],
-					}, LT.refreshMap);
-				});
-				// create an image for the piece info tab
-				$("<img>").appendTo($("#pieceEditorImages")).addClass("swatch").attr({
-					title: image.file,
-					src: "images/" + image.file,
-				}).click(function () {
-					LT.pieceSelected.image = $.extend({}, image);
-					LT.savePieceSettings(LT.pieceSelected);
-					$("#pieceEditorImages *").removeClass("selected");
-					$(this).addClass("selected");
-				});
-			});
-		});
-
+		LT.readTileImages(data.tiles);
+		LT.readPieceImages(data.pieces);
 	}); // $.get("images/images.json", function (data) {
 
 	// map rotate, tilt and zoom controls
