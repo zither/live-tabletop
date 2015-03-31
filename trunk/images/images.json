@@ -1,6 +1,7 @@
 {
 	"pieces":{
 		"character":[
+			{"id":101,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/adept-die1.png","name":"empty robe"},
 			{"id":101,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/ambusher.png","name":"saurian"},
 			{"id":102,"view":"side","size":[96,96],"center":[48,72],"base":[1,1],"palette":"wesnoth","file":"piece/armageddon-fire-inhale-3.png","name":"drake"},
 			{"id":103,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/dark-sorcerer.png","name":"necromancer"},
@@ -9,8 +10,8 @@
 			{"id":106,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/hero.png","name":"elf"},
 			{"id":107,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/highwayman-melee-1.png","name":"highwayman"},
 			{"id":110,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/peasant-ranged.png","name":"peasant"},
-			{"id":112,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/red-mage-attack-staff-1.png","name":"rogue"},
-			{"id":113,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/red-mage+female-attack-staff-1.png","name":"rogue"},
+			{"id":112,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/red-mage-attack-staff-1.png","name":"mage"},
+			{"id":113,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/red-mage+female-attack-staff-1.png","name":"mage"},
 			{"id":115,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/rogue+female-ranged.png","name":"rogue"},
 			{"id":116,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/shocktrooper-attack-1.png","name":"shocktrooper"},
 			{"id":117,"view":"side","size":[72,72],"center":[36,54],"base":[1,1],"palette":"wesnoth","file":"piece/skeleton.png","name":"skeleton"},

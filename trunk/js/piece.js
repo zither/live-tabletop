@@ -76,7 +76,7 @@ $(function () { // This anonymous function runs after the page loads.
 		}); // $.each(COLORS, function (colorIndex, color) {
 	}); // $.each(PALETTES, function (name, palette) {
 
-	LT.dropHandlers.push(function () {
+	$(document).mouseup(function (e) {
 		LT.dragging = 0;
 		if (LT.pieceMoving) {
 			LT.pieceMoving = false;
@@ -89,9 +89,7 @@ $(function () { // This anonymous function runs after the page loads.
 			}, LT.refreshMap);
 		}
 	});
-	LT.dragHandlers.push(function (e) {
-		if (e.ctrlKey) LT.cursorRequested = true;
-
+	$(document).mousemove(function (e) {
 		if (LT.pieceMoving) {
 			var x = parseFloat(LT.pieceElement.css("left")) / LT.WIDTH;
 			var y = parseFloat(LT.pieceElement.css("top")) / LT.HEIGHT;
@@ -398,7 +396,7 @@ LT.loadPieces = function () {
 					LT.savePieceSettings(piece);
 				});
 				$("#pieceScale option:first-child").text(
-					(piece.image.scale || 1) + "%");
+					(piece.image.scale || 100) + "%");
 				$("#pieceScale").val("").off("change").change(function () {
 					if ($(this).val() == "") return;
 					piece.image.scale = parseFloat($(this).val());

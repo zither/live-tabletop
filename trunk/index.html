@@ -696,16 +696,16 @@
 			</div>
 			<div class="content" data-tab="character list">
 				<div>
-					<input name="name" type="text" placeholder="character name"/>
-					<select><option value="-1">no system</option></select>
-					<input type="button" value="create character"/>
+					<input id="newCharacterName" name="name" type="text" placeholder="character name"/>
+					<select id="newCharacterSystem"><option value="-1">no system</option></select>
+					<input id="createCharacter" type="button" value="create character"/>
 				</div>
-				<table>
-					<tr class="template">
-						<td><a class="name">character name</a></td>
-						<td><input type="button" value="disown" class="disown"/></td>
-					</tr>
-				</table>
+				<div id="characterList">
+					<div class="template">
+						<span class="characterListRow ellipsis"><a class="name">character name</a></span>
+						<input class="disownCharacter" type="button" value="disown"/>
+					</div>
+				</div>
 			</div>
 			<div class="content" data-tab="character info">
 				<form>

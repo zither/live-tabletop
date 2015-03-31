@@ -117,7 +117,7 @@ LT.Panel.loadCookie = function () {
 }
 
 // If a panel is being moved or resized, update it's dimensions.
-LT.dragHandlers.push(function () {
+$(document).mousemove(function () {
 	if (LT.Panel.selected) LT.Panel.selected.move();
 	if (LT.Panel.selectedBL) LT.Panel.selectedBL.resizeBL();
 	if (LT.Panel.selectedBR) LT.Panel.selectedBR.resizeBR();
@@ -126,7 +126,7 @@ LT.dragHandlers.push(function () {
 });
 
 // Stop moving or resizing panels.
-LT.dropHandlers.push(function () {
+$(document).mouseup(function () {
 	LT.Panel.selected = null;
 	LT.Panel.selectedTR = null;
 	LT.Panel.selectedTL = null;
