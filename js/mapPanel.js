@@ -426,6 +426,10 @@ LT.refreshMap = function () {
 	} // if (LT.currentUser && LT.currentMap) { // stop updating if no map is loaded
 }
 
+// cursor appears when you press ctrl or move the mouse while holding it
+$(document).on("mousemove keydown", function (e) {
+	if (e.ctrlKey) LT.cursorRequested = true;
+});
 
 // update cursor when mouse has moved
 LT.cursorMove = function () {
@@ -511,6 +515,7 @@ LT.centerMap = function () {
 	});
 };
 
+/*
 $(document).mousemove(function () {
 	if (!LT.currentMap) return;
 	var output = [LT.screenToMap(LT.dragX, LT.dragY)];

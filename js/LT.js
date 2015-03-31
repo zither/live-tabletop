@@ -240,28 +240,27 @@ LT.dragX = 0; // current horizontal mouse position
 LT.dragY = 0; // current vertical mouse position
 LT.clickX = 0; // relative horizontal position of mouse when the button was pressed
 LT.clickY = 0; // relative vertical position of mouse when the button was pressed
-LT.dragHandlers = [];
-LT.dropHandlers = [];
-
-document.onselectstart = function () {return false;}
-
-// Stop dragging when the mouse button is released.
-document.onmouseup = function (e) {
-	if (!e) var e = window.event;
-	LT.holdTimestamps = 0;
-	for (var i = 0; i < LT.dropHandlers.length; i++)
-		LT.dropHandlers[i](e);
-	LT.clickDragGap = 0;
-}
-
-document.onmousedown = function () {
-	LT.holdTimestamps = 1;
-}
-
+//LT.dragHandlers = [];
+//LT.dropHandlers = [];
 LT.DELAY = 1000;
 
+// TODO: this doesn't seem to prevent tile image selection
+$(document).on("selectstart", function (e) {return false;});
+
+// TODO: not sure if this is helping at all
+$(document).on("dragstart", function (e) {e.preventDefault(); return false;});
+
+$(document).mousedown(function () {LT.holdTimestamps = 1;});
+
+// Stop dragging when the mouse button is released.
+$(document).mouseup(function (e) {
+	if (!e) var e = window.event;
+	LT.holdTimestamps = 0;
+	LT.clickDragGap = 0;
+});
+
 // Move or resize a panel when the mouse is dragged.
-document.onmousemove = function (e) {
+$(document).mousemove(function (e) {
 	if (!e) var e = window.event;
 	// grab the X and Y position of the mouse cursor
 	if (document.all) { // IE browser
@@ -271,11 +270,8 @@ document.onmousemove = function (e) {
 		LT.dragX = e.pageX;
 		LT.dragY = e.pageY;
 	}
-
-	for (var i = 0; i < LT.dragHandlers.length; i++)
-		LT.dragHandlers[i](e);
+	// prevents the dragging of images
 	e.preventDefault();
 	return false;
-};
-
+});
 
