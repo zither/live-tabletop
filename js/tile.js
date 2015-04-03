@@ -1,6 +1,6 @@
 LT.tiles = {};
 
-// read tile images from images.json after it is loaded in mapPanel.js
+// read tile images from images.json after it is loaded in LT.js
 LT.readTileImages = function (tileImageData) {
 	$.each(tileImageData, function (name, group) {
 		$.each(group, function (i, image) {

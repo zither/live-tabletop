@@ -329,26 +329,34 @@
 			{"id":409,"view":"top","size":[1300,970],"center":[650,485],"base":[1,1],"file":"story/landscape-plain.jpg"}
 		]
 	},
-	"portraits":[
+	"portraits":{
+		"human":[
 			{"id":121,"file":"portrait/bandit.png"},
 			{"id":122,"file":"portrait/duelist.png"},
-			{"id":123,"file":"portrait/fighter.png"},
-			{"id":124,"file":"portrait/fighter-2.png"},
 			{"id":125,"file":"portrait/footpad+female.png"},
-			{"id":126,"file":"portrait/impaler.png"},
-			{"id":127,"file":"portrait/inferno.png"},
 			{"id":128,"file":"portrait/iron-mauler.png"},
 			{"id":129,"file":"portrait/mage-red.png"},
 			{"id":130,"file":"portrait/mage-red+female.png"},
 			{"id":131,"file":"portrait/necromancer.png"},
 			{"id":132,"file":"portrait/necromancer+female.png"},
+			{"id":136,"file":"portrait/thief.png"},
+			{"id":137,"file":"portrait/thief+female.png"}
+		],
+		"dwarf":[
+			{"id":124,"file":"portrait/fighter-2.png"}
+		],
+		"elf":[
+			{"id":123,"file":"portrait/fighter.png"}
+		],
+		"monster":[
+			{"id":126,"file":"portrait/impaler.png"},
+			{"id":127,"file":"portrait/inferno.png"},
 			{"id":133,"file":"portrait/shadow.png"},
 			{"id":134,"file":"portrait/skeleton.png"},
 			{"id":135,"file":"portrait/skirmisher.png"},
-			{"id":136,"file":"portrait/thief.png"},
-			{"id":137,"file":"portrait/thief+female.png"},
 			{"id":138,"file":"portrait/troll.png"}
-	],
+		]
+	},
 	"tiles":{
 		"pit":[
 			{"id":44,"size":[144,144],"center":[72,72],"hex":[54,72],"square":[51,59],"file":"void/void.png","layer":1},

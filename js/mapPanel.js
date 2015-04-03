@@ -205,12 +205,6 @@ $(function () { // This anonymous function runs after the page loads.
 		$("#snap, #snap2").prop("checked", this.checked);
 	});
 
-	// load images
-	$.get("images/images.json", function (data) {
-		LT.readTileImages(data.tiles);
-		LT.readPieceImages(data.pieces);
-	}); // $.get("images/images.json", function (data) {
-
 	// map rotate, tilt and zoom controls
 	$("#zoomOut").click(function () {
 		if (Math.log(LT.zoom) / Math.log(2) % 1) LT.zoom /= 4 / 3;

@@ -149,6 +149,13 @@ $(function () { // This anonymous function runs after the page loads.
 		return false;
 	});
 
+	// load images
+	$.get("images/images.json", function (data) {
+		LT.readTileImages(data.tiles);
+		LT.readPieceImages(data.pieces);
+		LT.readPortraitImages(data.portraits);
+	});
+
 }); // $(function () { // This anonymous function runs after the page loads.
 
 

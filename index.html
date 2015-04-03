@@ -708,36 +708,49 @@
 				</div>
 			</div>
 			<div class="content" data-tab="character info">
-				<form>
-					<div>Name: <input name="name" type="text" placeholder="character name"/></div>
-					<div>System: <select><option value="-1">no system</option></select></div>
-					<div>
-						Owners:
+				<div>
+					<input id="characterName" name="name" type="text" placeholder="character name"/>
+					<input id="renameCharacter" type="button" value="rename"/>
+				</div>
+				<div><select id="system"><option value="-1">no system</option></select></div>
+				<div>
+					Owners:
+					<span id="characterOwners">
 						<a>Player 1</a> <input type="button" value="remove"/>,
 						<a>Player 2</a> <input type="button" value="remove"/>
-						<select name="character_id"><option>Player 3</option></select><input type="button" value="add owner"/>
-					</div>
-					<div>
-						Pieces:
+					</span>
+					<select id="newCharacterOwner"><option>Player 3</option></select><input id="shareCharacter" type="button" value="add owner"/>
+				</div>
+				<div>
+					Pieces:
+					<span id="characterPieces">
 						<a><img class="inlineImage" src="images/piece/rogue.png"/> rogue</a> at (1,3),
 						<a><img class="inlineImage" src="images/piece/priest.png"/> priest</a> at (7,4)
-					</div>
-					<input name="image_id" type="hidden" value=""/>
-				</form>
-				<div id="portrait">TODO: character portrait</div>
-				<div id="selectPortrait">TODO: character portrait selection</div>
+					</span>
+				</div>
+				<div id="portrait"></div>
+				<div>
+					<input id="changePortraitURL" type="button" value="external portrait URL"/>
+					<span id="portraitURL" class="ellipsis"></span>
+				</div>
+				<div id="selectPortrait"></div>
 			</div>
 			<div class="content" data-tab="character stats">
-				<div><input type="text" class="statName" value="NumberStat"/> <input type="text" class="statValue" value="18"/> <input type="button" class="statRemove" value="remove"/></div>
-				<div><input type="text" class="statName" value="CodeStat"/> <input type="text" class="statValue" value="[&quot;apple&quot;, &quot;orange&quot;]"/> <input type="button" class="statRemove" value="remove"/></div>
+				<div id="stats">
+					<div class="template">
+						<input type="text" class="name" value=""/>
+						<input type="text" class="value" value=""/>
+						<input type="button" value="remove"/>
+					</div>
+				</div>
 				<div>
-					<input type="button" value="add stat"/>
-					<input type="button" value="apply changes" id="submitStats"/>
+					<input id="addStat" type="button" value="add stat"/>
+					<input id="saveStats" type="button" value="save changes"/>
 				</div>
 			</div>
 			<div class="content" data-tab="character notes">
-				<textarea name="notes"></textarea>
-				<input type="button" value="apply changes"/>
+				<textarea id="characterNotes" name="notes"></textarea>
+				<input id="saveNotes" type="button" value="save changes"/>
 			</div>
 			<div class="content" data-tab="character turns">
 				<table id="turns">
