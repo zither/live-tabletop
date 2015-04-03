@@ -118,7 +118,7 @@ $(function () { // This anonymous function runs after the page loads.
 
 }); // $(function () { // This anonymous function runs after the page loads.
 
-// read piece images from images.json after it is loaded in mapPanel.js
+// read piece images from images.json after it is loaded in LT.js
 LT.readPieceImages = function (pieceImageData) {
 	$.each(pieceImageData, function (name, group) {
 		$.each(group, function (i, image) {

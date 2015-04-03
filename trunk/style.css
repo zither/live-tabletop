@@ -432,6 +432,15 @@ img.swatch {
 	top: 0.5em;
 }
 
+#portrait {
+	width: 100px;
+	height: 100px;
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+
+
 /* MAP */
 
 #map {
