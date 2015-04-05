@@ -690,6 +690,7 @@
 			<div class="tabBar">
 				<div class="tab active" data-tab="character list">List</div>
 				<div class="tab" data-tab="character info">Info</div>
+				<div class="tab" data-tab="character users">Users</div>
 				<div class="tab" data-tab="character stats">Stats</div>
 				<div class="tab" data-tab="character notes">Notes</div>
 				<div class="tab" data-tab="character turns">Turns</div>
@@ -709,38 +710,42 @@
 			</div>
 			<div class="content" data-tab="character info">
 				<div>
-					<input id="characterName" name="name" type="text" placeholder="character name"/>
+					<span id="characterName" class="ellipsis"></span>
 					<input id="renameCharacter" type="button" value="rename"/>
+					<select id="system"><option value="-1">no system</option></select>
 				</div>
-				<div><select id="system"><option value="-1">no system</option></select></div>
-				<div>
-					Owners:
-					<span id="characterOwners">
-						<a>Player 1</a> <input type="button" value="remove"/>,
-						<a>Player 2</a> <input type="button" value="remove"/>
-					</span>
-					<select id="newCharacterOwner"><option>Player 3</option></select><input id="shareCharacter" type="button" value="add owner"/>
-				</div>
-				<div>
-					Pieces:
-					<span id="characterPieces">
-						<a><img class="inlineImage" src="images/piece/rogue.png"/> rogue</a> at (1,3),
-						<a><img class="inlineImage" src="images/piece/priest.png"/> priest</a> at (7,4)
-					</span>
-				</div>
-				<div id="portrait"></div>
+				<table>
+					<tr>
+						<td id="portrait"></td>
+						<td id="characterPieces">
+							<div><a><img class="inlineImage" src="images/piece/rogue.png"/> rogue</a> at (1,3)</div>
+							<div><a><img class="inlineImage" src="images/piece/priest.png"/> priest</a> at (7,4)</div>
+						</td>
+					</tr>
+				</table>
 				<div>
 					<input id="changePortraitURL" type="button" value="external portrait URL"/>
 					<span id="portraitURL" class="ellipsis"></span>
 				</div>
 				<div id="selectPortrait"></div>
 			</div>
+			<div class="content" data-tab="character users">
+				<div>
+					<select id="newCharacterUser"><option>Player 3</option></select>
+					<input id="shareCharacter" type="button" value="add owner"/>
+				</div>
+				<div id="characterUsers">
+					<div><span class="ellipsis"><a>Player 1</a> </span><input type="button" value="remove"/></div>
+					<div><span class="ellipsis"><a>Player 2</a> </span><input type="button" value="remove"/></div>
+				</div>
+			</div>
 			<div class="content" data-tab="character stats">
+				<div>Changes are not saved or shared with other users until you click save changes below.</div>
 				<div id="stats">
 					<div class="template">
 						<input type="text" class="name" value=""/>
 						<input type="text" class="value" value=""/>
-						<input type="button" value="remove"/>
+						<input type="button" class="remove" value="remove"/>
 					</div>
 				</div>
 				<div>
@@ -749,6 +754,7 @@
 				</div>
 			</div>
 			<div class="content" data-tab="character notes">
+				<div>Changes are not saved or shared with other users until you click save changes below.</div>
 				<textarea id="characterNotes" name="notes"></textarea>
 				<input id="saveNotes" type="button" value="save changes"/>
 			</div>
@@ -763,13 +769,13 @@
 					</tr>
 				</table>
 				<div>
-					<td><input type="button" value="rotate forward"/></td>
-					<td><input type="button" value="rotate backward"/></td>
+					<td><input id="nextTurn" type="button" value="rotate forward"/></td>
+					<td><input id="previousTurn" type="button" value="rotate backward"/></td>
 				</div>
 				<div>
-					<select><option value="-1">no character</option></select>
-					<input type="text" value="description" placeholder="description"/>
-					<input type="button" value="add turn"/>
+					<select><option id="turnCharacter" value="-1">no character</option></select>
+					<input id="turnDescription" type="text" placeholder="description"/>
+					<input id="addTurn" type="button" value="add turn"/>
 				</div>
 			</div>
 			<div class="resizeBL"></div>

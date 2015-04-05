@@ -249,7 +249,7 @@ LT.clickX = 0; // relative horizontal position of mouse when the button was pres
 LT.clickY = 0; // relative vertical position of mouse when the button was pressed
 //LT.dragHandlers = [];
 //LT.dropHandlers = [];
-LT.DELAY = 1000;
+LT.DELAY = 10000;
 
 // TODO: this doesn't seem to prevent tile image selection
 $(document).on("selectstart", function (e) {return false;});

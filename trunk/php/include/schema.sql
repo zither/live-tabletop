@@ -1120,16 +1120,12 @@ END;
 
 /* User creates a new character */
 /* TODO: do we actually need to initialize all these fields? */
-CREATE PROCEDURE create_character (IN the_user INT, IN the_name TEXT,
-	IN the_system TEXT, IN the_stats TEXT, IN the_notes TEXT,
-	IN the_portrait TEXT, IN the_piece TEXT, IN the_color TEXT)
+CREATE PROCEDURE create_character (IN the_user INT, IN the_name TEXT, IN the_system TEXT)
 BEGIN
 	START TRANSACTION;
 /* create the character */
-	INSERT INTO characters
-		(`name`, `system`, `stats`, `notes`, `portrait`, `piece`, `color`)
-		VALUES (the_name, the_system, the_stats, the_notes, the_portrait,
-		the_piece, the_color);
+	INSERT INTO characters (`name`, `system`, `stats`, `color`)
+		VALUES (the_name, the_system, '[]', 'gray');
 	SET @id = LAST_INSERT_ID();
 /* make this user the character's owner */
 	INSERT INTO character_owners (`user`, `character`)
