@@ -285,10 +285,10 @@ LT.refreshCampaign = function () {
 							copy.find(".time").text("[" + LT.formatTime(message.time) + "]");
 							copy.find(".user").text(" " + name + ": ");
 							copy.find(".text").html(message.text);
-							copy.insertBefore("#chatBottom");
+							copy.appendTo("#chatOutput");
 							LT.currentCampaign.last_message = message.id;
 						});
-						$("#chatBottom")[0].scrollIntoView(true);
+						$("#campaignPanel .content[data-tab=chat]").scrollTop($("#chatOutput").height());
 					});
 				}
 
