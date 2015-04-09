@@ -55,7 +55,6 @@ $(function () { // This anonymous function runs after the page loads.
 		}, LT.refreshCharacterList);
 	});
 
-	// FIXME: temporary stats deleted when the character refreshes 
 	// character stats tab
 	$("#addStat").click(function () {
 		LT.currentCharacter.stats.push({"name": "", "value": ""});
@@ -64,14 +63,24 @@ $(function () { // This anonymous function runs after the page loads.
 	$("#saveStats").click(function () {
 		// TODO: should we store the stats in a buffer
 		// so they aren't saved when you change other character properties?
+		// or should we 
 		LT.saveCharacterSettings();
 	});
 
-	// FIXME: deleted when the character refreshes
 	// character notes tab
-	$("#saveNotes").click(function () {
+	$("#characterNotes").change(function () {
+		// save notes when the text area loses focus
 		LT.currentCharacter.notes = $("#characterNotes").val();
 		LT.saveCharacterSettings();
+	}).keyup(function() {
+		// save notes if text was changed but not merely truncated or appended
+		// this will not save the notes on cut and paste events
+		var after = $("#characterNotes").val();
+		var before = LT.currrentCharacter.notes;
+		if (before.indexOf(after) == -1 && after.indexOf(before) == -1) {
+			LT.currentCharacter.notes = after;
+			LT.saveCharacterSettings();
+		}
 	});
 
 	// character turns tab
@@ -185,11 +194,12 @@ LT.showCharacterInfo = function (character) {
 
 	// TODO: character users tab
 
-	// character stats tab
-	LT.showStats();
+	// update character stats tab only if the stats are not being edited
+	if (LT.characterPanel.getTab() != "character stats")
+		LT.showStats();
 
-	// character notes tab
-	$("#characterNotes").val(character.notes);
+	// update character notes if the textarea is not being edited
+	$("#characterNotes:not(:focus)").val(character.notes);
 
 }; // LT.showCharacterInfo = function (character) {
 
