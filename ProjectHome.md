@@ -1,0 +1,3 @@
+Live Tabletop is a virtual tabletop for RPGs and board games, which displays game boards, maps and peices. It also has built-in chat, dice-rolling, "fog of war" visibility control and tile-based map editing.
+
+Running a Live Tabletop server requires a MySQL database and web server with PHP. (Live Tabletop can be run on XAMPP and other Apache/MySQL/PHP stacks.) Users can connect with any recent web browser.
